@@ -73,6 +73,9 @@ namespace xx {
 
 			sf::ContextSettings contextSettings;
 			contextSettings.depthBits = 24;
+			contextSettings.majorVersion = 4;
+			contextSettings.minorVersion = 1;
+			contextSettings.attributeFlags = sf::ContextSettings::Core;
 
 			sf::Window window(sf::VideoMode((uint32_t)this->windowSize.x, (uint32_t)this->windowSize.y)
 				, sf::String((sf::Uint32*)this->title.data()), sf::Style::Default, contextSettings);
@@ -95,7 +98,9 @@ namespace xx {
 				this->baseTask = ((Derived*)this)->Task();							// step 5
 			}
 
+#ifdef WIN32
 			contextSettings.onDraw = [this] { this->GLLoop(); };
+#endif
 			while (window.isOpen()) {
 				sf::Event event;
 				while (window.pollEvent(event)) {

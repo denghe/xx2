@@ -2,6 +2,7 @@ build
 .idea
 cmake-build-*
 .vs
+.DS_Store
 build2
 *.exe
 *.plist

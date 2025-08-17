@@ -55,8 +55,8 @@ target_link_libraries(${name} libzstd_static)
 add_subdirectory(../../SFML SFML)
 target_link_libraries(${name} sfml-window)
 
-add_subdirectory(../../soloud soloud)
-target_link_libraries(${name} soloud)
+#add_subdirectory(../../soloud soloud)
+#target_link_libraries(${name} soloud)
 
 if (WIN32)
 	target_link_libraries(${name} winmm)
