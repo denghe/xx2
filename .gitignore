@@ -1,0 +1,7 @@
+build
+.idea
+cmake-build-*
+.vs
+build2
+*.exe
+*.plist

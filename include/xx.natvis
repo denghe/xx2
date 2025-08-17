@@ -1,0 +1,91 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+
+	<Type Name="xx::Span">
+		<DisplayString>len = {len}</DisplayString>
+		<Expand>
+			<ArrayItems>
+				<Size>len</Size>
+				<ValuePointer>buf</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
+
+	<Type Name="xx::Data_r">
+		<DisplayString>len = {len}, offset = {offset}</DisplayString>
+		<Expand>
+			<ArrayItems>
+				<Size>len</Size>
+				<ValuePointer>buf</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
+
+	<Type Name="xx::Data_rw&lt;*&gt;">
+		<DisplayString>len = {len}, cap = {cap}, offset = {offset}</DisplayString>
+		<Expand>
+			<ArrayItems>
+				<Size>len</Size>
+				<ValuePointer>buf</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
+
+	<Type Name="xx::FX64">
+		<DisplayString>{(double)value * (1.0 / 4294967296.0)}</DisplayString>
+		<Expand HideRawView="true">
+			<Item Name="[data]">value</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="xx::Shared_&lt;*,*&gt;">
+		<SmartPointer Usage="Minimal">pointer</SmartPointer>
+		<DisplayString Condition="pointer == 0">null</DisplayString>
+		<DisplayString Condition="pointer != 0">{pointer}</DisplayString>
+		<Expand HideRawView="true">
+			<Item Condition="pointer != 0" Name="[sharedCount]">((HeaderType*)((char*)pointer - ((::size_t)&amp;(char&amp;)((((HeaderType*)0)->data)))))->sharedCount</Item>
+			<Item Condition="pointer != 0" Name="[weakCount]">((HeaderType*)((char*)pointer - ((::size_t)&amp;(char&amp;)((((HeaderType*)0)->data)))))->weakCount</Item>
+			<Item Condition="pointer != 0" Name="[data]">pointer</Item>
+		</Expand>
+	</Type>
+	
+	<Type Name="xx::Weak&lt;*&gt;">
+		<SmartPointer Usage="Minimal">&amp;h->data</SmartPointer>
+		<DisplayString Condition="h == 0 || (*h).sharedCount == 0">null</DisplayString>
+		<DisplayString Condition="h != 0 &amp;&amp; (*h).sharedCount != 0">{h->data}</DisplayString>
+		<Expand HideRawView="true">
+			<Item Condition="h != 0" Name="[sharedCount]">h->sharedCount</Item>
+			<Item Condition="h != 0" Name="[weakCount]">h->weakCount</Item>
+			<Item Condition="h != 0 &amp;&amp; (*h).sharedCount != 0" Name="[data]">h->data</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="xx::List&lt;*&gt;">
+		<DisplayString Condition="cap == 0">nil</DisplayString>
+		<DisplayString Condition="cap &gt; 0 &amp;&amp; len == 0">empty</DisplayString>
+		<DisplayString Condition="cap &gt; 0 &amp;&amp; len &gt; 0">len = {len}</DisplayString>
+		<Expand>
+			<Item Name="[len]" ExcludeView="simple">len</Item>
+			<Item Name="[cap]" ExcludeView="simple">cap</Item>
+			<ArrayItems>
+				<Size>len</Size>
+				<ValuePointer>buf</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
+
+	<Type Name="xx::TinyList&lt;*&gt;">
+		<DisplayString Condition="core == nullptr">nil</DisplayString>
+		<DisplayString Condition="core != nullptr &amp;&amp; core-&gt;cap &gt; 0 &amp;&amp; core-&gt;len == 0">empty</DisplayString>
+		<DisplayString Condition="core != nullptr &amp;&amp; core-&gt;cap &gt; 0 &amp;&amp; core-&gt;len &gt; 0">len = {core-&gt;len}</DisplayString>
+		<Expand>
+			<Item Name="[len]" ExcludeView="simple">core-&gt;len</Item>
+			<Item Name="[cap]" ExcludeView="simple">core-&gt;cap</Item>
+			<ArrayItems>
+				<Size>core-&gt;len</Size>
+				<ValuePointer>core-&gt;buf</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
+
+</AutoVisualizer>
