@@ -13,14 +13,7 @@ void Game::Init() {
 xx::Task<> Game::Task() {
 	auto tex = LoadTexture("res/1.png");
 	while (true) {
-		auto q = ShaderBegin(shaderQuadInstance).Draw(tex, 1);
-		q->pos = {};
-		q->anchor = 0.5f;
-		q->scale = 10;
-		q->radians = 0;
-		q->colorplus = 1.f;
-		q->color = xx::RGBA8_White;
-		q->texRect = tex->FullRect();
+		ShaderBegin(shaderQuadInstance).Draw(tex, {}, {}, 0.5f, 10.f);
 		co_yield 0;
 	}
 }

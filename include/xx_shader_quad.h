@@ -165,12 +165,21 @@ void main() {
             return Draw(tex->GetValue(), numQuads);
         }
 
-        void Draw(GLuint texId, QuadInstanceData const& qv) {
-            memcpy(Draw(texId, 1), &qv, sizeof(QuadInstanceData));
-        }
-
-        void Draw(Ref<GLTexture> const& tex, QuadInstanceData const& qv) {
-			Draw(tex->GetValue(), qv);
+        XX_INLINE Shader_QuadInstance& Draw(Ref<GLTexture> const& tex, UVRect rect = {}, XY pos = {}, XY anchor = 0.5f, XY scale = 1.f, float radians = 0.f, float colorplus = 1.f, xx::RGBA8 color = xx::RGBA8_White) {
+            auto q = Draw(tex->GetValue(), 1);
+            q->pos = pos;
+            q->anchor = anchor;
+            q->scale = scale;
+            q->radians = radians;
+            q->colorplus = colorplus;
+            q->color = color;
+            if (rect.w) {
+                q->texRect = rect;
+            }
+            else {
+                q->texRect = tex->FullRect();
+            }
+            return *this;
         }
 
     };
