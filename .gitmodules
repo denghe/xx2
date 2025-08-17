@@ -1,3 +1,6 @@
 [submodule "SFML"]
 	path = SFML
 	url = https://github.com/denghe/SFML
+[submodule "zstd"]
+	path = zstd
+	url = https://github.com/facebook/zstd.git
