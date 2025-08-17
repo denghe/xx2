@@ -15,6 +15,7 @@ namespace xx {
 	// static constexpr float fps{ 120 }, frameDelay{ 1.f / fps }, maxFrameDelay{ 0.1f };
 	template<typename Derived, typename BaseType = GameBaseWithShader>
 	struct Game : BaseType {
+		sf::Window* wnd{};
 
 		void GLInit() {
 			this->ShaderInit();

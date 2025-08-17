@@ -34,7 +34,6 @@ namespace xx {
 		float flipY{ 1 };   // -1: flip  for ogl frame buffer
 		bool running{ true };
 		Shader* shader{};
-		sf::Window* wnd{};
 		std::string rootPath;
 		std::vector<std::string> searchPaths;
 		std::filesystem::path tmpPath;
