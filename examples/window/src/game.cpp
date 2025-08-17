@@ -7,13 +7,20 @@ int32_t main() {
 }
 
 void Game::Init() {
-	this->title = U"examples_window";
+	title = U"examples_window";
+	windowSize = { 350, 260 };
 }
 
 xx::Task<> Game::Task() {
 	auto tex = LoadTexture("res/1.png");
 	while (true) {
-		ShaderBegin(shaderQuadInstance).Draw(tex, {}, {}, 0.5f, 10.f);
-		co_yield 0;
+		for (float scale = 10.f; scale > 5.f; scale -= delta * 10.f) {
+			Quad().Draw(tex, {}, {}, 0.5f, scale);
+			co_yield 0;
+		}
+		for (float scale = 5.f; scale < 10.f; scale += delta * 10.f) {
+			Quad().Draw(tex, {}, {}, 0.5f, scale);
+			co_yield 0;
+		}
 	}
 }

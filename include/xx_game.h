@@ -5,9 +5,17 @@
 namespace xx {
 
 	struct GameBaseWithShader : GameBase {
-		Shader_QuadInstance shaderQuadInstance;
+
+		Shader_Quad shaderQuad;
+		XX_INLINE Shader_Quad& Quad() {
+			return ShaderBegin(shaderQuad);
+		}
+
+		// ... more
+
 		XX_INLINE void ShaderInit() {
-			shaderQuadInstance.Init();
+			shaderQuad.Init();
+			// ...
 		}
 	};
 

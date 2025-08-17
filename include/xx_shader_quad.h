@@ -3,14 +3,14 @@
 
 namespace xx {
 
-    struct QuadInstanceData {
+    struct Shader_QuadData {
         XY pos{}, anchor{ 0.5, 0.5 };                           // float * 4
         XY scale{ 1, 1 }; float radians{}, colorplus{ 1 };      // float * 4
         RGBA8 color{ 255, 255, 255, 255 };                      // u8n * 4
         UVRect texRect{};                                       // u16 * 4
     };
 
-    struct Shader_QuadInstance : Shader {
+    struct Shader_Quad : Shader {
         using Shader::Shader;
         GLint uTex0{ -1 }, aVert{ -1 }, aPosAnchor{ -1 }, aScaleRadiansColorplus{ -1 }, aColor{ -1 }, aTexRect{ -1 };
         GLVertexArrays va;
@@ -18,7 +18,7 @@ namespace xx {
 
         static constexpr int32_t maxQuadNums{ 200000 };
         GLuint lastTextureId{};
-        std::unique_ptr<QuadInstanceData[]> quadInstanceDatas = std::make_unique_for_overwrite<QuadInstanceData[]>(maxQuadNums);
+        std::unique_ptr<Shader_QuadData[]> data = std::make_unique_for_overwrite<Shader_QuadData[]>(maxQuadNums);
         int32_t quadCount{};
 
         void Init() {
@@ -98,19 +98,19 @@ void main() {
 
             glBindBuffer(GL_ARRAY_BUFFER, vb);
 
-            glVertexAttribPointer(aPosAnchor, 4, GL_FLOAT, GL_FALSE, sizeof(QuadInstanceData), (GLvoid*)offsetof(QuadInstanceData, pos));
+            glVertexAttribPointer(aPosAnchor, 4, GL_FLOAT, GL_FALSE, sizeof(Shader_QuadData), (GLvoid*)offsetof(Shader_QuadData, pos));
             glVertexAttribDivisor(aPosAnchor, 1);
             glEnableVertexAttribArray(aPosAnchor);
 
-            glVertexAttribPointer(aScaleRadiansColorplus, 4, GL_FLOAT, GL_FALSE, sizeof(QuadInstanceData), (GLvoid*)offsetof(QuadInstanceData, scale));
+            glVertexAttribPointer(aScaleRadiansColorplus, 4, GL_FLOAT, GL_FALSE, sizeof(Shader_QuadData), (GLvoid*)offsetof(Shader_QuadData, scale));
             glVertexAttribDivisor(aScaleRadiansColorplus, 1);
             glEnableVertexAttribArray(aScaleRadiansColorplus);
 
-            glVertexAttribPointer(aColor, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(QuadInstanceData), (GLvoid*)offsetof(QuadInstanceData, color));
+            glVertexAttribPointer(aColor, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(Shader_QuadData), (GLvoid*)offsetof(Shader_QuadData, color));
             glVertexAttribDivisor(aColor, 1);
             glEnableVertexAttribArray(aColor);
 
-            glVertexAttribPointer(aTexRect, 4, GL_UNSIGNED_SHORT, GL_FALSE, sizeof(QuadInstanceData), (GLvoid*)offsetof(QuadInstanceData, texRect));
+            glVertexAttribPointer(aTexRect, 4, GL_UNSIGNED_SHORT, GL_FALSE, sizeof(Shader_QuadData), (GLvoid*)offsetof(Shader_QuadData, texRect));
             glVertexAttribDivisor(aTexRect, 1);
             glEnableVertexAttribArray(aTexRect);
 
@@ -136,7 +136,7 @@ void main() {
 
         void Commit() {
             glBindBuffer(GL_ARRAY_BUFFER, vb);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(QuadInstanceData) * quadCount, quadInstanceDatas.get(), GL_STREAM_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, sizeof(Shader_QuadData) * quadCount, data.get(), GL_STREAM_DRAW);
 
             glBindTexture(GL_TEXTURE_2D, lastTextureId);
             glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, quadCount);
@@ -149,23 +149,23 @@ void main() {
             quadCount = 0;
         }
 
-        QuadInstanceData* Draw(GLuint texId, int32_t numQuads) {
+        Shader_QuadData* Draw(GLuint texId, int32_t numQuads) {
             assert(GameBase::instance->shader == this);
             assert(numQuads <= maxQuadNums);
             if (quadCount + numQuads > maxQuadNums || (lastTextureId && lastTextureId != texId)) {
                 Commit();
             }
             lastTextureId = texId;
-            auto r = &quadInstanceDatas[quadCount];
+            auto r = &data[quadCount];
             quadCount += numQuads;
             return r;
         }
 
-        QuadInstanceData* Draw(Ref<GLTexture> const& tex, int32_t numQuads) {
+        Shader_QuadData* Draw(Ref<GLTexture> const& tex, int32_t numQuads) {
             return Draw(tex->GetValue(), numQuads);
         }
 
-        XX_INLINE Shader_QuadInstance& Draw(Ref<GLTexture> const& tex, UVRect rect = {}, XY pos = {}, XY anchor = 0.5f, XY scale = 1.f, float radians = 0.f, float colorplus = 1.f, xx::RGBA8 color = xx::RGBA8_White) {
+        XX_INLINE Shader_Quad& Draw(Ref<GLTexture> const& tex, UVRect rect = {}, XY pos = {}, XY anchor = 0.5f, XY scale = 1.f, float radians = 0.f, float colorplus = 1.f, xx::RGBA8 color = xx::RGBA8_White) {
             auto q = Draw(tex->GetValue(), 1);
             q->pos = pos;
             q->anchor = anchor;
