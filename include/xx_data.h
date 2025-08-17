@@ -1134,31 +1134,6 @@ namespace xx {
         }
     };
 
-
-    // 适配 FromTo
-    template<typename T>
-    struct DataFuncs<T, std::enable_if_t< IsFromTo_v<T> >> {
-        template<bool needReserve = true>
-        static inline void Write(Data& d, T const& in) {
-            d.Write<needReserve>(in.from, in.to);
-        }
-        static inline int Read(Data_r& d, T& out) {
-            return d.Read(out.from, out.to);
-        }
-    };
-
-    // 适配 CurrentMax
-    template<typename T>
-    struct DataFuncs<T, std::enable_if_t< IsCurrentMax_v<T> >> {
-        template<bool needReserve = true>
-        static inline void Write(Data& d, T const& in) {
-            d.Write<needReserve>(in.current, in.max);
-        }
-        static inline int Read(Data_r& d, T& out) {
-            return d.Read(out.current, out.max);
-        }
-    };
-
     // 适配 BufLenRef( 针对类似 std::array<char, ?> buf; int len;  这种组合 )
     // example: xx::BufLenRef blr{ in.buf.data(), &in.len }; d.Read/Write( blr
     template<typename T, typename SizeType>

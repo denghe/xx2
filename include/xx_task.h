@@ -293,8 +293,8 @@ namespace xx {
     template<int timeoutSecs = 15>
     struct EventTasks {
         using Tuple = std::tuple<ptrdiff_t, void*, double, Task<>>;
-        Listi32<Task<>> tasks;
-        Listi32<Tuple> eventTasks;
+        List<Task<>> tasks;
+        List<Tuple> eventTasks;
 
         template<typename T>
         void Add(T&& t) {

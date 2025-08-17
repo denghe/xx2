@@ -50,10 +50,6 @@ namespace xx {
     template<typename T> constexpr bool IsStdQueueLike_v = IsStdQueue_v<T> || IsStdDeque_v<T>;
     // ...
 
-    template<typename T> constexpr bool IsFromTo_v = TemplateIsSame_v<std::remove_cvref_t<T>, FromTo<AnyType>>;
-    template<typename T> constexpr bool IsCurrentMax_v = TemplateIsSame_v<std::remove_cvref_t<T>, CurrentMax<AnyType>>;
-    // ...
-
     /************************************************************************************/
     // std::is_pod like, flag container can memcpy or memmove
 

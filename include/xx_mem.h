@@ -97,4 +97,11 @@ namespace xx {
         return ((U)a & (U)b) != U{};
     }
 
+    // for some search result
+    enum class ForeachResult {
+        Continue,
+        RemoveAndContinue,
+        Break,
+        RemoveAndBreak
+    };
 }

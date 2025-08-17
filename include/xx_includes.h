@@ -73,6 +73,7 @@ using namespace std::chrono_literals;
 #	include <Windows.h>
 #   include <intrin.h>     // _BitScanReverseXXXX _byteswap_XXXX
 #   include <ShlObj.h>
+#   include <mmsystem.h>	// timeBeginPeriod
 #else
 #	include <unistd.h>    // for usleep
 #   include <arpa/inet.h>  // __BYTE_ORDER __LITTLE_ENDIAN __BIG_ENDIAN

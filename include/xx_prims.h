@@ -1,4 +1,6 @@
 ﻿#pragma once
+#include "xx_string.h"
+#include "xx_data.h"
 
 namespace xx {
 
@@ -377,14 +379,54 @@ namespace xx {
 		}
     };
 	
-	// todo: StringFuncs DataFuncs
+    template<typename T> constexpr bool IsFromTo_v = TemplateIsSame_v<std::remove_cvref_t<T>, FromTo<AnyType>>;
+
+    template<typename T>
+    struct StringFuncs<T, std::enable_if_t<IsFromTo_v<T>>> {
+        static inline void Append(std::string& s, T const& in) {
+            ::xx::Append(s, '[', in.from, ", ", in.to, ']');
+        }
+    };
+
+    template<typename T>
+    struct DataFuncs<T, std::enable_if_t< IsFromTo_v<T> >> {
+        template<bool needReserve = true>
+        static inline void Write(Data& d, T const& in) {
+            d.Write<needReserve>(in.from, in.to);
+        }
+        static inline int Read(Data_r& d, T& out) {
+            return d.Read(out.from, out.to);
+        }
+    };
+
+    /*******************************************************************************************************************************************/
+    /*******************************************************************************************************************************************/
 
     template<typename T>
     struct CurrentMax {
         T current, max;
     };
 
-	// todo: StringFuncs DataFuncs
+    template<typename T> constexpr bool IsCurrentMax_v = TemplateIsSame_v<std::remove_cvref_t<T>, CurrentMax<AnyType>>;
+
+    template<typename T>
+    struct StringFuncs<T, std::enable_if_t<IsCurrentMax_v<T>>> {
+        static inline void Append(std::string& s, T const& in) {
+            ::xx::Append(s, '[', in.current, ", ", in.max, ']');
+        }
+    };
+
+    template<typename T>
+    struct DataFuncs<T, std::enable_if_t< IsCurrentMax_v<T> >> {
+        template<bool needReserve = true>
+        static inline void Write(Data& d, T const& in) {
+            d.Write<needReserve>(in.current, in.max);
+        }
+        static inline int Read(Data_r& d, T& out) {
+            return d.Read(out.current, out.max);
+        }
+    };
+
 
     /*******************************************************************************************************************************************/
     /*******************************************************************************************************************************************/

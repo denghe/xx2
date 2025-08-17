@@ -193,7 +193,7 @@ namespace xx {
             o[4] = 0b1000'0000 | (c & 0b0011'1111);
             return 4;
         }
-        xx_assert(false);   // out of char32_t handled range
+        assert(false);   // out of char32_t handled range
         return {};
     }
 
@@ -583,22 +583,6 @@ namespace xx {
             else {
                 s.push_back(']');
             }
-        }
-    };
-
-    // 适配 FromTo
-    template<typename T>
-    struct StringFuncs<T, std::enable_if_t<IsFromTo_v<T>>> {
-        static inline void Append(std::string& s, T const& in) {
-            ::xx::Append(s, '[', in.from, ", ", in.to, ']');
-        }
-    };
-
-    // 适配 CurrentMax
-    template<typename T>
-    struct StringFuncs<T, std::enable_if_t<IsCurrentMax_v<T>>> {
-        static inline void Append(std::string& s, T const& in) {
-            ::xx::Append(s, '[', in.current, ", ", in.max, ']');
         }
     };
 
