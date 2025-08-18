@@ -7,11 +7,13 @@
 
 namespace xx {
 
+	// derived member checkers
 	template<typename T> concept Has_Init = requires(T t) { { t.Init() } -> std::same_as<void>; };
 	template<typename T> concept Has_GLInit = requires(T t) { { t.GLInit() } -> std::same_as<void>; };
 	template<typename T> concept Has_Task = requires(T t) { { t.Task() } -> std::same_as<xx::Task<>>; };
 	template<typename T> concept Has_Loop = requires(T t) { { t.Loop() } -> std::same_as<void>; };
 
+	// engine base code
 	struct GameBase {
 		inline static struct GameBase* instance{};
 		GameBase(GameBase const&) = delete;
@@ -23,16 +25,16 @@ namespace xx {
 		static constexpr XY designSize{ 1920, 1080 };
 		static constexpr std::array<uint32_t, 3> blendDefault{ GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_FUNC_ADD };
 
-		std::u32string title{ U"game" };
-		XY windowSize{ designSize };
-
-		double time{}, delta{};
-		int drawVerts{}, drawCall{};
-		std::array<uint32_t, 3> blendBackup{};
+		std::u32string title{ U"game" };		// window title string
+		XY windowSize{ designSize };			// resolution
+		RGBA8 clearColor{};						// for glClearColor
 		std::array<uint32_t, 3> blend{ blendDefault };
-		RGBA8 clearColor{};
-		float flipY{ 1 };   // -1: flip  for ogl frame buffer
-		bool running{ true };
+		double time{}, delta{};					// for game logic
+		bool running{ true };					// == false: quit game
+		bool showStat{ false };					// == true: calc & print fps, dc, vc
+		float flipY{ 1 };						// -1: flip  for ogl frame buffer
+		int32_t drawVerts{}, drawCall{};		// counters
+		std::array<uint32_t, 3> blendBackup{};
 		Shader* shader{};
 		std::string rootPath;
 		std::vector<std::string> searchPaths;
@@ -143,7 +145,7 @@ namespace xx {
 		// read all data by full path
 		Data LoadFileDataWithFullPath(std::string_view fp) {
 			Data d;
-			if (int r = xx::ReadAllBytes((std::u8string_view&)fp, d)) {
+			if (int32_t r = xx::ReadAllBytes((std::u8string_view&)fp, d)) {
 				CoutN("file read error. r = ", r, ", fn = ", fp);
 				throw fp;
 			}

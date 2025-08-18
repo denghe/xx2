@@ -7,11 +7,8 @@ namespace xx {
 	struct GameBaseWithShader : GameBase {
 
 		Shader_Quad shaderQuad;
-		XX_INLINE Shader_Quad& Quad() {
-			return ShaderBegin(shaderQuad);
-		}
-
-		// ... more
+		XX_INLINE Shader_Quad& Quad() { return ShaderBegin(shaderQuad); }
+		// ...
 
 		XX_INLINE void ShaderInit() {
 			shaderQuad.Init();
@@ -24,6 +21,8 @@ namespace xx {
 	template<typename Derived, typename BaseType = GameBaseWithShader>
 	struct Game : BaseType {
 		sf::Window* wnd{};
+		float tmpDeltaPool{};
+		int32_t tmpCounter{};
 
 		void GLInit() {
 			this->ShaderInit();
@@ -31,8 +30,6 @@ namespace xx {
 #ifndef __EMSCRIPTEN__
 			glEnable(GL_PRIMITIVE_RESTART);
 			glPrimitiveRestartIndex(65535);
-			//glPointSize(5);
-			//glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
 #endif
 			glDisable(GL_CULL_FACE);
 			glDisable(GL_DEPTH_TEST);
@@ -49,15 +46,24 @@ namespace xx {
 			glBlendFunc(this->blendDefault[0], this->blendDefault[1]);
 			glBlendEquation(this->blendDefault[2]);
 
+			this->delta = NowSteadyEpochSeconds(this->time);
+			tmpDeltaPool += this->delta;
+			++tmpCounter;
+			if (tmpDeltaPool >= 1.f) {
+			if (this->showStat) {
+				CoutN("fps = ", tmpCounter, " draw call = ", this->drawCall, " draw verts = ", this->drawVerts);
+			}
+			tmpDeltaPool = 0;
+			tmpCounter = 0;
+			}
 			this->drawVerts = {};
 			this->drawCall = {};
-			this->delta = NowSteadyEpochSeconds(this->time);
 
 			if constexpr (Has_Task<Derived>) {
-				this->baseTask();													// step 6
+				this->baseTask();													// lifeCycle 6 ( loop )
 			}
 			if constexpr (Has_Loop<Derived>) {
-				((Derived*)this)->Loop();											// step 7
+				((Derived*)this)->Loop();											// lifeCycle 7 ( loop )
 			}
 
 			this->ShaderEnd();
@@ -65,10 +71,10 @@ namespace xx {
 		}
 
 		int32_t Run() {
-			this->BaseInit();														// step 1
+			this->BaseInit();														// lifeCycle 1 ( once )
 
 			if constexpr (Has_Init<Derived>) {
-				((Derived*)this)->Init();											// step 2
+				((Derived*)this)->Init();											// lifeCycle 2 ( once )
 			}
 
 			sf::ContextSettings contextSettings;
@@ -89,13 +95,13 @@ namespace xx {
 
 			gladLoadGL(reinterpret_cast<GLADloadfunc>(sf::Context::getFunction));
 
-			this->GLInit();															// step 3
+			this->GLInit();															// lifeCycle 3 ( once )
 			if constexpr (Has_GLInit<Derived>) {
-				((Derived*)this)->GLInit();											// step 4
+				((Derived*)this)->GLInit();											// lifeCycle 4 ( once )
 			}
 
 			if constexpr (Has_Task<Derived>) {
-				this->baseTask = ((Derived*)this)->Task();							// step 5
+				this->baseTask = ((Derived*)this)->Task();							// lifeCycle 5 ( once )
 			}
 
 #ifdef WIN32

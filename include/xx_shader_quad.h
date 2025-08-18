@@ -8,6 +8,17 @@ namespace xx {
         XY scale{ 1, 1 }; float radians{}, colorplus{ 1 };      // float * 4
         RGBA8 color{ 255, 255, 255, 255 };                      // u8n * 4
         UVRect texRect{};                                       // u16 * 4
+
+        XX_INLINE void Fill(UVRect rect_, XY pos_ = {}, XY anchor_ = 0.5f, XY scale_ = 1.f
+            , float radians_ = 0.f, float colorplus_ = 1.f, xx::RGBA8 color_ = xx::RGBA8_White) {
+            pos = pos_;
+            anchor = anchor_;
+            scale = scale_;
+            radians = radians_;
+            colorplus = colorplus_;
+            color = color_;
+            texRect = rect_;
+        }
     };
 
     struct Shader_Quad : Shader {
@@ -149,39 +160,26 @@ void main() {
             quadCount = 0;
         }
 
-        Shader_QuadData* Draw(GLuint texId, int32_t numQuads) {
+        XX_INLINE Shader_QuadData* Draw(GLuint texId_, int32_t numQuads_) {
             assert(GameBase::instance->shader == this);
-            assert(numQuads <= maxQuadNums);
-            if (quadCount + numQuads > maxQuadNums || (lastTextureId && lastTextureId != texId)) {
+            assert(numQuads_ <= maxQuadNums);
+            if (quadCount + numQuads_ > maxQuadNums || (lastTextureId && lastTextureId != texId_)) {
                 Commit();
             }
-            lastTextureId = texId;
+            lastTextureId = texId_;
             auto r = &data[quadCount];
-            quadCount += numQuads;
+            quadCount += numQuads_;
             return r;
         }
 
-        Shader_QuadData* Draw(Ref<GLTexture> const& tex, int32_t numQuads) {
-            return Draw(tex->GetValue(), numQuads);
+        XX_INLINE Shader_QuadData* Draw(Ref<GLTexture> const& texRef_, int32_t numQuads_) {
+            return Draw(texRef_->GetValue(), numQuads_);
         }
 
-        XX_INLINE Shader_Quad& Draw(Ref<GLTexture> const& tex, UVRect rect = {}, XY pos = {}, XY anchor = 0.5f, XY scale = 1.f, float radians = 0.f, float colorplus = 1.f, xx::RGBA8 color = xx::RGBA8_White) {
-            auto q = Draw(tex->GetValue(), 1);
-            q->pos = pos;
-            q->anchor = anchor;
-            q->scale = scale;
-            q->radians = radians;
-            q->colorplus = colorplus;
-            q->color = color;
-            if (rect.w) {
-                q->texRect = rect;
-            }
-            else {
-                q->texRect = tex->FullRect();
-            }
-            return *this;
+        XX_INLINE void Draw(Ref<GLTexture> const& texRef_, UVRect rect_ = {}, XY pos_ = {}, XY anchor_ = 0.5f
+            , XY scale_ = 1.f, float radians_ = 0.f, float colorplus_ = 1.f, xx::RGBA8 color_ = xx::RGBA8_White) {
+            Draw(texRef_->GetValue(), 1)->Fill(rect_, pos_, anchor_, scale_, radians_, colorplus_, color_);
         }
-
     };
 
 }

@@ -137,7 +137,7 @@ namespace xx {
 		auto const& Width() const { return std::get<1>(vs); }
 		auto const& Height() const { return std::get<2>(vs); }
 		auto const& FileName() const { return std::get<3>(vs); }
-		UVRect FullRect() const { return { 0,0, (uint16_t)Width(), (uint16_t)Height() }; }
+		UVRect Rect() const { return { 0,0, (uint16_t)Width(), (uint16_t)Height() }; }
 
 		template<GLuint filter = GL_NEAREST /* GL_LINEAR */, GLuint wraper = GL_CLAMP_TO_EDGE /* GL_REPEAT */>
 		static GLTexture Create(uint32_t w, uint32_t h, bool hasAlpha) {
