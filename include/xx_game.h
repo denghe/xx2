@@ -21,8 +21,6 @@ namespace xx {
 	template<typename Derived, typename BaseType = GameBaseWithShader>
 	struct Game : BaseType {
 		sf::Window* wnd{};
-		float tmpDeltaPool{};
-		int32_t tmpCounter{};
 
 		void GLInit() {
 			this->ShaderInit();
@@ -37,7 +35,7 @@ namespace xx {
 			glViewport(0, 0, (int)this->windowSize.x, (int)this->windowSize.y);
 		}
 
-		void GLLoop() {
+		void GLLoop(bool fromEvent) {
 			glClearColor(this->clearColor.r / 255.f, this->clearColor.g / 255.f
 				, this->clearColor.b / 255.f, this->clearColor.a / 255.f);
 			glClear(GL_COLOR_BUFFER_BIT);
@@ -47,34 +45,48 @@ namespace xx {
 			glBlendEquation(this->blendDefault[2]);
 
 			this->delta = NowSteadyEpochSeconds(this->time);
-			tmpDeltaPool += this->delta;
-			++tmpCounter;
-			if (tmpDeltaPool >= 1.f) {
-			if (this->showStat) {
-				CoutN("fps = ", tmpCounter, " draw call = ", this->drawCall, " draw verts = ", this->drawVerts);
-			}
-			tmpDeltaPool = 0;
-			tmpCounter = 0;
-			}
 			this->drawVerts = {};
 			this->drawCall = {};
 
 			if constexpr (Has_Task<Derived>) {
 				this->baseTask();													// lifeCycle 6 ( loop )
 			}
-			if constexpr (Has_Loop<Derived>) {
-				((Derived*)this)->Loop();											// lifeCycle 7 ( loop )
+			if constexpr (Has_Update<Derived>) {
+				((Derived*)this)->Update();											// lifeCycle 7 ( loop )
 			}
 
 			this->ShaderEnd();
+
+			this->drawFPSTimePool += this->delta;
+			++this->drawFPS;
+			if (this->drawFPSTimePool >= 1.f) {
+				if constexpr (Has_Stat<Derived>) {
+					((Derived*)this)->Stat();
+				}
+				this->drawFPSTimePool = {};
+				this->drawFPS = {};
+			}
+
 			this->wnd->display();
+
+			if (!fromEvent) {
+				if constexpr (Has_Delay<Derived>) {
+					((Derived*)this)->Delay();										// lifeCycle 8 ( loop )
+				}
+			}
+		}
+
+		XX_INLINE void StoreWindowSize() {
+			auto ws = wnd->getSize();
+			this->windowSize.x = (float)ws.x;
+			this->windowSize.y = (float)ws.y;
 		}
 
 		int32_t Run() {
-			this->BaseInit();														// lifeCycle 1 ( once )
+			this->BaseInit();														// lifeCycle 1
 
 			if constexpr (Has_Init<Derived>) {
-				((Derived*)this)->Init();											// lifeCycle 2 ( once )
+				((Derived*)this)->Init();											// lifeCycle 2
 			}
 
 			sf::ContextSettings contextSettings;
@@ -85,48 +97,62 @@ namespace xx {
 
 			sf::Window window(sf::VideoMode((uint32_t)this->windowSize.x, (uint32_t)this->windowSize.y)
 				, sf::String((sf::Uint32*)this->title.data()), sf::Style::Default, contextSettings);
+			if (!window.setActive()) return -1;
+
 			this->wnd = &window;
-
-			auto ws = window.getSize();
-			this->windowSize.x = (float)ws.x;
-			this->windowSize.y = (float)ws.y;
-
-			window.setActive();
-
+			StoreWindowSize();
 			gladLoadGL(reinterpret_cast<GLADloadfunc>(sf::Context::getFunction));
 
-			this->GLInit();															// lifeCycle 3 ( once )
+			this->GLInit();															// lifeCycle 3
 			if constexpr (Has_GLInit<Derived>) {
-				((Derived*)this)->GLInit();											// lifeCycle 4 ( once )
+				((Derived*)this)->GLInit();											// lifeCycle 4
 			}
 
 			if constexpr (Has_Task<Derived>) {
-				this->baseTask = ((Derived*)this)->Task();							// lifeCycle 5 ( once )
+				this->baseTask = ((Derived*)this)->Task();							// lifeCycle 5
 			}
 
 #ifdef WIN32
-			contextSettings.onDraw = [this] { this->GLLoop(); };
+			// to solve the stuck when dragging/resizing windows
+			contextSettings.onDraw = [this] { this->GLLoop(true); };
 #endif
 			while (window.isOpen()) {
 				sf::Event event;
 				while (window.pollEvent(event)) {
-					if (event.type == sf::Event::Closed
-						|| (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)) {
+					if (event.type == sf::Event::Closed ||
+						(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)) {
 						window.close();
 						goto LabEnd;
-					}
-					if (event.type == sf::Event::Resized) {
-						auto ws = window.getSize();
-						this->windowSize.x = (float)ws.x;
-						this->windowSize.y = (float)ws.y;
+					} else if (event.type == sf::Event::Resized) {
+						StoreWindowSize();
 						glViewport(0, 0, (int)this->windowSize.x, (int)this->windowSize.y);
 						// todo: call user func
+						this->GLLoop(true);
+					}
+					else {
+						// todo: keyboard, mouse? event ?
 					}
 				}
-				this->GLLoop();
+				this->GLLoop(false);
 			}
 		LabEnd:
 			return EXIT_SUCCESS;
 		}
+
+		/****************************************************************************/
+		// utils
+
+		XX_INLINE void SetVerticalSyncEnabled(bool enabled_) {
+			wnd->setVerticalSyncEnabled(enabled_);
+		}
+
+		XX_INLINE void SetFramerateLimit(uint32_t limit_) {
+			wnd->setFramerateLimit(limit_);
+		}
+
+		XX_INLINE void Close() {
+			wnd->close();
+		}
+
 	};
 }

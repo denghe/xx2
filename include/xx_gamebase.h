@@ -11,7 +11,9 @@ namespace xx {
 	template<typename T> concept Has_Init = requires(T t) { { t.Init() } -> std::same_as<void>; };
 	template<typename T> concept Has_GLInit = requires(T t) { { t.GLInit() } -> std::same_as<void>; };
 	template<typename T> concept Has_Task = requires(T t) { { t.Task() } -> std::same_as<xx::Task<>>; };
-	template<typename T> concept Has_Loop = requires(T t) { { t.Loop() } -> std::same_as<void>; };
+	template<typename T> concept Has_Update = requires(T t) { { t.Update() } -> std::same_as<void>; };
+	template<typename T> concept Has_Stat = requires(T t) { { t.Stat() } -> std::same_as<void>; };
+	template<typename T> concept Has_Delay = requires(T t) { { t.Delay() } -> std::same_as<void>; };
 
 	// engine base code
 	struct GameBase {
@@ -25,15 +27,14 @@ namespace xx {
 		static constexpr XY designSize{ 1920, 1080 };
 		static constexpr std::array<uint32_t, 3> blendDefault{ GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_FUNC_ADD };
 
-		std::u32string title{ U"game" };		// window title string
-		XY windowSize{ designSize };			// resolution
-		RGBA8 clearColor{};						// for glClearColor
+		std::u32string title{ U"game" };				// window title string
+		XY windowSize{ designSize };					// resolution
+		RGBA8 clearColor{};								// for glClearColor
 		std::array<uint32_t, 3> blend{ blendDefault };
-		double time{}, delta{};					// for game logic
-		bool running{ true };					// == false: quit game
-		bool showStat{ false };					// == true: calc & print fps, dc, vc
-		float flipY{ 1 };						// -1: flip  for ogl frame buffer
-		int32_t drawVerts{}, drawCall{};		// counters
+		double time{}, delta{};							// for game logic
+		float flipY{ 1 };								// -1: flip  for ogl frame buffer
+		int32_t drawVerts{}, drawCall{}, drawFPS{};		// counters
+		float drawFPSTimePool{};						// for count drawFPS
 		std::array<uint32_t, 3> blendBackup{};
 		Shader* shader{};
 		std::string rootPath;

@@ -8,7 +8,6 @@ int32_t main() {
 
 void Game::Init() {
 	title = U"examples_scene";
-	showStat = true;
 }
 
 xx::Task<> Game::Task() {
@@ -24,4 +23,19 @@ xx::Task<> Game::Task() {
 		}
 		co_yield 0;
 	}
+}
+
+void Game::Update() {
+	// ...
+}
+
+void Game::Delay() {
+	// for power saving
+	for (auto d = cFrameDelay - (float)xx::NowSteadyEpochSeconds(time); d > 0.005; d -= 0.005) {
+		Sleep(3);
+	}
+}
+
+void Game::Stat() {
+	xx::CoutN("drawFPS = ", drawFPS, " drawCall = ", drawCall, " drawVerts = ", drawVerts);
 }
