@@ -32,9 +32,8 @@ xx::Task<> Game::Task() {
 }
 
 void Game::Delay() {
-	for (auto d = cFrameDelay - (float)xx::NowSteadyEpochSeconds(time); d > 0.005; d -= 0.005) {
-		Sleep(3);	// for power saving
-	}
+	// for power saving
+	for (auto d = cFrameDelay - (float)xx::NowSteadyEpochSeconds(time); d > 0.005; d -= 0.005) Sleep(3);
 }
 
 void Game::Stat() {
@@ -52,11 +51,20 @@ void Game::OnResize() {
 
 void Scene_1::Init() {
 	ResizeCalc();
-	auto r = gg.designSize.y / 100.f;
+
+	int ny = 80;
+	auto r = gg.designSize.y / ny;
 	auto r_2 = r * 0.5f;
-	for (int i = -50; i < 50; ++i) {
-		for (int j = -50; j < 50; ++j) {
-			monsters.Emplace().Emplace<Monster>()->Init({ i * r + r_2, j * r + r_2 }, r);
+	auto nx = int(gg.designSize.x / r);
+
+	auto x1 = -nx * 0.5f * r;
+	auto x2 = nx * 0.5f * r;
+	auto y1 = -ny * 0.5f * r;
+	auto y2 = ny * 0.5f * r;
+
+	for (auto y = y1; y < y2; y += r) {
+		for (auto x = x1; x < x2; x += r) {
+			monsters.Emplace().Emplace<Monster>()->Init({ x + r_2, y + r_2 }, r);
 		}
 	}
 	monsters.Emplace().Emplace<Monster>()->Init({ -600, 0 }, 128);
@@ -64,7 +72,7 @@ void Scene_1::Init() {
 }
 
 void Scene_1::Update() {
-	auto d = float(gg.delta * timeScale);
+	auto d = float(std::min((float)gg.delta, gg.cMaxFrameDelay) * timeScale);
 	time += d;
 	timePool += d;
 	while (timePool >= gg.cDelta) {
