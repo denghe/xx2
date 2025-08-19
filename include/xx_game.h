@@ -4,6 +4,7 @@
 
 namespace xx {
 
+	// basic shader support
 	struct GameBaseWithShader : GameBase {
 
 		Shader_Quad shaderQuad;
@@ -16,8 +17,7 @@ namespace xx {
 		}
 	};
 
-	// example: struct Game : xx::Game<Game> { void Init(); int32_t Update(); };
-	// static constexpr float fps{ 120 }, frameDelay{ 1.f / fps }, maxFrameDelay{ 0.1f };
+	// example: struct Game : xx::Game<Game> { ...
 	template<typename Derived, typename BaseType = GameBaseWithShader>
 	struct Game : BaseType {
 		sf::Window* wnd{};
@@ -82,6 +82,11 @@ namespace xx {
 			this->windowSize.y = (float)ws.y;
 		}
 
+		XX_INLINE void AssignWindowSize() {
+			this->windowSizeBackup = this->windowSize;
+			glViewport(0, 0, (GLsizei)this->windowSize.x, (GLsizei)this->windowSize.y);
+		}
+
 		int32_t Run() {
 			this->BaseInit();														// lifeCycle 1
 
@@ -100,13 +105,17 @@ namespace xx {
 			if (!window.setActive()) return -1;
 
 			this->wnd = &window;
-			StoreWindowSize();
 			gladLoadGL(reinterpret_cast<GLADloadfunc>(sf::Context::getFunction));
+
+			StoreWindowSize();
+			AssignWindowSize();
 
 			this->GLInit();															// lifeCycle 3
 			if constexpr (Has_GLInit<Derived>) {
 				((Derived*)this)->GLInit();											// lifeCycle 4
 			}
+			this->time = NowSteadyEpochSeconds();
+			this->delta = 0.00001;
 
 			if constexpr (Has_Task<Derived>) {
 				this->baseTask = ((Derived*)this)->Task();							// lifeCycle 5
@@ -125,12 +134,15 @@ namespace xx {
 						goto LabEnd;
 					} else if (event.type == sf::Event::Resized) {
 						StoreWindowSize();
-						glViewport(0, 0, (int)this->windowSize.x, (int)this->windowSize.y);
-						// todo: call user func
-						this->GLLoop(true);
 					}
 					else {
 						// todo: keyboard, mouse? event ?
+					}
+				}
+				if (this->windowSize != this->windowSizeBackup) {
+					AssignWindowSize();
+					if constexpr (Has_OnResize<Derived>) {
+						((Derived*)this)->OnResize();
 					}
 				}
 				this->GLLoop(false);

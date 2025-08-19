@@ -373,10 +373,13 @@ namespace xx {
     template<typename T>
     struct FromTo {
         T from, to;
-		XX_INLINE void Limit(T& v) const {
+		constexpr void Limit(T& v) const {
 			if (v < from) v = from;
 			else if (v > to) v = to;
 		}
+        constexpr T Sub() const {
+            return to - from;
+        }
     };
 	
     template<typename T> constexpr bool IsFromTo_v = TemplateIsSame_v<std::remove_cvref_t<T>, FromTo<AnyType>>;

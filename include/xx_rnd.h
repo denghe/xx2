@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "xx_time.h"
-#include "xx_fx64.h"
+//#include "xx_fx64.h"
 
 namespace xx {
 
@@ -134,10 +134,10 @@ namespace xx {
         V NextRadians() {
             if constexpr (std::is_floating_point_v<V>) {
                 return (V)Next<float>(-M_PI, M_PI);
-            } else if constexpr (std::is_base_of_v<FX64, V>) {
-                FX64 v;
-                v.value = Next<int32_t>((int32_t)FX64_PI_DIV_10_NEG.value, (int32_t)FX64_PI_DIV_10.value);
-                return v * FX64_10;
+            //} else if constexpr (std::is_base_of_v<FX64, V>) {
+            //    FX64 v;
+            //    v.value = Next<int32_t>((int32_t)FX64_PI_DIV_10_NEG.value, (int32_t)FX64_PI_DIV_10.value);
+            //    return v * FX64_10;
             } else {
                 static_assert((ptrdiff_t)sizeof(V) < 0, "unsupported type");
             }

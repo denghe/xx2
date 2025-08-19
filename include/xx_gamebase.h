@@ -12,8 +12,10 @@ namespace xx {
 	template<typename T> concept Has_GLInit = requires(T t) { { t.GLInit() } -> std::same_as<void>; };
 	template<typename T> concept Has_Task = requires(T t) { { t.Task() } -> std::same_as<xx::Task<>>; };
 	template<typename T> concept Has_Update = requires(T t) { { t.Update() } -> std::same_as<void>; };
-	template<typename T> concept Has_Stat = requires(T t) { { t.Stat() } -> std::same_as<void>; };
 	template<typename T> concept Has_Delay = requires(T t) { { t.Delay() } -> std::same_as<void>; };
+	template<typename T> concept Has_Stat = requires(T t) { { t.Stat() } -> std::same_as<void>; };
+	template<typename T> concept Has_OnResize = requires(T t) { { t.OnResize() } -> std::same_as<void>; };
+
 
 	// engine base code
 	struct GameBase {
@@ -29,9 +31,10 @@ namespace xx {
 
 		std::u32string title{ U"game" };				// window title string
 		XY windowSize{ designSize };					// resolution
+		XY windowSizeBackup{};
 		RGBA8 clearColor{};								// for glClearColor
 		std::array<uint32_t, 3> blend{ blendDefault };
-		double time{}, delta{};							// for game logic
+		double time{}, delta{};							// usually for ui logic
 		float flipY{ 1 };								// -1: flip  for ogl frame buffer
 		int32_t drawVerts{}, drawCall{}, drawFPS{};		// counters
 		float drawFPSTimePool{};						// for count drawFPS
