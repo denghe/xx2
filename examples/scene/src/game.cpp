@@ -51,6 +51,7 @@ void Game::OnResize() {
 
 void Scene_1::Init() {
 	ResizeCalc();
+	cam.Init(scale, 1.f);
 
 	int ny = 80;
 	auto r = gg.designSize.y / ny;
@@ -64,11 +65,11 @@ void Scene_1::Init() {
 
 	for (auto y = y1; y < y2; y += r) {
 		for (auto x = x1; x < x2; x += r) {
-			monsters.Emplace().Emplace<Monster>()->Init({ x + r_2, y + r_2 }, r);
+			monsters.Emplace().Emplace<Monster>()->Init(this, { x + r_2, y + r_2 }, r);
 		}
 	}
-	monsters.Emplace().Emplace<Monster>()->Init({ -600, 0 }, 128);
-	monsters.Emplace().Emplace<Monster>()->Init({ 600, 0 }, 128);
+	monsters.Emplace().Emplace<Monster>()->Init(this, { -600, 0 }, 128);
+	monsters.Emplace().Emplace<Monster>()->Init(this, { 600, 0 }, 128);
 }
 
 void Scene_1::Update() {
@@ -100,10 +101,10 @@ void Scene_1::OnResize() {
 /**************************************************************************************/
 
 
-void Monster::Init(XY pos_, float radius_) {
+void Monster::Init(Scene* scene_, XY pos_, float radius_) {
+	scene = scene_;
 	pos = pos_;
 	radius = radius_;
-	baseScale = radius / gg.res.tex->Width();
 	_1scale = cAnimScaleRange.from;
 }
 
@@ -121,9 +122,8 @@ void Monster::Update() {
 }
 
 void Monster::Draw() {
-	auto& t = *gg.res.tex;
-	auto ss = gg.scene->scale;
-	auto p = pos * ss;
-	auto s = _1scale * baseScale * ss;
-	gg.Quad().Draw(t, t.Rect(), p, 0.5f, s);
+	auto& tex = *gg.res.tex;
+	auto& cam = scene->cam;
+	auto scale = _1scale * cam.scale * (radius / gg.res.tex->Width());
+	gg.Quad().Draw(tex, tex.Rect(), cam.ToGLPos(pos), 0.5f, scale);
 }

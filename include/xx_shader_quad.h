@@ -172,18 +172,9 @@ void main() {
             return r;
         }
 
-        XX_INLINE Shader_QuadData* Draw(Ref<GLTexture> const& texRef_, int32_t numQuads_) {
-            return Draw(texRef_->GetValue(), numQuads_);
-        }
-
-        XX_INLINE void Draw(GLTexture const& tex_, UVRect rect_ = {}, XY pos_ = {}, XY anchor_ = 0.5f
+        XX_INLINE void Draw(GLuint texId_, UVRect rect_ = {}, XY pos_ = {}, XY anchor_ = 0.5f
             , XY scale_ = 1.f, float radians_ = 0.f, float colorplus_ = 1.f, xx::RGBA8 color_ = xx::RGBA8_White) {
-            Draw(tex_.GetValue(), 1)->Fill(rect_, pos_, anchor_, scale_, radians_, colorplus_, color_);
-        }
-
-        XX_INLINE void Draw(Ref<GLTexture> const& texRef_, UVRect rect_ = {}, XY pos_ = {}, XY anchor_ = 0.5f
-            , XY scale_ = 1.f, float radians_ = 0.f, float colorplus_ = 1.f, xx::RGBA8 color_ = xx::RGBA8_White) {
-            Draw(texRef_->GetValue(), 1)->Fill(rect_, pos_, anchor_, scale_, radians_, colorplus_, color_);
+            Draw(texId_, 1)->Fill(rect_, pos_, anchor_, scale_, radians_, colorplus_, color_);
         }
     };
 

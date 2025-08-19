@@ -9,6 +9,15 @@ namespace xx {
 		XY original{};	// logic center pos
 		Shaker shaker;
 
+		XX_INLINE Camera& Init(float baseScale_, float logicScale_, XY original_ = {}) {
+			baseScale = baseScale_;
+			logicScale = logicScale_;
+			scale = logicScale * baseScale;
+			_1_scale = 1.f / scale;
+			original = original_;
+			return *this;
+		}
+
 		XX_INLINE Camera& SetOriginal(XY original_) {
 			original = original_;
 			return *this;
@@ -22,14 +31,6 @@ namespace xx {
 		}
 
 		XX_INLINE Camera& SetLogicScale(float logicScale_) {
-			logicScale = logicScale_;
-			scale = logicScale * baseScale;
-			_1_scale = 1.f / scale;
-			return *this;
-		}
-
-		XX_INLINE Camera& SetScale(float baseScale_, float logicScale_) {
-			baseScale = baseScale_;
 			logicScale = logicScale_;
 			scale = logicScale * baseScale;
 			_1_scale = 1.f / scale;

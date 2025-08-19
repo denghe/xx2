@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "pch.h"
 #include "xx_scenebase.h"
+#include "xx_camera.h"
 
 struct Res {
 	// global res list
@@ -16,7 +17,7 @@ struct Game : xx::Game<Game> {
 	static constexpr float cFrameDelay{ 1.f / cFps };
 	static constexpr float cMaxFrameDelay{ 0.1f };
 	static constexpr float cDelta{ cFrameDelay };
-	xx::Shared<Scene> scene, oldScene;	// oldScene for delay remove
+	xx::Shared<Scene> scene, oldScene;	// oldScene: delay remove( after draw )
 	Res res;
 
 	void Init();
@@ -31,6 +32,7 @@ extern Game gg;
 
 struct Monster;
 struct Scene : xx::SceneBase {
+	xx::Camera cam;
 	float time{}, timePool{}, timeScale{ 1 };
 	xx::List<xx::Shared<Monster>> monsters;
 };
@@ -40,11 +42,12 @@ struct Monster {
 	static constexpr xx::FromTo<float> cAnimScaleRange{ .5f, 1.f };
 	static constexpr float cAnimDuration{ 0.5f };
 	static constexpr float cAnimStepDelay{ cAnimScaleRange.Sub() / (Game::cFps * cAnimDuration) };
+	Scene* scene{};
 	XY pos{};
-	float radius{}, baseScale{};
-	int32_t _1{};	// for coroutine logic
+	float radius{};
+	int32_t _1{};	// for coroutine
 	float _1scale{};
-	void Init(XY pos_, float radius_);
+	void Init(Scene* scene_, XY pos_, float radius_);
 	void Update();
 	void Draw();
 };
