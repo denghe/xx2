@@ -110,7 +110,6 @@ namespace xx {
 
 #ifdef WIN32
 			// to solve the stuck when dragging/resizing windows
-			contextSettings.onDrawHolder = std::make_shared<int>();
 			contextSettings.onDraw = [this] { this->GLLoop(true); };
 #endif
 
