@@ -11,11 +11,14 @@ void Game::Init() {
 	windowSize = designSize = { 800, 600 };
 }
 
-xx::Task<> Game::Task() {
+void Game::GLInit() {
 	lbl.Emplace()->Init(1, p5, 2 * scale, a5, xx::RGBA8_White, "hi");
 	tex = LoadTexture("res/1.png");
+	heartScale = 20.f;
+}
+
+xx::Task<> Game::Task() {
 	while (true) {
-		heartScale = 20.f;
 		for (; heartScale > 15.f; heartScale -= delta * 20.f) {
 			co_yield 0;
 		}

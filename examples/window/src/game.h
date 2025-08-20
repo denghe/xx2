@@ -9,6 +9,7 @@ struct Game : xx::Game<Game> {
 	float heartScale{};
 
 	void Init();
+	void GLInit();
 	xx::Task<> Task();
 	void Update();
 	void Stat();
