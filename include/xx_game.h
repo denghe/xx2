@@ -151,10 +151,6 @@ namespace xx {
 		}
 
 		XX_INLINE void Close() {
-#ifdef WIN32
-			// to solve the stuck when dragging/resizing windows
-			contextSettings.onDrawHolder.reset();
-#endif
 			this->wnd->close();
 		}
 

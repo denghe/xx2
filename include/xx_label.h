@@ -30,7 +30,7 @@ namespace xx {
 			FillTrans();
 		}
 
-		// S : literal string u8string [view]
+		// S : literal string u8/32string [view]
 		template<typename S>
 		void SetText(S const& txt_) {
 			auto len = (int32_t)StrLen(txt_);
