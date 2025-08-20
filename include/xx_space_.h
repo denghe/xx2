@@ -11,8 +11,8 @@ namespace xx {
 
 	struct SpaceGridRingDiffuseData {
 		int32_t cellSize;
-		Listi32<SpaceGridCountRadius> lens;
-		Listi32<XYi> idxs;
+		List<SpaceGridCountRadius> lens;
+		List<XYi> idxs;
 
 		void Init(int32_t gridNumRows, int32_t cellSize_) {
 			cellSize = cellSize_;

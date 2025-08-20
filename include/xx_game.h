@@ -1,12 +1,29 @@
 ﻿#pragma once
-#include "xx_gamebase_ex.h"
+#include "xx_gamebase_font.h"
 
 namespace xx {
+	// derived member checkers
+	template<typename T> concept Has_Init = requires(T t) { { t.Init() } -> std::same_as<void>; };
+	template<typename T> concept Has_GLInit = requires(T t) { { t.GLInit() } -> std::same_as<void>; };
+	template<typename T> concept Has_Task = requires(T t) { { t.Task() } -> std::same_as<xx::Task<>>; };
+	template<typename T> concept Has_Update = requires(T t) { { t.Update() } -> std::same_as<void>; };
+	template<typename T> concept Has_Delay = requires(T t) { { t.Delay() } -> std::same_as<void>; };
+	template<typename T> concept Has_Stat = requires(T t) { { t.Stat() } -> std::same_as<void>; };
+	template<typename T> concept Has_OnResize = requires(T t) { { t.OnResize() } -> std::same_as<void>; };
+
+
+	// for game scene logic
+	struct SceneBase {
+		virtual ~SceneBase() {}
+		virtual void Update() {};
+		virtual void Draw() {};
+		virtual void OnResize() {};
+	};
+
 
 	// example: struct Game : xx::Game<Game> { ...
-	template<typename Derived, typename BaseType = GameBaseEx>
+	template<typename Derived, typename BaseType = GameBase_font>
 	struct Game : BaseType {
-		sf::Window* wnd{};
 		sf::ContextSettings contextSettings;
 
 		int32_t Run() {
@@ -31,7 +48,7 @@ namespace xx {
 			StoreWindowSize();
 			AssignWindowSize();
 
-			this->GLInit();															// lifeCycle 3
+			this->BaseGLInit();														// lifeCycle 3
 			if constexpr (Has_GLInit<Derived>) {
 				((Derived*)this)->GLInit();											// lifeCycle 4
 			}
@@ -74,10 +91,6 @@ namespace xx {
 			return EXIT_SUCCESS;
 		}
 
-		void GLInit() {
-			this->BaseGLInit();
-		}
-
 		void GLLoop(bool fromEvent) {
 			this->GLClear(this->clearColor);
 			this->GLBlendFunc();
@@ -115,7 +128,7 @@ namespace xx {
 		}
 
 		XX_INLINE void StoreWindowSize() {
-			auto ws = wnd->getSize();
+			auto ws = this->wnd->getSize();
 			this->windowSize.x = (float)ws.x;
 			this->windowSize.y = (float)ws.y;
 		}
@@ -130,11 +143,11 @@ namespace xx {
 		// utils
 
 		XX_INLINE void SetVerticalSyncEnabled(bool enabled_) {
-			wnd->setVerticalSyncEnabled(enabled_);
+			this->wnd->setVerticalSyncEnabled(enabled_);
 		}
 
 		XX_INLINE void SetFramerateLimit(uint32_t limit_) {
-			wnd->setFramerateLimit(limit_);
+			this->wnd->setFramerateLimit(limit_);
 		}
 
 		XX_INLINE void Close() {
@@ -142,7 +155,7 @@ namespace xx {
 			// to solve the stuck when dragging/resizing windows
 			contextSettings.onDrawHolder.reset();
 #endif
-			wnd->close();
+			this->wnd->close();
 		}
 
 	};

@@ -3,6 +3,11 @@
 
 namespace xx {
 
+    struct FontFrame {
+        GLuint texId;
+        UVRect textureRect;
+    };
+
     // sprite frame
     struct TinyFrame {
         Ref<GLTexture> tex;

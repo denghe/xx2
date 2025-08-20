@@ -19,6 +19,7 @@ namespace xx {
 		std::u32string title{ U"game" };					// window title string( user can init )
 		XY designSize{ 1920, 1080 };						// design resolution( user can init )
 		XY windowSize{ designSize }, windowSizeBackup{};	// physics resolution( user can init )
+		XY worldMinXY{}, worldMaxXY{};						// for node( worldMinXY = -windowSize / 2,  worldMinXY = windowSize / 2 );
 		XY size{}, size_2{};								// actual design size
 		/*
 				 screen anchor points
@@ -49,14 +50,22 @@ namespace xx {
 		double time{}, delta{};								// usually for ui logic
 		int32_t drawVerts{}, drawCall{}, drawFPS{};			// counters
 		float drawFPSTimePool{};							// for count drawFPS
+
 		Shader* shader{};
+
 		std::string rootPath;
 		std::vector<std::string> searchPaths;
 		std::filesystem::path tmpPath;
+
 		xx::Task<> baseTask;
+#ifndef __EMSCRIPTEN__
+		sf::Window* wnd{};
+#endif
 
 		// for window resize event
 		void ResizeCalc() {
+			worldMinXY = -windowSize * 0.5f;
+			worldMaxXY = windowSize * 0.5f;
 			if (windowSize.x / designSize.x > windowSize.y / designSize.y) {
 				scale = windowSize.y / designSize.y;
 				size.y = designSize.y;
@@ -254,7 +263,7 @@ namespace xx {
 			return MakeRef<GLTexture>(LoadGLTexture(d, p));
 		}
 
-		// first life cycle
+		// life cycle 1
 		void BaseInit() {
 #ifdef WIN32
 			SetConsoleOutputCP(CP_UTF8);
@@ -264,6 +273,17 @@ namespace xx {
 			this->rootPath = this->ToSearchPath((std::string&)currDir);
 			this->searchPaths.clear();
 			this->searchPaths.push_back(this->rootPath);
+		}
+
+		// life cycle 2
+		void BaseGLInit() {
+#ifndef __EMSCRIPTEN__
+			glEnable(GL_PRIMITIVE_RESTART);
+			glPrimitiveRestartIndex(65535);
+#endif
+			glDisable(GL_CULL_FACE);
+			glDisable(GL_DEPTH_TEST);
+			glEnable(GL_BLEND);
 		}
 	};
 

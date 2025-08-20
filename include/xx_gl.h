@@ -116,6 +116,26 @@ namespace xx {
 		using BT::BT;
 
 		template<GLuint filter = GL_NEAREST /* GL_LINEAR */, GLuint wraper = GL_CLAMP_TO_EDGE /* GL_REPEAT */>
+		static GLTexture Create(XYu siz, bool hasAlpha = true) {
+			auto t = GLGenTextures<false, filter, wraper>();
+			auto c = hasAlpha ? GL_RGBA : GL_RGB;
+			glTexImage2D(GL_TEXTURE_2D, 0, c, siz.x, siz.y, 0, c, GL_UNSIGNED_BYTE, {});
+			glBindTexture(GL_TEXTURE_2D, 0);
+			return { t, siz.x, siz.y, "" };
+		}
+
+		template<GLuint filter = GL_NEAREST /* GL_LINEAR */, GLuint wraper = GL_CLAMP_TO_EDGE /* GL_REPEAT */>
+		static Ref<GLTexture> CreateRef(XYu siz, bool hasAlpha = true) {
+			return MakeRef<GLTexture>(Create(siz, hasAlpha));
+		}
+
+		auto const& Width() const { return std::get<1>(vs); }
+		auto const& Height() const { return std::get<2>(vs); }
+		auto const& FileName() const { return std::get<3>(vs); }
+		UVRect Rect() const { return { 0,0, (uint16_t)std::get<1>(vs), (uint16_t)std::get<2>(vs) }; }
+		XY Size() const { return { std::get<1>(vs), std::get<2>(vs) }; }
+
+		template<GLuint filter = GL_NEAREST /* GL_LINEAR */, GLuint wraper = GL_CLAMP_TO_EDGE /* GL_REPEAT */>
 		void SetGLTexParm() {
 			glBindTexture(GL_TEXTURE_2D, GetValue());
 			GLTexParameteri<filter, wraper>();
@@ -132,21 +152,6 @@ namespace xx {
 			glBindTexture(GL_TEXTURE_2D, GetValue());
 			glGenerateMipmap(GetValue());
 			glBindTexture(GL_TEXTURE_2D, 0);
-		}
-
-		auto const& Width() const { return std::get<1>(vs); }
-		auto const& Height() const { return std::get<2>(vs); }
-		auto const& FileName() const { return std::get<3>(vs); }
-		UVRect Rect() const { return { 0,0, (uint16_t)std::get<1>(vs), (uint16_t)std::get<2>(vs) }; }
-		XY Size() const { return { std::get<1>(vs), std::get<2>(vs) }; }
-
-		template<GLuint filter = GL_NEAREST /* GL_LINEAR */, GLuint wraper = GL_CLAMP_TO_EDGE /* GL_REPEAT */>
-		static GLTexture Create(uint32_t w, uint32_t h, bool hasAlpha) {
-			auto t = GLGenTextures<false, filter, wraper>();
-			auto c = hasAlpha ? GL_RGBA : GL_RGB;
-			glTexImage2D(GL_TEXTURE_2D, 0, c, w, h, 0, c, GL_UNSIGNED_BYTE, {});
-			glBindTexture(GL_TEXTURE_2D, 0);
-			return GLTexture(t, w, h, "");
 		}
 	};
 

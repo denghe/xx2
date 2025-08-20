@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include <xx_data.h>
+#include "xx_data.h"
 #include <zstd.h>
 
 namespace xx {

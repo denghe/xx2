@@ -23,10 +23,6 @@ namespace xx {
             return *this;
         }
 
-        inline static Ref<GLTexture> MakeTexture(XYu const& wh, bool hasAlpha = true) {
-            return MakeRef<GLTexture>(GLTexture::Create(wh.x, wh.y, hasAlpha));
-        }
-
         template<typename Func>
         void DrawTo(Ref<GLTexture>& t, std::optional<RGBA8> const& c, Func&& func, Data* store = {}) {
             Begin(t, c);
@@ -36,7 +32,7 @@ namespace xx {
 
         template<typename Func>
         Ref<GLTexture> Draw(XYu const& wh, bool hasAlpha, std::optional<RGBA8> const& c, Func&& func, Data* store = {}) {
-            auto t = MakeTexture(wh, hasAlpha);
+            auto t = MakeRef<GLTexture>(GLTexture::Create(wh.x, wh.y, hasAlpha));
             DrawTo(t, c, std::forward<Func>(func), store);
             return t;
         }
