@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include "pch.h"
-#include "xx_scenebase.h"
 #include "xx_camera.h"
 
 struct Res {

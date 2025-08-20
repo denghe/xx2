@@ -42,7 +42,6 @@ void Game::Stat() {
 
 void Game::OnResize() {
 	if (scene) {
-		scene->ResizeCalc();
 		scene->OnResize();
 	}
 }
@@ -50,8 +49,7 @@ void Game::OnResize() {
 /**************************************************************************************/
 
 void Scene_1::Init() {
-	ResizeCalc();
-	cam.Init(scale, 1.f);
+	cam.Init(gg.scale, 1.f);
 
 	int ny = 80;
 	auto r = gg.designSize.y / ny;
@@ -95,7 +93,7 @@ void Scene_1::Draw() {
 }
 
 void Scene_1::OnResize() {
-	// sync ui? cam?
+	cam.SetBaseScale(gg.scale);
 }
 
 /**************************************************************************************/

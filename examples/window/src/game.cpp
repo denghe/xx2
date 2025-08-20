@@ -8,21 +8,25 @@ int32_t main() {
 
 void Game::Init() {
 	title = U"examples_window";
-	windowSize = { 350, 260 };
-	showStat = true;
+	windowSize = { 640, 480 };
 }
 
 xx::Task<> Game::Task() {
 	auto tex = LoadTexture("res/1.png");
 	auto rect = tex->Rect();
 	while (true) {
-		for (float scale = 10.f; scale > 5.f; scale -= delta * 10.f) {
-			Quad().Draw(tex, rect, XY{}, 0.5f, scale);
+		float s = 30.f;
+		for (; s > 15.f; s -= delta * 20.f) {
+			Quad().Draw(tex, rect, XY{}, 0.5f, s * scale);
 			co_yield 0;
 		}
-		for (float scale = 5.f; scale < 10.f; scale += delta * 10.f) {
-			Quad().Draw(tex, rect, XY{}, 0.5f, scale);
+		for (; s < 30.f; s += delta * 20.f) {
+			Quad().Draw(tex, rect, XY{}, 0.5f, s * scale);
 			co_yield 0;
 		}
 	}
+}
+
+void Game::Stat() {
+	xx::CoutN("drawFPS = ", drawFPS, " drawCall = ", drawCall, " drawVerts = ", drawVerts);
 }

@@ -7,18 +7,8 @@
 
 namespace xx {
 
-	// derived member checkers
-	template<typename T> concept Has_Init = requires(T t) { { t.Init() } -> std::same_as<void>; };
-	template<typename T> concept Has_GLInit = requires(T t) { { t.GLInit() } -> std::same_as<void>; };
-	template<typename T> concept Has_Task = requires(T t) { { t.Task() } -> std::same_as<xx::Task<>>; };
-	template<typename T> concept Has_Update = requires(T t) { { t.Update() } -> std::same_as<void>; };
-	template<typename T> concept Has_Delay = requires(T t) { { t.Delay() } -> std::same_as<void>; };
-	template<typename T> concept Has_Stat = requires(T t) { { t.Stat() } -> std::same_as<void>; };
-	template<typename T> concept Has_OnResize = requires(T t) { { t.OnResize() } -> std::same_as<void>; };
-
-
 	// engine base code
-	struct GameBase {
+	struct alignas(8) GameBase {
 		inline static struct GameBase* instance{};
 		GameBase(GameBase const&) = delete;
 		GameBase& operator=(GameBase const&) = delete;
@@ -26,24 +16,63 @@ namespace xx {
 			instance = this;
 		}
 
-		static constexpr XY designSize{ 1920, 1080 };
-		static constexpr std::array<uint32_t, 3> blendDefault{ GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_FUNC_ADD };
+		std::u32string title{ U"game" };					// window title string
+		XY designSize{ 1920, 1080 };						// design resolution
+		XY windowSize{ designSize }, windowSizeBackup{};	// physics resolution
+		XY size{}, size_2{};								// actual design size
+		/*
+				 screen anchor points
+		   ┌───────────────────────────────┐
+		   │ 7             8             9 │
+		   │                               │
+		   │                               │
+		   │ 4             5             6 │
+		   │                               │
+		   │                               │
+		   │ 1             2             3 │
+		   └───────────────────────────────┘
+		*/
+		static constexpr XY a7{ 0, 1 }, a8{ 0.5, 1 }, a9{ 1, 1 };
+		static constexpr XY a4{ 0, 0.5f }, a5{ 0.5, 0.5f }, a6{ 1, 0.5f };
+		static constexpr XY a1{ 0, 0 }, a2{ 0.5, 0 }, a3{ 1, 0 };
+		XY p7{}, p8{}, p9{};
+		XY p4{}, p5{}, p6{};
+		XY p1{}, p2{}, p3{};
+		float scale{};										// base scale. actual design size * base scale = physics resolution
+		float flipY{ 1 };									// -1: flip  for ogl frame buffer
 
-		std::u32string title{ U"game" };				// window title string
-		XY windowSize{ designSize };					// resolution
-		XY windowSizeBackup{};
-		RGBA8 clearColor{};								// for glClearColor
+		RGBA8 clearColor{};									// for glClearColor
+		std::array<uint32_t, 3> blendDefault{ GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_FUNC_ADD };
 		std::array<uint32_t, 3> blend{ blendDefault };
-		double time{}, delta{};							// usually for ui logic
-		float flipY{ 1 };								// -1: flip  for ogl frame buffer
-		int32_t drawVerts{}, drawCall{}, drawFPS{};		// counters
-		float drawFPSTimePool{};						// for count drawFPS
 		std::array<uint32_t, 3> blendBackup{};
+
+		double time{}, delta{};								// usually for ui logic
+		int32_t drawVerts{}, drawCall{}, drawFPS{};			// counters
+		float drawFPSTimePool{};							// for count drawFPS
 		Shader* shader{};
 		std::string rootPath;
 		std::vector<std::string> searchPaths;
 		std::filesystem::path tmpPath;
 		xx::Task<> baseTask;
+
+		void ResizeCalc() {
+			auto& ds = GameBase::instance->designSize;
+			auto& ws = GameBase::instance->windowSize;
+			if (ws.x / ds.x > ws.y / ds.y) {
+				scale = ws.y / GameBase::instance->designSize.y;
+				size.y = GameBase::instance->designSize.y;
+				size.x = ws.x / scale;
+			}
+			else {
+				scale = ws.x / GameBase::instance->designSize.x;
+				size.x = GameBase::instance->designSize.x;
+				size.y = ws.y / scale;
+			}
+			size_2 = size * 0.5f;
+			p7 = { -size_2.x, +size_2.y }; p8 = { 0, +size_2.y }; p9 = { +size_2.x, +size_2.y };
+			p4 = { -size_2.x, 0 }; p5 = { 0, 0 }; p6 = { +size_2.x, 0 };
+			p1 = { -size_2.x, -size_2.y }; p2 = { 0, -size_2.y }; p3 = { +size_2.x, -size_2.y };
+		};
 
 		template<typename ST>
 		XX_INLINE ST& ShaderBegin(ST& s) {

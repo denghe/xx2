@@ -1,26 +1,13 @@
 ﻿#pragma once
-#include "xx_gamebase.h"
-#include "xx_shader_quad.h"
+#include "xx_gamebase_ex.h"
 
 namespace xx {
 
-	// basic shader support
-	struct GameBaseWithShader : GameBase {
-
-		Shader_Quad shaderQuad;
-		XX_INLINE Shader_Quad& Quad() { return ShaderBegin(shaderQuad); }
-		// ...
-
-		XX_INLINE void ShaderInit() {
-			shaderQuad.Init();
-			// ...
-		}
-	};
-
 	// example: struct Game : xx::Game<Game> { ...
-	template<typename Derived, typename BaseType = GameBaseWithShader>
+	template<typename Derived, typename BaseType = GameBaseEx>
 	struct Game : BaseType {
 		sf::Window* wnd{};
+		sf::ContextSettings contextSettings;
 
 		void GLInit() {
 			this->ShaderInit();
@@ -85,6 +72,7 @@ namespace xx {
 		XX_INLINE void AssignWindowSize() {
 			this->windowSizeBackup = this->windowSize;
 			glViewport(0, 0, (GLsizei)this->windowSize.x, (GLsizei)this->windowSize.y);
+			this->ResizeCalc();
 		}
 
 		int32_t Run() {
@@ -94,7 +82,6 @@ namespace xx {
 				((Derived*)this)->Init();											// lifeCycle 2
 			}
 
-			sf::ContextSettings contextSettings;
 			contextSettings.depthBits = 24;
 			contextSettings.majorVersion = 4;
 			contextSettings.minorVersion = 1;
@@ -123,14 +110,16 @@ namespace xx {
 
 #ifdef WIN32
 			// to solve the stuck when dragging/resizing windows
+			contextSettings.onDrawHolder = std::make_shared<int>();
 			contextSettings.onDraw = [this] { this->GLLoop(true); };
 #endif
+
 			while (window.isOpen()) {
 				sf::Event event;
 				while (window.pollEvent(event)) {
 					if (event.type == sf::Event::Closed ||
 						(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)) {
-						window.close();
+						Close();
 						goto LabEnd;
 					} else if (event.type == sf::Event::Resized) {
 						StoreWindowSize();
@@ -147,6 +136,7 @@ namespace xx {
 				}
 				this->GLLoop(false);
 			}
+
 		LabEnd:
 			return EXIT_SUCCESS;
 		}
@@ -163,6 +153,10 @@ namespace xx {
 		}
 
 		XX_INLINE void Close() {
+#ifdef WIN32
+			// to solve the stuck when dragging/resizing windows
+			contextSettings.onDrawHolder.reset();
+#endif
 			wnd->close();
 		}
 
