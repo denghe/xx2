@@ -5,6 +5,8 @@ using XY = xx::XY;
 
 struct Game : xx::Game<Game> {
 	xx::Shared<xx::Label> lbl;
+	xx::RefGLTexture tex;
+	float heartScale{};
 
 	void Init();
 	xx::Task<> Task();

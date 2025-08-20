@@ -13,22 +13,20 @@ void Game::Init() {
 
 xx::Task<> Game::Task() {
 	lbl.Emplace()->Init(1, p5, 2 * scale, a5, xx::RGBA8_White, "hi");
-	auto tex = LoadTexture("res/1.png");
-	auto rect = tex->Rect();
+	tex = LoadTexture("res/1.png");
 	while (true) {
-		float s = 20.f;
-		for (; s > 15.f; s -= delta * 20.f) {
-			Quad().Draw(*tex, rect, XY{}, 0.5f, s * scale, 0, 1, xx::RGBA8_Red);
+		heartScale = 20.f;
+		for (; heartScale > 15.f; heartScale -= delta * 20.f) {
 			co_yield 0;
 		}
-		for (; s < 20.f; s += delta * 20.f) {
-			Quad().Draw(*tex, rect, XY{}, 0.5f, s * scale, 0, 1, xx::RGBA8_Red);
+		for (; heartScale < 20.f; heartScale += delta * 20.f) {
 			co_yield 0;
 		}
 	}
 }
 
 void Game::Update() {
+	Quad().Draw(*tex, tex->Rect(), XY{}, 0.5f, heartScale * scale, 0, 1, xx::RGBA8_Red);
 	DrawNode(lbl);
 }
 
