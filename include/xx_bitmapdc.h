@@ -2,6 +2,7 @@
 #include "xx_gamebase_shader.h"
 
 namespace xx {
+    // only for windows: text -> bmp -> texture
     // code ref: cocos2dx
 
     enum class TextAlign {
@@ -298,3 +299,49 @@ inline std::pair<float, float> upload_unicode_char_to_texture(int charSize, char
     CheckGLError();
     return { (float)w, (float)h };
 }
+
+/*
+* some mac code ref
+
+#include <CoreGraphics/CoreGraphics.h>
+#include <CoreText/CoreText.h>
+// ... (include other necessary headers)
+
+// Example: Rendering "Hello, World!" to a bitmap
+void renderTextToBitmap(const char* text, int width, int height, const char* filename) {
+    // 1. Create a bitmap context
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    CGContextRef context = CGBitmapContextCreate(nullptr, width, height, 8, width * 4, colorSpace, kCGImageAlphaPremultipliedLast);
+    CGColorSpaceRelease(colorSpace);
+
+    if (!context) {
+        return; // Handle error
+    }
+
+    // 2. Create an attributed string (example uses a simple string)
+    CFStringRef cfText = CFStringCreateWithCString(kCFAllocatorDefault, text, kCFStringEncodingUTF8);
+    CFMutableAttributedStringRef attrString = CFAttributedStringCreateMutable(kCFAllocatorDefault, 0);
+    CFAttributedStringReplaceString(attrString, CFRangeMake(0, 0), cfText);
+
+    // 3. Create a Core Text line
+    CTLineRef line = CTLineCreateWithAttributedString(attrString);
+
+    // 4. Set text position and draw
+    CGContextSetTextPosition(context, 0, height - CTLineGetBoundsWithOptions(line, kCTLineBoundsUseGlyphPathBounds).size.height); // Adjust position as needed
+    CTLineDraw(line, context);
+
+    // 5. Create a CGImage from the bitmap context
+    CGImageRef image = CGBitmapContextCreateImage(context);
+
+    // 6. Save or further process the image
+    // ... (Example: save as PNG using ImageIO)
+
+    // 7. Release Core Graphics objects
+    CGImageRelease(image);
+    CGContextRelease(context);
+    CFRelease(line);
+    CFRelease(attrString);
+    CFRelease(cfText);
+}
+
+*/

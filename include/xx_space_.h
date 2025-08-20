@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "xx_list.h"
-#include "xx_xy.h"
+#include "xx_prims.h"
 
 namespace xx {
 
