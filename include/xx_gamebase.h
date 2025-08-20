@@ -16,9 +16,9 @@ namespace xx {
 			instance = this;
 		}
 
-		std::u32string title{ U"game" };					// window title string
-		XY designSize{ 1920, 1080 };						// design resolution
-		XY windowSize{ designSize }, windowSizeBackup{};	// physics resolution
+		std::u32string title{ U"game" };					// window title string( user can init )
+		XY designSize{ 1920, 1080 };						// design resolution( user can init )
+		XY windowSize{ designSize }, windowSizeBackup{};	// physics resolution( user can init )
 		XY size{}, size_2{};								// actual design size
 		/*
 				 screen anchor points
@@ -55,24 +55,66 @@ namespace xx {
 		std::filesystem::path tmpPath;
 		xx::Task<> baseTask;
 
+		// for window resize event
 		void ResizeCalc() {
-			auto& ds = GameBase::instance->designSize;
-			auto& ws = GameBase::instance->windowSize;
-			if (ws.x / ds.x > ws.y / ds.y) {
-				scale = ws.y / GameBase::instance->designSize.y;
-				size.y = GameBase::instance->designSize.y;
-				size.x = ws.x / scale;
+			if (windowSize.x / designSize.x > windowSize.y / designSize.y) {
+				scale = windowSize.y / designSize.y;
+				size.y = designSize.y;
+				size.x = windowSize.x / scale;
 			}
 			else {
-				scale = ws.x / GameBase::instance->designSize.x;
-				size.x = GameBase::instance->designSize.x;
-				size.y = ws.y / scale;
+				scale = windowSize.x / designSize.x;
+				size.x = designSize.x;
+				size.y = windowSize.y / scale;
 			}
 			size_2 = size * 0.5f;
 			p7 = { -size_2.x, +size_2.y }; p8 = { 0, +size_2.y }; p9 = { +size_2.x, +size_2.y };
 			p4 = { -size_2.x, 0 }; p5 = { 0, 0 }; p6 = { +size_2.x, 0 };
 			p1 = { -size_2.x, -size_2.y }; p2 = { 0, -size_2.y }; p3 = { +size_2.x, -size_2.y };
 		};
+
+		// for framebuffer only
+		void SetWindowSize(XY siz) {
+			if (siz.x < 1.f) siz.x = 1.f;
+			if (siz.y < 1.f) siz.y = 1.f;
+			windowSize = siz;
+			ResizeCalc();
+		}
+
+		void GLViewport() {
+			glViewport(0, 0, (GLsizei)windowSize.x, (GLsizei)windowSize.y);
+		}
+
+		void GLClear(RGBA8 c) {
+			glClearColor(c.r / 255.f, c.g / 255.f, c.b / 255.f, c.a / 255.f);
+			glClear(GL_COLOR_BUFFER_BIT);
+		}
+
+		template<bool backup = false, bool autoEndShader = true>
+		void GLBlendFunc(std::array<uint32_t, 3> const& args) {
+			if constexpr (backup) {
+				blendBackup = blendDefault;
+			}
+			if (blend != args) {
+				if constexpr (autoEndShader) {
+					ShaderEnd();
+				}
+				blend = args;
+				glBlendFunc(args[0], args[1]);
+				glBlendEquation(args[2]);
+			}
+		}
+
+		void GLBlendFunc() {
+			blend = blendDefault;
+			glBlendFunc(blendDefault[0], blendDefault[1]);
+			glBlendEquation(blendDefault[2]);
+		}
+
+		template<bool autoEndShader = true>
+		void GLBlendFuncRestore() {
+			GLBlendFunc<false, autoEndShader>(blendBackup);
+		}
 
 		template<typename ST>
 		XX_INLINE ST& ShaderBegin(ST& s) {

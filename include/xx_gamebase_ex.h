@@ -19,7 +19,15 @@ namespace xx {
 		XX_INLINE Shader_Quad& Quad() { return ShaderBegin(shaderQuad); }
 		// ...
 
-		XX_INLINE void ShaderInit() {
+		XX_INLINE void BaseGLInit() {
+#ifndef __EMSCRIPTEN__
+			glEnable(GL_PRIMITIVE_RESTART);
+			glPrimitiveRestartIndex(65535);
+#endif
+			glDisable(GL_CULL_FACE);
+			glDisable(GL_DEPTH_TEST);
+			glEnable(GL_BLEND);
+
 			shaderQuad.Init();
 			// ...
 		}
