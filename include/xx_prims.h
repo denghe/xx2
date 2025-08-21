@@ -373,6 +373,7 @@ namespace xx {
     template<typename T>
     struct FromTo {
         T from, to;
+        constexpr bool operator==(FromTo const& o) const = default;
 		constexpr void Limit(T& v) const {
 			if (v < from) v = from;
 			else if (v > to) v = to;

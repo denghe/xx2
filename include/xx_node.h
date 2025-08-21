@@ -181,4 +181,39 @@ namespace xx {
 		}
 	};
 
+	struct MouseEventHandlerNode : Node {
+		int32_t indexAtUiGrid{ -1 };
+
+		virtual void OnMouseDown() {};
+		virtual void OnMouseMove() {};
+		virtual void OnMouseUp() {};
+
+		XX_INLINE bool MousePosInArea() const {		// virtual ?
+			return PosInArea(GameBase::instance->mousePos);
+		}
+
+		virtual void TransUpdate() override {
+			auto& g = GameBase::instance->uiGrid;
+			FromTo<XY> aabb{ worldMinXY, worldMaxXY };
+			if (g.TryLimitAABB(aabb)) {
+				if (indexAtUiGrid != -1) {
+					g.Update(indexAtUiGrid, aabb);
+				}
+				else {
+					indexAtUiGrid = g.Add(aabb, this);
+				}
+			}
+			else {
+				g.Remove(indexAtUiGrid);
+				indexAtUiGrid = -1;
+			}
+		}
+
+		~MouseEventHandlerNode() {
+			if (indexAtUiGrid != -1) {
+				GameBase::instance->uiGrid.Remove(indexAtUiGrid);
+				indexAtUiGrid = -1;
+			}
+		}
+	};
 }

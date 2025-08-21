@@ -3,9 +3,12 @@
 #include "xx_shader.h"
 #include "xx_file.h"
 #include "xx_zstd.h"
+#include "xx_grid2d_aabb.h"
 #include <SFML/Window.hpp>
 
 namespace xx {
+
+	struct MouseEventHandlerNode;
 
 	// engine base code
 	struct alignas(8) GameBase {
@@ -50,6 +53,10 @@ namespace xx {
 		double time{}, delta{};								// usually for ui logic
 		int32_t drawVerts{}, drawCall{}, drawFPS{};			// counters
 		float drawFPSTimePool{};							// for count drawFPS
+
+		// todo: input, event handler
+		XY mousePos{};
+		Grid2dAABB<MouseEventHandlerNode*> uiGrid;
 
 		Shader* shader{};
 

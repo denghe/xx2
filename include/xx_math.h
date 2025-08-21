@@ -1,6 +1,5 @@
 ﻿#pragma once
-#include "xx_gamebase_font.h"
-#include "xx_node.h"
+#include "xx_prims.h"
 
 namespace xx {
 
@@ -27,14 +26,15 @@ namespace xx {
     }
 
     // for float
-    template<typename XY1 = XY, typename XY2 = XY>
-    XX_INLINE bool IsIntersect_BoxBoxF(XY1 const& b1minXY, XY1 const& b1maxXY, XY2 const& b2minXY, XY2 const& b2maxXY) {
-        return !(b1maxXY.x < b2minXY.x || b2maxXY.x < b1minXY.x || b1maxXY.y < b2minXY.y || b2maxXY.y < b1minXY.y);
+    template<typename T = XY>
+    XX_INLINE bool IsIntersect_BoxBoxF(T b1minXY, T b1maxXY, T b2minXY, T b2maxXY) {
+        return !(b1maxXY.x < b2minXY.x || b2maxXY.x < b1minXY.x
+            || b1maxXY.y < b2minXY.y || b2maxXY.y < b1minXY.y);
     }
 
     // for float
-    template<typename XY1 = XY, typename XY2 = XY>
-    XX_INLINE bool IsIntersect_BoxPointF(XY1 const& b1minXY, XY1 const& b1maxXY, XY2 const& p) {
+    template<typename T = XY>
+    XX_INLINE bool IsIntersect_BoxPointF(T b1minXY, T b1maxXY, T p) {
         return !(b1maxXY.x < p.x || p.x < b1minXY.x || b1maxXY.y < p.y || p.y < b1minXY.y);
     }
 }
