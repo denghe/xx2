@@ -81,8 +81,8 @@ namespace xx {
 			if (!isFocus) {
 				SetFocus();
 				GameBase::instance->delayFuncs.Emplace([w = WeakFromThis(this)] {
-					if (!w) return 1;
 					auto p = w.TryGetPointer();
+					if (!p) return 1;
 					if (GameBase::instance->uiHandler.TryGetPointer() != p
 						|| !p->MousePosInArea()) {
 						p->LostFocus();
