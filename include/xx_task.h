@@ -129,7 +129,7 @@ namespace xx {
     /*************************************************************************************************************************/
 
     struct Tasks {
-        BlockLink<xx::Task<>, BlockLinkVINPT> tasks;
+        BlockLink<Task<>, BlockLinkVINPT> tasks;
         void Clear() { tasks.Clear(); }
         int32_t Count() const { return tasks.Count(); }
         bool Empty() const { return !tasks.Count(); }
@@ -163,7 +163,7 @@ namespace xx {
 
         // resume once
         int32_t operator()() {
-            tasks.ForeachLink([&](xx::Task<>& o)->ForeachResult {
+            tasks.ForeachLink([&](Task<>& o)->ForeachResult {
                 return o() ? ForeachResult::RemoveAndContinue : ForeachResult::Continue;
             });
             return tasks.Count();
@@ -257,7 +257,7 @@ namespace xx {
 
         template<typename T>
         void Add(T&& t) {
-            if constexpr (xx::IsFunction_v<Cond>) {
+            if constexpr (IsFunction_v<Cond>) {
                 assert(false);
             }
             Add(Cond{}, std::forward<T>(t));

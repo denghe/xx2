@@ -522,14 +522,14 @@ namespace xx {
         // fill likely. make instance
         template<typename T = int32_t, typename = std::enable_if_t<std::is_convertible_v<T, uint8_t>>>
         static Data_rw From(std::initializer_list<T> const &bytes) {
-            xx::Data_rw d;
+            Data_rw d;
             d.Fill(bytes);
             return d;
         }
 
         template<typename T = int32_t, typename = std::enable_if_t<std::is_convertible_v<T, std::string_view>>>
         static Data_rw From(T const &sv) {
-            xx::Data_rw d;
+            Data_rw d;
             d.WriteBuf(sv);
             return d;
         }

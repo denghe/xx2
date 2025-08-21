@@ -107,7 +107,7 @@ namespace xx {
 
 			//......Head+++++++++++Tail.......
 			if (head < tail) {
-				if constexpr (xx::IsPod_v<T>) {
+				if constexpr (IsPod_v<T>) {
 					memcpy((void*)newBuf, buf + head, dataLen * sizeof(T));
 				} else {
 					for (size_t i = 0; i < dataLen; ++i) {
@@ -121,7 +121,7 @@ namespace xx {
 			else {
 				//...Head++++++
 				auto frontDataLen = cap - head;
-				if constexpr (xx::IsPod_v<T>) {
+				if constexpr (IsPod_v<T>) {
 					memcpy((void*)newBuf, buf + head, frontDataLen * sizeof(T));
 				} else {
 					for (size_t i = 0; i < frontDataLen; ++i) {
@@ -131,7 +131,7 @@ namespace xx {
 				}
 
 				// ++++++Tail...
-				if constexpr (xx::IsPod_v<T>) {
+				if constexpr (IsPod_v<T>) {
 					memcpy((void*)(newBuf + frontDataLen), buf, tail * sizeof(T));
 				} else {
 					for (size_t i = 0; i < tail; ++i) {

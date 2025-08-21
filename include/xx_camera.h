@@ -49,7 +49,7 @@ namespace xx {
 			return { glPos.x * _1_scale + original.x + shaker.offset.x, -glPos.y * _1_scale + original.y + shaker.offset.y };
 		}
 
-		XX_INLINE void Update(xx::Rnd& rnd, int32_t time) {
+		XX_INLINE void Update(Rnd& rnd, int32_t time) {
 			shaker.Update(rnd, time);
 		}
 	};

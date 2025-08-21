@@ -208,7 +208,7 @@ namespace xx {
     };
 
     template<typename T, typename...TS>
-    auto&& Get(xx::SimpleTuple<TS...>& t) {
+    auto&& Get(SimpleTuple<TS...>& t) {
         if constexpr (std::is_same_v< decltype(t.value), T>) {
             return t.value;
         } else {

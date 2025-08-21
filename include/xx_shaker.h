@@ -17,7 +17,7 @@ namespace xx {
 			endtime = time + duration;
 		}
 
-		XX_INLINE static XY GetRndPosDoughnut(xx::Rnd& rnd, float maxRadius, float safeRadius) {
+		XX_INLINE static XY GetRndPosDoughnut(Rnd& rnd, float maxRadius, float safeRadius) {
 			auto len = maxRadius - safeRadius;
 			auto len_radius = len / maxRadius;
 			auto safeRadius_radius = safeRadius / maxRadius;
@@ -26,7 +26,7 @@ namespace xx {
 			return { std::cosf(radians) * radius, std::sinf(radians) * radius };
 		}
 
-		XX_INLINE void Update(xx::Rnd& rnd, int32_t time) {
+		XX_INLINE void Update(Rnd& rnd, int32_t time) {
 			XX_BEGIN(n);
 		LabWait:
 			while (time >= endtime) { XX_YIELD(n); }	// sleepEx

@@ -5,6 +5,8 @@
 namespace xx {
 
 	struct alignas(8) Node {
+		static constexpr int32_t cTypeId{};							// need set typeId in Init
+
 		List<Shared<Node>> children;
 		Weak<Node> parent;											// fill by MakeChildren
 		Weak<Node> scissor;											// fill by scroll view MakeContent
@@ -15,11 +17,13 @@ namespace xx {
 
 		XY position{}, scale{ 1, 1 }, anchor{ 0.5, 0.5 }, size{};
 		XY worldMaxXY{}, worldSize{};								// boundingBox. world coordinate. fill by FillTrans()
+
+		int32_t typeId{};											// fill by Init
 		int z{};													// global z for event priority or batch combine
 		bool inParentArea{ true };									// panel true ? combo box pop false ?
-		float alpha{ 1 };
+		float alpha{ 1 };	// todo
 		int32_t indexAtParentChildren{-1};
-		uint64_t ud{};
+		//uint64_t ud{};
 
 		XX_INLINE XY GetScaledSize() const {
 			return scale * size;
@@ -85,6 +89,7 @@ namespace xx {
 
 		// for copy: Node::Init(z_, position_, scale_, anchor_, size_);
 		XX_INLINE Node& Init(int z_ = 0, XY const& position_ = {}, XY const& scale_ = { 1,1 }, XY const& anchor_ = {}, XY const& size_ = {}) {
+			typeId = cTypeId;
 			z = z_;
 			position = position_;
 			scale = scale_;

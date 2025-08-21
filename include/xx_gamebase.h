@@ -56,6 +56,7 @@ namespace xx {
 
 		// todo: input, event handler
 		XY mousePos{};
+		Weak<MouseEventHandlerNode> uiHandler;
 		Grid2dAABB<MouseEventHandlerNode*> uiGrid;
 
 		Shader* shader{};
@@ -64,7 +65,7 @@ namespace xx {
 		std::vector<std::string> searchPaths;
 		std::filesystem::path tmpPath;
 
-		xx::Task<> baseTask;
+		Task<> baseTask;
 #ifndef __EMSCRIPTEN__
 		sf::Window* wnd{};
 #endif
@@ -236,7 +237,7 @@ namespace xx {
 		// read all data by full path
 		Data LoadFileDataWithFullPath(std::string_view fp) {
 			Data d;
-			if (int32_t r = xx::ReadAllBytes((std::u8string_view&)fp, d)) {
+			if (int32_t r = ReadAllBytes((std::u8string_view&)fp, d)) {
 				CoutN("file read error. r = ", r, ", fn = ", fp);
 				throw fp;
 			}

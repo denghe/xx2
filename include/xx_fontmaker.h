@@ -20,7 +20,7 @@ namespace xx {
         GLTexture canvasTex;  // single char texture
         std::unique_ptr<FontFrame[]> bases;
         std::unordered_map<char32_t, FontFrame> extras;
-        xx::List<Ref<GLTexture>> texs;  // batchs
+        List<Ref<GLTexture>> texs;  // batchs
 
         // need ogl frame env
         void Init(float charSize_ = 24, float padding_ = 1, XYu texSize_ = { 2048, 2048 }, std::string fontName_ = "Arial") {

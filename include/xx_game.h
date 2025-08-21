@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "xx_gamebase_font.h"
-#include "xx_ui.h"
+#include "xx_ui_ext.h"
 
 namespace xx {
 	// derived member checkers

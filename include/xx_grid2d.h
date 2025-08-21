@@ -248,7 +248,7 @@ namespace xx {
 
 		// ring diffuse foreach ( usually for update logic or range search )
 		template <typename F, typename R = std::invoke_result_t<F, Node&, float>>
-		void ForeachByRange(int32_t rowNumber_, int32_t columnNumber_, int32_t searchRange, xx::SpaceGridRingDiffuseData const& rdd, F&& func) {
+		void ForeachByRange(int32_t rowNumber_, int32_t columnNumber_, int32_t searchRange, SpaceGridRingDiffuseData const& rdd, F&& func) {
 			auto scale = float(((Derived*)this)->cellSize) / rdd.cellSize;
 			for (int32_t i = 1, e = rdd.lens.len; i < e; i++) {
 				auto offsets = rdd.lens[i - 1].count;

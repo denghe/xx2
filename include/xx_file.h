@@ -59,7 +59,7 @@ namespace xx
 #ifdef _WIN32
 		PWSTR path_tmp;
 		auto r = SHGetKnownFolderPath(FOLDERID_ProgramData, 0, nullptr, &path_tmp);
-		auto sg = xx::MakeScopeGuard([&] { CoTaskMemFree(path_tmp); });
+		auto sg = MakeScopeGuard([&] { CoTaskMemFree(path_tmp); });
 		if (r != S_OK) return {};
 		return path_tmp;
 #else

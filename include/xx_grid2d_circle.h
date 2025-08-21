@@ -4,8 +4,8 @@
 namespace xx {
 
 	template<typename T, typename C = void>
-	struct Grid2dCircle : xx::Grid2dBase<Grid2dCircle<T, C>, T, C> {
-		using Base = xx::Grid2dBase<Grid2dCircle<T, C>, T, C>;
+	struct Grid2dCircle : Grid2dBase<Grid2dCircle<T, C>, T, C> {
+		using Base = Grid2dBase<Grid2dCircle<T, C>, T, C>;
 		using Base::Base;
 		int32_t cellSize{};
 		float _1_cellSize{};

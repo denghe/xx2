@@ -890,7 +890,7 @@ namespace xx {
         s.resize(len * 2);
         auto b = (uint8_t*)s.data();
         for (auto i = (ptrdiff_t)len - 1; i >= 0; --i) {
-            xx::ToHex(b[i], b[i * 2], b[i * 2 + 1]);
+            ::xx::ToHex(b[i], b[i * 2], b[i * 2 + 1]);
         }
     }
 
