@@ -23,14 +23,14 @@ namespace xx {
 		Grid2dAABB(Grid2dAABB const& o) = delete;
 		Grid2dAABB& operator=(Grid2dAABB const& o) = delete;
 
-		XX_INLINE void Init(XYi gridSize_, XY cellSize_, int32_t cellCap_ = 4, int32_t capacity_ = 0) {
+		XX_INLINE void Init(XYi gridSize_, XY cellSize_, int32_t cellCap_ = 4, int32_t capacity_ = 16) {
 			assert(!nodes && capacity_ > 0);
-			assert(gridSize.x > 0 && gridSize.y > 0);
+			assert(gridSize_.x > 0 && gridSize_.y > 0);
 			assert(cellSize_.x > 0 && cellSize_.y > 0);
 			gridSize = gridSize_;
 			cellSize = cellSize_;
 			_1_cellSize = 1.f / cellSize_;
-			worldSize = cellSize * gridSize;
+			worldSize = cellSize_ * gridSize_;
 			freeHead = -1;
 			freeCount = count = 0;
 			capacity = capacity_;
@@ -191,7 +191,6 @@ namespace xx {
 		}
 
 		XX_INLINE Node& NodeAt(int32_t nodeIndex_) const {
-			assert(cells);
 			assert(nodeIndex_ >= 0 && nodeIndex_ < count && nodes[nodeIndex_].next == -1);
 			return (Node&)nodes[nodeIndex_];
 		}

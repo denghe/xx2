@@ -15,7 +15,7 @@ namespace xx {
         XY worldScale, worldMinXY;
         XX_INLINE SimpleAffineTransform const& trans() const { return (SimpleAffineTransform&)worldScale; }
 
-		XY position{}, scale{ 1, 1 }, anchor{ 0.5, 0.5 }, size{};
+		XY position{}, anchor{ 0.5, 0.5 }, scale{ 1, 1 }, size{};
 		XY worldMaxXY{}, worldSize{};								// boundingBox. world coordinate. fill by FillTrans()
 
 		int32_t typeId{};											// fill by Init
@@ -88,15 +88,20 @@ namespace xx {
 		}
 
 		// for copy: Node::Init(z_, position_, scale_, anchor_, size_);
-		XX_INLINE Node& Init(int z_ = 0, XY const& position_ = {}, XY const& scale_ = { 1,1 }, XY const& anchor_ = {}, XY const& size_ = {}) {
+		XX_INLINE Node& Init(int z_ = 0, XY const& position_ = {}, XY const& anchor_ = {}, XY const& scale_ = { 1,1 }, XY const& size_ = {}) {
 			typeId = cTypeId;
 			z = z_;
 			position = position_;
-			scale = scale_;
 			anchor = anchor_;
+			scale = scale_;
 			size = size_;
 			FillTrans();
 			return *this;
+		}
+
+		// for ui root node only
+		XX_INLINE Node& InitRoot(XY const& scale_) {
+			return Init(0, 0, 0, scale_);
 		}
 
 		template<typename T, typename = std::enable_if_t<std::is_base_of_v<Node, T>>>
@@ -134,6 +139,19 @@ namespace xx {
 		virtual void TransUpdate() {};
 		virtual void Draw() {};									// draw current node only ( do not contain children )
 		virtual ~Node() {};
+
+
+		void Resize(XY const& scale_) {
+			scale = scale_;
+			FillTransRecursive();
+		}
+
+		void Resize(XY const& position_, XY const& scale_) {
+			position = position_;
+			scale = scale_;
+			FillTransRecursive();
+		}
+
 	};
 
 	/**********************************************************************************************/
@@ -199,7 +217,9 @@ namespace xx {
 
 		virtual void TransUpdate() override {
 			auto& g = GameBase::instance->uiGrid;
-			FromTo<XY> aabb{ worldMinXY, worldMaxXY };
+			auto w2 = g.worldSize * 0.5f;
+			FromTo<XY> aabb{ worldMinXY + w2, worldMaxXY + w2 };
+
 			if (g.TryLimitAABB(aabb)) {
 				if (indexAtUiGrid != -1) {
 					g.Update(indexAtUiGrid, aabb);

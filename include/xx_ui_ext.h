@@ -5,12 +5,17 @@ namespace xx {
 
 	struct InteractionNode : MouseEventHandlerNode {
 		static constexpr FromTo<int32_t> typeIdRange { 10, 20 };	// is InteractionNode check
+
 		std::function<void()> onFocus = [] {};	// play sound?
+
 		Ref<Scale9SpriteConfig> cfgNormal, cfgHighlight;
 		bool isFocus{}, alwaysHighlight{};
+
 		virtual void SetFocus() { assert(!isFocus); isFocus = true; };
 		virtual void LostFocus() { assert(isFocus); isFocus = false; };
+
 		// todo: focus navigate? prev next?
+
 		Scale9SpriteConfig& GetCfg() {
 			return alwaysHighlight ? *cfgHighlight : (isFocus ? *cfgHighlight : *cfgNormal);
 		}
@@ -32,15 +37,16 @@ namespace xx {
 			cfgHighlight = std::move(cfgHighlight_);
 			FillTrans();
 			auto& cfg = GetCfg();
-			MakeChildren<Scale9Sprite>()->Init(z + 1, 0, cfg.borderScale, {}, size / cfg.borderScale, cfg);
+			MakeChildren<Scale9Sprite>()->Init(z + 1, 0, {}, cfg.borderScale, size / cfg.borderScale, cfg);
 			return *this;
 		}
 
 		virtual void ApplyCfg() {
 			assert(children.len);
 			auto& cfg = GetCfg();
+			//CoutN(cfg.frame.tex->FileName());
 			auto bg = (Scale9Sprite*)children[0].pointer;
-			bg->Init(z + 1, 0, cfg.borderScale, {}, size / cfg.borderScale, cfg);
+			bg->Init(z + 1, 0, {}, cfg.borderScale, size / cfg.borderScale, cfg);
 		}
 
 		void SetFocus() override {
@@ -103,7 +109,7 @@ namespace xx {
 
 			auto& cfg = GetCfg();
 			auto lblLeft = MakeChildren<Label>();
-			lblLeft->Init(z + 1, { cfg.txtPadding.x, cfg.txtPaddingRightBottom.y }, cfg.txtScale, {}, cfg.txtColor, txtLeft_);
+			lblLeft->Init(z + 1, { cfg.txtPadding.x, cfg.txtPaddingRightBottom.y }, {}, cfg.txtScale, cfg.txtColor).SetText(txtLeft_);
 			if (fixedSize.x > 0) {
 				size = fixedSize;
 			}
@@ -111,9 +117,9 @@ namespace xx {
 				size = lblLeft->GetScaledSize() + cfg.txtPadding + cfg.txtPaddingRightBottom;
 			}
 			if (StrLen(txtRight_)) {
-				MakeChildren<Label>()->Init(z + 1, { size.x - cfg.txtPadding.x, cfg.txtPaddingRightBottom.y }, cfg.txtScale, { 1, 0 }, cfg.txtColor, txtRight_);
+				MakeChildren<Label>()->Init(z + 1, { size.x - cfg.txtPadding.x, cfg.txtPaddingRightBottom.y }, { 1, 0 }, cfg.txtScale, cfg.txtColor).SetText(txtRight_);
 			}
-			MakeChildren<Scale9Sprite>()->Init(z, {}, cfg.borderScale, {}, size / cfg.borderScale, cfg);
+			MakeChildren<Scale9Sprite>()->Init(z, {}, {}, cfg.borderScale, size / cfg.borderScale, cfg);
 			FillTransRecursive();
 			return *this;
 		}
@@ -121,8 +127,9 @@ namespace xx {
 		void ApplyCfg() override {
 			assert(children.len == 2 || children.len == 3);		// lblLeft [, lblRight], bg
 			auto& cfg = GetCfg();
+			//CoutN(cfg.frame.tex->FileName());
 			auto lblLeft = (Label*)children[0].pointer;
-			lblLeft->Init(z + 1, { cfg.txtPadding.x, cfg.txtPaddingRightBottom.y }, cfg.txtScale, {}, cfg.txtColor);
+			lblLeft->Init(z + 1, { cfg.txtPadding.x, cfg.txtPaddingRightBottom.y }, {}, cfg.txtScale, cfg.txtColor);
 			if (fixedSize.x > 0) {
 				size = fixedSize;
 			}
@@ -131,13 +138,13 @@ namespace xx {
 			}
 			Scale9Sprite* bg;
 			if (children.len == 3) {
-				((Label*)children[1].pointer)->Init(z + 1, { size.x - cfg.txtPadding.x, cfg.txtPaddingRightBottom.y }, cfg.txtScale, { 1, 0 }, cfg.txtColor);
+				((Label*)children[1].pointer)->Init(z + 1, { size.x - cfg.txtPadding.x, cfg.txtPaddingRightBottom.y }, { 1, 0 }, cfg.txtScale, cfg.txtColor);
 				bg = (Scale9Sprite*)children[2].pointer;
 			}
 			else {
 				bg = (Scale9Sprite*)children[1].pointer;
 			}
-			bg->Init(z, {}, cfg.borderScale, {}, size / cfg.borderScale, cfg);
+			bg->Init(z, {}, {}, cfg.borderScale, size / cfg.borderScale, cfg);
 			FillTransRecursive();
 		}
 
@@ -168,7 +175,7 @@ namespace xx {
 			FillTrans();
 			MakeChildren<Image>()->Init(z, spacing_, {}, fixedSize_, keepAspect_, std::move(frame_), radians_, color_, colorplus_);
 			auto& cfg = GetCfg();
-			MakeChildren<Scale9Sprite>()->Init(z + 1, 0, cfg.borderScale, {}, size / cfg.borderScale, cfg);
+			MakeChildren<Scale9Sprite>()->Init(z + 1, 0, {}, cfg.borderScale, size / cfg.borderScale, cfg);
 			return *this;
 		}
 
@@ -176,7 +183,7 @@ namespace xx {
 			assert(children.len == 2);
 			auto& cfg = GetCfg();
 			auto bg = (Scale9Sprite*)children[1].pointer;
-			bg->Init(z + 1, 0, cfg.borderScale, {}, size / cfg.borderScale, cfg);
+			bg->Init(z + 1, 0, {}, cfg.borderScale, size / cfg.borderScale, cfg);
 		}
 	};
 
@@ -218,7 +225,7 @@ namespace xx {
 			blockMoving = false;
 
 			auto& cfg = isFocus ? *cfgHighlight : *cfgNormal;
-			MakeChildren<Label>()->Init(z + 1, { cfg.txtPadding.x, cfg.txtPaddingRightBottom.y }, cfg.txtScale, {}, cfg.txtColor, txtLeft_);
+			MakeChildren<Label>()->Init(z + 1, { cfg.txtPadding.x, cfg.txtPaddingRightBottom.y }, {}, cfg.txtScale, cfg.txtColor, txtLeft_);
 			return *this;
 		}
 
@@ -231,15 +238,15 @@ namespace xx {
 			auto barMinWidth = cfgBar->center.x * 2. * cfgBar->borderScale;
 			XY barSize{ std::max(widthBar * value, barMinWidth), height * 0.25f };
 			XY barPos{ widthTxtLeft, (height - barSize.y) * 0.5f };
-			MakeChildren<Scale9Sprite>()->Init(z + 1, barPos, cfgBar->borderScale, {}, barSize / cfgBar->borderScale, *cfgBar);
+			MakeChildren<Scale9Sprite>()->Init(z + 1, barPos, {}, cfgBar->borderScale, barSize / cfgBar->borderScale, *cfgBar);
 
 			XY blockSize{ height * 0.6f, height * 0.6f };
 			XY blockPos{ widthTxtLeft + widthBar * value - blockSize.x * 0.5f, (height - blockSize.y) * 0.5f };
-			MakeChildren<Scale9Sprite>()->Init(z + 2, blockPos, cfgBlock->borderScale, {}, blockSize / cfgBlock->borderScale, *cfgBlock);
+			MakeChildren<Scale9Sprite>()->Init(z + 2, blockPos, {}, cfgBlock->borderScale, blockSize / cfgBlock->borderScale, *cfgBlock);
 
 			auto txtRight = valueToString(value);
-			MakeChildren<Label>()->Init(z + 1, { size.x - cfg.txtPadding.x, cfg.txtPaddingRightBottom.y }, cfg.txtScale, { 1, 0 }, cfg.txtColor, txtRight);
-			MakeChildren<Scale9Sprite>()->Init(z, {}, cfg.borderScale, {}, size / cfg.borderScale, cfg);
+			MakeChildren<Label>()->Init(z + 1, { size.x - cfg.txtPadding.x, cfg.txtPaddingRightBottom.y }, cfg.txtScale, { 1, 0 }, cfg.txtColor).SetText(txtRight);
+			MakeChildren<Scale9Sprite>()->Init(z, {}, {}, cfg.borderScale, size / cfg.borderScale, cfg);
 			FillTransRecursive();
 			return *this;
 		}
@@ -263,7 +270,7 @@ namespace xx {
 			auto& cfg = isFocus ? *cfgHighlight : *cfgNormal;
 			//auto lblLeft = (Label*)children[0].pointer;
 			//lblLeft->Init(z + 1, { cfg.txtPadding.x, cfg.txtPaddingRightBottom.y }, cfg.txtScale, {}, cfg.txtColor);
-			((Scale9Sprite*)children[4].pointer)->Init(z, {}, cfg.borderScale, {}, size / cfg.borderScale, cfg);
+			((Scale9Sprite*)children[4].pointer)->Init(z, {}, {}, cfg.borderScale, size / cfg.borderScale, cfg);
 			//FillTransRecursive();
 		}
 
@@ -279,7 +286,7 @@ namespace xx {
 			XY barSize{ std::max(widthBar * value, barMinWidth), height * 0.25f };
 			XY barPos{ widthTxtLeft, (height - barSize.y) * 0.5f };
 			auto bar = ((Scale9Sprite*)children[1].pointer);
-			bar->Init(z + 1, barPos, cfgBar->borderScale, {}, barSize / cfgBar->borderScale, *cfgBar);
+			bar->Init(z + 1, barPos, {}, cfgBar->borderScale, barSize / cfgBar->borderScale, *cfgBar);
 
 			XY blockSize{ height * 0.6f, height * 0.6f };
 			XY blockPos{ widthTxtLeft + widthBar * value - blockSize.x * 0.5f, (height - blockSize.y) * 0.5f };

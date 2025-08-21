@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "xx_gamebase.h"
+#include "xx_gl.h"
 
 namespace xx {
 
@@ -12,6 +12,22 @@ namespace xx {
     struct TinyFrame {
         Ref<GLTexture> tex;
         UVRect textureRect{};
+
+        TinyFrame() = default;
+        TinyFrame(TinyFrame const&) = default;
+        TinyFrame(TinyFrame &&) = default;
+        TinyFrame& operator=(TinyFrame const&) = default;
+        TinyFrame& operator=(TinyFrame &&) = default;
+
+        TinyFrame(Ref<GLTexture> t) {
+            tex = std::move(t);
+            textureRect = tex->Rect();
+        }
+
+        void operator=(Ref<GLTexture> t) {
+            tex = std::move(t);
+            textureRect = tex->Rect();
+        }
     };
 
     // texture packer element container

@@ -3,8 +3,13 @@
 using XY = xx::XY;
 
 struct Game : xx::Game<Game> {
-	xx::Shared<xx::Label> lbl;
-	xx::RefGLTexture tex;
+	xx::Shared<xx::Node> ui;
+	struct {
+	xx::Ref<xx::Scale9SpriteConfig> btnNormal, btnHighlight;
+	} cfgs;
+	struct {
+	xx::RefGLTexture heart, ui_button_n, ui_button_h;
+	} texs;
 	float heartScale{};
 
 	void Init();

@@ -9,14 +9,7 @@ namespace xx {
 		List<FontFrame> fs;
 		RGBA8 color;
 
-		template<typename S>
-		Label& Init(int z_, XY const& position_, XY const& scale_, XY const& anchor_, RGBA8 color_, S const& txt_) {
-			Init(z_, position_, scale_, anchor_, color_);
-			SetText(txt_);
-			return *this;
-		}
-
-		Label& Init(int z_, XY const& position_, XY const& scale_, XY const& anchor_, RGBA8 color_) {
+		Label& Init(int z_, XY position_, XY anchor_ = 0, XY scale_ = 1, RGBA8 color_ = RGBA8_White) {
 			typeId = cTypeId;
 			z = z_;
 			position = position_;
@@ -24,12 +17,6 @@ namespace xx {
 			scale = scale_;
 			color = color_;
 			return *this;
-		}
-
-		void Resize(XY const& position_, XY const& scale_) {
-			position = position_;
-			scale = scale_;
-			FillTrans();
 		}
 
 		// S : literal string u8/32string [view]
@@ -147,8 +134,8 @@ namespace xx {
 		XY texScale;
 		float colorplus;
 
-		Scale9Sprite& Init(int z_, XY const& position_, XY const& scale_, XY const& anchor_, XY const& size_, Scale9SpriteConfig const& cfg_, float colorplus_ = 1) {
-			Node::Init(z_, position_, scale_, anchor_, size_);
+		Scale9Sprite& Init(int z_, XY position_, XY anchor_, XY scale_, XY size_, Scale9SpriteConfig const& cfg_, float colorplus_ = 1) {
+			Node::Init(z_, position_, anchor_, scale_, size_);
 			typeId = cTypeId;
 			frame = cfg_.frame;
 			center = cfg_.center;

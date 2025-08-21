@@ -22,7 +22,7 @@ namespace xx {
 		std::u32string title{ U"game" };					// window title string( user can init )
 		XY designSize{ 1920, 1080 };						// design resolution( user can init )
 		XY windowSize{ designSize }, windowSizeBackup{};	// physics resolution( user can init )
-		XY worldMinXY{}, worldMaxXY{};						// for node( worldMinXY = -windowSize / 2,  worldMinXY = windowSize / 2 );
+		XY worldMinXY{}, worldMaxXY{};						// for node( worldMinXY = -windowSize / 2,  worldMaxXY = windowSize / 2 );
 		XY size{}, size_2{};								// actual design size
 		/*
 				 screen anchor points
@@ -56,6 +56,7 @@ namespace xx {
 
 		// todo: input, event handler
 		XY mousePos{};
+		std::array<bool, 16> mouseBtns{};
 		Weak<MouseEventHandlerNode> uiHandler;
 		Grid2dAABB<MouseEventHandlerNode*> uiGrid;
 
@@ -281,6 +282,8 @@ namespace xx {
 			this->rootPath = this->ToSearchPath((std::string&)currDir);
 			this->searchPaths.clear();
 			this->searchPaths.push_back(this->rootPath);
+
+			uiGrid.Init(64, 128);	// 8k
 		}
 
 		// life cycle 2
