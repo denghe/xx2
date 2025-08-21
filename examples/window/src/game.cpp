@@ -16,7 +16,7 @@ void Game::GLInit() {
 	texs.ui_button_n = LoadTexture("res/ui_button_n.png");
 	texs.ui_button_h = LoadTexture("res/ui_button_h.png");
 
-	cfgs.btnNormal.Emplace(xx::Scale9SpriteConfig{
+	cfgs.s9bN.Emplace(xx::Scale9Config{
 		.frame = texs.ui_button_n,
 		.texScale = { 1, 1 },
 		.center = { 2, 2, 2, 2 },
@@ -29,8 +29,8 @@ void Game::GLInit() {
 		.iconPadding = { 5 }
 	});
 
-	cfgs.btnHighlight.Emplace(*cfgs.btnNormal);
-	cfgs.btnHighlight->frame = texs.ui_button_h;
+	cfgs.s9bH.Emplace(*cfgs.s9bN);
+	cfgs.s9bH->frame = texs.ui_button_h;
 
 	ui.Emplace()->InitRoot(scale);
 
@@ -38,12 +38,15 @@ void Game::GLInit() {
 		.SetText("hi");
 
 	ui->MakeChildren<xx::LabelButton>()->Init(2, p5 + XY{ 0, -35 }, a5
-		, cfgs.btnNormal, cfgs.btnHighlight
-		, "change color").onClicked = [this] {
-		heart.colorIdx++;
-		if (heart.colorIdx == heart.colors.size()) {
-			heart.colorIdx = 0;
+		, cfgs.s9bN, cfgs.s9bH, "change color").onClicked = [this] {
+		heart.ci++;
+		if (heart.ci >= heart.colors.size()) {
+			heart.ci = 0;
 		}
+	};
+
+	ui->MakeChildren<xx::LabelButton>()->Init(3, p5 + XY{ 0, -20 }, a5
+		, cfgs.s9bN, cfgs.s9bH, "asdfqwer").onClicked = [this] {
 	};
 
 	heart.scale = 20.f;
@@ -62,7 +65,7 @@ xx::Task<> Game::Task() {
 
 void Game::Update() {
 	Quad().Draw(*texs.heart, texs.heart->Rect(), XY{}, 0.5f
-		, heart.scale * scale, 0, 1, heart.colors[heart.colorIdx]);
+		, heart.scale * scale, 0, 1, heart.colors[heart.ci]);
 	DrawNode(ui);
 }
 
@@ -72,5 +75,7 @@ void Game::OnResize() {
 
 void Game::Stat() {
 	xx::CoutN("drawFPS = ", drawFPS, " drawCall = "
-		, drawCall, " drawVerts = ", drawVerts);
+		, drawCall, " drawVerts = ", drawVerts
+		, " delayFuncs.len = ", delayFuncs.len
+	);
 }

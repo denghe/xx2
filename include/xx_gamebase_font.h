@@ -31,42 +31,38 @@ namespace xx {
 				// left-top: 0,0 to center 0,0 gl pos
 				mousePos = { e.mouseMove.x - worldMaxXY.x, worldMaxXY.y - e.mouseMove.y };
 
-				if (uiHandler) {
-					uiHandler->OnMouseMove();
+				// search
+				uiGrid.ForeachPoint(uiGrid.worldSize * 0.5f + mousePos);
+
+				// search results -> tmpZNodes
+				for (auto& i : uiGrid.results) {
+					auto o = uiGrid.NodeAt(i).value;
+					assert(o->typeId >= 10);
+					tmpZNodes.Emplace(o->z, o);
 				}
-				else {
-					// search
-					uiGrid.ForeachPoint(uiGrid.worldSize * 0.5f + mousePos);
 
-					// search results -> tmpZNodes
-					for (auto& i : uiGrid.results) {
-						auto o = uiGrid.NodeAt(i).value;
-						assert(o->typeId >= 10);
-						tmpZNodes.Emplace(o->z, o);
-					}
+				// sort order by z
+				std::sort(tmpZNodes.buf, tmpZNodes.buf + tmpZNodes.len
+					, ZNode::GreaterThanComparer);	
 
-					// sort order by z
-					std::sort(tmpZNodes.buf, tmpZNodes.buf + tmpZNodes.len
-						, ZNode::GreaterThanComparer);	
-
-					// try dispatch
-					for (auto& zn : tmpZNodes) {
-						if (!((MouseEventHandlerNode*)zn.n)->PosInScissor(mousePos)) continue;
-						((MouseEventHandlerNode*)zn.n)->OnMouseMove();
-						if (uiHandler) break;
-					}
-					tmpZNodes.Clear();
+				// try dispatch
+				for (auto& zn : tmpZNodes) {
+					auto n = ((MouseEventHandlerNode*)zn.n);
+					if (!n->PosInScissor(mousePos)) continue;
+					if (n->OnMouseMove()) break;
 				}
+				tmpZNodes.Clear();
 			}
 			else if (e.type == sf::Event::MouseButtonPressed) {
 				auto btnId = (int)e.mouseButton.button;
 				if (mouseBtns[btnId]) return;  // for duplicate message bug
+
 				bool handled{};
-				if (uiHandler) {
-					uiHandler->OnMouseDown();
-					handled = true;
-				}
-				else {
+				//if (uiHandler) {
+				//	uiHandler->OnMouseDown();
+				//	handled = true;
+				//}
+				//else {
 					// search
 					uiGrid.ForeachPoint(uiGrid.worldSize * 0.5f + mousePos);
 
@@ -82,13 +78,15 @@ namespace xx {
 						, ZNode::GreaterThanComparer);
 
 					for (auto& zn : tmpZNodes) {
-						if (!((MouseEventHandlerNode*)zn.n)->PosInScissor(mousePos)) continue;
-						((MouseEventHandlerNode*)zn.n)->OnMouseDown();
-						handled = true;
-						if (uiHandler) break;
+						auto n = ((MouseEventHandlerNode*)zn.n);
+						if (!n->PosInScissor(mousePos)) continue;
+						if (n->OnMouseDown()) {
+							handled = true;
+							break;
+						}
 					}
 					tmpZNodes.Clear();
-				}
+				//}
 				if (!handled) {
 					mouseBtns[btnId] = true;
 				}
@@ -97,10 +95,9 @@ namespace xx {
 			else if (e.type == sf::Event::MouseButtonReleased) {
 				auto btnId = (int)e.mouseButton.button;
 				mouseBtns[btnId] = false;
-				if (uiHandler) {
-					uiHandler->OnMouseUp();
-					//uiHandler.Reset();
-				}
+				//if (uiHandler) {
+				//	uiHandler->OnMouseUp();
+				//}
 			}
 		}
 

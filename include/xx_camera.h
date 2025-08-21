@@ -3,6 +3,8 @@
 
 namespace xx {
 
+	// todo: smoothing? targets? death area?
+
 	struct Camera {
 		float logicScale{ 1 }, baseScale{ 1 };
 		float scale{ 1 }, _1_scale{ 1 };

@@ -8,6 +8,7 @@
 
 namespace xx {
 
+	struct Node;
 	struct MouseEventHandlerNode;
 
 	// engine base code
@@ -66,10 +67,21 @@ namespace xx {
 		std::vector<std::string> searchPaths;
 		std::filesystem::path tmpPath;
 
+		List<std::function<int32_t()>> delayFuncs;				// call after update
 		Task<> baseTask;
 #ifndef __EMSCRIPTEN__
 		sf::Window* wnd{};
 #endif
+
+		// example:
+		// GameBase::instance->delayFuncs.Emplace([w = WeakFromThis(this)] { if (!w) return 1; return 0; });
+		void ExecuteDelayFuncs() {
+			for (int32_t i = delayFuncs.len - 1; i >= 0; --i) {
+				if (delayFuncs[i]()) {
+					delayFuncs.SwapRemoveAt(i);
+				}
+			}
+		}
 
 		// for window resize event
 		void ResizeCalc() {

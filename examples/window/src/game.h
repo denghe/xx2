@@ -6,17 +6,18 @@ struct Game : xx::Game<Game> {
 	xx::Shared<xx::Node> ui;
 
 	struct {
-	xx::Ref<xx::Scale9SpriteConfig> btnNormal, btnHighlight;
+		xx::Ref<xx::Scale9Config> s9bN, s9bH;
 	} cfgs;
 
 	struct {
-	xx::RefGLTexture heart, ui_button_n, ui_button_h;
+		xx::RefGLTexture heart, ui_button_n, ui_button_h;
 	} texs;
 
 	struct {
-	float scale{};
-	int32_t colorIdx{};
-	std::array<xx::RGBA8, 4> colors { xx::RGBA8_White, xx::RGBA8_Red, xx::RGBA8_Yellow, xx::RGBA8_Blue };
+		float scale{};
+		int32_t ci{};	// color index
+		std::array<xx::RGBA8, 4> colors{
+			xx::RGBA8_White, xx::RGBA8_Red, xx::RGBA8_Yellow, xx::RGBA8_Blue };
 	} heart;
 
 	void Init();

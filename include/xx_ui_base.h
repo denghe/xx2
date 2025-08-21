@@ -7,7 +7,7 @@ namespace xx {
 		static constexpr int32_t cTypeId{ 1 };
 
 		List<FontFrame> fs;
-		RGBA8 color;
+		RGBA8 color{};
 
 		Label& Init(int z_, XY position_, XY anchor_ = 0, XY scale_ = 1, RGBA8 color_ = RGBA8_White) {
 			typeId = cTypeId;
@@ -104,7 +104,7 @@ namespace xx {
 		}
 	};
 
-	struct Scale9SpriteConfig {
+	struct Scale9Config {
 		TinyFrame frame;
 		XY texScale{ 1, 1 };
 		UVRect center{};
@@ -125,7 +125,7 @@ namespace xx {
 		}
 	};
 
-	struct Scale9Sprite : Node {
+	struct Scale9 : Node {
 		static constexpr int32_t cTypeId{ 3 };
 
 		TinyFrame frame;
@@ -134,7 +134,7 @@ namespace xx {
 		XY texScale;
 		float colorplus;
 
-		Scale9Sprite& Init(int z_, XY position_, XY anchor_, XY scale_, XY size_, Scale9SpriteConfig const& cfg_, float colorplus_ = 1) {
+		Scale9& Init(int z_, XY position_, XY anchor_, XY scale_, XY size_, Scale9Config const& cfg_, float colorplus_ = 1) {
 			Node::Init(z_, position_, anchor_, scale_, size_);
 			typeId = cTypeId;
 			frame = cfg_.frame;
@@ -145,7 +145,7 @@ namespace xx {
 			return *this;
 		}
 
-		Scale9Sprite& Init(int z_, XY position_, XY anchor_, XY size_, Scale9SpriteConfig const& cfg_) {
+		Scale9& Init(int z_, XY position_, XY anchor_, XY size_, Scale9Config const& cfg_) {
 			return Init(z_, position_, cfg_.borderScale, anchor_, size_ / cfg_.borderScale, cfg_);
 		}
 

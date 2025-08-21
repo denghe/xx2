@@ -3,12 +3,14 @@
 
 namespace xx {
 
+	// todo: ScrollView Richxxxx
+
 	struct InteractionNode : MouseEventHandlerNode {
 		static constexpr FromTo<int32_t> typeIdRange { 10, 20 };	// is InteractionNode check
 
 		std::function<void()> onFocus = [] {};	// play sound?
 
-		Ref<Scale9SpriteConfig> cfgNormal, cfgHighlight;
+		Ref<Scale9Config> cfgNormal, cfgHighlight;
 		bool isFocus{}, alwaysHighlight{};
 
 		virtual void SetFocus() { assert(!isFocus); isFocus = true; };
@@ -16,7 +18,7 @@ namespace xx {
 
 		// todo: focus navigate? prev next?
 
-		Scale9SpriteConfig& GetCfg() {
+		Scale9Config& GetCfg() {
 			return alwaysHighlight ? *cfgHighlight : (isFocus ? *cfgHighlight : *cfgNormal);
 		}
 	};
@@ -27,7 +29,7 @@ namespace xx {
 		std::function<void()> onClicked = [] { CoutN("Button clicked."); };
 
 		Button& Init(int z_, XY position_, XY anchor_, XY size_
-			, Ref<Scale9SpriteConfig> cfgNormal_, Ref<Scale9SpriteConfig> cfgHighlight_) {
+			, Ref<Scale9Config> cfgNormal_, Ref<Scale9Config> cfgHighlight_) {
 			typeId = cTypeId;
 			z = z_;
 			position = position_;
@@ -37,7 +39,7 @@ namespace xx {
 			cfgHighlight = std::move(cfgHighlight_);
 			FillTrans();
 			auto& cfg = GetCfg();
-			MakeChildren<Scale9Sprite>()->Init(z + 1, 0, {}, cfg.borderScale, size / cfg.borderScale, cfg);
+			MakeChildren<Scale9>()->Init(z + 1, 0, {}, cfg.borderScale, size / cfg.borderScale, cfg);
 			return *this;
 		}
 
@@ -45,45 +47,51 @@ namespace xx {
 			assert(children.len);
 			auto& cfg = GetCfg();
 			//CoutN(cfg.frame.tex->FileName());
-			auto bg = (Scale9Sprite*)children[0].pointer;
+			auto bg = (Scale9*)children[0].pointer;
 			bg->Init(z + 1, 0, {}, cfg.borderScale, size / cfg.borderScale, cfg);
 		}
 
 		void SetFocus() override {
 			assert(!isFocus);
 			isFocus = true;
-			ApplyCfg();
 			GameBase::instance->uiHandler = WeakFromThis(this);
+			ApplyCfg();
 			onFocus();
 			//CoutN("SetFocus");
 		}
 
 		void LostFocus() override {
 			assert(isFocus);
+			if (GameBase::instance->uiHandler.TryGetPointer() == this) {
+				GameBase::instance->uiHandler.Reset();
+			}
 			isFocus = false;
 			ApplyCfg();
-			GameBase::instance->uiHandler.Reset();
 			//CoutN("LostFocus");
 		}
 
 		// todo: enable disable
 
-		virtual void OnMouseDown() override {
-			if (MousePosInArea()) {
-				onClicked();
-			}
+		virtual int32_t OnMouseDown() override {
+			onClicked();
+			return 1;
 		}
 
-		virtual void OnMouseMove() override {
-			if (MousePosInArea()) {
-				if (isFocus) return;
+		virtual int32_t OnMouseMove() override {
+			if (!isFocus) {
 				SetFocus();
+				GameBase::instance->delayFuncs.Emplace([w = WeakFromThis(this)] {
+					if (!w) return 1;
+					auto p = w.TryGetPointer();
+					if (GameBase::instance->uiHandler.TryGetPointer() != p
+						|| !p->MousePosInArea()) {
+						p->LostFocus();
+						return 1;
+					}
+					return 0;
+				});
 			}
-			else {
-				if (!isFocus) return;
-				LostFocus();
-				GameBase::instance->uiHandler.Reset();
-			}
+			return 1;
 		}
 
 	};
@@ -95,7 +103,7 @@ namespace xx {
 
 		template<typename S1, typename S2 = char const*>
 		LabelButton& Init(int z_, XY position_, XY anchor_
-			, Ref<Scale9SpriteConfig> cfgNormal_, Ref<Scale9SpriteConfig> cfgHighlight_
+			, Ref<Scale9Config> cfgNormal_, Ref<Scale9Config> cfgHighlight_
 			, S1 const& txtLeft_ = {}, S2 const& txtRight_ = {}, XY fixedSize_ = {}) {
 			assert(children.Empty());
 			typeId = cTypeId;
@@ -119,7 +127,7 @@ namespace xx {
 			if (StrLen(txtRight_)) {
 				MakeChildren<Label>()->Init(z + 1, { size.x - cfg.txtPadding.x, cfg.txtPaddingRightBottom.y }, { 1, 0 }, cfg.txtScale, cfg.txtColor).SetText(txtRight_);
 			}
-			MakeChildren<Scale9Sprite>()->Init(z, {}, {}, cfg.borderScale, size / cfg.borderScale, cfg);
+			MakeChildren<Scale9>()->Init(z, {}, {}, cfg.borderScale, size / cfg.borderScale, cfg);
 			FillTransRecursive();
 			return *this;
 		}
@@ -136,13 +144,13 @@ namespace xx {
 			else {
 				size = lblLeft->GetScaledSize() + cfg.txtPadding + cfg.txtPaddingRightBottom;
 			}
-			Scale9Sprite* bg;
+			Scale9* bg;
 			if (children.len == 3) {
 				((Label*)children[1].pointer)->Init(z + 1, { size.x - cfg.txtPadding.x, cfg.txtPaddingRightBottom.y }, { 1, 0 }, cfg.txtScale, cfg.txtColor);
-				bg = (Scale9Sprite*)children[2].pointer;
+				bg = (Scale9*)children[2].pointer;
 			}
 			else {
-				bg = (Scale9Sprite*)children[1].pointer;
+				bg = (Scale9*)children[1].pointer;
 			}
 			bg->Init(z, {}, {}, cfg.borderScale, size / cfg.borderScale, cfg);
 			FillTransRecursive();
@@ -163,7 +171,7 @@ namespace xx {
 		static constexpr int32_t cTypeId{ 12 };
 
 		ImageButton& Init(int z_, XY position_, XY anchor_, XY fixedSize_, bool keepAspect_, XY spacing_
-			, Ref<Scale9SpriteConfig> cfgNormal_, Ref<Scale9SpriteConfig> cfgHighlight_
+			, Ref<Scale9Config> cfgNormal_, Ref<Scale9Config> cfgHighlight_
 			, TinyFrame frame_, ImageRadians radians_ = ImageRadians::Zero, RGBA8 color_ = RGBA8_White, float colorplus_ = 1) {
 			typeId = cTypeId;
 			z = z_;
@@ -175,14 +183,14 @@ namespace xx {
 			FillTrans();
 			MakeChildren<Image>()->Init(z, spacing_, {}, fixedSize_, keepAspect_, std::move(frame_), radians_, color_, colorplus_);
 			auto& cfg = GetCfg();
-			MakeChildren<Scale9Sprite>()->Init(z + 1, 0, {}, cfg.borderScale, size / cfg.borderScale, cfg);
+			MakeChildren<Scale9>()->Init(z + 1, 0, {}, cfg.borderScale, size / cfg.borderScale, cfg);
 			return *this;
 		}
 
 		void ApplyCfg() override {
 			assert(children.len == 2);
 			auto& cfg = GetCfg();
-			auto bg = (Scale9Sprite*)children[1].pointer;
+			auto bg = (Scale9*)children[1].pointer;
 			bg->Init(z + 1, 0, {}, cfg.borderScale, size / cfg.borderScale, cfg);
 		}
 	};
@@ -190,7 +198,7 @@ namespace xx {
 	struct Slider : InteractionNode {
 		static constexpr int32_t cTypeId{ 13 };
 
-		Ref<Scale9SpriteConfig> cfgBar, cfgBlock;
+		Ref<Scale9Config> cfgBar, cfgBlock;
 		float height{}, widthTxtLeft{}, widthBar{}, widthTxtRight{};
 		double value{}, valueBak{};	// 0 ~ 1
 		bool blockMoving{};
@@ -203,8 +211,8 @@ namespace xx {
 		// InitBegin + set value/ToSting + InitEnd
 		template<typename S>
 		Slider& InitBegin(int z_, XY position_, XY anchor_
-			, Ref<Scale9SpriteConfig> cfgNormal_, Ref<Scale9SpriteConfig> cfgHighlight_
-			, Ref<Scale9SpriteConfig> cfgBar_, Ref<Scale9SpriteConfig> cfgBlock_
+			, Ref<Scale9Config> cfgNormal_, Ref<Scale9Config> cfgHighlight_
+			, Ref<Scale9Config> cfgBar_, Ref<Scale9Config> cfgBlock_
 			, float height_, float widthTxtLeft_, float widthBar_, float widthTxtRight_
 			, S const& txtLeft_)
 		{
@@ -238,23 +246,23 @@ namespace xx {
 			auto barMinWidth = cfgBar->center.x * 2. * cfgBar->borderScale;
 			XY barSize{ std::max(widthBar * value, barMinWidth), height * 0.25f };
 			XY barPos{ widthTxtLeft, (height - barSize.y) * 0.5f };
-			MakeChildren<Scale9Sprite>()->Init(z + 1, barPos, {}, cfgBar->borderScale, barSize / cfgBar->borderScale, *cfgBar);
+			MakeChildren<Scale9>()->Init(z + 1, barPos, {}, cfgBar->borderScale, barSize / cfgBar->borderScale, *cfgBar);
 
 			XY blockSize{ height * 0.6f, height * 0.6f };
 			XY blockPos{ widthTxtLeft + widthBar * value - blockSize.x * 0.5f, (height - blockSize.y) * 0.5f };
-			MakeChildren<Scale9Sprite>()->Init(z + 2, blockPos, {}, cfgBlock->borderScale, blockSize / cfgBlock->borderScale, *cfgBlock);
+			MakeChildren<Scale9>()->Init(z + 2, blockPos, {}, cfgBlock->borderScale, blockSize / cfgBlock->borderScale, *cfgBlock);
 
 			auto txtRight = valueToString(value);
 			MakeChildren<Label>()->Init(z + 1, { size.x - cfg.txtPadding.x, cfg.txtPaddingRightBottom.y }, cfg.txtScale, { 1, 0 }, cfg.txtColor).SetText(txtRight);
-			MakeChildren<Scale9Sprite>()->Init(z, {}, {}, cfg.borderScale, size / cfg.borderScale, cfg);
+			MakeChildren<Scale9>()->Init(z, {}, {}, cfg.borderScale, size / cfg.borderScale, cfg);
 			FillTransRecursive();
 			return *this;
 		}
 
 		template<typename S>
 		Slider& Init(int z_, XY position_, XY anchor_
-			, Ref<Scale9SpriteConfig> cfgNormal_, Ref<Scale9SpriteConfig> cfgHighlight_
-			, Ref<Scale9SpriteConfig> cfgBar_, Ref<Scale9SpriteConfig> cfgBlock_
+			, Ref<Scale9Config> cfgNormal_, Ref<Scale9Config> cfgHighlight_
+			, Ref<Scale9Config> cfgBar_, Ref<Scale9Config> cfgBlock_
 			, float height_, float widthTxtLeft_, float widthBar_, float widthTxtRight_
 			, S const& txtLeft_, double value_) {
 			InitBegin(z_, position_, anchor_
@@ -270,7 +278,7 @@ namespace xx {
 			auto& cfg = isFocus ? *cfgHighlight : *cfgNormal;
 			//auto lblLeft = (Label*)children[0].pointer;
 			//lblLeft->Init(z + 1, { cfg.txtPadding.x, cfg.txtPaddingRightBottom.y }, cfg.txtScale, {}, cfg.txtColor);
-			((Scale9Sprite*)children[4].pointer)->Init(z, {}, {}, cfg.borderScale, size / cfg.borderScale, cfg);
+			((Scale9*)children[4].pointer)->Init(z, {}, {}, cfg.borderScale, size / cfg.borderScale, cfg);
 			//FillTransRecursive();
 		}
 
@@ -285,12 +293,12 @@ namespace xx {
 			auto barMinWidth = cfgBar->center.x * 2. * cfgBar->borderScale;
 			XY barSize{ std::max(widthBar * value, barMinWidth), height * 0.25f };
 			XY barPos{ widthTxtLeft, (height - barSize.y) * 0.5f };
-			auto bar = ((Scale9Sprite*)children[1].pointer);
+			auto bar = ((Scale9*)children[1].pointer);
 			bar->Init(z + 1, barPos, {}, cfgBar->borderScale, barSize / cfgBar->borderScale, *cfgBar);
 
 			XY blockSize{ height * 0.6f, height * 0.6f };
 			XY blockPos{ widthTxtLeft + widthBar * value - blockSize.x * 0.5f, (height - blockSize.y) * 0.5f };
-			auto block = ((Scale9Sprite*)children[2].pointer);
+			auto block = ((Scale9*)children[2].pointer);
 			block->position = blockPos;
 			block->FillTrans();
 
@@ -326,48 +334,44 @@ namespace xx {
 
 		// todo: enable disable
 
-		void OnMouseDown() override {
-			if (MousePosInArea()) {
-				auto mx = GameBase::instance->mousePos.x;
-				auto x1 = worldMinXY.x + widthTxtLeft * worldScale.x;
-				auto x2 = worldMinXY.x + (widthTxtLeft + widthBar) * worldScale.x;
-				assert(worldMaxXY.x > x1);
-				assert(worldMaxXY.x > x2);
-				if (mx <= x1) {
-					value = 0;
-				}
-				else if (mx >= x2) {
-					value = 1;
-				}
-				else {
-					value = (mx - x1) / (x2 - x1);
-				}
-				ApplyValue();
-				blockMoving = true;
+		int32_t OnMouseDown() override {
+			auto mx = GameBase::instance->mousePos.x;
+			auto x1 = worldMinXY.x + widthTxtLeft * worldScale.x;
+			auto x2 = worldMinXY.x + (widthTxtLeft + widthBar) * worldScale.x;
+			assert(worldMaxXY.x > x1);
+			assert(worldMaxXY.x > x2);
+			if (mx <= x1) {
+				value = 0;
 			}
-		}
-
-		void OnMouseMove() override {
-			if (MousePosInArea()) {
-				if (!isFocus) {
-					SetFocus();
-				}
-				if (blockMoving) {
-					OnMouseDown();
-				}
+			else if (mx >= x2) {
+				value = 1;
 			}
 			else {
-				if (!isFocus) return;
-				LostFocus();
-				if (blockMoving) {
-					blockMoving = false;
-					if (valueBak != value) {
-						onChanged(value);
-						valueBak = value;
-					}
-				}
-				GameBase::instance->uiHandler.Reset();
+				value = (mx - x1) / (x2 - x1);
 			}
+			ApplyValue();
+			blockMoving = true;
+			return true;
+		}
+
+		int32_t OnMouseMove() override {
+			if (!isFocus) {
+				SetFocus();
+			}
+			if (blockMoving) {
+				OnMouseDown();
+			}
+			//if (!isFocus) return;
+			//LostFocus();
+			//if (blockMoving) {
+			//	blockMoving = false;
+			//	if (valueBak != value) {
+			//		onChanged(value);
+			//		valueBak = value;
+			//	}
+			//}
+			//GameBase::instance->uiHandler.Reset();
+			return true;
 		}
 
 		void OnMouseUp() override {

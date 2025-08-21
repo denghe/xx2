@@ -122,7 +122,7 @@ namespace xx {
 		}
 
 		XX_INLINE T& At(SizeType idx) const noexcept {
-			xx_assert(idx >= 0 && idx < len);
+			assert(idx >= 0 && idx < len);
 			return (T&)buf[idx];
 		}
 

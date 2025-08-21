@@ -109,13 +109,15 @@ namespace xx {
 				((Derived*)this)->Update();											// lifeCycle 7 ( loop )
 			}
 
+			this->ExecuteDelayFuncs();												// lifeCycle 8 ( loop )
+
 			this->ShaderEnd();
 
 			this->drawFPSTimePool += this->delta;
 			++this->drawFPS;
 			if (this->drawFPSTimePool >= 1.f) {
 				if constexpr (Has_Stat<Derived>) {
-					((Derived*)this)->Stat();
+					((Derived*)this)->Stat();										// lifeCycle 9 ( loop )
 				}
 				this->drawFPSTimePool = {};
 				this->drawFPS = {};
@@ -125,7 +127,7 @@ namespace xx {
 
 			if (!fromEvent) {
 				if constexpr (Has_Delay<Derived>) {
-					((Derived*)this)->Delay();										// lifeCycle 8 ( loop )
+					((Derived*)this)->Delay();										// lifeCycle 10 ( loop )
 				}
 			}
 		}
