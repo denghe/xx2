@@ -42,9 +42,6 @@ struct Heart {
 	int32_t _2{};
 	float _2x{};
 	void AnimBounce();
-	XX_INLINE static float CalcBounce(float x) {
-		return 1.f - std::expf(-5.f * x) * std::cosf(6.f * (float)M_PI * x);
-	}
 
 	void Init();
 	void Update();

@@ -37,4 +37,9 @@ namespace xx {
     XX_INLINE bool IsIntersect_BoxPointF(T b1minXY, T b1maxXY, T p) {
         return !(b1maxXY.x < p.x || p.x < b1minXY.x || b1maxXY.y < p.y || p.y < b1minXY.y);
     }
+
+
+    XX_INLINE static float CalcBounce(float x) {
+        return 1.f - std::expf(-5.f * x) * std::cosf(6.f * (float)M_PI * x);
+    }
 }

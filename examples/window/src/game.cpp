@@ -8,7 +8,7 @@ int32_t main() {
 
 void Game::Init() {
 	title = U"examples_window";
-	windowSize = designSize = { 1024, 1024 };
+	windowSize = designSize = { 1024, 768 };
 }
 
 void Game::GLInit() {
@@ -34,18 +34,18 @@ void Game::GLInit() {
 
 	ui.Emplace()->InitRoot(scale);
 
-	ui->MakeChildren<xx::Label>()->Init(1, p5 + XY{ 0, 35 }, a5, 2)
+	ui->MakeChildren<xx::Label>()->Init(1, p5 + XY{ 0, -69 }, a5, 2)
 		.SetText("hi");
 
-	ui->MakeChildren<xx::LabelButton>()->Init(2, p5 + XY{ 0, -35 }, a5
+	ui->MakeChildren<xx::LabelButton>()->Init(2, p5 + XY{ 0, 50 }, a5
 		, cfgs.s9bN, cfgs.s9bH
-		, "change color").onClicked = [this] {
+		, "change color!!!").onClicked = [this] {
 			heart->ChangeColor();
 	};
 
-	ui->MakeChildren<xx::LabelButton>()->Init(3, p5 + XY{ 0, -20 }, a5
+	ui->MakeChildren<xx::LabelButton>()->Init(3, p5 + XY{ 0, 0 }, a5
 		, cfgs.s9bN, cfgs.s9bH
-		, "asdfqwer").onClicked = [this] {
+		, "change anim").onClicked = [this] {
 			heart->ChangeAnim();
 	};
 
@@ -102,9 +102,9 @@ void Heart::AnimScale() {
 
 void Heart::AnimBounce() {
 	XX_BEGIN(_2);
-	for (_2x = 0.1f; _2x < 1.2f; _2x += gg.delta) {
+	for (_2x = 0.0834f; _2x < 0.916f; _2x += gg.delta) {
 		{
-			auto r = CalcBounce(_2x);
+			auto r = xx::CalcBounce(_2x);
 			scale = { r, 2.f - r };
 		}
 		XX_YIELD(_2);
