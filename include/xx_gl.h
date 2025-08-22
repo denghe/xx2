@@ -175,9 +175,6 @@ namespace xx {
 		auto const& SizeY() const { return std::get<4>(vs); }
 	};
 
-	using RefGLTexture = Ref<GLTexture>;
-	using RefGLVertTexture = Ref<GLVertTexture>;
-	using RefGLTiledTexture = Ref<GLTiledTexture>;
 
 	/**********************************************************************************************************************************/
 	/**********************************************************************************************************************************/

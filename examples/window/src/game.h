@@ -2,6 +2,7 @@
 #include "pch.h"
 using XY = xx::XY;
 
+struct Heart;
 struct Game : xx::Game<Game> {
 	xx::Shared<xx::Node> ui;
 
@@ -10,21 +11,42 @@ struct Game : xx::Game<Game> {
 	} cfgs;
 
 	struct {
-		xx::RefGLTexture heart, ui_button_n, ui_button_h;
+		xx::Ref<xx::GLTexture> heart, ui_button_n, ui_button_h;
 	} texs;
 
-	struct {
-		float scale{};
-		int32_t ci{};	// color index
-		std::array<xx::RGBA8, 4> colors{
-			xx::RGBA8_White, xx::RGBA8_Red, xx::RGBA8_Yellow, xx::RGBA8_Blue };
-	} heart;
+	xx::Shared<Heart> heart;
 
 	void Init();
 	void GLInit();
-	xx::Task<> Task();
 	void Update();
 	void Stat();
 	void OnResize();
 };
 extern Game gg;
+
+struct Heart {
+	static constexpr int32_t cAnimCount{ 2 };
+	static constexpr std::array<xx::RGBA8, 4> cColors {
+		xx::RGBA8_White, xx::RGBA8_Red, xx::RGBA8_Yellow, xx::RGBA8_Blue
+	};
+
+	XY scale{};
+	int32_t colorIndex{}, animIndex{};
+
+	void ChangeColor();
+	void ChangeAnim();
+
+	int32_t _1{};
+	void AnimScale();
+
+	int32_t _2{};
+	float _2x{};
+	void AnimBounce();
+	XX_INLINE static float CalcBounce(float x) {
+		return 1.f - std::expf(-5.f * x) * std::cosf(6.f * (float)M_PI * x);
+	}
+
+	void Init();
+	void Update();
+	void Draw();
+};

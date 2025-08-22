@@ -4,7 +4,7 @@
 
 struct Res {
 	// global res list
-	xx::RefGLTexture tex;
+	xx::Ref<xx::GLTexture> tex;
 	// ...
 };
 
