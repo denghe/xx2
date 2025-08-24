@@ -146,18 +146,135 @@ namespace xx {
 				break;
 			}
 			case sf::Event::JoystickButtonPressed: {
-				xx::CoutN("joy id = ", e.joystickButton.joystickId, " pressed btn = ", e.joystickButton.button);
-				// todo
+				//xx::CoutN("joy id = ", e.joystickButton.joystickId, " pressed btn = ", e.joystickButton.button);
+
+				// btn : AX  BO  X4  Y3   L1   R1   Map   Menu   AxisLeft   AxisRight   PAD   PS
+				// xbox: 0   1   2   3    4    5    6     7      8          9
+				// ps  : 1   2   0   3    4    5    8     9      10         11          13    12
+				// axis: AxisLeft   AxisRight   L2      R2      4way
+				// xbox: h0 v1      h4 v5       2+      2-      h6 v7
+				// ps  : h0 v1      h2 v3       4       5       h6 v7
+				// h0 h6: left -100, right 100   v1: up -100 down 100   h7: up 100 down -100
+
+				// xbox:
+				// some btn id disable: 8, 9
+				// some axis map to btn: 0 -> 8, 9   1-> 10, 11   6 -> 12, 13   7 -> 14, 15
+
+				if (e.joystickButton.button >= 8) break;
+				auto jid = (int32_t)e.joystickButton.joystickId;
+				if (joys.len <= jid) {
+					joys.Resize(jid + 1);
+				}
+				joys[jid][e.joystickButton.button].Press(time);
+				joy[e.joystickButton.button].Press(time);
 				break;
 			}
 			case sf::Event::JoystickButtonReleased: {
-				xx::CoutN("joy id = ", e.joystickButton.joystickId, " released btn = ", e.joystickButton.button);
-				// todo
+				//xx::CoutN("joy id = ", e.joystickButton.joystickId, " released btn = ", e.joystickButton.button);
+				if (e.joystickButton.button >= 8) break;
+				auto jid = (int32_t)e.joystickButton.joystickId;
+				if (joys.len <= jid) {
+					joys.Resize(jid + 1);
+				}
+				joys[jid][e.joystickButton.button].Release();
+				joy[e.joystickButton.button].Release();
 				break;
 			}
 			case sf::Event::JoystickMoved: {
-				xx::CoutN("joy id = ", e.joystickButton.joystickId, " axis = ", e.joystickMove.axis, " pos = ", e.joystickMove.position);
-				// todo
+				//xx::CoutN("joy id = ", e.joystickButton.joystickId, " axis = ", e.joystickMove.axis, " pos = ", e.joystickMove.position);
+				if (e.joystickMove.axis >= 8) break;
+				auto jid = (int32_t)e.joystickMove.joystickId;
+				if (joys.len <= jid) {
+					joys.Resize(jid + 1);
+				}
+				if (joyas.len <= jid) {
+					joyas.Resize(jid + 1);
+				}
+				joyas[jid][e.joystickButton.button] = e.joystickMove.position;
+				joya[e.joystickButton.button] = e.joystickMove.position;
+
+				switch (e.joystickMove.axis) {
+				case 0:
+					if (e.joystickMove.position < -20.f) {
+						joys[jid][8].Press(time);	// left
+						joy[8].Press(time);
+					}
+					else if (e.joystickMove.position > 20.f) {
+						joys[jid][9].Press(time);	// right
+						joy[9].Press(time);
+					}
+					else {
+						joys[jid][8].Release();
+						joy[8].Release();
+						joys[jid][9].Release();
+						joy[9].Release();
+					}
+					break;
+				case 1:
+					if (e.joystickMove.position < -20.f) {
+						joys[jid][10].Press(time);	// up
+						joy[10].Press(time);
+					}
+					else if (e.joystickMove.position > 20.f) {
+						joys[jid][11].Press(time);	// down
+						joy[11].Press(time);
+					}
+					else {
+						joys[jid][10].Release();
+						joy[10].Release();
+						joys[jid][11].Release();
+						joy[11].Release();
+					}
+					break;
+				case 6:
+					if (e.joystickMove.position < -20.f) {
+						joys[jid][12].Press(time);	// left
+						joy[12].Press(time);
+					}
+					else if (e.joystickMove.position > 20.f) {
+						joys[jid][13].Press(time);	// right
+						joy[13].Press(time);
+					}
+					else {
+						joys[jid][12].Release();
+						joy[12].Release();
+						joys[jid][13].Release();
+						joy[13].Release();
+					}
+					break;
+				case 7:
+					if (e.joystickMove.position > 20.f) {
+						joys[jid][14].Press(time);	// up
+						joy[14].Press(time);
+					}
+					else if (e.joystickMove.position < -20.f) {
+						joys[jid][15].Press(time);	// down
+						joy[15].Press(time);
+					}
+					else {
+						joys[jid][14].Release();
+						joy[14].Release();
+						joys[jid][15].Release();
+						joy[15].Release();
+					}
+					break;
+				default:;
+				}
+				break;
+			}
+			case sf::Event::JoystickConnected:
+			case sf::Event::JoystickDisconnected: {
+				auto jid = (int32_t)e.joystickConnect.joystickId;
+				if (joys.len <= jid) {
+					joys.Resize(jid + 1);
+				}
+				if (joyas.len <= jid) {
+					joyas.Resize(jid + 1);
+				}
+				memset(&joys[jid], 0, sizeof(joys[0]));
+				memset(&joyas[jid], 0, sizeof(joyas[0]));
+				memset(&joy, 0, sizeof(joy));
+				memset(&joya, 0, sizeof(joya));
 				break;
 			}
 			default:
