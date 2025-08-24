@@ -25,22 +25,58 @@ namespace xx {
 			this->wnd->display();
 		}
 
+		// todo: forground auto pause?
 		void HandleEvent(sf::Event& e) {
 			switch (e.type) {
+			case sf::Event::LostFocus: {
+				focused = false;
+				break;
+			}
+			case sf::Event::GainedFocus: {
+				focused = true;
+				break;
+			}
 			case sf::Event::TextEntered: {
-				// todo
+				// todo: use timeout queue store ?
 				break;
 			}
 			case sf::Event::KeyPressed: {
+				if (e.key.code == sf::Keyboard::Unknown) break;
+				keyboardBtns[e.key.code].Press(time);
 				break;
 			}
 			case sf::Event::KeyReleased: {
+				if (e.key.code == sf::Keyboard::Unknown) break;
+				keyboardBtns[e.key.code].Release();
+				break;
+			}
+			case sf::Event::MouseWheelMoved:
+				// deprecated
+				break;
+			case sf::Event::MouseWheelScrolled: {
+				if (e.mouseWheelScroll.wheel == 0) {
+					if (e.mouseWheelScroll.delta >= 0) {
+						mouseBtns[5].Press(time);
+						wheelTimeouts[5] = time + 0.05f;
+					}
+					else {
+						mouseBtns[6].Press(time);
+						wheelTimeouts[6] = time + 0.05f;
+					}
+				}
+				else {
+					if (e.mouseWheelScroll.delta >= 0) {
+						mouseBtns[7].Press(time);
+						wheelTimeouts[7] = time + 0.05f;
+					}
+					else {
+						mouseBtns[8].Press(time);
+						wheelTimeouts[8] = time + 0.05f;
+					}
+				}
 				break;
 			}
 			case sf::Event::MouseButtonPressed: {
-				auto btnId = (int)e.mouseButton.button;
-				if (mouseBtns[btnId]) return;  // for duplicate message bug
-
 				// search
 				uiGrid.ForeachPoint(uiGrid.worldSize * 0.5f + mousePos);
 
@@ -66,13 +102,12 @@ namespace xx {
 				}
 				tmpZNodes.Clear();
 				if (!handled) {
-					mouseBtns[btnId] = true;
+					mouseBtns[e.mouseButton.button].Press(time);
 				}
 				break;
 			}
 			case sf::Event::MouseButtonReleased: {
-				auto btnId = (int)e.mouseButton.button;
-				mouseBtns[btnId] = false;
+				mouseBtns[e.mouseButton.button].Release();
 				break;
 			}
 			case sf::Event::MouseMoved: {
@@ -102,9 +137,44 @@ namespace xx {
 				tmpZNodes.Clear();
 				break;
 			}
+			case sf::Event::MouseEntered: {
+				mouseInWindow = true;
+				break;
+			}
+			case sf::Event::MouseLeft: {
+				mouseInWindow = false;
+				break;
+			}
+			case sf::Event::JoystickButtonPressed: {
+				xx::CoutN("joy id = ", e.joystickButton.joystickId, " pressed btn = ", e.joystickButton.button);
+				// todo
+				break;
+			}
+			case sf::Event::JoystickButtonReleased: {
+				xx::CoutN("joy id = ", e.joystickButton.joystickId, " released btn = ", e.joystickButton.button);
+				// todo
+				break;
+			}
+			case sf::Event::JoystickMoved: {
+				xx::CoutN("joy id = ", e.joystickButton.joystickId, " axis = ", e.joystickMove.axis, " pos = ", e.joystickMove.position);
+				// todo
+				break;
+			}
 			default:
 				CoutN("unhandled event: ", e.type);
 				break;
+			}
+		}
+
+		void BaseUpdate() {
+			// event timeout handles
+			for (int32_t i = 5; i < 9; ++i) {
+				if (time < wheelTimeouts[i]) {
+					mouseBtns[i].Press(time);
+				}
+				else {
+					mouseBtns[i].Release();
+				}
 			}
 		}
 

@@ -32,6 +32,8 @@ void Game::GLInit() {
 	cfgs.s9bH.Emplace(*cfgs.s9bN);
 	cfgs.s9bH->frame = texs.ui_button_h;
 
+	cam.Init(scale, 1.f, {});
+
 	ui.Emplace()->InitRoot(scale);
 
 	ui->MakeChildren<xx::Label>()->Init(1, p5 + XY{ 0, -69 }, a5, 2)
@@ -53,6 +55,20 @@ void Game::GLInit() {
 }
 
 void Game::Update() {
+	// handle inputs
+	if (keyboardBtns[sf::Keyboard::Escape]) {
+		Close();
+		return;
+	}
+	if (mouseBtns[5](0.01f)		// mouse wheel up
+		|| keyboardBtns[sf::Keyboard::Z](0.01f)) {
+		cam.SetLogicScale(cam.logicScale + 0.001f);
+	}
+	if (mouseBtns[6](0.01f)		// mouse wheel down
+		|| keyboardBtns[sf::Keyboard::X](0.01f)) {
+		cam.SetLogicScale(cam.logicScale - 0.001f);
+	}
+
 	// logic
 	heart->Update();
 
@@ -63,6 +79,7 @@ void Game::Update() {
 
 void Game::OnResize() {
 	ui->Resize(scale);
+	cam.SetBaseScale(scale);
 }
 
 void Game::Stat() {
@@ -120,16 +137,16 @@ void Heart::Init() {
 void Heart::Update() {
 	switch (animIndex) {
 	case 0:
-		AnimScale();
+		AnimBounce();
 		break;
 	case 1:
-		AnimBounce();
+		AnimScale();
 		break;
 	}
 }
 
 void Heart::Draw() {
 	auto& t = *gg.texs.heart;
-	gg.Quad().Draw(t, t.Rect(), XY{}, 0.5f
-		, 20.f * scale * gg.scale, 0, 1, cColors[colorIndex]);
+	gg.Quad().Draw(t, t.Rect(), gg.cam.ToGLPos({}), 0.5f
+		, 20.f * scale * gg.cam.scale, 0, 1, cColors[colorIndex]);
 }

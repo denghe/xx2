@@ -11,6 +11,42 @@ namespace xx {
 	struct Node;
 	struct MouseEventHandlerNode;
 
+	// for mouse, keyboard, joystick
+	struct BtnState {
+		int32_t pressed{};
+		float lastPressedTime{};
+		float lastActivedTime{};
+
+		XX_INLINE operator bool() const {
+			return pressed;
+		}
+
+		XX_INLINE void Press(float t) {
+			pressed = true;
+			lastPressedTime = t;
+			// lastActivedTime not set
+		}
+
+		XX_INLINE void Release() {
+			pressed = {};
+			lastPressedTime = {};
+			lastActivedTime = {};
+		}
+
+		// auto release. return pressed
+		XX_INLINE bool Once() {
+			if (pressed) {
+				Release();
+				return true;
+			}
+			return false;
+		}
+
+		// handle lastActivedTime
+		bool operator()(float interval_);
+
+	};
+
 	// engine base code
 	struct alignas(8) GameBase {
 		inline static struct GameBase* instance{};
@@ -55,9 +91,13 @@ namespace xx {
 		int32_t drawVerts{}, drawCall{}, drawFPS{};			// counters
 		float drawFPSTimePool{};							// for count drawFPS
 
-		// todo: input, event handler
 		XY mousePos{};
-		std::array<bool, 16> mouseBtns{};
+		std::array<BtnState, 9> mouseBtns{};	// index 0~4: left, middle, right, side1, side2;   5~8: wheel up, down, left, right
+		std::array<float, 9> wheelTimeouts{};	// map to mouseBtns. store timeout
+		std::array<BtnState, sf::Keyboard::KeyCount> keyboardBtns{};
+		// todo: joy
+		bool focused{};
+		bool mouseInWindow{};
 		Weak<MouseEventHandlerNode> uiHandler;
 		Grid2dAABB<MouseEventHandlerNode*> uiGrid;
 
@@ -309,5 +349,14 @@ namespace xx {
 			glEnable(GL_BLEND);
 		}
 	};
+
+
+	XX_INLINE bool BtnState::operator()(float interval_) {
+		if (pressed && lastPressedTime >= lastActivedTime + interval_) {
+			lastActivedTime = lastPressedTime + interval_;
+			return true;
+		}
+		return false;
+	}
 
 }

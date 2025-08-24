@@ -14,6 +14,7 @@ struct Game : xx::Game<Game> {
 		xx::Ref<xx::GLTexture> heart, ui_button_n, ui_button_h;
 	} texs;
 
+	xx::Camera cam;
 	xx::Shared<Heart> heart;
 
 	void Init();

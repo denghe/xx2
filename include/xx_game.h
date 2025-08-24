@@ -62,16 +62,13 @@ namespace xx {
 
 #ifdef WIN32
 			// to solve the stuck when dragging/resizing windows
-			contextSettings.onDraw = [this] { this->GLLoop(true); };
+			contextSettings.onDraw = [this] { this->Loop(true); };
 #endif
 
 			while (window.isOpen()) {
 				sf::Event event;
 				while (window.pollEvent(event)) {
-					if (event.type == sf::Event::Closed
-						|| (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)
-						)
-					{
+					if (event.type == sf::Event::Closed) {
 						Close();
 						goto LabEnd;
 					} else if (event.type == sf::Event::Resized) {
@@ -87,14 +84,14 @@ namespace xx {
 						((Derived*)this)->OnResize();
 					}
 				}
-				this->GLLoop(false);
+				this->Loop(false);
 			}
 
 		LabEnd:
 			return EXIT_SUCCESS;
 		}
 
-		void GLLoop(bool fromEvent) {
+		void Loop(bool fromEvent) {
 			this->GLClear(this->clearColor);
 			this->GLBlendFunc();
 
@@ -130,6 +127,8 @@ namespace xx {
 					((Derived*)this)->Delay();										// lifeCycle 10 ( loop )
 				}
 			}
+
+			this->BaseUpdate();
 		}
 
 		XX_INLINE void StoreWindowSize() {
