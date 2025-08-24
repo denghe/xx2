@@ -42,12 +42,12 @@ namespace xx {
 			}
 			case sf::Event::KeyPressed: {
 				if (e.key.code == sf::Keyboard::Unknown) break;
-				keyboardBtns[e.key.code].Press(time);
+				keyboard[e.key.code].Press(time);
 				break;
 			}
 			case sf::Event::KeyReleased: {
 				if (e.key.code == sf::Keyboard::Unknown) break;
-				keyboardBtns[e.key.code].Release();
+				keyboard[e.key.code].Release();
 				break;
 			}
 			case sf::Event::MouseWheelMoved:
@@ -56,21 +56,21 @@ namespace xx {
 			case sf::Event::MouseWheelScrolled: {
 				if (e.mouseWheelScroll.wheel == 0) {
 					if (e.mouseWheelScroll.delta >= 0) {
-						mouseBtns[5].Press(time);
+						mouse[5].Press(time);
 						wheelTimeouts[5] = time + 0.05f;
 					}
 					else {
-						mouseBtns[6].Press(time);
+						mouse[6].Press(time);
 						wheelTimeouts[6] = time + 0.05f;
 					}
 				}
 				else {
 					if (e.mouseWheelScroll.delta >= 0) {
-						mouseBtns[7].Press(time);
+						mouse[7].Press(time);
 						wheelTimeouts[7] = time + 0.05f;
 					}
 					else {
-						mouseBtns[8].Press(time);
+						mouse[8].Press(time);
 						wheelTimeouts[8] = time + 0.05f;
 					}
 				}
@@ -102,12 +102,12 @@ namespace xx {
 				}
 				tmpZNodes.Clear();
 				if (!handled) {
-					mouseBtns[e.mouseButton.button].Press(time);
+					mouse[e.mouseButton.button].Press(time);
 				}
 				break;
 			}
 			case sf::Event::MouseButtonReleased: {
-				mouseBtns[e.mouseButton.button].Release();
+				mouse[e.mouseButton.button].Release();
 				break;
 			}
 			case sf::Event::MouseMoved: {
@@ -170,10 +170,10 @@ namespace xx {
 			// event timeout handles
 			for (int32_t i = 5; i < 9; ++i) {
 				if (time < wheelTimeouts[i]) {
-					mouseBtns[i].Press(time);
+					mouse[i].Press(time);
 				}
 				else {
-					mouseBtns[i].Release();
+					mouse[i].Release();
 				}
 			}
 		}

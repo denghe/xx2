@@ -92,9 +92,9 @@ namespace xx {
 		float drawFPSTimePool{};							// for count drawFPS
 
 		XY mousePos{};
-		std::array<BtnState, 9> mouseBtns{};	// index 0~4: left, middle, right, side1, side2;   5~8: wheel up, down, left, right
-		std::array<float, 9> wheelTimeouts{};	// map to mouseBtns. store timeout
-		std::array<BtnState, sf::Keyboard::KeyCount> keyboardBtns{};
+		std::array<BtnState, 9> mouse{};					// index 0~4: left, middle, right, side1, side2;   5~8: wheel up, down, left, right
+		std::array<BtnState, sf::Keyboard::KeyCount> keyboard{};
+		std::array<float, 9> wheelTimeouts{};				// map to mouse. store timeout
 		// todo: joy
 		bool focused{};
 		bool mouseInWindow{};
@@ -107,7 +107,7 @@ namespace xx {
 		std::vector<std::string> searchPaths;
 		std::filesystem::path tmpPath;
 
-		List<std::function<int32_t()>> delayFuncs;				// call after update
+		List<std::function<int32_t()>> delayFuncs;			// call after update
 		Task<> baseTask;
 #ifndef __EMSCRIPTEN__
 		sf::Window* wnd{};

@@ -56,16 +56,16 @@ void Game::GLInit() {
 
 void Game::Update() {
 	// handle inputs
-	if (keyboardBtns[sf::Keyboard::Escape]) {
+	if (keyboard[sf::Keyboard::Escape]) {
 		Close();
 		return;
 	}
-	if (mouseBtns[5](0.01f)		// mouse wheel up
-		|| keyboardBtns[sf::Keyboard::Z](0.01f)) {
+	if (mouse[5](0.01f)		// mouse wheel up
+		|| keyboard[sf::Keyboard::Z](0.01f)) {
 		cam.SetLogicScale(cam.logicScale + 0.001f);
 	}
-	if (mouseBtns[6](0.01f)		// mouse wheel down
-		|| keyboardBtns[sf::Keyboard::X](0.01f)) {
+	if (mouse[6](0.01f)		// mouse wheel down
+		|| keyboard[sf::Keyboard::X](0.01f)) {
 		cam.SetLogicScale(cam.logicScale - 0.001f);
 	}
 
