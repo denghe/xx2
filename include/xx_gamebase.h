@@ -100,9 +100,9 @@ namespace xx {
 		std::array<BtnState, 9> mouse{};					// index 0~4: left, middle, right, side1, side2;   5~8: wheel up, down, left, right
 		std::array<BtnState, sf::Keyboard::KeyCount> keyboard{};
 		std::array<float, 9> wheelTimeouts{};				// map to mouse. store timeout
-		List<std::array<BtnState, 16>> joys;
+		List<std::array<BtnState, 24>> joys;
 		List<std::array<float, 8>> joyas;
-		std::array<BtnState, 16> joy{};						// for single player easy check
+		std::array<BtnState, 24> joy{};						// for single player easy check
 		std::array<float, 8> joya;							// for single player easy check
 		float joyDeathZone{ 10.f };
 		bool focused{};

@@ -75,6 +75,16 @@ void Game::Update() {
 	// draw
 	heart->Draw();
 	DrawNode(ui);
+
+#if 0
+	for (int i = 0; i < 16; ++i) {
+	xx::Cout(joy[i].pressed, " ");
+	}
+	for (int i = 0; i < 8; ++i) {
+		xx::Cout(joya[i], " ");
+	}
+	xx::CoutN();
+#endif
 }
 
 void Game::OnResize() {
@@ -87,14 +97,6 @@ void Game::Stat() {
 		, drawCall, " drawVerts = ", drawVerts
 		, " delayFuncs.len = ", delayFuncs.len
 	);
-
-	//for (int i = 0; i < 16; ++i) {
-	//	xx::Cout(joy[i].pressed, " ");
-	//}
-	//for (int i = 0; i < 8; ++i) {
-	//	xx::Cout(joya[i], " ");
-	//}
-	//xx::CoutN();
 }
 
 /***************************************************************************/

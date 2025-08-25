@@ -157,8 +157,8 @@ namespace xx {
 				// h0 h6: left -100, right 100   v1: up -100 down 100   h7: up 100 down -100
 
 				// xbox:
-				// some btn id disable: 8, 9
-				// some axis map to btn: 0 -> 8, 9   1-> 10, 11   6 -> 12, 13   7 -> 14, 15
+				// some axis map to btn: 2 -> 14, 15   0-> 16, 17  1-> 18 19  6 -> 20, 21   7 -> 22, 23
+				// ps: todo
 
 				if (e.joystickButton.button >= 8) break;
 				auto jid = (int32_t)e.joystickButton.joystickId;
@@ -181,7 +181,7 @@ namespace xx {
 				break;
 			}
 			case sf::Event::JoystickMoved: {
-				//xx::CoutN("joy id = ", e.joystickButton.joystickId, " axis = ", e.joystickMove.axis, " pos = ", e.joystickMove.position);
+				xx::CoutN("joy id = ", e.joystickButton.joystickId, " axis = ", e.joystickMove.axis, " pos = ", e.joystickMove.position);
 				if (e.joystickMove.axis >= 8) break;
 				auto jid = (int32_t)e.joystickMove.joystickId;
 				if (joys.len <= jid) {
@@ -196,66 +196,84 @@ namespace xx {
 				switch (e.joystickMove.axis) {
 				case 0:
 					if (e.joystickMove.position < -20.f) {
-						joys[jid][8].Press(time);	// left
-						joy[8].Press(time);
+						joys[jid][16].Press(time);	// left
+						joy[16].Press(time);
 					}
 					else if (e.joystickMove.position > 20.f) {
-						joys[jid][9].Press(time);	// right
-						joy[9].Press(time);
+						joys[jid][17].Press(time);	// right
+						joy[17].Press(time);
 					}
 					else {
-						joys[jid][8].Release();
-						joy[8].Release();
-						joys[jid][9].Release();
-						joy[9].Release();
+						joys[jid][16].Release();
+						joy[16].Release();
+						joys[jid][17].Release();
+						joy[17].Release();
 					}
 					break;
 				case 1:
 					if (e.joystickMove.position < -20.f) {
-						joys[jid][10].Press(time);	// up
-						joy[10].Press(time);
+						joys[jid][18].Press(time);	// up
+						joy[18].Press(time);
 					}
 					else if (e.joystickMove.position > 20.f) {
-						joys[jid][11].Press(time);	// down
-						joy[11].Press(time);
+						joys[jid][19].Press(time);	// down
+						joy[19].Press(time);
 					}
 					else {
-						joys[jid][10].Release();
-						joy[10].Release();
-						joys[jid][11].Release();
-						joy[11].Release();
+						joys[jid][18].Release();
+						joy[18].Release();
+						joys[jid][19].Release();
+						joy[19].Release();
+					}
+					break;
+				case 2:
+					if (e.joystickMove.position > 35.f) {
+						joys[jid][14].Press(time);	// L2
+						joy[14].Press(time);
+					}
+					else if (e.joystickMove.position < -35.f) {
+						joys[jid][15].Press(time);	// R2
+						joy[15].Press(time);
+					}
+					else if (e.joystickMove.position > 5.f) {
+						joys[jid][14].Release();
+						joy[14].Release();
+					}
+					else if (e.joystickMove.position < -5.f) {
+						joys[jid][15].Release();
+						joy[15].Release();
 					}
 					break;
 				case 6:
 					if (e.joystickMove.position < -20.f) {
-						joys[jid][12].Press(time);	// left
-						joy[12].Press(time);
+						joys[jid][20].Press(time);	// left
+						joy[20].Press(time);
 					}
 					else if (e.joystickMove.position > 20.f) {
-						joys[jid][13].Press(time);	// right
-						joy[13].Press(time);
+						joys[jid][21].Press(time);	// right
+						joy[21].Press(time);
 					}
 					else {
-						joys[jid][12].Release();
-						joy[12].Release();
-						joys[jid][13].Release();
-						joy[13].Release();
+						joys[jid][20].Release();
+						joy[20].Release();
+						joys[jid][21].Release();
+						joy[21].Release();
 					}
 					break;
 				case 7:
 					if (e.joystickMove.position > 20.f) {
-						joys[jid][14].Press(time);	// up
-						joy[14].Press(time);
+						joys[jid][22].Press(time);	// up
+						joy[22].Press(time);
 					}
 					else if (e.joystickMove.position < -20.f) {
-						joys[jid][15].Press(time);	// down
-						joy[15].Press(time);
+						joys[jid][23].Press(time);	// down
+						joy[23].Press(time);
 					}
 					else {
-						joys[jid][14].Release();
-						joy[14].Release();
-						joys[jid][15].Release();
-						joy[15].Release();
+						joys[jid][22].Release();
+						joy[22].Release();
+						joys[jid][23].Release();
+						joy[23].Release();
 					}
 					break;
 				default:;
