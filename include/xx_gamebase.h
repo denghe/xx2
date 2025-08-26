@@ -63,7 +63,6 @@ namespace xx {
 
 	struct JoyState {
 		int32_t jid{ -1 };
-		int32_t rank{};		// for sort & assign to joy
 		std::string name;
 
 		//	A, B, X, Y, L1, R1, Back, Start, Home, L2, R2, Up, Right, Down, Left
@@ -73,14 +72,16 @@ namespace xx {
 		std::array<float, GLFW_GAMEPAD_AXIS_LAST + 1> axes{};
 
 		void ClearValues() {
-			memset(&btns, 0, sizeof(btns));
+			for (auto& btn : btns) {
+				btn.pressed = 0;
+				btn.lastPressedTime = 0;
+			}
 			memset(&axes, 0, sizeof(float) * GLFW_GAMEPAD_AXIS_LAST - 1);
 			axes[GLFW_GAMEPAD_AXIS_LAST - 1] = -1.f;
 			axes[GLFW_GAMEPAD_AXIS_LAST] = -1.f;
 		}
 		void Cleanup() {
 			jid = -1;
-			rank = 0;
 			name.clear();
 			ClearValues();
 		}
@@ -135,8 +136,7 @@ namespace xx {
 		std::array<float, 4> wheelTimeouts{};				// store mouse wheel timeout
 		std::array<BtnState, GLFW_KEY_LAST + 1> keyboard{};
 		List<JoyState> joys;
-		int32_t lastJoyIdx{ -1 };
-		//float joyDeathZone{ 10.f };
+		JoyState joy;										// joy = sum(joys) ( easy access for single player )
 
 		bool running{};
 		bool focused{};
@@ -155,12 +155,6 @@ namespace xx {
 #ifndef __EMSCRIPTEN__
 		GLFWwindow* wnd{};
 #endif
-
-		// ref last active joy( easy access for single player )
-		JoyState* Joy() {
-			if (lastJoyIdx == -1) return {};
-			return &joys[lastJoyIdx];
-		}
 
 		// example:
 		// GameBase::instance->delayFuncs.Emplace([w = WeakFromThis(this)] { if (!w) return 1; return 0; });

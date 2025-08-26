@@ -129,76 +129,72 @@ namespace xx {
 
 		void BaseUpdate() {
 
-			// refresh all joystick data
-			GLFWgamepadstate gs;
-			int32_t maxI{}, maxRank{};
-			for (int32_t i = 0; i < joys.len; ++i) {
-				auto& joy = joys[i];
-				auto jid = joy.jid;
-				joy.rank = 0;
-				if (glfwGetGamepadState(jid, &gs)) {
-					for (auto i = 0; i <= GLFW_GAMEPAD_BUTTON_LAST; i++) {
-						if (gs.buttons[i]) {
-							joy.btns[i].Press(time);
-							joy.rank++;
-						}
-						else {
-							joy.btns[i].Release();
-						}
-					}
-					for (auto i = 0; i < GLFW_GAMEPAD_AXIS_LAST - 1; i++) {
-						auto v = gs.axes[i];
-						if (std::abs(v) < 0.08f) joy.axes[i] = 0.f;		// 0.08f: death zone
-						else {
-							joy.axes[i] = v;
-							joy.rank++;
-						}
-					}
-					for (auto i = GLFW_GAMEPAD_AXIS_LAST - 1; i <= GLFW_GAMEPAD_AXIS_LAST; i++) {
-						auto v = gs.axes[i];
-						if (v < -0.9f) joy.axes[i] = -1.f;		// 0.9f: death zone
-						else {
-							joy.axes[i] = v;
-							joy.rank++;
-						}
-					}
-
-					// LT -> L2, RT -> R2
-					if (joy.axes[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER] > -0.5f) {
-						joy.btns[GLFW_GAMEPAD_BUTTON_LEFT_THUMB].Press(time);
-					}
-					else {
-						joy.btns[GLFW_GAMEPAD_BUTTON_LEFT_THUMB].Release();
-					}
-					if (joy.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > -0.5f) {
-						joy.btns[GLFW_GAMEPAD_BUTTON_RIGHT_THUMB].Press(time);
-					}
-					else {
-						joy.btns[GLFW_GAMEPAD_BUTTON_RIGHT_THUMB].Release();
-					}
-				}
-				else {
-					joy.ClearValues();
-				}
-				if (joy.rank > maxRank) {
-					maxRank = joy.rank;
-					maxI = i;
-				}
-			}
-
-			// choose one copy to joy( max rank or current )
+			// fill all joystick data
+			joy.ClearValues();
 			if (joys.len) {
-				if (maxRank == 0) {
-					if (lastJoyIdx == -1 || lastJoyIdx >= joys.len) {
-						lastJoyIdx = 0;
+				GLFWgamepadstate gs;
+				for (int32_t i = 0; i < joys.len; ++i) {
+					auto& j = joys[i];
+					auto jid = j.jid;
+					if (glfwGetGamepadState(jid, &gs)) {
+						for (auto i = 0; i <= GLFW_GAMEPAD_BUTTON_LAST; i++) {
+							if (gs.buttons[i]) {
+								j.btns[i].Press(time);
+								joy.btns[i].Press(time);
+							}
+							else {
+								j.btns[i].Release();
+							}
+						}
+						for (auto i = 0; i < GLFW_GAMEPAD_AXIS_LAST - 1; i++) {
+							auto v = gs.axes[i];
+							if (std::abs(v) < 0.08f) j.axes[i] = 0.f;	// 0.08f: death zone
+							else {
+								j.axes[i] = v;
+								joy.axes[i] = v;
+							}
+						}
+						for (auto i = GLFW_GAMEPAD_AXIS_LAST - 1; i <= GLFW_GAMEPAD_AXIS_LAST; i++) {
+							auto v = gs.axes[i];
+							if (v < -0.9f) j.axes[i] = -1.f;	// 0.9f: death zone
+							else {
+								j.axes[i] = v;
+								joy.axes[i] = v;
+							}
+						}
+
+						// LT -> L2, RT -> R2
+						if (j.axes[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER] > -0.5f) {
+							j.btns[GLFW_GAMEPAD_BUTTON_LEFT_THUMB].Press(time);
+						}
+						else {
+							j.btns[GLFW_GAMEPAD_BUTTON_LEFT_THUMB].Release();
+						}
+						if (j.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > -0.5f) {
+							j.btns[GLFW_GAMEPAD_BUTTON_RIGHT_THUMB].Press(time);
+						}
+						else {
+							j.btns[GLFW_GAMEPAD_BUTTON_RIGHT_THUMB].Release();
+						}
+					}
+					else {
+						j.ClearValues();
 					}
 				}
-				else {
-					lastJoyIdx = maxI;
+
+				// LT -> L2, RT -> R2
+				if (joy.axes[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER] > -0.5f) {
+					joy.btns[GLFW_GAMEPAD_BUTTON_LEFT_THUMB].Press(time);
 				}
-			}
-			else {
-				lastJoyIdx = -1;
+				else {
+					joy.btns[GLFW_GAMEPAD_BUTTON_LEFT_THUMB].Release();
+				}
+				if (joy.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > -0.5f) {
+					joy.btns[GLFW_GAMEPAD_BUTTON_RIGHT_THUMB].Press(time);
+				}
+				else {
+					joy.btns[GLFW_GAMEPAD_BUTTON_RIGHT_THUMB].Release();
+				}
 			}
 
 			// timeout
