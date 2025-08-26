@@ -131,7 +131,7 @@ namespace xx {
 		std::array<float, 4> wheelTimeouts{};				// store mouse wheel timeout
 		std::array<BtnState, GLFW_KEY_LAST + 1> keyboard{};
 		List<JoyState> joys;
-		JoyState joy{};										// copy last active joy data here
+		int32_t lastJoyIdx{ -1 };
 		//float joyDeathZone{ 10.f };
 
 		bool running{};
@@ -151,6 +151,12 @@ namespace xx {
 #ifndef __EMSCRIPTEN__
 		GLFWwindow* wnd{};
 #endif
+
+		// ref last active joy
+		JoyState* Joy() {
+			if (lastJoyIdx == -1) return {};
+			return &joys[lastJoyIdx];
+		}
 
 		// example:
 		// GameBase::instance->delayFuncs.Emplace([w = WeakFromThis(this)] { if (!w) return 1; return 0; });

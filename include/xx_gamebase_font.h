@@ -189,16 +189,17 @@ namespace xx {
 			// choose one copy to joy( max rank or current )
 			if (joys.len) {
 				if (maxRank == 0) {
-					joy.ClearValues();
+					if (lastJoyIdx == -1 || lastJoyIdx >= joys.len) {
+						lastJoyIdx = 0;
+					}
 				}
 				else {
-					joy = joys[maxI];
+					lastJoyIdx = maxI;
 				}
 			}
 			else {
-				joy.Cleanup();
+				lastJoyIdx = -1;
 			}
-
 
 			// timeout
 			for (int32_t i = 0; i < 4; ++i) {

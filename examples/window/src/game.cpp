@@ -77,13 +77,15 @@ void Game::Update() {
 	DrawNode(ui);
 
 #if 1
-	for (int i = 0; i <= GLFW_GAMEPAD_BUTTON_LAST; ++i) {
-	xx::Cout(joy.btns[i].pressed, " ");
+	if (auto joy = Joy()) {
+		for (int i = 0; i <= GLFW_GAMEPAD_BUTTON_LAST; ++i) {
+			xx::Cout(joy->btns[i].pressed, " ");
+		}
+		for (int i = 0; i <= GLFW_GAMEPAD_AXIS_LAST; ++i) {
+			xx::Cout(joy->axes[i], " ");
+		}
+		xx::CoutN(joy->name, " ", joy->jid);
 	}
-	for (int i = 0; i <= GLFW_GAMEPAD_AXIS_LAST; ++i) {
-		xx::Cout(joy.axes[i], " ");
-	}
-	xx::CoutN();
 #endif
 }
 
