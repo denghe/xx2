@@ -7,7 +7,7 @@ int32_t main() {
 }
 
 void Game::Init() {
-	title = U"examples_scene";
+	title = "examples_scene";
 }
 
 void Game::GLInit() {

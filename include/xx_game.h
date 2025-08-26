@@ -77,15 +77,16 @@ namespace xx {
 				g->windowSize.y = (float)h;
 				g->ResizeCalc();
 				g->GLViewport();
+				if constexpr (Has_OnResize<Derived>) {
+					((Derived*)g)->OnResize();
+				}
 			});
 
-#ifdef WIN32
 			// drag title / resize( windows only? )
 			glfwSetWindowRefreshCallback(this->wnd, [](GLFWwindow* wnd) {
 				auto g = (Game*)glfwGetWindowUserPointer(wnd);
 				g->Loop(true);
 			});
-#endif
 
 			// mouse move
 			glfwSetCursorPosCallback(this->wnd, [](GLFWwindow* wnd, double x, double y) {
