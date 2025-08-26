@@ -284,7 +284,7 @@ inline void init_gCanvas(int charSize, int width, int height, const char* font) 
     using namespace xx;
     if (!BitmapDC::instance) {
         BitmapDC::instance = std::make_unique<BitmapDC>();
-        BitmapDC::instance->Init(GameBase_shader::GetInstance()->wnd->getSystemHandle());
+        BitmapDC::instance->Init(glfwGetWin32Window(GameBase_shader::GetInstance()->wnd));
     }
 }
 

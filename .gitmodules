@@ -10,3 +10,6 @@
 [submodule "soloud"]
 	path = soloud
 	url = https://github.com/denghe/soloud.git
+[submodule "glfw"]
+	path = glfw
+	url = https://github.com/denghe/glfw

@@ -4,7 +4,12 @@
 #include "xx_file.h"
 #include "xx_zstd.h"
 #include "xx_grid2d_aabb.h"
-#include <SFML/Window.hpp>
+
+#include <GLFW/glfw3.h>
+#define GLFW_EXPOSE_NATIVE_WIN32
+#define GLFW_EXPOSE_NATIVE_WGL
+#define GLFW_NATIVE_INCLUDE_NONE
+#include <GLFW/glfw3native.h>
 
 namespace xx {
 
@@ -52,6 +57,31 @@ namespace xx {
 		}
 	};
 
+	struct JoyState {
+		int32_t jid{ -1 };
+		int32_t rank{};		// for sort & assign to joy
+		std::string name;
+
+		//	A, B, X, Y, L1, R1, Back, Start, Home, L2, R2, Up, Right, Down, Left
+		std::array<BtnState, GLFW_GAMEPAD_BUTTON_LAST + 1> btns{};
+
+		// AxisLeft H V, AxisRight H V, Trigger L R
+		std::array<float, GLFW_GAMEPAD_AXIS_LAST + 1> axes{};
+
+		void ClearValues() {
+			memset(&btns, 0, sizeof(btns));
+			memset(&axes, 0, sizeof(float) * GLFW_GAMEPAD_AXIS_LAST - 1);
+			axes[GLFW_GAMEPAD_AXIS_LAST - 1] = -1.f;
+			axes[GLFW_GAMEPAD_AXIS_LAST] = -1.f;
+		}
+		void Cleanup() {
+			jid = -1;
+			rank = 0;
+			name.clear();
+			ClearValues();
+		}
+	};
+
 	// engine base code
 	struct alignas(8) GameBase {
 		inline static struct GameBase* instance{};
@@ -61,9 +91,9 @@ namespace xx {
 			instance = this;
 		}
 
-		std::u32string title{ U"game" };					// window title string( user can init )
+		std::string title{ "game" };						// window title string( user can init )
 		XY designSize{ 1920, 1080 };						// design resolution( user can init )
-		XY windowSize{ designSize }, windowSizeBackup{};	// physics resolution( user can init )
+		XY windowSize{ designSize };						// physics resolution( user can init )
 		XY worldMinXY{}, worldMaxXY{};						// for node( worldMinXY = -windowSize / 2,  worldMaxXY = windowSize / 2 );
 		XY size{}, size_2{};								// actual design size
 		/*
@@ -97,14 +127,14 @@ namespace xx {
 		float drawFPSTimePool{};							// for count drawFPS
 
 		XY mousePos{};
-		std::array<BtnState, 9> mouse{};					// index 0~4: left, middle, right, side1, side2;   5~8: wheel up, down, left, right
-		std::array<BtnState, sf::Keyboard::KeyCount> keyboard{};
-		std::array<float, 9> wheelTimeouts{};				// map to mouse. store timeout
-		List<std::array<BtnState, 24>> joys;
-		List<std::array<float, 8>> joyas;
-		std::array<BtnState, 24> joy{};						// for single player easy check
-		std::array<float, 8> joya;							// for single player easy check
-		float joyDeathZone{ 10.f };
+		std::array<BtnState, GLFW_MOUSE_BUTTON_LAST + 1 + 4> mouse{};	// +4 for wheel up, down, left, right
+		std::array<float, 4> wheelTimeouts{};				// store mouse wheel timeout
+		std::array<BtnState, GLFW_KEY_LAST + 1> keyboard{};
+		List<JoyState> joys;
+		JoyState joy{};										// copy last active joy data here
+		//float joyDeathZone{ 10.f };
+
+		bool running{};
 		bool focused{};
 		bool mouseInWindow{};
 		Weak<MouseEventHandlerNode> uiHandler;
@@ -119,7 +149,7 @@ namespace xx {
 		List<std::function<int32_t()>> delayFuncs;			// call after update
 		Task<> baseTask;
 #ifndef __EMSCRIPTEN__
-		sf::Window* wnd{};
+		GLFWwindow* wnd{};
 #endif
 
 		// example:

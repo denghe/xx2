@@ -22,293 +22,191 @@ namespace xx {
 		void BaseGLInit() {
 			GameBase_shader::BaseGLInit();
 			fontMaker.Init();
-			this->wnd->display();
 		}
 
-		// todo: forground auto pause?
-		void HandleEvent(sf::Event& e) {
-			switch (e.type) {
-			case sf::Event::LostFocus: {
-				focused = false;
-				break;
-			}
-			case sf::Event::GainedFocus: {
-				focused = true;
-				break;
-			}
-			case sf::Event::TextEntered: {
-				// todo: use timeout queue store ?
-				break;
-			}
-			case sf::Event::KeyPressed: {
-				if (e.key.code == sf::Keyboard::Unknown) break;
-				keyboard[e.key.code].Press(time);
-				break;
-			}
-			case sf::Event::KeyReleased: {
-				if (e.key.code == sf::Keyboard::Unknown) break;
-				keyboard[e.key.code].Release();
-				break;
-			}
-			case sf::Event::MouseWheelMoved:
-				// deprecated
-				break;
-			case sf::Event::MouseWheelScrolled: {
-				if (e.mouseWheelScroll.wheel == 0) {
-					if (e.mouseWheelScroll.delta >= 0) {
-						mouse[5].Press(time);
-						wheelTimeouts[5] = time + 0.05f;
-					}
-					else {
-						mouse[6].Press(time);
-						wheelTimeouts[6] = time + 0.05f;
-					}
-				}
-				else {
-					if (e.mouseWheelScroll.delta >= 0) {
-						mouse[7].Press(time);
-						wheelTimeouts[7] = time + 0.05f;
-					}
-					else {
-						mouse[8].Press(time);
-						wheelTimeouts[8] = time + 0.05f;
-					}
-				}
-				break;
-			}
-			case sf::Event::MouseButtonPressed: {
-				// search
-				uiGrid.ForeachPoint(uiGrid.worldSize * 0.5f + mousePos);
+		void HandleMouseMove(XY mp_) {
+			mousePos = mp_;
 
-				// search results -> tmpZNodes
-				for (auto& i : uiGrid.results) {
-					auto o = uiGrid.NodeAt(i).value;
-					assert(o->typeId >= 10);
-					tmpZNodes.Emplace(o->z, o);
-				}
+			// search
+			uiGrid.ForeachPoint(uiGrid.worldSize * 0.5f + mousePos);
 
-				// sort order by z
-				std::sort(tmpZNodes.buf, tmpZNodes.buf + tmpZNodes.len
-					, ZNode::GreaterThanComparer);
-
-				bool handled{};
-				for (auto& zn : tmpZNodes) {
-					auto n = ((MouseEventHandlerNode*)zn.n);
-					if (!n->PosInScissor(mousePos)) continue;
-					if (n->OnMouseDown()) {
-						handled = true;
-						break;
-					}
-				}
-				tmpZNodes.Clear();
-				if (!handled) {
-					mouse[e.mouseButton.button].Press(time);
-				}
-				break;
+			// search results -> tmpZNodes
+			for (auto& i : uiGrid.results) {
+				auto o = uiGrid.NodeAt(i).value;
+				assert(o->typeId >= 10);
+				tmpZNodes.Emplace(o->z, o);
 			}
-			case sf::Event::MouseButtonReleased: {
-				mouse[e.mouseButton.button].Release();
-				break;
+
+			// sort order by z
+			std::sort(tmpZNodes.buf, tmpZNodes.buf + tmpZNodes.len
+				, ZNode::GreaterThanComparer);
+
+			// try dispatch
+			for (auto& zn : tmpZNodes) {
+				auto n = ((MouseEventHandlerNode*)zn.n);
+				if (!n->PosInScissor(mousePos)) continue;
+				if (n->OnMouseMove()) break;
 			}
-			case sf::Event::MouseMoved: {
-				// left-top: 0,0 to center 0,0 gl pos
-				mousePos = { e.mouseMove.x - worldMaxXY.x, worldMaxXY.y - e.mouseMove.y };
+			tmpZNodes.Clear();
+		}
 
-				// search
-				uiGrid.ForeachPoint(uiGrid.worldSize * 0.5f + mousePos);
+		void HandleMouseButtonPressed(int32_t idx) {
+			assert(!mouse[idx]);
+			// search
+			uiGrid.ForeachPoint(uiGrid.worldSize * 0.5f + mousePos);
 
-				// search results -> tmpZNodes
-				for (auto& i : uiGrid.results) {
-					auto o = uiGrid.NodeAt(i).value;
-					assert(o->typeId >= 10);
-					tmpZNodes.Emplace(o->z, o);
-				}
-
-				// sort order by z
-				std::sort(tmpZNodes.buf, tmpZNodes.buf + tmpZNodes.len
-					, ZNode::GreaterThanComparer);
-
-				// try dispatch
-				for (auto& zn : tmpZNodes) {
-					auto n = ((MouseEventHandlerNode*)zn.n);
-					if (!n->PosInScissor(mousePos)) continue;
-					if (n->OnMouseMove()) break;
-				}
-				tmpZNodes.Clear();
-				break;
+			// search results -> tmpZNodes
+			for (auto& i : uiGrid.results) {
+				auto o = uiGrid.NodeAt(i).value;
+				assert(o->typeId >= 10);
+				tmpZNodes.Emplace(o->z, o);
 			}
-			case sf::Event::MouseEntered: {
-				mouseInWindow = true;
-				break;
-			}
-			case sf::Event::MouseLeft: {
-				mouseInWindow = false;
-				break;
-			}
-			case sf::Event::JoystickButtonPressed: {
-				//xx::CoutN("joy id = ", e.joystickButton.joystickId, " pressed btn = ", e.joystickButton.button);
 
-				// btn : AX  BO  X4  Y3   L1   R1   Map   Menu   AxisLeft   AxisRight   PAD   PS
-				// xbox: 0   1   2   3    4    5    6     7      8          9
-				// ps  : 1   2   0   3    4    5    8     9      10         11          13    12
-				// axis: AxisLeft   AxisRight   L2      R2      4way
-				// xbox: h0 v1      h4 v5       2+      2-      h6 v7
-				// ps  : h0 v1      h2 v3       4       5       h6 v7
-				// h0 h6: left -100, right 100   v1: up -100 down 100   h7: up 100 down -100
+			// sort order by z
+			std::sort(tmpZNodes.buf, tmpZNodes.buf + tmpZNodes.len
+				, ZNode::GreaterThanComparer);
 
-				// xbox:
-				// some axis map to btn: 2 -> 14, 15   0-> 16, 17  1-> 18 19  6 -> 20, 21   7 -> 22, 23
-				// ps: todo
-
-				if (e.joystickButton.button >= 8) break;
-				auto jid = (int32_t)e.joystickButton.joystickId;
-				if (joys.len <= jid) {
-					joys.Resize(jid + 1);
-				}
-				joys[jid][e.joystickButton.button].Press(time);
-				joy[e.joystickButton.button].Press(time);
-				break;
-			}
-			case sf::Event::JoystickButtonReleased: {
-				//xx::CoutN("joy id = ", e.joystickButton.joystickId, " released btn = ", e.joystickButton.button);
-				if (e.joystickButton.button >= 8) break;
-				auto jid = (int32_t)e.joystickButton.joystickId;
-				if (joys.len <= jid) {
-					joys.Resize(jid + 1);
-				}
-				joys[jid][e.joystickButton.button].Release();
-				joy[e.joystickButton.button].Release();
-				break;
-			}
-			case sf::Event::JoystickMoved: {
-				xx::CoutN("joy id = ", e.joystickButton.joystickId, " axis = ", e.joystickMove.axis, " pos = ", e.joystickMove.position);
-				if (e.joystickMove.axis >= 8) break;
-				auto jid = (int32_t)e.joystickMove.joystickId;
-				if (joys.len <= jid) {
-					joys.Resize(jid + 1);
-				}
-				if (joyas.len <= jid) {
-					joyas.Resize(jid + 1);
-				}
-				joyas[jid][e.joystickButton.button] = e.joystickMove.position;
-				joya[e.joystickButton.button] = e.joystickMove.position;
-
-				switch (e.joystickMove.axis) {
-				case 0:
-					if (e.joystickMove.position < -20.f) {
-						joys[jid][16].Press(time);	// left
-						joy[16].Press(time);
-					}
-					else if (e.joystickMove.position > 20.f) {
-						joys[jid][17].Press(time);	// right
-						joy[17].Press(time);
-					}
-					else {
-						joys[jid][16].Release();
-						joy[16].Release();
-						joys[jid][17].Release();
-						joy[17].Release();
-					}
+			bool handled{};
+			for (auto& zn : tmpZNodes) {
+				auto n = ((MouseEventHandlerNode*)zn.n);
+				if (!n->PosInScissor(mousePos)) continue;
+				if (n->OnMouseDown()) {
+					handled = true;
 					break;
-				case 1:
-					if (e.joystickMove.position < -20.f) {
-						joys[jid][18].Press(time);	// up
-						joy[18].Press(time);
-					}
-					else if (e.joystickMove.position > 20.f) {
-						joys[jid][19].Press(time);	// down
-						joy[19].Press(time);
-					}
-					else {
-						joys[jid][18].Release();
-						joy[18].Release();
-						joys[jid][19].Release();
-						joy[19].Release();
-					}
-					break;
-				case 2:
-					if (e.joystickMove.position > 35.f) {
-						joys[jid][14].Press(time);	// L2
-						joy[14].Press(time);
-					}
-					else if (e.joystickMove.position < -35.f) {
-						joys[jid][15].Press(time);	// R2
-						joy[15].Press(time);
-					}
-					else if (e.joystickMove.position > 5.f) {
-						joys[jid][14].Release();
-						joy[14].Release();
-					}
-					else if (e.joystickMove.position < -5.f) {
-						joys[jid][15].Release();
-						joy[15].Release();
-					}
-					break;
-				case 6:
-					if (e.joystickMove.position < -20.f) {
-						joys[jid][20].Press(time);	// left
-						joy[20].Press(time);
-					}
-					else if (e.joystickMove.position > 20.f) {
-						joys[jid][21].Press(time);	// right
-						joy[21].Press(time);
-					}
-					else {
-						joys[jid][20].Release();
-						joy[20].Release();
-						joys[jid][21].Release();
-						joy[21].Release();
-					}
-					break;
-				case 7:
-					if (e.joystickMove.position > 20.f) {
-						joys[jid][22].Press(time);	// up
-						joy[22].Press(time);
-					}
-					else if (e.joystickMove.position < -20.f) {
-						joys[jid][23].Press(time);	// down
-						joy[23].Press(time);
-					}
-					else {
-						joys[jid][22].Release();
-						joy[22].Release();
-						joys[jid][23].Release();
-						joy[23].Release();
-					}
-					break;
-				default:;
 				}
-				break;
 			}
-			case sf::Event::JoystickConnected:
-			case sf::Event::JoystickDisconnected: {
-				auto jid = (int32_t)e.joystickConnect.joystickId;
-				if (joys.len <= jid) {
-					joys.Resize(jid + 1);
-				}
-				if (joyas.len <= jid) {
-					joyas.Resize(jid + 1);
-				}
-				memset(&joys[jid], 0, sizeof(joys[0]));
-				memset(&joyas[jid], 0, sizeof(joyas[0]));
-				memset(&joy, 0, sizeof(joy));
-				memset(&joya, 0, sizeof(joya));
-				break;
+			tmpZNodes.Clear();
+			if (!handled) {
+				mouse[idx].Press(time);
 			}
-			default:
-				CoutN("unhandled event: ", e.type);
-				break;
+		}
+
+		void HandleMouseButtonReleased(int32_t idx) {
+			mouse[idx].Release();
+		}
+
+		void HandleMouseWheel(double xoffset, double yoffset) {
+			if (yoffset > 0) {
+				mouse[GLFW_MOUSE_BUTTON_LAST + 1].Press(time);
+				wheelTimeouts[0] = time + 0.05f;
+			}
+			else if (yoffset < 0) {
+				mouse[GLFW_MOUSE_BUTTON_LAST + 2].Press(time);
+				wheelTimeouts[1] = time + 0.05f;
+			}
+			if (xoffset > 0) {
+				mouse[GLFW_MOUSE_BUTTON_LAST + 3].Press(time);
+				wheelTimeouts[2] = time + 0.05f;
+			}
+			else if (xoffset < 0) {
+				mouse[GLFW_MOUSE_BUTTON_LAST + 4].Press(time);
+				wheelTimeouts[3] = time + 0.05f;
+			}
+		}
+
+		void HandleKeyboardPressed(int32_t idx) {
+			keyboard[idx].Press(time);
+		}
+
+		void HandleKeyboardReleased(int32_t idx) {
+			keyboard[idx].Release();
+		}
+
+		void HandleJoystickConnected(int jid) {
+			auto& joy = joys.Emplace();
+			joy.jid = jid;
+			joy.name = glfwGetGamepadName(jid);
+		}
+
+		void HandleJoystickDisconnected(int jid) {
+			for (int i = 0; i < joys.len; ++i) {
+				if (joys[i].jid == jid) {
+					joys.RemoveAt(i);
+					break;
+				}
 			}
 		}
 
 		void BaseUpdate() {
-			// event timeout handles
-			for (int32_t i = 5; i < 9; ++i) {
-				if (time < wheelTimeouts[i]) {
-					mouse[i].Press(time);
+
+			// refresh all joystick data
+			GLFWgamepadstate gs;
+			int32_t maxI{}, maxRank{};
+			for (int32_t i = 0; i < joys.len; ++i) {
+				auto& joy = joys[i];
+				auto jid = joy.jid;
+				joy.rank = 0;
+				if (glfwGetGamepadState(jid, &gs)) {
+					for (auto i = 0; i <= GLFW_GAMEPAD_BUTTON_LAST; i++) {
+						if (gs.buttons[i]) {
+							joy.btns[i].Press(time);
+							joy.rank++;
+						}
+						else {
+							joy.btns[i].Release();
+						}
+					}
+					for (auto i = 0; i < GLFW_GAMEPAD_AXIS_LAST - 1; i++) {
+						auto v = gs.axes[i];
+						if (std::abs(v) < 0.08f) joy.axes[i] = 0.f;		// 0.08f: death zone
+						else {
+							joy.axes[i] = v;
+							joy.rank++;
+						}
+					}
+					for (auto i = GLFW_GAMEPAD_AXIS_LAST - 1; i <= GLFW_GAMEPAD_AXIS_LAST; i++) {
+						auto v = gs.axes[i];
+						if (v < -0.9f) joy.axes[i] = -1.f;		// 0.9f: death zone
+						else {
+							joy.axes[i] = v;
+							joy.rank++;
+						}
+					}
+
+					// LT -> L2, RT -> R2
+					if (joy.axes[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER] > 0) {
+						joy.btns[GLFW_GAMEPAD_BUTTON_LEFT_THUMB].Press(time);
+					}
+					else {
+						joy.btns[GLFW_GAMEPAD_BUTTON_LEFT_THUMB].Release();
+					}
+					if (joy.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > 0) {
+						joy.btns[GLFW_GAMEPAD_BUTTON_RIGHT_THUMB].Press(time);
+					}
+					else {
+						joy.btns[GLFW_GAMEPAD_BUTTON_RIGHT_THUMB].Release();
+					}
 				}
 				else {
-					mouse[i].Release();
+					joy.ClearValues();
+				}
+				if (joy.rank > maxRank) {
+					maxRank = joy.rank;
+					maxI = i;
+				}
+			}
+
+			// choose one copy to joy( max rank or current )
+			if (joys.len) {
+				if (maxRank == 0) {
+					joy.ClearValues();
+				}
+				else {
+					joy = joys[maxI];
+				}
+			}
+			else {
+				joy.Cleanup();
+			}
+
+
+			// timeout
+			for (int32_t i = 0; i < 4; ++i) {
+				if (time < wheelTimeouts[i]) {
+					mouse[GLFW_MOUSE_BUTTON_LAST + 1 + i].Press(time);
+				}
+				else {
+					mouse[GLFW_MOUSE_BUTTON_LAST + 1 + i].Release();
 				}
 			}
 		}

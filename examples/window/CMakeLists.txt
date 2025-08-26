@@ -20,7 +20,7 @@ include_directories(
 	../../zstd/lib
 	../../stb
 	../../soloud/include
-	../../SFML/include
+	../../glfw/include
 )
 
 file(GLOB sources
@@ -52,14 +52,18 @@ SET(ZSTD_MULTITHREAD_SUPPORT OFF CACHE BOOL "ZSTD_MULTITHREAD_SUPPORT" FORCE)
 add_subdirectory(../../zstd/build/cmake zstd)
 target_link_libraries(${name} libzstd_static)
 
-add_subdirectory(../../SFML SFML)
-target_link_libraries(${name} sfml-window)
-
-#add_subdirectory(../../soloud soloud)
-#target_link_libraries(${name} soloud)
-
 if (WIN32)
 	target_link_libraries(${name} winmm)
+	
+	add_subdirectory(../../soloud soloud)
+	target_link_libraries(${name} soloud)
+	
+	SET(GLFW_BUILD_DOCS OFF CACHE BOOL "GLFW_BUILD_DOCS" FORCE)
+	SET(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "GLFW_BUILD_EXAMPLES" FORCE)
+	SET(GLFW_BUILD_TESTS OFF CACHE BOOL "GLFW_BUILD_TESTS" FORCE)
+	SET(GLFW_INSTALL OFF CACHE BOOL "GLFW_INSTALL" FORCE)
+	add_subdirectory(../../glfw glfw)
+	target_link_libraries(${name} glfw)
 endif()
 
 if(MSVC)

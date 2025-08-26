@@ -7,7 +7,7 @@ int32_t main() {
 }
 
 void Game::Init() {
-	title = U"examples_window";
+	title = "examples_window";
 	windowSize = designSize = { 1024, 768 };
 }
 
@@ -56,16 +56,16 @@ void Game::GLInit() {
 
 void Game::Update() {
 	// handle inputs
-	if (keyboard[sf::Keyboard::Escape]) {
-		Close();
+	if (keyboard[GLFW_KEY_ESCAPE]) {
+		running = false;
 		return;
 	}
-	if (mouse[5](0.01f)		// mouse wheel up
-		|| keyboard[sf::Keyboard::Z](0.01f)) {
+	if (mouse[GLFW_MOUSE_BUTTON_LAST + 1](0.01f)		// mouse wheel up
+		|| keyboard[GLFW_KEY_Z](0.01f)) {
 		cam.SetLogicScale(cam.logicScale + 0.001f);
 	}
-	if (mouse[6](0.01f)		// mouse wheel down
-		|| keyboard[sf::Keyboard::X](0.01f)) {
+	if (mouse[GLFW_MOUSE_BUTTON_LAST + 2](0.01f)		// mouse wheel down
+		|| keyboard[GLFW_KEY_X](0.01f)) {
 		cam.SetLogicScale(cam.logicScale - 0.001f);
 	}
 
@@ -76,12 +76,12 @@ void Game::Update() {
 	heart->Draw();
 	DrawNode(ui);
 
-#if 0
-	for (int i = 0; i < 16; ++i) {
-	xx::Cout(joy[i].pressed, " ");
+#if 1
+	for (int i = 0; i <= GLFW_GAMEPAD_BUTTON_LAST; ++i) {
+	xx::Cout(joy.btns[i].pressed, " ");
 	}
-	for (int i = 0; i < 8; ++i) {
-		xx::Cout(joya[i], " ");
+	for (int i = 0; i <= GLFW_GAMEPAD_AXIS_LAST; ++i) {
+		xx::Cout(joy.axes[i], " ");
 	}
 	xx::CoutN();
 #endif

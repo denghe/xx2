@@ -1,6 +1,11 @@
 ﻿#pragma once
 #include "xx_prims.h"
-#include <gl.h>
+#ifndef __EMSCRIPTEN__
+#include <gl33.h>
+#else
+// todo
+//#include <gles3.h>
+#endif
 #include <stb_image.h>
 
 namespace xx {

@@ -5,7 +5,9 @@
 #define GLAD_MALLOC(sz)       (new char[sz])
 #define GLAD_FREE(ptr)        delete[](ptr)
 #define GLAD_GL_IMPLEMENTATION
-#include <gl.h>
+#ifndef __EMSCRIPTEN__
+#include <gl33.h>
+#endif
 
 
 //#define STBI_NO_JPEG
