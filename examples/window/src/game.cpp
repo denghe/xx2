@@ -56,28 +56,9 @@ void Game::GLInit() {
 
 void Game::Update() {
 	// handle inputs
-	if (keyboard[GLFW_KEY_ESCAPE]) {
-		running = false;
-		return;
-	}
-	if (mouse[GLFW_MOUSE_BUTTON_LAST + 1](0.01f)		// mouse wheel up
-		|| keyboard[GLFW_KEY_Z](0.01f)) {
-		cam.SetLogicScale(cam.logicScale + 0.001f);
-	}
-	if (mouse[GLFW_MOUSE_BUTTON_LAST + 2](0.01f)		// mouse wheel down
-		|| keyboard[GLFW_KEY_X](0.01f)) {
-		cam.SetLogicScale(cam.logicScale - 0.001f);
-	}
-
-	// logic
-	heart->Update();
-
-	// draw
-	heart->Draw();
-	DrawNode(ui);
-
+	auto joy = Joy();
 #if 1
-	if (auto joy = Joy()) {
+	if (joy) {
 		for (int i = 0; i <= GLFW_GAMEPAD_BUTTON_LAST; ++i) {
 			xx::Cout(joy->btns[i].pressed, " ");
 		}
@@ -87,6 +68,30 @@ void Game::Update() {
 		xx::CoutN(joy->name, " ", joy->jid);
 	}
 #endif
+
+	if (keyboard[GLFW_KEY_ESCAPE]) {
+		running = false;
+		return;
+	}
+	if (mouse[GLFW_MOUSE_BUTTON_WHEEL_UP](0.01f)
+		|| keyboard[GLFW_KEY_Z](0.01f)
+		|| (joy && joy->btns[GLFW_GAMEPAD_BUTTON_A](0.01f))
+		) {
+		cam.SetLogicScale(cam.logicScale + 0.001f);
+	}
+	if (mouse[GLFW_MOUSE_BUTTON_WHEEL_DOWN](0.01f)
+		|| keyboard[GLFW_KEY_X](0.01f)
+		|| (joy && joy->btns[GLFW_GAMEPAD_BUTTON_B](0.01f))
+		) {
+		cam.SetLogicScale(cam.logicScale - 0.001f);
+	}
+
+	// logic
+	heart->Update();
+
+	// draw
+	heart->Draw();
+	DrawNode(ui);
 }
 
 void Game::OnResize() {

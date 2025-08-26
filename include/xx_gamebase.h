@@ -10,6 +10,10 @@
 #define GLFW_EXPOSE_NATIVE_WGL
 #define GLFW_NATIVE_INCLUDE_NONE
 #include <GLFW/glfw3native.h>
+#define GLFW_MOUSE_BUTTON_WHEEL_UP (GLFW_MOUSE_BUTTON_LAST + 1)
+#define GLFW_MOUSE_BUTTON_WHEEL_DOWN (GLFW_MOUSE_BUTTON_LAST + 2)
+#define GLFW_MOUSE_BUTTON_WHEEL_LEFT (GLFW_MOUSE_BUTTON_LAST + 3)
+#define GLFW_MOUSE_BUTTON_WHEEL_RIGHT (GLFW_MOUSE_BUTTON_LAST + 4)
 
 namespace xx {
 
@@ -152,7 +156,7 @@ namespace xx {
 		GLFWwindow* wnd{};
 #endif
 
-		// ref last active joy
+		// ref last active joy( easy access for single player )
 		JoyState* Joy() {
 			if (lastJoyIdx == -1) return {};
 			return &joys[lastJoyIdx];

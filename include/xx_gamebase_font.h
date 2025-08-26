@@ -164,13 +164,13 @@ namespace xx {
 					}
 
 					// LT -> L2, RT -> R2
-					if (joy.axes[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER] > 0) {
+					if (joy.axes[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER] > -0.5f) {
 						joy.btns[GLFW_GAMEPAD_BUTTON_LEFT_THUMB].Press(time);
 					}
 					else {
 						joy.btns[GLFW_GAMEPAD_BUTTON_LEFT_THUMB].Release();
 					}
-					if (joy.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > 0) {
+					if (joy.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > -0.5f) {
 						joy.btns[GLFW_GAMEPAD_BUTTON_RIGHT_THUMB].Press(time);
 					}
 					else {
