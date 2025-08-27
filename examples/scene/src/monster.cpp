@@ -1,7 +1,8 @@
 ﻿#include "pch.h"
+#include "scene_1.h"
 #include "monster.h"
 
-void Monster::Init(Scene* scene_, xx::Ref<xx::GLTexture> tex_, XY pos_, float radius_) {
+void Monster::Init(Scene_1* scene_, xx::Ref<xx::GLTexture> tex_, XY pos_, float radius_) {
 	scene = scene_;
 	tex = std::move(tex_);
 	pos = pos_;

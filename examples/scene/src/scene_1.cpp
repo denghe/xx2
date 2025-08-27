@@ -1,6 +1,5 @@
 ﻿#include "pch.h"
 #include "scene_1.h"
-#include "monster.h"
 
 void Scene_1::Init() {
 	cam.Init(gg.scale, 1.f);

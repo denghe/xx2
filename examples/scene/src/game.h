@@ -2,14 +2,19 @@
 #include "pch.h"
 using XY = xx::XY;
 
-struct Scene;
 struct Game : xx::Game<Game> {
 	static constexpr float cFps{ 120 };
 	static constexpr float cFrameDelay{ 1.f / cFps };
 	static constexpr float cMaxFrameDelay{ 0.1f };
 	static constexpr float cDelta{ cFrameDelay };
 
-	xx::Shared<Scene> scene, oldScene;	// oldScene: delay remove( after draw )
+	xx::Shared<xx::SceneBase> scene, oldScene;	// oldScene: delay remove( after draw )
+	template<typename T>
+	xx::Shared<T>& MakeScene() {
+		oldScene = std::move(scene);
+		scene = xx::MakeShared<T>();
+		return (xx::Shared<T>&)scene;
+	}
 
 	struct {
 		xx::Ref<xx::Scale9Config> s9bN, s9bH;
@@ -28,11 +33,3 @@ struct Game : xx::Game<Game> {
 	void OnResize();
 };
 extern Game gg;
-
-
-struct Monster;
-struct Scene : xx::SceneBase {
-	xx::Camera cam;
-	float time{}, timePool{}, timeScale{ 1 };
-	xx::List<xx::Shared<Monster>> monsters;
-};

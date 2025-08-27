@@ -1,7 +1,6 @@
 ﻿#include "pch.h"
 #include "game.h"
-#include "scene_1.h"
-#include "monster.h"
+#include "scene_mainmenu.h"
 Game gg;
 
 int32_t main() {
@@ -36,7 +35,7 @@ xx::Task<> Game::Task() {
 	cfg.s9bH->frame = res.ui_button_h;
 
 	// init first scene
-	scene.Emplace<Scene_1>()->Init();
+	scene.Emplace<Scene_MainMenu>()->Init();
 
 	// game loop
 	while (true) {
