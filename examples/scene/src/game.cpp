@@ -1,5 +1,7 @@
 ﻿#include "pch.h"
 #include "game.h"
+#include "scene_1.h"
+#include "monster.h"
 Game gg;
 
 int32_t main() {
@@ -10,14 +12,28 @@ void Game::Init() {
 	title = "examples_scene";
 }
 
-void Game::GLInit() {
-	// init shaders
-}
-
 xx::Task<> Game::Task() {
 	// load res
-	res.tex = LoadTexture("res/1.png");
-	// ...
+	res.heart = LoadTexture("res/heart.png");
+	res.ui_button_n = LoadTexture("res/ui_button_n.png");
+	res.ui_button_h = LoadTexture("res/ui_button_h.png");
+
+	// init cfgs
+	cfg.s9bN.Emplace(xx::Scale9Config{
+		.frame = res.ui_button_n,
+		.texScale = { 1, 1 },
+		.center = { 2, 2, 2, 2 },
+		.color = xx::RGBA8_White,
+		.borderScale = { 4.f },
+		.txtColor = xx::RGBA8_White,
+		.txtPadding = { 20, 5 },
+		.txtPaddingRightBottom = { 20, 10 },
+		.txtScale = { 2 },
+		.iconPadding = { 5 }
+		});
+
+	cfg.s9bH.Emplace(*cfg.s9bN);
+	cfg.s9bH->frame = res.ui_button_h;
 
 	// init first scene
 	scene.Emplace<Scene_1>()->Init();
@@ -33,11 +49,8 @@ xx::Task<> Game::Task() {
 
 void Game::Delay() {
 	// for power saving
-	for (auto d = cFrameDelay - (float)xx::NowSteadyEpochSeconds(time); d > 0.005; d -= 0.005) Sleep(3);
-}
-
-void Game::Stat() {
-	xx::CoutN("drawFPS = ", drawFPS, " drawCall = ", drawCall, " drawVerts = ", drawVerts);
+	auto d = cFrameDelay - (float)xx::NowSteadyEpochSeconds(time);
+	for (; d > 0.005f; d -= 0.005f) Sleep(3);
 }
 
 void Game::OnResize() {
@@ -46,82 +59,6 @@ void Game::OnResize() {
 	}
 }
 
-/**************************************************************************************/
-
-void Scene_1::Init() {
-	cam.Init(gg.scale, 1.f);
-
-	int ny = 80;
-	auto r = gg.designSize.y / ny;
-	auto r_2 = r * 0.5f;
-	auto nx = int(gg.designSize.x / r);
-
-	auto x1 = -nx * 0.5f * r;
-	auto x2 = nx * 0.5f * r;
-	auto y1 = -ny * 0.5f * r;
-	auto y2 = ny * 0.5f * r;
-
-	for (auto y = y1; y < y2; y += r) {
-		for (auto x = x1; x < x2; x += r) {
-			monsters.Emplace().Emplace<Monster>()->Init(this, { x + r_2, y + r_2 }, r);
-		}
-	}
-	monsters.Emplace().Emplace<Monster>()->Init(this, { -600, 0 }, 128);
-	monsters.Emplace().Emplace<Monster>()->Init(this, { 600, 0 }, 128);
-}
-
-void Scene_1::Update() {
-	auto d = float(std::min((float)gg.delta, gg.cMaxFrameDelay) * timeScale);
-	time += d;
-	timePool += d;
-	while (timePool >= gg.cDelta) {
-		timePool -= gg.cDelta;
-		FixedUpdate();
-	}
-}
-
-void Scene_1::FixedUpdate() {
-	for (auto& m : monsters) {
-		m->Update();
-	}
-}
-
-void Scene_1::Draw() {
-	for (auto& m : monsters) {
-		m->Draw();
-	}
-}
-
-void Scene_1::OnResize() {
-	cam.SetBaseScale(gg.scale);
-}
-
-/**************************************************************************************/
-
-
-void Monster::Init(Scene* scene_, XY pos_, float radius_) {
-	scene = scene_;
-	pos = pos_;
-	radius = radius_;
-	_1scale = cAnimScaleRange.from;
-}
-
-void Monster::Update() {
-	XX_BEGIN(_1);
-	while (true) {
-		for (; _1scale < cAnimScaleRange.to; _1scale += cAnimStepDelay) {
-			XX_YIELD(_1);
-		}
-		for (; _1scale > cAnimScaleRange.from; _1scale -= cAnimStepDelay) {
-			XX_YIELD(_1);
-		}
-	}
-	XX_END(_1);
-}
-
-void Monster::Draw() {
-	auto& tex = *gg.res.tex;
-	auto& cam = scene->cam;
-	auto scale = _1scale * cam.scale * (radius / gg.res.tex->Width());
-	gg.Quad().Draw(tex, tex.Rect(), cam.ToGLPos(pos), 0.5f, scale);
+void Game::Stat() {
+	xx::CoutN("drawFPS = ", drawFPS, " drawCall = ", drawCall, " drawVerts = ", drawVerts);
 }

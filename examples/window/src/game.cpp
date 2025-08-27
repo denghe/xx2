@@ -1,5 +1,6 @@
 ﻿#include "pch.h"
 #include "game.h"
+#include "monster.h"
 Game gg;
 
 int32_t main() {
@@ -12,12 +13,14 @@ void Game::Init() {
 }
 
 void Game::GLInit() {
-	texs.heart = LoadTexture("res/heart.png");
-	texs.ui_button_n = LoadTexture("res/ui_button_n.png");
-	texs.ui_button_h = LoadTexture("res/ui_button_h.png");
+	// load res
+	res.heart = LoadTexture("res/heart.png");
+	res.ui_button_n = LoadTexture("res/ui_button_n.png");
+	res.ui_button_h = LoadTexture("res/ui_button_h.png");
 
-	cfgs.s9bN.Emplace(xx::Scale9Config{
-		.frame = texs.ui_button_n,
+	// init cfgs
+	cfg.s9bN.Emplace(xx::Scale9Config{
+		.frame = res.ui_button_n,
 		.texScale = { 1, 1 },
 		.center = { 2, 2, 2, 2 },
 		.color = xx::RGBA8_White,
@@ -29,29 +32,32 @@ void Game::GLInit() {
 		.iconPadding = { 5 }
 	});
 
-	cfgs.s9bH.Emplace(*cfgs.s9bN);
-	cfgs.s9bH->frame = texs.ui_button_h;
+	cfg.s9bH.Emplace(*cfg.s9bN);
+	cfg.s9bH->frame = res.ui_button_h;
 
+	// init cam
 	cam.Init(scale, 1.f, {});
 
+	// init ui
 	ui.Emplace()->InitRoot(scale);
 
 	ui->MakeChildren<xx::Label>()->Init(1, p5 + XY{ 0, -69 }, a5, 2)
 		.SetText("hi");
 
 	ui->MakeChildren<xx::LabelButton>()->Init(2, p5 + XY{ 0, 50 }, a5
-		, cfgs.s9bN, cfgs.s9bH
+		, cfg.s9bN, cfg.s9bH
 		, "change color!!!").onClicked = [this] {
 			heart->ChangeColor();
 	};
 
 	ui->MakeChildren<xx::LabelButton>()->Init(3, p5 + XY{ 0, 0 }, a5
-		, cfgs.s9bN, cfgs.s9bH
+		, cfg.s9bN, cfg.s9bH
 		, "change anim").onClicked = [this] {
 			heart->ChangeAnim();
 	};
 
-	heart.Emplace()->Init();
+	// init logic
+	heart.Emplace()->Init(res.heart);
 }
 
 void Game::Update() {
@@ -83,7 +89,7 @@ void Game::Update() {
 		cam.SetLogicScale(cam.logicScale - 0.001f);
 	}
 
-	// logic
+	// logic update
 	heart->Update();
 
 	// draw
@@ -101,66 +107,4 @@ void Game::Stat() {
 		, drawCall, " drawVerts = ", drawVerts
 		, " delayFuncs.len = ", delayFuncs.len
 	);
-}
-
-/***************************************************************************/
-
-void Heart::ChangeColor() {
-	colorIndex++;
-	if (colorIndex >= cColors.size()) {
-		colorIndex = 0;
-	}
-}
-
-void Heart::ChangeAnim() {
-	animIndex++;
-	if (animIndex >= cAnimCount) {
-		animIndex = 0;
-	}
-}
-
-void Heart::AnimScale() {
-	XX_BEGIN(_1);
-	for (scale = 1.f; scale.x > 0.75f; scale -= gg.delta) {
-		XX_YIELD(_1);
-	}
-	for (scale = 0.75f; scale.x < 1.f; scale += gg.delta) {
-		XX_YIELD(_1);
-	}
-	XX_YIELD_TO_BEGIN(_1);
-	XX_END(_1);
-}
-
-void Heart::AnimBounce() {
-	XX_BEGIN(_2);
-	for (_2x = 0.0834f; _2x < 0.916f; _2x += gg.delta) {
-		{
-			auto r = xx::CalcBounce(_2x);
-			scale = { r, 2.f - r };
-		}
-		XX_YIELD(_2);
-	}
-	XX_YIELD_TO_BEGIN(_2);
-	XX_END(_2);
-}
-
-void Heart::Init() {
-	scale = 1.f;
-}
-
-void Heart::Update() {
-	switch (animIndex) {
-	case 0:
-		AnimBounce();
-		break;
-	case 1:
-		AnimScale();
-		break;
-	}
-}
-
-void Heart::Draw() {
-	auto& t = *gg.texs.heart;
-	gg.Quad().Draw(t, t.Rect(), gg.cam.ToGLPos({}), 0.5f
-		, 20.f * scale * gg.cam.scale, 0, 1, cColors[colorIndex]);
 }

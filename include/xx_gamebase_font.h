@@ -22,6 +22,12 @@ namespace xx {
 		void BaseGLInit() {
 			GameBase_shader::BaseGLInit();
 			fontMaker.Init();
+			// search exists joys
+			for (auto jid = GLFW_JOYSTICK_1; jid <= GLFW_JOYSTICK_LAST; jid++) {
+				if (glfwJoystickPresent(jid)) {
+					this->HandleJoystickConnected(jid);
+				}
+			}
 		}
 
 		void HandleMouseMove(XY mp_) {

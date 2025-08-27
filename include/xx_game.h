@@ -35,10 +35,10 @@ namespace xx {
 
 		int32_t Run() {
 			this->running = true;
-			this->BaseInit();														// lifeCycle 1
+			this->BaseInit();														// lifeCycle 1 ( once )
 
 			if constexpr (Has_Init<Derived>) {
-				((Derived*)this)->Init();											// lifeCycle 2
+				((Derived*)this)->Init();											// lifeCycle 2 ( once )
 			}
 
 			glfwSetErrorCallback([](int error, const char* description) {
@@ -70,7 +70,15 @@ namespace xx {
 			glfwSwapInterval(0);	// no v-sync by default
 			gladLoadGL(glfwGetProcAddress);
 
-			// resize
+			// register event callbacks
+
+			// window focus
+			glfwSetWindowFocusCallback(this->wnd, [](GLFWwindow* wnd, int focused) {
+				auto g = (Game*)glfwGetWindowUserPointer(wnd);
+				g->focused = focused != 0;
+			});
+
+			// window resize
 			glfwSetFramebufferSizeCallback(this->wnd, [](GLFWwindow* wnd, int w, int h) {
 				auto g = (Game*)glfwGetWindowUserPointer(wnd);
 				g->windowSize.x = (float)w;
@@ -82,7 +90,7 @@ namespace xx {
 				}
 			});
 
-			// drag title / resize( windows only? )
+			// window drag title / resize( windows only? )
 			glfwSetWindowRefreshCallback(this->wnd, [](GLFWwindow* wnd) {
 				auto g = (Game*)glfwGetWindowUserPointer(wnd);
 				g->Loop(true);
@@ -139,35 +147,28 @@ namespace xx {
 
 			// ...
 
-			// search exists joys
-			for (auto jid = GLFW_JOYSTICK_1; jid <= GLFW_JOYSTICK_LAST; jid++) {
-				if (glfwJoystickPresent(jid)) {
-					this->HandleJoystickConnected(jid);
-				}
-			}
-
 			// dump & cleanup glfw3 error
 			while (auto e = glGetError()) {
 				CoutN("glGetError() == ", (int)e);
 			};
 
-			this->BaseGLInit();														// lifeCycle 3
-			glfwSwapBuffers(this->wnd);
+			this->BaseGLInit();														// lifeCycle 3 ( once )
+			glfwSwapBuffers(this->wnd);	// for draw font
 
 			if constexpr (Has_GLInit<Derived>) {
-				((Derived*)this)->GLInit();											// lifeCycle 4
+				((Derived*)this)->GLInit();											// lifeCycle 4 ( once )
 			}
 
 			this->time = NowSteadyEpochSeconds();
 			this->delta = 0.00001;
 
 			if constexpr (Has_Task<Derived>) {
-				this->baseTask = ((Derived*)this)->Task();							// lifeCycle 5
+				this->baseTask = ((Derived*)this)->Task();
 			}
 
-			while (this->running && !glfwWindowShouldClose(this->wnd)) {
-				glfwPollEvents();
-				Loop(false);
+			while (this->running && !glfwWindowShouldClose(this->wnd)) {			// ( loop )
+				glfwPollEvents();													// lifeCycle 5
+				Loop(false);												// lifeCycle 6,7,8,9,10
 			}
 
 		LabEnd:
