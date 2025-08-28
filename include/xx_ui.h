@@ -1,0 +1,13 @@
+﻿#pragma once
+#include "xx_ui_label.h"
+#include "xx_ui_image.h"
+#include "xx_ui_scale9.h"
+#include "xx_ui_button.h"
+#include "xx_ui_imagebutton.h"
+#include "xx_ui_iconbutton.h"
+#include "xx_ui_labelbutton.h"
+#include "xx_ui_background.h"
+#include "xx_ui_dropdownlist.h"
+#include "xx_ui_scrollview.h"
+#include "xx_ui_rich.h"
+// ...

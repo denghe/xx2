@@ -27,7 +27,7 @@ void Scene_1::Init() {
 }
 
 void Scene_1::Update() {
-	auto d = float(std::min((float)gg.delta, gg.cMaxFrameDelay) * timeScale);
+	auto d = float(std::min((float)gg.delta, gg.cMaxDelta) * timeScale);
 	time += d;
 	timePool += d;
 	while (timePool >= gg.cDelta) {

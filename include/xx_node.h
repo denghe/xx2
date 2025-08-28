@@ -50,19 +50,19 @@ namespace xx {
 			return IsIntersect_BoxBoxF(worldMinXY, worldMaxXY, GameBase::instance->worldMinXY, GameBase::instance->worldMaxXY);
 		}
 
-		XX_INLINE bool PosInArea(XY const& pos) const {
-			if (scissor && !IsIntersect_BoxPointF(scissor->worldMinXY, scissor->worldMaxXY, pos)) return false;
-			return IsIntersect_BoxPointF(worldMinXY, worldMaxXY, pos);
+		XX_INLINE bool PosInArea(XY pos_) const {
+			if (scissor && !IsIntersect_BoxPointF(scissor->worldMinXY, scissor->worldMaxXY, pos_)) return false;
+			return IsIntersect_BoxPointF(worldMinXY, worldMaxXY, pos_);
 		}
 
-		XX_INLINE bool PosInScissor(XY const& pos) const {
+		XX_INLINE bool PosInScissor(XY pos_) const {
 			if (!scissor) return true;
-			return IsIntersect_BoxPointF(scissor->worldMinXY, scissor->worldMaxXY, pos);
+			return IsIntersect_BoxPointF(scissor->worldMinXY, scissor->worldMaxXY, pos_);
 		}
 
 		// for draw bg
-		XX_INLINE XY CalcBorderSize(XY const& padding = {}) const {
-			return size * scale + padding;
+		XX_INLINE XY CalcBorderSize(XY padding_ = {}) const {
+			return size * scale + padding_;
 		}
 
 		// for update
@@ -87,20 +87,24 @@ namespace xx {
 			}
 		}
 
-		// for copy: Node::Init(z_, position_, scale_, anchor_, size_);
-		XX_INLINE Node& Init(int z_ = 0, XY const& position_ = {}, XY const& anchor_ = {}, XY const& scale_ = { 1,1 }, XY const& size_ = {}) {
-			typeId = cTypeId;
+		template<typename Derived>
+		XX_INLINE Derived& InitDerived(int z_ = 0, XY position_ = {}, XY anchor_ = {}, XY scale_ = { 1,1 }, XY size_ = {}) {
+			typeId = Derived::cTypeId;
 			z = z_;
 			position = position_;
 			anchor = anchor_;
 			scale = scale_;
 			size = size_;
 			FillTrans();
-			return *this;
+			return (Derived&)*this;
+		}
+
+		XX_INLINE Node& Init(int z_ = 0, XY position_ = {}, XY anchor_ = {}, XY scale_ = { 1,1 }, XY size_ = {}) {
+			return InitDerived<Node>(z_, position_, anchor_, scale_, size_);
 		}
 
 		// for ui root node only
-		XX_INLINE Node& InitRoot(XY const& scale_) {
+		XX_INLINE Node& InitRoot(XY scale_) {
 			return Init(0, 0, 0, scale_);
 		}
 
@@ -141,12 +145,12 @@ namespace xx {
 		virtual ~Node() {};
 
 
-		void Resize(XY const& scale_) {
+		void Resize(XY scale_) {
 			scale = scale_;
 			FillTransRecursive();
 		}
 
-		void Resize(XY const& position_, XY const& scale_) {
+		void Resize(XY position_, XY scale_) {
 			position = position_;
 			scale = scale_;
 			FillTransRecursive();
@@ -207,9 +211,9 @@ namespace xx {
 	struct MouseEventHandlerNode : Node {
 		int32_t indexAtUiGrid{ -1 };
 
-		virtual int32_t OnMouseDown() { return 0; };	// return 1: swallow
+		virtual int32_t OnMouseDown(int32_t btnId_) { return 0; };	// return 1: swallow
 		virtual int32_t OnMouseMove() { return 0; };
-		virtual void OnMouseUp() {};
+		//virtual void OnMouseUp(int32_t btnId_) {};
 
 		XX_INLINE bool MousePosInArea() const {		// virtual ?
 			return PosInArea(GameBase::instance->mousePos);

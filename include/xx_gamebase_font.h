@@ -76,18 +76,40 @@ namespace xx {
 			for (auto& zn : tmpZNodes) {
 				auto n = ((MouseEventHandlerNode*)zn.n);
 				if (!n->PosInScissor(mousePos)) continue;
-				if (n->OnMouseDown()) {
+				if (n->OnMouseDown(idx)) {
 					handled = true;
 					break;
 				}
 			}
 			tmpZNodes.Clear();
 			if (!handled) {
+				xx::CoutN("HandleMouseButtonPressed idx = ", idx);
 				mouse[idx].Press(time);
 			}
 		}
 
 		void HandleMouseButtonReleased(int32_t idx) {
+			if (!mouse[idx]) return;
+			//// search
+			//uiGrid.ForeachPoint(uiGrid.worldSize * 0.5f + mousePos);
+
+			//// search results -> tmpZNodes
+			//for (auto& i : uiGrid.results) {
+			//	auto o = uiGrid.NodeAt(i).value;
+			//	assert(o->typeId >= 10);
+			//	tmpZNodes.Emplace(o->z, o);
+			//}
+
+			//// sort order by z
+			//std::sort(tmpZNodes.buf, tmpZNodes.buf + tmpZNodes.len
+			//	, ZNode::GreaterThanComparer);
+
+			//for (auto& zn : tmpZNodes) {
+			//	auto n = ((MouseEventHandlerNode*)zn.n);
+			//	if (!n->PosInScissor(mousePos)) continue;
+			//	n->OnMouseUp(idx);
+			//}
+			//tmpZNodes.Clear();
 			mouse[idx].Release();
 		}
 

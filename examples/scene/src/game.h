@@ -4,9 +4,8 @@ using XY = xx::XY;
 
 struct Game : xx::Game<Game> {
 	static constexpr float cFps{ 120 };
-	static constexpr float cFrameDelay{ 1.f / cFps };
-	static constexpr float cMaxFrameDelay{ 0.1f };
-	static constexpr float cDelta{ cFrameDelay };
+	static constexpr float cDelta{ 1.f / cFps };
+	static constexpr float cMaxDelta{ 0.1f };
 
 	xx::Shared<xx::SceneBase> scene, oldScene;	// oldScene: delay remove( after draw )
 	template<typename T>
@@ -17,11 +16,23 @@ struct Game : xx::Game<Game> {
 	}
 
 	struct {
-		xx::Ref<xx::Scale9Config> s9bN, s9bH;
+		xx::Ref<xx::Scale9Config> s9bN, s9bH, s9bg;
 	} cfg;
 
 	struct {
-		xx::Ref<xx::GLTexture> heart, ui_button_n, ui_button_h;
+		xx::Ref<xx::GLTexture>
+			heart,
+			ui_button,
+			ui_button_h,
+			ui_button_n,
+			ui_imgbtn_h,
+			ui_imgbtn_n,
+			ui_dropdownlist_icon,
+			ui_dropdownlist_head,
+			ui_panel,
+			ui_slider_bar,
+			ui_slider_block
+			;
 	} res;
 
 	xx::Shared<xx::Node> ui;
