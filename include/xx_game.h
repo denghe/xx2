@@ -33,6 +33,10 @@ namespace xx {
 			glfwTerminate();
 		}
 
+		void SetResolution(XY size_) {
+			glfwSetWindowSize(this->wnd, (int)size_.x, (int)size_.y);
+		}
+
 		int32_t Run() {
 			this->running = true;
 			this->BaseInit();														// lifeCycle 1 ( once )

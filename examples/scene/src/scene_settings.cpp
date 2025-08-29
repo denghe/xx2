@@ -33,9 +33,34 @@ void Scene_Settings::Init() {
 
 	auto ddl = ui->MakeChildren<xx::DropDownList>();
 	ddl->InitBegin(2, gg.p5 + XY{ 0, 0 }, gg.a5
-		, { 500, 80 }, gg.cfg.s9bN, gg.cfg.s9bH, gg.cfg.s9bg);
-	ddl->data.Add("1280x720", "1366x768", "1920x1080", "2560x1440", "3840x2160");
-	ddl->InitEnd(2, gg.res.ui_dropdownlist_icon, gg.res.ui_dropdownlist_head);
+		, { 500, 80 }, gg.cfg.s9bN, gg.cfg.s9bH, gg.cfg.s9bg
+		, gg.res.ui_dropdownlist_icon, gg.res.ui_dropdownlist_head);
+	ddl->items.Add("1280x720", "1366x768", "1920x1080", "2560x1440", "3840x2160");
+	ddl->InitEnd(2);
+	ddl->onSelectedIndexChanged = [](int32_t idx) {
+		switch (idx) {
+		case 0:
+			gg.SetResolution({ 1280,720 });
+			break;
+		case 1:
+			gg.SetResolution({ 1366,768 });
+			break;
+		case 2:
+			gg.SetResolution({ 1920,1080 });
+			break;
+		case 3:
+			gg.SetResolution({ 2560,1440 });
+			break;
+		case 4:
+			gg.SetResolution({ 3840,2160 });
+			break;
+		default:
+			assert(false);
+		}
+	};
+	// todo: block unavailable‌ resolutions
+
+	// todo: switch window mode / full screen
 }
 
 void Scene_Settings::Update() {

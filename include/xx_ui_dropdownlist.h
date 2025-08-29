@@ -4,8 +4,6 @@
 
 namespace xx {
 
-	// todo
-
 	struct DropDownList;
 	struct DropDownListItem : MouseEventHandlerNode {
 		static constexpr int32_t cTypeId{ 15 };
@@ -13,8 +11,7 @@ namespace xx {
 		int32_t idx{ -1 };
 		bool highLight{};
 
-		template<typename S1>
-		void Init(Weak<DropDownList> owner_, int32_t idx_, bool highLight_);
+		void Init(int32_t z_, Weak<DropDownList> owner_, int32_t idx_, bool highLight_);
 
 		void SetHighLight(bool enable);
 
@@ -26,13 +23,19 @@ namespace xx {
 	struct DropDownList : Button {
 		static constexpr int32_t cTypeId{ 15 };
 		Ref<Scale9Config> cfgBG;
-		List<std::string> data;
+		List<std::string> items;
+		Weak<Label> lbl;
 		Weak<Background> bg;
 		Weak<Scale9> content;
-		TinyFrame itemHead;
+		TinyFrame icon, itemHead;
+		XY totalSize{};
+		int32_t selectedIndex{};
+		std::function<void(int32_t)> onSelectedIndexChanged = [](int32_t idx) { CoutN("DropDownList selectedIndex = ", idx); };
 
+		// init step 1/2
 		DropDownList& InitBegin(int32_t z_, XY position_, XY anchor_, XY fixedSize_
-			, Ref<Scale9Config> cfgNormal_, Ref<Scale9Config> cfgHighlight_, Ref<Scale9Config> cfgBG_) {
+			, Ref<Scale9Config> cfgNormal_, Ref<Scale9Config> cfgHighlight_, Ref<Scale9Config> cfgBG_
+			, TinyFrame icon_, TinyFrame itemHead_) {
 			typeId = cTypeId;
 			isFocus = false;
 			z = z_;
@@ -42,22 +45,28 @@ namespace xx {
 			cfgNormal = std::move(cfgNormal_);
 			cfgHighlight = std::move(cfgHighlight_);
 			cfgBG = std::move(cfgBG_);
+			icon = std::move(icon_);
+			itemHead = std::move(itemHead_);
 			FillTrans();
 			return *this;
 		}
 
-		void InitEnd(int32_t selectedIndex, TinyFrame icon_, TinyFrame itemHead_) {
-			itemHead = std::move(itemHead_);
+		// init step 2/2
+		// need items.Add(...
+		void InitEnd(int32_t selectedIndex_) {
+			selectedIndex = selectedIndex_;
+			totalSize = { size.x, size.y * items.len };
 			auto& cfg = GetCfg();
 
 			auto lblLeft = MakeChildren<Label>();
 			lblLeft->Init(z + 1, { cfg.txtPadding.x, cfg.txtPaddingRightBottom.y }, {}, cfg.txtScale, cfg.txtColor);
-			lblLeft->SetText(data[selectedIndex]);
+			lblLeft->SetText(items[selectedIndex]);
+			lbl = lblLeft;
 			
 			auto imgSize = size.y * 0.8f;
 			auto imgSpacing = (size.y - imgSize) * 0.5f;
 			XY imgPos{ size.x - imgSpacing, imgSpacing };
-			MakeChildren<Image>()->Init(z + 2, imgPos, { 1, 0 }, imgSize, true, std::move(icon_));
+			MakeChildren<Image>()->Init(z + 2, imgPos, { 1, 0 }, imgSize, true, icon);
 
 			MakeChildren<Scale9>()->Init(z, 0, {}, cfg.borderScale, size / cfg.borderScale, cfg);
 
@@ -68,19 +77,33 @@ namespace xx {
 		}
 
 		void PopList() {
-			XY totalSize{ size.x, size.y * data.len };
-
 			auto c = MakeChildren<Scale9>();
 			c->Init(z + 1000, 0, {0, 1}, 1, totalSize, *cfgBG);
 			content = c.ToWeak();
 
-			// todo: make items
+			for (int32_t i = 0; i < items.len; ++i) {
+				c->MakeChildren<DropDownListItem>()->Init(z + 1000
+					, WeakFromThis(this), i, false);
+			}
 
 			bg = MakeChildren<Background>();
 			bg->Init(z + 999, content).onOutsideClicked = [this] {
 				content->SwapRemoveFromParent();
 				bg->SwapRemoveFromParent();
 			};
+		}
+
+		void ItemCommit(int32_t idx_) {
+			assert(content);
+			assert(bg);
+			assert(lbl);
+			content->SwapRemoveFromParent();
+			bg->SwapRemoveFromParent();
+			if (selectedIndex != idx_) {
+				selectedIndex = idx_;
+				lbl->SetText(items[idx_]);
+				onSelectedIndexChanged(idx_);
+			}
 		}
 
 		void ApplyCfg() override {
@@ -93,15 +116,27 @@ namespace xx {
 	};
 
 
-	template<typename S1>
-	inline void DropDownListItem::Init(Weak<DropDownList> owner_, int32_t idx_, bool highLight_) {
+	inline void DropDownListItem::Init(int32_t z_, Weak<DropDownList> owner_, int32_t idx_, bool highLight_) {
+		typeId = cTypeId;
+		z = z_;
 		owner = std::move(owner_);
 		idx = idx_;
 		highLight = highLight_;
 		size = owner->size;
+		position = { 0, owner->totalSize.y - size.y * idx_ };
+		anchor = { 0, 1 };
+		FillTrans();
 
-		// todo: make childs
-		//auto img = MakeChildren<Image>()->Init(z_, )
+		auto imgSize = size.y * 0.8f;
+		auto imgSpacing = (size.y - imgSize) * 0.5f;
+		auto imgColor = idx_ == owner->selectedIndex ? RGBA8_Blue : RGBA8_White;
+		MakeChildren<Image>()->Init(z, imgSpacing, { 0, 0 }, imgSize, true, owner->itemHead, {}, imgColor);
+
+		auto& cfg = *owner->cfgNormal;
+		auto lblLeft = MakeChildren<Label>();
+		XY lblPos{ imgSpacing + imgSize + imgSpacing, cfg.txtPaddingRightBottom.y };
+		lblLeft->Init(z, lblPos, {}, cfg.txtScale, cfg.txtColor);
+		lblLeft->SetText(owner->items[idx_]);
 	}
 
 	inline void DropDownListItem::SetHighLight(bool enable) {
@@ -114,7 +149,7 @@ namespace xx {
 
 	inline int32_t DropDownListItem::OnMouseDown(int32_t btnId_) {
 		assert(owner);
-		// todo: callback owner on selected func
+		owner->ItemCommit(idx);
 		return 1;
 	}
 
