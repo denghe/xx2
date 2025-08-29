@@ -83,7 +83,7 @@ namespace xx {
 			}
 			tmpZNodes.Clear();
 			if (!handled) {
-				xx::CoutN("HandleMouseButtonPressed idx = ", idx);
+				//xx::CoutN("HandleMouseButtonPressed idx = ", idx);
 				mouse[idx].Press(time);
 			}
 		}

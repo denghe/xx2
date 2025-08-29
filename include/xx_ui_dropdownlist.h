@@ -129,7 +129,7 @@ namespace xx {
 
 		auto imgSize = size.y * 0.8f;
 		auto imgSpacing = (size.y - imgSize) * 0.5f;
-		auto imgColor = idx_ == owner->selectedIndex ? RGBA8_Blue : RGBA8_White;
+		auto imgColor = idx_ == owner->selectedIndex ? RGBA8_Green : RGBA8_White;
 		MakeChildren<Image>()->Init(z, imgSpacing, { 0, 0 }, imgSize, true, owner->itemHead, {}, imgColor);
 
 		auto& cfg = *owner->cfgNormal;
@@ -144,7 +144,7 @@ namespace xx {
 		highLight = enable;
 		assert(children[1]->typeId == Label::cTypeId);
 		auto lbl = (Label*)children[1].pointer;
-		lbl->color = enable ? RGBA8_Blue : RGBA8_White;
+		lbl->color = enable ? RGBA8{ 200, 100, 100, 255 } : RGBA8_White;
 	}
 
 	inline int32_t DropDownListItem::OnMouseDown(int32_t btnId_) {

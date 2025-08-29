@@ -17,6 +17,8 @@ xx::Task<> Game::Task() {
 	res.ui_button = LoadTexture("res/ui_button.png");
 	res.ui_button_h = LoadTexture("res/ui_button_h.png");
 	res.ui_button_n = LoadTexture("res/ui_button_n.png");
+	res.ui_checkbox_0 = LoadTexture("res/ui_checkbox_0.png");
+	res.ui_checkbox_1 = LoadTexture("res/ui_checkbox_1.png");
 	res.ui_imgbtn_h = LoadTexture("res/ui_imgbtn_h.png");
 	res.ui_imgbtn_n = LoadTexture("res/ui_imgbtn_n.png");
 	res.ui_dropdownlist_icon = LoadTexture("res/ui_dropdownlist_icon.png");

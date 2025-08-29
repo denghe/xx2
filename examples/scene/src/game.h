@@ -25,6 +25,8 @@ struct Game : xx::Game<Game> {
 			ui_button,
 			ui_button_h,
 			ui_button_n,
+			ui_checkbox_0,
+			ui_checkbox_1,
 			ui_imgbtn_h,
 			ui_imgbtn_n,
 			ui_dropdownlist_icon,

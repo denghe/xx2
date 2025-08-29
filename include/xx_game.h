@@ -33,8 +33,40 @@ namespace xx {
 			glfwTerminate();
 		}
 
-		void SetResolution(XY size_) {
-			glfwSetWindowSize(this->wnd, (int)size_.x, (int)size_.y);
+		void SetFullScreenMode(XY size_ = {}) {
+			auto monitor = glfwGetPrimaryMonitor();
+			auto mode = glfwGetVideoMode(monitor);
+			if (size_.x == 0 || size_.y == 0) {
+				size_ = { mode->width, mode->height };
+			}
+			glfwSetWindowAttrib(this->wnd, GLFW_DECORATED, GLFW_TRUE);
+			glfwSetWindowMonitor(this->wnd, monitor, 0, 0, size_.x, size_.y, mode->refreshRate);
+			this->isFullScreen = true;
+			this->isBorderless = false;
+		}
+
+		void SetWindowMode(XY size_ = {}) {
+			auto monitor = glfwGetPrimaryMonitor();
+			auto mode = glfwGetVideoMode(monitor);
+			// todo: min( mode.size, design size )
+			if (size_.x == 0 || size_.y == 0) {
+				size_ = this->designSize;
+			}
+			glfwRestoreWindow(this->wnd);
+			glfwSetWindowAttrib(this->wnd, GLFW_DECORATED, GLFW_TRUE);
+			glfwSetWindowMonitor(this->wnd, NULL, (mode->width - size_.x) / 2, (mode->height - size_.y) / 2
+				, size_.x, size_.y, GLFW_DONT_CARE);
+			this->isFullScreen = false;
+			this->isBorderless = false;
+		}
+
+		void SetBorderlessMode() {
+			auto monitor = glfwGetPrimaryMonitor();
+			auto mode = glfwGetVideoMode(monitor);
+			glfwSetWindowAttrib(this->wnd, GLFW_DECORATED, GLFW_FALSE);
+			glfwSetWindowMonitor(this->wnd, NULL, 0, 0, mode->width, mode->height, GLFW_DONT_CARE);
+			this->isFullScreen = false;
+			this->isBorderless = true;
 		}
 
 		int32_t Run() {
@@ -64,6 +96,10 @@ namespace xx {
 			glfwMakeContextCurrent(this->wnd);
 			glfwSetWindowUserPointer(this->wnd, this);
 
+			glfwSetWindowSizeLimits(this->wnd, this->minSize.x, this->minSize.y, GLFW_DONT_CARE, GLFW_DONT_CARE);
+
+			SetWindowMode();	// window pos -> center
+
 			int w{}, h{};
 			glfwGetFramebufferSize(this->wnd, &w, &h);
 			this->windowSize.x = (float)w;
@@ -85,6 +121,11 @@ namespace xx {
 			// window resize
 			glfwSetFramebufferSizeCallback(this->wnd, [](GLFWwindow* wnd, int w, int h) {
 				auto g = (Game*)glfwGetWindowUserPointer(wnd);
+				if (w == 0 || h == 0) {
+					g->minimized = true;
+					return;
+				}
+				g->minimized = false;
 				g->windowSize.x = (float)w;
 				g->windowSize.y = (float)h;
 				g->ResizeCalc();
@@ -128,14 +169,22 @@ namespace xx {
 				// action 1: down  0: up  2: repeat
 				if (key < 0) return;    // macos fn key == -1
 				auto g = (Game*)glfwGetWindowUserPointer(wnd);
-				if (action == 0) {	// down
+				if (key == GLFW_KEY_ENTER && action == GLFW_PRESS && (mods & GLFW_MOD_ALT)) {
+					if (g->isBorderless) {
+						g->SetWindowMode();
+					}
+					else {
+						g->SetBorderlessMode();
+					}
+					return;
+				}
+				if (action == GLFW_RELEASE) {
 					g->HandleKeyboardReleased(key);
 				}
-				else if (action == 1) {	// up
+				else if (action == GLFW_PRESS) {
 					g->HandleKeyboardPressed(key);
 				}
-				// else action == 2  repeat
-				// mods 0b 0011 win alt ctrl shift
+				// else action == GLFW_REPEAT
 			});
 
 			// joystick
@@ -170,7 +219,7 @@ namespace xx {
 				this->baseTask = ((Derived*)this)->Task();
 			}
 
-			while (this->running && !glfwWindowShouldClose(this->wnd)) {			// ( loop )
+			while (this->running && !glfwWindowShouldClose(this->wnd)) {		// ( loop )
 				glfwPollEvents();													// lifeCycle 5
 				Loop(false);												// lifeCycle 6,7,8,9,10
 			}

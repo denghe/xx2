@@ -10,26 +10,23 @@ void Scene_Settings::Init() {
 	// todo: checkbox slider
 
 	// title
-	// display mode
-	// full screen( no border ) / window
 	// music / sound volume
 	// back:[esc]
 
 	ui->MakeChildren<xx::Label>()->Init(2, gg.p5 + XY{ 0, 300 }, gg.a5, 5)
 		.SetText("settings");
 
-	ui->MakeChildren<xx::LabelButton>()->Init(2, gg.p5 + XY{ 0, 100 }, gg.a5
-		, gg.cfg.s9bN, gg.cfg.s9bH
-		, "asdf").onClicked = [this] {
-			xx::CoutN("asdf");
-			auto contentArea = ui->MakeChildren<xx::Scale9>();
-			contentArea->Init(1, 0, 0.5, 1, { 300,300 }, *gg.cfg.s9bg);
-			auto bg = ui->MakeChildren<xx::Background>();
-			bg->Init(3, contentArea.ToWeak()).onOutsideClicked = [w = bg.ToWeak()] {
-				w->contentArea->SwapRemoveFromParent();
-				w->SwapRemoveFromParent();
-				};
-		};
+	ui->MakeChildren<xx::CheckBox>()->Init(2, gg.p5 + XY{ 0, 100 }, gg.a5
+		, { 500, 80 }, true, gg.cfg.s9bN, gg.cfg.s9bH
+		, gg.res.ui_checkbox_0, gg.res.ui_checkbox_1, "full screen", false)
+		.onValueChanged = [](bool v) {
+		if (v) {
+			gg.SetBorderlessMode();
+		}
+		else {
+			gg.SetWindowMode();
+		}
+	};
 
 	auto ddl = ui->MakeChildren<xx::DropDownList>();
 	ddl->InitBegin(2, gg.p5 + XY{ 0, 0 }, gg.a5
@@ -40,27 +37,29 @@ void Scene_Settings::Init() {
 	ddl->onSelectedIndexChanged = [](int32_t idx) {
 		switch (idx) {
 		case 0:
-			gg.SetResolution({ 1280,720 });
+			gg.SetWindowMode({ 1280,720 });
 			break;
 		case 1:
-			gg.SetResolution({ 1366,768 });
+			gg.SetWindowMode({ 1366,768 });
 			break;
 		case 2:
-			gg.SetResolution({ 1920,1080 });
+			gg.SetWindowMode({ 1920,1080 });
 			break;
 		case 3:
-			gg.SetResolution({ 2560,1440 });
+			gg.SetWindowMode({ 2560,1440 });
 			break;
 		case 4:
-			gg.SetResolution({ 3840,2160 });
+			gg.SetWindowMode({ 3840,2160 });
 			break;
 		default:
 			assert(false);
 		}
 	};
+
+	// todo: need refresh ui values after set xxxxx mode
+
 	// todo: block unavailable‌ resolutions
 
-	// todo: switch window mode / full screen
 }
 
 void Scene_Settings::Update() {
