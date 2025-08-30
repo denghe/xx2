@@ -21,6 +21,8 @@ namespace xx {
 		int32_t typeId{};											// fill by Init
 		int z{};													// global z for event priority or batch combine
 		bool inParentArea{ true };									// panel true ? combo box pop false ?
+		bool enable{ true };	// todo
+		bool visible{ true };	// todo
 		float alpha{ 1 };	// todo
 		int32_t indexAtParentChildren{-1};
 		//uint64_t ud{};
@@ -45,6 +47,7 @@ namespace xx {
 
 		// for draw FillZNodes
 		XX_INLINE bool IsVisible() const {
+			if (!visible) return false;
 			if (scissor && !IsIntersect_BoxBoxF(worldMinXY, worldMaxXY, scissor->worldMinXY, scissor->worldMaxXY)) return false;
 			if (inParentArea && parent) return IsIntersect_BoxBoxF(worldMinXY, worldMaxXY, parent->worldMinXY, parent->worldMaxXY);
 			return IsIntersect_BoxBoxF(worldMinXY, worldMaxXY, GameBase::instance->worldMinXY, GameBase::instance->worldMaxXY);
@@ -72,6 +75,20 @@ namespace xx {
 				c->FillTransRecursive();
 			}
 		};
+
+		void SetVisibleRecursive(bool visible_) {
+			visible = visible_;
+			for (auto& c : children) {
+				c->SetAlphaRecursive(visible_);
+			}
+		}
+
+		void SetEnableRecursive(bool enable_) {
+			enable = enable_;
+			for (auto& c : children) {
+				c->SetAlphaRecursive(enable_);
+			}
+		}
 
 		void SetAlphaRecursive(float alpha_) {
 			alpha = alpha_;

@@ -7,28 +7,39 @@ void Scene_MainMenu::Init() {
 	// init ui
 	ui.Emplace()->InitRoot(gg.scale);
 
+	if (!gg.langSelected) {
+		ui->MakeChildren<UILangChoosePanel>()->Init().onClose = [this](i18n::Languages v) {
+			gg.langSelected = true;				// set flag
+			gg.lang.SetLanguage(v);		// set lang
+			this->Init();						// reload ui ( unsafe )
+		};
+		return;
+	}
+
 	// todo: bg
 
 	ui->MakeChildren<xx::Label>()->Init(2, gg.p5 + XY{ 0, 300 }, gg.a5, 5)
-		.SetText("game title");
+		.SetText(gg.lang(Strs::gameName));
 
 	ui->MakeChildren<xx::LabelButton>()->Init(2, gg.p5 + XY{ 0, 0 }, gg.a5
 		, gg.cfg.s9bN, gg.cfg.s9bH
-		, "play").onClicked = [this] {
+		, gg.lang(Strs::play)).onClicked = [this] {
 			gg.MakeScene<Scene_1>()->Init();
 		};
 
 	ui->MakeChildren<xx::LabelButton>()->Init(2, gg.p5 + XY{ 0, -100 }, gg.a5
 		, gg.cfg.s9bN, gg.cfg.s9bH
-		, "settings").onClicked = [this] {
+		, gg.lang(Strs::settings)).onClicked = [this] {
 			gg.MakeScene<Scene_Settings>()->Init();
 		};
 
 	ui->MakeChildren<xx::LabelButton>()->Init(2, gg.p5 + XY{ 0, -200 }, gg.a5
 		, gg.cfg.s9bN, gg.cfg.s9bH
-		, "quit").onClicked = [this] {
+		, gg.lang(Strs::quit)).onClicked = [this] {
 			gg.running = false;
 		};
+
+	// todo: version? lang icon?
 }
 
 void Scene_MainMenu::Update() {

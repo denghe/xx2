@@ -1,5 +1,7 @@
 ﻿#pragma once
 #include "pch.h"
+#include "_i18n.h"
+using namespace i18n;
 using XY = xx::XY;
 
 struct Game : xx::Game<Game> {
@@ -37,7 +39,13 @@ struct Game : xx::Game<Game> {
 			;
 	} res;
 
-	xx::Shared<xx::Node> ui;
+	// config / runtime vars
+	i18n::Lang lang;
+	bool langSelected{};
+	float soundVolume{ 1.f }, musicVolume{ 0.5f };
+	// ...
+
+	// todo: save & load config
 
 	void Init();
 	xx::Task<> Task();

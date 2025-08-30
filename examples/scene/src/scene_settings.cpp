@@ -6,19 +6,18 @@ void Scene_Settings::Init() {
 	// init ui
 	ui.Emplace()->InitRoot(gg.scale);
 
-	// todo: drop down list
-	// todo: checkbox slider
+	// todo: slider
 
-	// title
+	// settings
 	// music / sound volume
 	// back:[esc]
 
 	ui->MakeChildren<xx::Label>()->Init(2, gg.p5 + XY{ 0, 300 }, gg.a5, 5)
-		.SetText("settings");
+		.SetText(gg.lang(Strs::settings));
 
 	ui->MakeChildren<xx::CheckBox>()->Init(2, gg.p5 + XY{ 0, 100 }, gg.a5
 		, { 500, 80 }, true, gg.cfg.s9bN, gg.cfg.s9bH
-		, gg.res.ui_checkbox_0, gg.res.ui_checkbox_1, "full screen", false)
+		, gg.res.ui_checkbox_0, gg.res.ui_checkbox_1, gg.lang(Strs::fullScreen), false)
 		.onValueChanged = [](bool v) {
 		if (v) {
 			gg.SetBorderlessMode();
@@ -57,7 +56,6 @@ void Scene_Settings::Init() {
 	};
 
 	// todo: need refresh ui values after set xxxxx mode
-
 	// todo: block unavailable‌ resolutions
 
 }
