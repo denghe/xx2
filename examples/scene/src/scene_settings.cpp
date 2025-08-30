@@ -17,6 +17,7 @@ void Scene_Settings::Init() {
 
 	// settings
 	// music / sound volume
+	// keyboard remap ?
 	// back:[esc]
 
 #if 1
