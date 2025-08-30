@@ -77,6 +77,11 @@ void Game::OnResize() {
 	}
 }
 
+#if 1
 void Game::Stat() {
-	//xx::CoutN("drawFPS = ", drawFPS, " drawCall = ", drawCall, " drawVerts = ", drawVerts);
+	xx::CoutN("drawFPS = ", drawFPS, " drawCall = "
+		, drawCall, " drawVerts = ", drawVerts
+		, " delayFuncs.len = ", delayFuncs.len
+	);
 }
+#endif

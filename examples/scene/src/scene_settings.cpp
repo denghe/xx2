@@ -48,9 +48,10 @@ void Scene_Settings::Init() {
 	ui->MakeChildren<xx::Label>()->Init(2, gg.p5 + XY{ 0, 300 }, gg.a5, 5)
 		.SetText(gg.lang(Strs::settings));
 
+	// borderless logic
 	ui->MakeChildren<xx::CheckBox>()->Init(2, gg.p5 + XY{ 0, 0 }, gg.a5
 		, { 500, 80 }, true, gg.cfg.s9bN, gg.cfg.s9bH
-		, gg.res.ui_checkbox_0, gg.res.ui_checkbox_1, gg.lang(Strs::fullScreen), false)
+		, gg.res.ui_checkbox_0, gg.res.ui_checkbox_1, gg.lang(Strs::fullScreen), gg.isBorderless)
 		.onValueChanged = [](bool v) {
 		if (v) {
 			gg.SetBorderlessMode();
