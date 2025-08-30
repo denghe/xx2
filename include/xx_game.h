@@ -25,6 +25,10 @@ namespace xx {
 	// example: struct Game : xx::Game<Game> { ...
 	template<typename Derived, typename BaseType = GameBase_font>
 	struct Game : BaseType {
+#ifdef WIN32
+		HANDLE eventForDelay{};
+#endif
+
 		~Game() {
 			if (this->wnd) {
 				glfwDestroyWindow(this->wnd);
@@ -67,6 +71,17 @@ namespace xx {
 			glfwSetWindowMonitor(this->wnd, NULL, 0, 0, mode->width, mode->height, GLFW_DONT_CARE);
 			this->isFullScreen = false;
 			this->isBorderless = true;
+		}
+
+		// example: SleepSecs(cDelta - (glfwGetTime() - time));
+		XX_INLINE void SleepSecs(double secs) {
+#if WIN32
+			if (secs > 0) {
+				WaitForSingleObjectEx(eventForDelay, uint64_t(secs * 1000.0 + 0.5), FALSE);
+			}
+#else
+			for (; secs > 0.003f; secs -= 0.003f) Sleep(3);
+#endif
 		}
 
 		int32_t Run() {
@@ -212,8 +227,11 @@ namespace xx {
 				((Derived*)this)->GLInit();											// lifeCycle 4 ( once )
 			}
 
-			this->time = NowSteadyEpochSeconds();
-			this->delta = 0.00001;
+			this->time = glfwGetTime();
+			this->delta = 0.001;
+#ifdef WIN32
+			eventForDelay = CreateEvent(NULL, FALSE, FALSE, NULL);
+#endif
 
 			if constexpr (Has_Task<Derived>) {
 				this->baseTask = ((Derived*)this)->Task();
@@ -232,7 +250,6 @@ namespace xx {
 			this->GLClear(this->clearColor);
 			this->GLBlendFunc();
 
-			this->delta = NowSteadyEpochSeconds(this->time);
 			this->drawVerts = {};
 			this->drawCall = {};
 
@@ -267,6 +284,9 @@ namespace xx {
 				}
 			}
 
+			auto newTime = glfwGetTime();
+			this->delta = newTime - this->time;
+			this->time = newTime;
 		}
 
 	};

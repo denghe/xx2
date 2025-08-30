@@ -66,9 +66,8 @@ xx::Task<> Game::Task() {
 }
 
 void Game::Delay() {
-	// for power saving
-	auto d = cDelta - (float)xx::NowSteadyEpochSeconds(time);
-	for (; d > 0.005f; d -= 0.005f) Sleep(3);
+	// for power saving, fps limit
+	SleepSecs(cDelta - (glfwGetTime() - time));	
 }
 
 void Game::OnResize() {

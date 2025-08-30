@@ -6,8 +6,14 @@ void Scene_Settings::Init() {
 	// init ui
 	ui.Emplace()->InitRoot(gg.scale);
 
-	// todo: enable disable
 	// todo: iconbutton richlabel
+
+	// todo: enable disable
+
+	// todo: 
+	// window mode
+	// Full screen border less mode
+	// Full screen exclusive mode
 
 	// settings
 	// music / sound volume
