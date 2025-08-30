@@ -1,5 +1,6 @@
 ﻿#include "pch.h"
 #include "scene_1.h"
+#include "scene_mainmenu.h"
 
 void Scene_1::Init() {
 	cam.Init(gg.scale, 1.f);
@@ -27,6 +28,12 @@ void Scene_1::Init() {
 }
 
 void Scene_1::Update() {
+	// handle inputs
+	if (gg.keyboard[GLFW_KEY_ESCAPE](0.2f)) {
+		gg.MakeScene<Scene_MainMenu>()->Init();
+		return;
+	}
+
 	auto d = float(std::min((float)gg.delta, gg.cMaxDelta) * timeScale);
 	time += d;
 	timePool += d;

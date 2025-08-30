@@ -22,14 +22,15 @@ namespace xx {
 
 	struct DropDownList : Button {
 		static constexpr int32_t cTypeId{ 15 };
-		Ref<Scale9Config> cfgBG;
-		List<std::string> items;
 		Weak<Label> lbl;
-		Weak<Background> bg;
-		Weak<Scale9> content;
 		TinyFrame icon, itemHead;
 		XY totalSize{};
 		int32_t selectedIndex{};
+		Ref<Scale9Config> cfgBG;
+		List<std::string> items;
+		Weak<Background> itemsBG;
+		Weak<Scale9> itemsBorder;
+		Weak<Node> itemsContent;
 		std::function<void(int32_t)> onSelectedIndexChanged = [](int32_t idx) { CoutN("DropDownList selectedIndex = ", idx); };
 
 		// init step 1/2
@@ -77,28 +78,33 @@ namespace xx {
 		}
 
 		void PopList() {
-			auto c = MakeChildren<Scale9>();
-			c->Init(z + 1000, 0, {0, 1}, 1, totalSize, *cfgBG);
-			content = c.ToWeak();
+			itemsBorder = MakeChildren<Scale9>();
+			itemsBorder->Init(z + 1000, 0, { 0, 1 }, cfgBG->borderScale, totalSize / cfgBG->borderScale, *cfgBG);
+			itemsBorder->inParentArea = false;
+
+			itemsContent = MakeChildren<Node>();
+			itemsContent->Init(z + 1001, 0, { 0, 1 }, 1, totalSize);
+			itemsContent->inParentArea = false;
 
 			for (int32_t i = 0; i < items.len; ++i) {
-				c->MakeChildren<DropDownListItem>()->Init(z + 1000
+				itemsContent->MakeChildren<DropDownListItem>()->Init(z + 1001
 					, WeakFromThis(this), i, false);
 			}
 
-			bg = MakeChildren<Background>();
-			bg->Init(z + 999, content).onOutsideClicked = [this] {
-				content->SwapRemoveFromParent();
-				bg->SwapRemoveFromParent();
+			itemsBG = MakeChildren<Background>();
+			itemsBG->Init(z + 999, itemsContent).onOutsideClicked = [this] {
+				assert(itemsBorder);
+				assert(itemsBG);
+				assert(itemsContent);
+				itemsBorder->SwapRemoveFromParent();
+				itemsBG->SwapRemoveFromParent();
+				itemsContent->SwapRemoveFromParent();
 			};
 		}
 
 		void ItemCommit(int32_t idx_) {
-			assert(content);
-			assert(bg);
 			assert(lbl);
-			content->SwapRemoveFromParent();
-			bg->SwapRemoveFromParent();
+			itemsBG->onOutsideClicked();	// unsafe
 			if (selectedIndex != idx_) {
 				selectedIndex = idx_;
 				lbl->SetText(items[idx_]);

@@ -47,6 +47,12 @@ xx::Task<> Game::Task() {
 	cfg.s9bg.Emplace(*cfg.s9bN);
 	cfg.s9bg->frame = res.ui_panel;
 
+	cfg.sbar.Emplace(*cfg.s9bN);
+	cfg.sbar->frame = res.ui_slider_bar;
+
+	cfg.sblock.Emplace(*cfg.s9bN);
+	cfg.sblock->frame = res.ui_slider_block;
+
 	// init first scene
 	scene.Emplace<Scene_MainMenu>()->Init();
 

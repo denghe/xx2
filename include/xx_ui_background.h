@@ -7,17 +7,17 @@ namespace xx {
 	struct Background : MouseEventHandlerNode {
 		static constexpr int32_t cTypeId{ 14 };
 		std::function<void()> onOutsideClicked = [] { CoutN("Background Outside clicked."); };
-		Weak<Node> contentArea;
+		Weak<Node> content;
 
 		Background& Init(int z_, Weak<Node> contentArea_) {
-			Node::InitDerived<Background>(z_, 0, 0.5f, 1, GameBase::instance->windowSize);
-			contentArea = std::move(contentArea_);
+			Node::InitDerived<Background>(z_, 0, 0.5, 1, GameBase::instance->uiGrid.worldSize);
+			content = std::move(contentArea_);
 			return *this;
 		}
 
 		virtual int32_t OnMouseDown(int32_t btnId_) override {
 			if (btnId_ != GLFW_MOUSE_BUTTON_LEFT) return 0;
-			if (contentArea && contentArea->PosInArea(GameBase::instance->mousePos)) {
+			if (content && content->PosInArea(GameBase::instance->mousePos)) {
 				// do nothing
 			}
 			else {

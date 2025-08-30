@@ -8,7 +8,7 @@ void Scene_MainMenu::Init() {
 	ui.Emplace()->InitRoot(gg.scale);
 
 	if (!gg.langSelected) {
-		ui->MakeChildren<UILangChoosePanel>()->Init().onClose = [this](i18n::Languages v) {
+		ui->MakeChildren<UILangChoosePanel>()->Init(100).onClose = [this](i18n::Languages v) {
 			gg.langSelected = true;				// set flag
 			gg.lang.SetLanguage(v);		// set lang
 			this->Init();						// reload ui ( unsafe )

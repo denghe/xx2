@@ -21,9 +21,10 @@ namespace xx {
 		int32_t typeId{};											// fill by Init
 		int z{};													// global z for event priority or batch combine
 		bool inParentArea{ true };									// panel true ? combo box pop false ?
-		bool enable{ true };	// todo
-		bool visible{ true };	// todo
-		float alpha{ 1 };	// todo
+		bool visible{ true };										// false: do not draw
+		bool enabled{ true };										// for some logic & draw
+		bool selected{ false };										// for some logic & draw
+		float alpha{ 1 };											// for some logic & draw
 		int32_t indexAtParentChildren{-1};
 		//uint64_t ud{};
 
@@ -79,14 +80,14 @@ namespace xx {
 		void SetVisibleRecursive(bool visible_) {
 			visible = visible_;
 			for (auto& c : children) {
-				c->SetAlphaRecursive(visible_);
+				c->SetVisibleRecursive(visible_);
 			}
 		}
 
-		void SetEnableRecursive(bool enable_) {
-			enable = enable_;
+		void SetEnabledRecursive(bool enabled_) {
+			enabled = enabled_;
 			for (auto& c : children) {
-				c->SetAlphaRecursive(enable_);
+				c->SetEnabledRecursive(enabled_);
 			}
 		}
 

@@ -13,8 +13,26 @@ namespace xx {
 		Ref<Scale9Config> cfgNormal, cfgHighlight;
 		bool isFocus{}, alwaysHighlight{};
 
-		virtual void SetFocus() { assert(!isFocus); isFocus = true; };
-		virtual void LostFocus() { assert(isFocus); isFocus = false; };
+		virtual void ApplyCfg() {}	// need override
+
+		virtual void SetFocus() {
+			assert(!isFocus);
+			isFocus = true;
+			GameBase::instance->uiHandler = WeakFromThis(this);
+			ApplyCfg();
+			onFocus();
+			//CoutN("SetFocus");
+		}
+
+		virtual void LostFocus() {
+			if (!isFocus) return;
+			if (GameBase::instance->uiHandler.TryGetPointer() == this) {
+				GameBase::instance->uiHandler.Reset();
+			}
+			isFocus = false;
+			ApplyCfg();
+			//CoutN("LostFocus");
+		}
 
 		// todo: focus navigate? prev next?
 
@@ -43,31 +61,12 @@ namespace xx {
 			return *this;
 		}
 
-		virtual void ApplyCfg() {
+		virtual void ApplyCfg() override {
 			assert(children.len);
 			auto& cfg = GetCfg();
 			//CoutN(cfg.frame.tex->FileName());
 			auto bg = (Scale9*)children[0].pointer;
 			bg->Init(z + 1, 0, {}, cfg.borderScale, size / cfg.borderScale, cfg);
-		}
-
-		void SetFocus() override {
-			assert(!isFocus);
-			isFocus = true;
-			GameBase::instance->uiHandler = WeakFromThis(this);
-			ApplyCfg();
-			onFocus();
-			//CoutN("SetFocus");
-		}
-
-		void LostFocus() override {
-			if (!isFocus) return;
-			if (GameBase::instance->uiHandler.TryGetPointer() == this) {
-				GameBase::instance->uiHandler.Reset();
-			}
-			isFocus = false;
-			ApplyCfg();
-			//CoutN("LostFocus");
 		}
 
 		// todo: enable disable

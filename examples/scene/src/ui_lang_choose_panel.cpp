@@ -11,17 +11,20 @@
 +-----------------------------+
 */
 
-UILangChoosePanel& UILangChoosePanel::Init() {
-	if (children.Empty()) {
-		xx::Node::Init(100, gg.p5, gg.a5, 1, { 800, 600 });
-	}
-	else {
-		children.Clear();
-	}
+UILangChoosePanel& UILangChoosePanel::Init(int32_t z_) {
+	xx::Node::Init(z_, gg.p5, gg.a5, 1, { 800, 600 });
+	lang.SetLanguage(gg.lang.language);
+	Refresh();
+	return *this;
+}
+
+void UILangChoosePanel::Refresh() {
+	children.Clear();
 
 	// border
 	auto c = MakeChildren<xx::Scale9>();
-	c->Init(z + 1, 0, 0, 1, size, *gg.cfg.s9bg);
+	c->Init(z + 1, 0, 0, gg.cfg.s9bg->borderScale, size / gg.cfg.s9bg->borderScale, *gg.cfg.s9bg);
+
 
 	auto cp = size * 0.5f;	// center pos
 
@@ -34,7 +37,7 @@ UILangChoosePanel& UILangChoosePanel::Init() {
 		, gg.cfg.s9bN, gg.cfg.s9bH, U"english")
 		.onClicked = [this] {
 		this->lang.SetLanguage(Languages::en);
-		this->Init();	// unsafe
+		this->Refresh();	// unsafe
 	};
 
 	// 
@@ -42,7 +45,7 @@ UILangChoosePanel& UILangChoosePanel::Init() {
 		, gg.cfg.s9bN, gg.cfg.s9bH, U"中文")
 		.onClicked = [this] {
 		this->lang.SetLanguage(Languages::cn);
-		this->Init();	// unsafe
+		this->Refresh();	// unsafe
 	};
 
 	// close
@@ -55,6 +58,5 @@ UILangChoosePanel& UILangChoosePanel::Init() {
 	// bg
 	auto bg = MakeChildren<xx::Background>();
 	bg->Init(z, c.ToWeak()).onOutsideClicked = [] {};	// swallow
-
-	return *this;
 }
+

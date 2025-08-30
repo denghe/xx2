@@ -43,7 +43,7 @@ namespace xx {
 			blockMoving = false;
 
 			auto& cfg = isFocus ? *cfgHighlight : *cfgNormal;
-			MakeChildren<Label>()->Init(z + 1, { cfg.txtPadding.x, cfg.txtPaddingRightBottom.y }, {}, cfg.txtScale, cfg.txtColor, txtLeft_);
+			MakeChildren<Label>()->Init(z + 1, { cfg.txtPadding.x, cfg.txtPaddingRightBottom.y }, {}, cfg.txtScale, cfg.txtColor).SetText(txtLeft_);
 			return *this;
 		}
 
@@ -51,7 +51,6 @@ namespace xx {
 			assert(value >= 0 && value <= 1);
 			auto& cfg = isFocus ? *cfgHighlight : *cfgNormal;
 			size = { widthTxtLeft + widthBar + widthTxtRight, height };
-			// todo: bar, block
 
 			auto barMinWidth = cfgBar->center.x * 2. * cfgBar->borderScale;
 			XY barSize{ std::max(widthBar * value, barMinWidth), height * 0.25f };
@@ -63,7 +62,7 @@ namespace xx {
 			MakeChildren<Scale9>()->Init(z + 2, blockPos, {}, cfgBlock->borderScale, blockSize / cfgBlock->borderScale, *cfgBlock);
 
 			auto txtRight = valueToString(value);
-			MakeChildren<Label>()->Init(z + 1, { size.x - cfg.txtPadding.x, cfg.txtPaddingRightBottom.y }, cfg.txtScale, { 1, 0 }, cfg.txtColor).SetText(txtRight);
+			MakeChildren<Label>()->Init(z + 1, { size.x - cfg.txtPadding.x, cfg.txtPaddingRightBottom.y }, { 1, 0 }, cfg.txtScale, cfg.txtColor).SetText(txtRight);
 			MakeChildren<Scale9>()->Init(z, {}, {}, cfg.borderScale, size / cfg.borderScale, cfg);
 			FillTransRecursive();
 			return *this;
@@ -83,13 +82,11 @@ namespace xx {
 			return *this;
 		}
 
-		void ApplyCfg() {
+		void ApplyCfg() override {
 			assert(children.len == 5);		// lblLeft, bar, block, lblRight, bg
 			auto& cfg = isFocus ? *cfgHighlight : *cfgNormal;
-			//auto lblLeft = (Label*)children[0].pointer;
-			//lblLeft->Init(z + 1, { cfg.txtPadding.x, cfg.txtPaddingRightBottom.y }, cfg.txtScale, {}, cfg.txtColor);
+			assert(children[4]->typeId == Scale9::cTypeId);
 			((Scale9*)children[4].pointer)->Init(z, {}, {}, cfg.borderScale, size / cfg.borderScale, cfg);
-			//FillTransRecursive();
 		}
 
 		Slider& SetValue(double v) {
@@ -117,34 +114,29 @@ namespace xx {
 
 		Label& LabelLeft() {
 			assert(children.len == 5);
+			assert(children[0]->typeId == Label::cTypeId);
 			return *(Label*)children[0].pointer;
 		}
 
 		Label& LabelRight() {
 			assert(children.len == 5);
+			assert(children[3]->typeId == Label::cTypeId);
 			return *(Label*)children[3].pointer;
 		}
 
-		void SetFocus() override {
-			assert(!isFocus);
-			isFocus = true;
-			ApplyCfg();
-			GameBase::instance->uiHandler = WeakFromThis(this);
-			onFocus();
-			//CoutN("SetFocus");
-		}
-
-		void LostFocus() override {
-			assert(isFocus);
-			isFocus = false;
-			ApplyCfg();
-			GameBase::instance->uiHandler.Reset();
-			//CoutN("LostFocus");
+		void DragEnd() {
+			if (!blockMoving) return;
+			blockMoving = false;
+			if (valueBak != value) {
+				onChanged(value);
+				valueBak = value;
+			}
 		}
 
 		// todo: enable disable
 
-		int32_t OnMouseDown() override {
+		virtual int32_t OnMouseDown(int32_t btnId_) override {
+			if (btnId_ != GLFW_MOUSE_BUTTON_LEFT) return 0;
 			auto mx = GameBase::instance->mousePos.x;
 			auto x1 = worldMinXY.x + widthTxtLeft * worldScale.x;
 			auto x2 = worldMinXY.x + (widthTxtLeft + widthBar) * worldScale.x;
@@ -161,36 +153,31 @@ namespace xx {
 			}
 			ApplyValue();
 			blockMoving = true;
-			return true;
+			return 1;
 		}
 
 		int32_t OnMouseMove() override {
 			if (!isFocus) {
 				SetFocus();
+				GameBase::instance->delayFuncs.Emplace([w = WeakFromThis(this)] {
+					auto p = w.TryGetPointer();
+					if (!p) return 1;
+					if (GameBase::instance->uiHandler.TryGetPointer() != p || !p->MousePosInArea()) {
+						p->LostFocus();
+						p->DragEnd();
+						return 1;
+					}
+					if (!GameBase::instance->mouse[GLFW_MOUSE_BUTTON_LEFT]) {
+						p->DragEnd();
+					}
+					return 0;
+				});
 			}
 			if (blockMoving) {
-				OnMouseDown();
+				OnMouseDown(GLFW_MOUSE_BUTTON_LEFT);
 			}
-			//if (!isFocus) return;
-			//LostFocus();
-			//if (blockMoving) {
-			//	blockMoving = false;
-			//	if (valueBak != value) {
-			//		onChanged(value);
-			//		valueBak = value;
-			//	}
-			//}
-			//GameBase::instance->uiHandler.Reset();
-			return true;
+			return 1;
 		}
-
-		void OnMouseUp() override {
-			blockMoving = false;
-			if (valueBak != value) {
-				onChanged(value);
-				valueBak = value;
-			}
-		};
 
 	};
 }

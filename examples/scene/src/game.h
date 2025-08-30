@@ -18,7 +18,7 @@ struct Game : xx::Game<Game> {
 	}
 
 	struct {
-		xx::Ref<xx::Scale9Config> s9bN, s9bH, s9bg;
+		xx::Ref<xx::Scale9Config> s9bN, s9bH, s9bg, sbar, sblock;
 	} cfg;
 
 	struct {
