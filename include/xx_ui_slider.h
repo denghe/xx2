@@ -20,11 +20,14 @@ namespace xx {
 
 		// InitBegin + set value/ToSting + InitEnd
 		template<typename S>
-		Slider& InitBegin(int z_, XY position_, XY anchor_
-			, Ref<Scale9Config> cfgNormal_, Ref<Scale9Config> cfgHighlight_
-			, Ref<Scale9Config> cfgBar_, Ref<Scale9Config> cfgBlock_
+		Slider& Init(int z_, XY position_, XY anchor_
 			, float height_, float widthTxtLeft_, float widthBar_, float widthTxtRight_
-			, S const& txtLeft_)
+			, S const& txtLeft_, double value_
+			, Ref<Scale9Config> cfgNormal_ = GameBase_ui::GetInstance()->defaultCfg.s9bN
+			, Ref<Scale9Config> cfgHighlight_ = GameBase_ui::GetInstance()->defaultCfg.s9bH
+			, Ref<Scale9Config> cfgBar_ = GameBase_ui::GetInstance()->defaultCfg.sbar
+			, Ref<Scale9Config> cfgBlock_ = GameBase_ui::GetInstance()->defaultCfg.sblock
+		)
 		{
 			assert(children.Empty());
 			typeId = cTypeId;
@@ -41,15 +44,12 @@ namespace xx {
 			widthBar = widthBar_;
 			widthTxtRight = widthTxtRight_;
 			blockMoving = false;
-
-			auto& cfg = isFocus ? *cfgHighlight : *cfgNormal;
-			MakeChildren<Label>()->Init(z + 1, { cfg.txtPadding.x, cfg.txtPaddingRightBottom.y }, {}, cfg.txtScale, cfg.txtColor).SetText(txtLeft_);
-			return *this;
-		}
-
-		Slider& InitEnd() {
+			SetValue(value_);
 			assert(value >= 0 && value <= 1);
+
 			auto& cfg = isFocus ? *cfgHighlight : *cfgNormal;
+			MakeChildren<Label>()->Init(z + 1, { cfg.txtPadding.x * cfg.txtScale, cfg.txtPaddingRightBottom.y * cfg.txtScale }, {}, cfg.txtScale, cfg.txtColor).SetText(txtLeft_);
+
 			size = { widthTxtLeft + widthBar + widthTxtRight, height };
 
 			auto barMinWidth = cfgBar->center.x * 2. * cfgBar->borderScale;
@@ -62,23 +62,10 @@ namespace xx {
 			MakeChildren<Scale9>()->Init(z + 2, blockPos, {}, cfgBlock->borderScale, blockSize / cfgBlock->borderScale, *cfgBlock);
 
 			auto txtRight = valueToString(value);
-			MakeChildren<Label>()->Init(z + 1, { size.x - cfg.txtPadding.x, cfg.txtPaddingRightBottom.y }, { 1, 0 }, cfg.txtScale, cfg.txtColor).SetText(txtRight);
+			MakeChildren<Label>()->Init(z + 1, { size.x - cfg.txtPadding.x * cfg.txtScale, cfg.txtPaddingRightBottom.y * cfg.txtScale }, { 1, 0 }, cfg.txtScale, cfg.txtColor).SetText(txtRight);
 			MakeChildren<Scale9>()->Init(z, {}, {}, cfg.borderScale, size / cfg.borderScale, cfg);
 			FillTransRecursive();
-			return *this;
-		}
 
-		template<typename S>
-		Slider& Init(int z_, XY position_, XY anchor_
-			, Ref<Scale9Config> cfgNormal_, Ref<Scale9Config> cfgHighlight_
-			, Ref<Scale9Config> cfgBar_, Ref<Scale9Config> cfgBlock_
-			, float height_, float widthTxtLeft_, float widthBar_, float widthTxtRight_
-			, S const& txtLeft_, double value_) {
-			InitBegin(z_, position_, anchor_
-				, std::move(cfgNormal_), std::move(cfgHighlight_), std::move(cfgBar_), std::move(cfgBlock_)
-				, height_, widthTxtLeft_, widthBar_, widthTxtRight_, txtLeft_);
-			SetValue(value_);
-			InitEnd();
 			return *this;
 		}
 

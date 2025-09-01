@@ -18,25 +18,8 @@ struct Game : xx::Game<Game> {
 	}
 
 	struct {
-		xx::Ref<xx::Scale9Config> s9bN, s9bH, s9bg, sbar, sblock;
-	} cfg;
-
-	struct {
 		xx::Ref<xx::GLTexture>
-			heart,
-			ui_button,
-			ui_button_h,
-			ui_button_n,
-			ui_checkbox_0,
-			ui_checkbox_1,
-			ui_imgbtn_h,
-			ui_imgbtn_n,
-			ui_dropdownlist_icon,
-			ui_dropdownlist_head,
-			ui_panel,
-			ui_slider_bar,
-			ui_slider_block
-			;
+			heart;
 	} res;
 
 	// config / runtime vars

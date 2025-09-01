@@ -22,9 +22,7 @@ void Scene_Settings::Init() {
 
 #if 1
 	auto ddl = ui->MakeChildren<xx::DropDownList>();
-	ddl->InitBegin(2, gg.p5 + XY{ 0, 100 }, gg.a5
-		, { 500, 80 }, gg.cfg.s9bN, gg.cfg.s9bH, gg.cfg.s9bg
-		, gg.res.ui_dropdownlist_icon, gg.res.ui_dropdownlist_head);
+	ddl->InitBegin(2, gg.p5 + XY{ 0, 100 }, gg.a5, { 500, 80 });
 	ddl->items.Add("1280x720", "1366x768", "1920x1080", "2560x1440", "3840x2160");
 	ddl->InitEnd(2);
 	ddl->onSelectedIndexChanged = [](int32_t idx) {
@@ -48,6 +46,8 @@ void Scene_Settings::Init() {
 			assert(false);
 		}
 	};
+	//ddl->SetEnabledRecursive(false);
+
 	// todo: need refresh ui values after set xxxxx mode
 	// todo: block unavailable‌ resolutions
 #endif
@@ -57,8 +57,8 @@ void Scene_Settings::Init() {
 
 	// borderless logic
 	ui->MakeChildren<xx::CheckBox>()->Init(2, gg.p5 + XY{ 0, 0 }, gg.a5
-		, { 500, 80 }, true, gg.cfg.s9bN, gg.cfg.s9bH
-		, gg.res.ui_checkbox_0, gg.res.ui_checkbox_1, gg.lang(Strs::fullScreen), gg.isBorderless)
+		, { 500, 80 }, true
+		, gg.lang(Strs::fullScreen), gg.isBorderless)
 		.onValueChanged = [](bool v) {
 		if (v) {
 			gg.SetBorderlessMode();
@@ -70,7 +70,6 @@ void Scene_Settings::Init() {
 
 	ui->MakeChildren<xx::Slider>()->Init(
 		2, gg.p5 + XY{ 0, -100 }, gg.a5
-		, gg.cfg.s9bN, gg.cfg.s9bH, gg.cfg.sbar, gg.cfg.sblock
 		, 80, 400, 450, 150, "asdf", 0.5);
 
 

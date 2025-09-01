@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "xx_gamebase_font.h"
+#include "xx_gamebase_ui.h"
 #include "xx_ui.h"
 
 namespace xx {
@@ -23,7 +23,7 @@ namespace xx {
 
 
 	// example: struct Game : xx::Game<Game> { ...
-	template<typename Derived, typename BaseType = GameBase_font>
+	template<typename Derived, typename BaseType = GameBase_ui>
 	struct Game : BaseType {
 #ifdef WIN32
 		HANDLE eventForDelay = CreateEvent(NULL, FALSE, FALSE, NULL);	// todo: Reset?
@@ -204,7 +204,7 @@ namespace xx {
 
 			// joystick
 			glfwSetJoystickCallback([](int jid, int event) {
-				auto g = GameBase_font::GetInstance();
+				auto g = BaseType::GetInstance();
 				if (event == GLFW_CONNECTED) {
 					g->HandleJoystickConnected(jid);
 				}
@@ -234,9 +234,9 @@ namespace xx {
 				this->baseTask = ((Derived*)this)->Task();
 			}
 
-			while (this->running && !glfwWindowShouldClose(this->wnd)) {		// ( loop )
+			while (this->running && !glfwWindowShouldClose(this->wnd)) {			// ( loop )
 				glfwPollEvents();													// lifeCycle 5
-				Loop(false);												// lifeCycle 6,7,8,9,10
+				Loop(false);														// lifeCycle 6,7,8,9,10
 			}
 
 		LabEnd:

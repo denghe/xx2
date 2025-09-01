@@ -23,7 +23,7 @@ void UILangChoosePanel::Refresh() {
 
 	// border
 	auto c = MakeChildren<xx::Scale9>();
-	c->Init(z + 1, 0, 0, gg.cfg.s9bg->borderScale, size / gg.cfg.s9bg->borderScale, *gg.cfg.s9bg);
+	c->Init(z + 1, 0, 0, size);
 
 
 	auto cp = size * 0.5f;	// center pos
@@ -34,7 +34,7 @@ void UILangChoosePanel::Refresh() {
 
 	// lang btns
 	MakeChildren<xx::LabelButton>()->Init(z + 3, cp + XY{ -200, 0 }, 0.5
-		, gg.cfg.s9bN, gg.cfg.s9bH, U"english")
+		, {}, {}, U"english")
 		.onClicked = [this] {
 		this->lang.SetLanguage(Languages::en);
 		this->Refresh();	// unsafe
@@ -42,7 +42,7 @@ void UILangChoosePanel::Refresh() {
 
 	// 
 	MakeChildren<xx::LabelButton>()->Init(z + 3, cp + XY{ 200, 0 }, 0.5
-		, gg.cfg.s9bN, gg.cfg.s9bH, U"中文")
+		, {}, {}, U"中文")
 		.onClicked = [this] {
 		this->lang.SetLanguage(Languages::cn);
 		this->Refresh();	// unsafe
@@ -50,7 +50,7 @@ void UILangChoosePanel::Refresh() {
 
 	// close
 	MakeChildren<xx::LabelButton>()->Init(z + 3, cp + XY{ 0, -300 + 30 }, { 0.5f, 0 }
-		, gg.cfg.s9bN, gg.cfg.s9bH, lang(Strs::close))
+		, {}, {}, lang(Strs::close))
 		.onClicked = [this] {
 		this->onClose(lang.language);	// unsafe
 	};
@@ -59,4 +59,3 @@ void UILangChoosePanel::Refresh() {
 	auto bg = MakeChildren<xx::Background>();
 	bg->Init(z, c.ToWeak()).onOutsideClicked = [] {};	// swallow
 }
-

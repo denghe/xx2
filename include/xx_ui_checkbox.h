@@ -12,8 +12,12 @@ namespace xx {
 
 		template<typename S>
 		CheckBox& Init(int z_, XY position_, XY anchor_, XY fixedSize_, bool keepAspect_
-			, Ref<Scale9Config> cfgNormal_, Ref<Scale9Config> cfgHighlight_
-			, TinyFrame icon0_, TinyFrame icon1_, S const& txt_, bool value_) {
+			, S const& txt_, bool value_
+			, Ref<Scale9Config> cfgNormal_ = GameBase_shader::GetInstance()->defaultCfg.s9bN
+			, Ref<Scale9Config> cfgHighlight_ = GameBase_shader::GetInstance()->defaultCfg.s9bH
+			, TinyFrame icon0_ = GameBase_shader::GetInstance()->defaultRes.ui_checkbox_0
+			, TinyFrame icon1_ = GameBase_shader::GetInstance()->defaultRes.ui_checkbox_1
+		) {
 			typeId = cTypeId;
 			z = z_;
 			position = position_;
@@ -28,7 +32,7 @@ namespace xx {
 
 			auto& cfg = GetCfg();
 			auto lblLeft = MakeChildren<Label>();
-			lblLeft->Init(z + 1, { cfg.txtPadding.x, cfg.txtPaddingRightBottom.y }, {}, cfg.txtScale, cfg.txtColor);
+			lblLeft->Init(z + 1, { cfg.txtPadding.x * cfg.txtScale, cfg.txtPaddingRightBottom.y * cfg.txtScale }, {}, cfg.txtScale, cfg.txtColor);
 			lblLeft->SetText(txt_);
 			auto imgSize = size.y * 0.8f;
 			auto imgSpacing = (size.y - imgSize) * 0.5f;

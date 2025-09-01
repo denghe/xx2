@@ -1,16 +1,14 @@
 ﻿#pragma once
 #include "xx_gamebase_shader.h"
-#include "xx_fontmaker.h"
 #include "xx_node.h"
 
 namespace xx {
 	// font support
-	struct GameBase_font : GameBase_shader {
-		inline static GameBase_font* GetInstance() {
-			return (GameBase_font*)GameBase::instance;
+	struct GameBase_ui : GameBase_shader {
+		inline static GameBase_ui* GetInstance() {
+			return (GameBase_ui*)GameBase::instance;
 		}
 
-		FontMaker fontMaker;	// for Label
 		List<ZNode> tmpZNodes;	// for node tree sort
 
 		// for easy draw root node only
@@ -21,7 +19,6 @@ namespace xx {
 
 		void BaseGLInit() {
 			GameBase_shader::BaseGLInit();
-			fontMaker.Init();
 			// search exists joys
 			for (auto jid = GLFW_JOYSTICK_1; jid <= GLFW_JOYSTICK_LAST; jid++) {
 				if (glfwJoystickPresent(jid)) {

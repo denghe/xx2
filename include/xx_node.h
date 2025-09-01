@@ -251,8 +251,10 @@ namespace xx {
 				}
 			}
 			else {
-				g.Remove(indexAtUiGrid);
-				indexAtUiGrid = -1;
+				if (indexAtUiGrid != -1) {
+					g.Remove(indexAtUiGrid);
+					indexAtUiGrid = -1;
+				}
 			}
 		}
 

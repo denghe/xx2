@@ -257,6 +257,11 @@ namespace xx {
 			return {};
 		}
 
+		// zstd ?
+		XX_INLINE static bool IsCompressedData(uint8_t const* buf, size_t len) {
+			return len >= 4 && buf[0] == 0x28 && buf[1] == 0xB5 && buf[2] == 0x2F && buf[3] == 0xFD;
+		}
+
 		// read all data by full path
 		Data LoadFileDataWithFullPath(std::string_view fp) {
 			Data d;
@@ -268,7 +273,7 @@ namespace xx {
 				CoutN("file content is empty. fn = ", fp);
 				throw fp;
 			}
-			if (d.len >= 4 && d[0] == 0x28 && d[1] == 0xB5 && d[2] == 0x2F && d[3] == 0xFD) {	// zstd
+			if (IsCompressedData(d.buf, d.len)) {
 				Data d2;
 				ZstdDecompress(d, d2);
 				return d2;
@@ -287,11 +292,42 @@ namespace xx {
 			return { std::move(d), std::move(p) };
 		}
 
+		// copy or decompress
+		Data LoadDataFromData(uint8_t const* buf, size_t len) {
+			if (IsCompressedData(buf, len)) {
+				Data d;
+				ZstdDecompress({ (char*)buf, len }, d);
+				return d;
+			}
+			return { buf, len };
+		}
+
+		template<size_t len>
+		Data LoadDataFromData(const uint8_t(&buf)[len]) {
+			return LoadDataFromData(buf, len);
+		}
+
 		// load texture from file
 		Ref<GLTexture> LoadTexture(std::string_view fn) {
 			auto [d, p] = LoadFileData(fn);
 			assert(d);
 			return MakeRef<GLTexture>(LoadGLTexture(d, p));
+		}
+
+		// load texture from data
+		Ref<GLTexture> LoadTextureFromData(uint8_t const* buf, size_t len, std::string_view fn = {}) {
+			if (IsCompressedData(buf, len)) {	// zstd
+				Data d;
+				ZstdDecompress({(char*)buf, len}, d);
+				return MakeRef<GLTexture>(LoadGLTexture(d, fn));
+			}
+			return MakeRef<GLTexture>(LoadGLTexture({(char*)buf, len}, fn));
+		}
+
+		// load texture from data
+		template<size_t len>
+		Ref<GLTexture> LoadTextureFromData(const uint8_t(&buf)[len], std::string_view fn = {}) {
+			return LoadTextureFromData(buf, len, fn);
 		}
 
 		// life cycle 1

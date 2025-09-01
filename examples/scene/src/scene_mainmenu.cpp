@@ -22,20 +22,17 @@ void Scene_MainMenu::Init() {
 		.SetText(gg.lang(Strs::gameName));
 
 	ui->MakeChildren<xx::LabelButton>()->Init(2, gg.p5 + XY{ 0, 0 }, gg.a5
-		, gg.cfg.s9bN, gg.cfg.s9bH
-		, gg.lang(Strs::play)).onClicked = [this] {
+		, {}, {}, gg.lang(Strs::play)).onClicked = [this] {
 			gg.MakeScene<Scene_1>()->Init();
 		};
 
 	ui->MakeChildren<xx::LabelButton>()->Init(2, gg.p5 + XY{ 0, -100 }, gg.a5
-		, gg.cfg.s9bN, gg.cfg.s9bH
-		, gg.lang(Strs::settings)).onClicked = [this] {
+		, {}, {}, gg.lang(Strs::settings)).onClicked = [this] {
 			gg.MakeScene<Scene_Settings>()->Init();
 		};
 
 	ui->MakeChildren<xx::LabelButton>()->Init(2, gg.p5 + XY{ 0, -200 }, gg.a5
-		, gg.cfg.s9bN, gg.cfg.s9bH
-		, gg.lang(Strs::quit)).onClicked = [this] {
+		, {}, {}, gg.lang(Strs::quit)).onClicked = [this] {
 			gg.running = false;
 		};
 
@@ -52,6 +49,8 @@ void Scene_MainMenu::Update() {
 
 void Scene_MainMenu::Draw() {
 	gg.DrawNode(ui);
+	//auto& t = *gg.defaultFonts.sys->texs[0];
+	//gg.Quad().Draw(t, t.Rect());
 }
 
 void Scene_MainMenu::OnResize() {

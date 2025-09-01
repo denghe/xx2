@@ -47,7 +47,8 @@ namespace xx {
 		std::function<void()> onClicked = [] { CoutN("Button clicked."); };
 
 		Button& Init(int z_, XY position_, XY anchor_, XY size_
-			, Ref<Scale9Config> cfgNormal_, Ref<Scale9Config> cfgHighlight_) {
+			, Ref<Scale9Config> cfgNormal_ = GameBase_shader::GetInstance()->defaultCfg.s9bN
+			, Ref<Scale9Config> cfgHighlight_ = GameBase_shader::GetInstance()->defaultCfg.s9bH) {
 			typeId = cTypeId;
 			z = z_;
 			position = position_;
@@ -73,12 +74,14 @@ namespace xx {
 
 		virtual int32_t OnMouseDown(int32_t btnId_) override {
 			if (btnId_ != GLFW_MOUSE_BUTTON_LEFT) return 0;
+			if (!enabled) return 0;
 			LostFocus();
 			onClicked();
 			return 1;
 		}
 
 		virtual int32_t OnMouseMove() override {
+			if (!enabled) return 0;
 			if (!isFocus) {
 				SetFocus();
 				GameBase::instance->delayFuncs.Emplace([w = WeakFromThis(this)] {

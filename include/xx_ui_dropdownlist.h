@@ -35,8 +35,11 @@ namespace xx {
 
 		// init step 1/2
 		DropDownList& InitBegin(int32_t z_, XY position_, XY anchor_, XY fixedSize_
-			, Ref<Scale9Config> cfgNormal_, Ref<Scale9Config> cfgHighlight_, Ref<Scale9Config> cfgBG_
-			, TinyFrame icon_, TinyFrame itemHead_) {
+			, Ref<Scale9Config> cfgNormal_ = GameBase_ui::GetInstance()->defaultCfg.s9bN
+			, Ref<Scale9Config> cfgHighlight_ = GameBase_ui::GetInstance()->defaultCfg.s9bH
+			, Ref<Scale9Config> cfgBG_ = GameBase_ui::GetInstance()->defaultCfg.s9bg
+			, TinyFrame icon_ = GameBase_ui::GetInstance()->defaultRes.ui_dropdownlist_icon
+			, TinyFrame itemHead_ = GameBase_ui::GetInstance()->defaultRes.ui_dropdownlist_head) {
 			typeId = cTypeId;
 			isFocus = false;
 			z = z_;
@@ -60,7 +63,7 @@ namespace xx {
 			auto& cfg = GetCfg();
 
 			auto lblLeft = MakeChildren<Label>();
-			lblLeft->Init(z + 1, { cfg.txtPadding.x, cfg.txtPaddingRightBottom.y }, {}, cfg.txtScale, cfg.txtColor);
+			lblLeft->Init(z + 1, { cfg.txtPadding.x * cfg.txtScale, cfg.txtPaddingRightBottom.y * cfg.txtScale }, {}, cfg.txtScale, cfg.txtColor);
 			lblLeft->SetText(items[selectedIndex]);
 			lbl = lblLeft;
 			
@@ -140,7 +143,7 @@ namespace xx {
 
 		auto& cfg = *owner->cfgNormal;
 		auto lblLeft = MakeChildren<Label>();
-		XY lblPos{ imgSpacing + imgSize + imgSpacing, cfg.txtPaddingRightBottom.y };
+		XY lblPos{ imgSpacing + imgSize + imgSpacing, cfg.txtPaddingRightBottom.y * cfg.txtScale };
 		lblLeft->Init(z, lblPos, {}, cfg.txtScale, cfg.txtColor);
 		lblLeft->SetText(owner->items[idx_]);
 	}

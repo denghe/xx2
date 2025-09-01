@@ -1,28 +1,7 @@
 ﻿#pragma once
-#include "xx_node.h"
+#include "xx_gamebase_ui.h"
 
 namespace xx {
-
-	struct Scale9Config {
-		TinyFrame frame;
-		XY texScale{ 1, 1 };
-		UVRect center{};
-		RGBA8 color{ RGBA8{ 0x5f, 0x15, 0xd9, 0xff } };
-		float borderScale{ 1.f };
-		RGBA8 txtColor{ RGBA8_White };
-		XY txtPadding{ 20, 5 };
-		XY txtPaddingRightBottom{ 20, 10 };
-		float txtScale{ 1 };
-		float iconPadding{ 5 };
-
-		XX_INLINE XY GetCornerSize() const {
-			return { float(frame.textureRect.w - center.w) * borderScale, float(frame.textureRect.h - center.h) * borderScale };
-		}
-
-		XX_INLINE XY GetCornerScaledSize() const {
-			return GetCornerSize() * texScale;
-		}
-	};
 
 	struct Scale9 : Node {
 		static constexpr int32_t cTypeId{ 3 };
@@ -44,8 +23,9 @@ namespace xx {
 			return *this;
 		}
 
-		Scale9& Init(int z_, XY position_, XY anchor_, XY size_, Scale9Config const& cfg_) {
-			return Init(z_, position_, cfg_.borderScale, anchor_, size_ / cfg_.borderScale, cfg_);
+		Scale9& Init(int z_, XY position_, XY anchor_, XY size_) {
+			auto& cfg = *GameBase_ui::GetInstance()->defaultCfg.s9bg;
+			return Init(z_, position_, cfg.borderScale, anchor_, size_ / cfg.borderScale, cfg);
 		}
 
 		virtual void Draw() override {
