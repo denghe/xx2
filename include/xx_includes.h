@@ -118,7 +118,7 @@ using namespace std::chrono_literals;
 
 #ifndef _countof
 template<typename T, size_t N>
-size_t _countof(T const (&arr)[N]) {
+constexpr size_t _countof(T const (&arr)[N]) {
     return N;
 }
 #endif

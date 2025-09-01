@@ -94,8 +94,8 @@ namespace xx {
 			auto& o = nodes[nodeIndex];
 
 			// calc covered cells
-			FromTo<XYi> ccrr{ (aabb_.from * _1_cellSize).As<int32_t>()
-							, (aabb_.to * _1_cellSize).As<int32_t>() };
+			FromTo<XYi> ccrr{ (aabb_.from * _1_cellSize).template As<int32_t>()
+							, (aabb_.to * _1_cellSize).template As<int32_t>() };
 
 			// link
 			for (auto y = ccrr.from.y; y <= ccrr.to.y; y++) {
@@ -156,8 +156,8 @@ namespace xx {
 			// update1
 			o.aabb = aabb_;
 
-			FromTo<XYi> ccrr{ (aabb_.from * _1_cellSize).As<int32_t>()
-							, (aabb_.to * _1_cellSize).As<int32_t>() };
+			FromTo<XYi> ccrr{ (aabb_.from * _1_cellSize).template As<int32_t>()
+							, (aabb_.to * _1_cellSize).template As<int32_t>() };
 
 			// no change check
 			if (o.ccrr == ccrr) return;
@@ -222,7 +222,7 @@ namespace xx {
 			assert(p_.y >= 0 && p_.y < worldSize.y);
 			results.Clear();
 
-			auto cr = (p_ * _1_cellSize).As<int32_t>();
+			auto cr = (p_ * _1_cellSize).template As<int32_t>();
 			auto& c = cells[cr.y * gridSize.x + cr.x];
 			for (int32_t i = 0; i < c.len; ++i) {
 				auto& n = nodes[c[i]];
@@ -242,8 +242,8 @@ namespace xx {
 			results.Clear();
 
 			// calc covered cells
-			FromTo<XYi> ccrr{ (aabb_.from * _1_cellSize).As<int32_t>()
-				, (aabb_.to * _1_cellSize).As<int32_t>() };
+			FromTo<XYi> ccrr{ (aabb_.from * _1_cellSize).template As<int32_t>()
+				, (aabb_.to * _1_cellSize).template As<int32_t>() };
 
 			if (ccrr.from.x == ccrr.to.x || ccrr.from.y == ccrr.to.y) {
 				// 1-2 row, 1-2 col: do full rect check

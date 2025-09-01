@@ -347,8 +347,8 @@ namespace xx {
 		// life cycle 2
 		void BaseGLInit() {
 #ifndef __EMSCRIPTEN__
-			glEnable(GL_PRIMITIVE_RESTART);
-			glPrimitiveRestartIndex(65535);
+			//glEnable(GL_PRIMITIVE_RESTART);
+			//glPrimitiveRestartIndex(65535);
 #endif
 			glDisable(GL_CULL_FACE);
 			glDisable(GL_DEPTH_TEST);

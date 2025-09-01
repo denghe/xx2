@@ -24,12 +24,12 @@ void Game::GLInit() {
 		.texScale = { 1, 1 },
 		.center = { 2, 2, 2, 2 },
 		.color = xx::RGBA8_White,
-		.borderScale = { 4.f },
+		.borderScale = 4.f,
 		.txtColor = xx::RGBA8_White,
 		.txtPadding = { 20, 5 },
 		.txtPaddingRightBottom = { 20, 10 },
-		.txtScale = { 2 },
-		.iconPadding = { 5 }
+		.txtScale = 2.f,
+		.iconPadding = 5.f
 	});
 
 	cfg.s9bH.Emplace(*cfg.s9bN);
@@ -58,6 +58,7 @@ void Game::GLInit() {
 
 	// init logic
 	heart.Emplace()->Init(res.heart);
+	heart->Update();
 }
 
 void Game::Update() {

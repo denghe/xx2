@@ -15,7 +15,7 @@ namespace xx {
 
 	// for game scene logic
 	struct SceneBase {
-		virtual ~SceneBase() {}
+		virtual ~SceneBase() = default;
 		virtual void Update() {};
 		virtual void Draw() {};
 		virtual void OnResize() {};
@@ -58,7 +58,7 @@ namespace xx {
 			}
 			glfwRestoreWindow(this->wnd);
 			glfwSetWindowAttrib(this->wnd, GLFW_DECORATED, GLFW_TRUE);
-			glfwSetWindowMonitor(this->wnd, NULL, (mode->width - size_.x) / 2, (mode->height - size_.y) / 2
+			glfwSetWindowMonitor(this->wnd, NULL, (mode->width - (int)size_.x) / 2, (mode->height - (int)size_.y) / 2
 				, size_.x, size_.y, GLFW_DONT_CARE);
 			this->isFullScreen = false;
 			this->isBorderless = false;
@@ -80,7 +80,7 @@ namespace xx {
 				WaitForSingleObjectEx(eventForDelay, uint64_t(secs * 1000.0/* + 0.5*/), FALSE);
 			}
 #else
-			for (; secs > 0.003f; secs -= 0.003f) Sleep(3);
+			for (; secs > 0.003; secs -= 0.003) Sleep(3);
 #endif
 		}
 
@@ -94,7 +94,7 @@ namespace xx {
 
 			glfwSetErrorCallback([](int error, const char* description) {
 				CoutN("glfwSetErrorCallback error = ", error, " description = ", description);
-				throw description;
+				throw std::runtime_error(description);
 			});
 
 			if (glfwInit() == GLFW_FALSE) return __LINE__;
@@ -103,6 +103,14 @@ namespace xx {
 			glfwWindowHint(GLFW_DEPTH_BITS, 0);
 			glfwWindowHint(GLFW_STENCIL_BITS, 0);
 			//glfwWindowHint(GLFW_SCALE_TO_MONITOR, GLFW_TRUE);
+
+			glfwWindowHint (GLFW_CONTEXT_VERSION_MAJOR, 3);
+			glfwWindowHint (GLFW_CONTEXT_VERSION_MINOR, 3);
+			glfwWindowHint (GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#ifdef __APPLE__
+			glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
+			glfwWindowHint(GLFW_COCOA_RETINA_FRAMEBUFFER, GLFW_FALSE);
+#endif
 
 			this->wnd = glfwCreateWindow((int)this->windowSize.x, (int)this->windowSize.y
 				, this->title.c_str(), nullptr, nullptr);
@@ -114,6 +122,8 @@ namespace xx {
 			glfwSetWindowSizeLimits(this->wnd, this->minSize.x, this->minSize.y, GLFW_DONT_CARE, GLFW_DONT_CARE);
 
 			SetWindowMode();	// window pos -> center
+
+			glfwPollEvents();	// fix macos content scale mouse pos issue
 
 			int w{}, h{};
 			glfwGetFramebufferSize(this->wnd, &w, &h);
@@ -148,12 +158,6 @@ namespace xx {
 				if constexpr (Has_OnResize<Derived>) {
 					((Derived*)g)->OnResize();
 				}
-			});
-
-			// window drag title / resize( windows only? )
-			glfwSetWindowRefreshCallback(this->wnd, [](GLFWwindow* wnd) {
-				auto g = (Game*)glfwGetWindowUserPointer(wnd);
-				g->Loop(true);
 			});
 
 			// mouse move
@@ -234,12 +238,18 @@ namespace xx {
 				this->baseTask = ((Derived*)this)->Task();
 			}
 
+			// window drag title / resize
+			// put here avoid macos call it before gl init
+			glfwSetWindowRefreshCallback(this->wnd, [](GLFWwindow* wnd) {
+				auto g = (Game*)glfwGetWindowUserPointer(wnd);
+				g->Loop(true);
+			});
+
 			while (this->running && !glfwWindowShouldClose(this->wnd)) {			// ( loop )
 				glfwPollEvents();													// lifeCycle 5
 				Loop(false);														// lifeCycle 6,7,8,9,10
 			}
 
-		LabEnd:
 			return EXIT_SUCCESS;
 		}
 
