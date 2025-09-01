@@ -54,7 +54,7 @@ namespace xx {
 		}
 
 		void HandleMouseButtonPressed(int32_t idx) {
-			assert(!mouse[idx]);
+			// known issue: macos maybe duplicate msg ( when click button switch full screen )
 			// search
 			uiGrid.ForeachPoint(uiGrid.worldSize * 0.5f + mousePos);
 
