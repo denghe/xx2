@@ -13,13 +13,13 @@
 
 UILangChoosePanel& UILangChoosePanel::Init(int32_t z_) {
 	xx::Node::Init(z_, gg.p5, gg.a5, 1, { 800, 600 });
-	lang.SetLanguage(gg.lang.language);
-	Refresh();
+	lang.Set(gg.lang.language);	// copy current setting
+	MakeUI();
 	return *this;
 }
 
-void UILangChoosePanel::Refresh() {
-	children.Clear();
+void UILangChoosePanel::MakeUI() {
+	children.Clear();	// unsafe
 
 	// border
 	auto c = MakeChildren<xx::Scale9>();
@@ -33,25 +33,19 @@ void UILangChoosePanel::Refresh() {
 		.SetText(lang(Strs::language));
 
 	// lang btns
-	MakeChildren<xx::LabelButton>()->Init(z + 3, cp + XY{ -200, 0 }, 0.5
-		, {}, {}, U"english")
-		.onClicked = [this] {
-		this->lang.SetLanguage(Languages::en);
-		this->Refresh();	// unsafe
+	MakeChildren<xx::LabelButton>()->Init(z + 3, cp + XY{ -200, 0 }, 0.5)(U"english").onClicked = [this] {
+		this->lang.Set(Languages::en);
+		this->MakeUI();	// unsafe
 	};
 
 	// 
-	MakeChildren<xx::LabelButton>()->Init(z + 3, cp + XY{ 200, 0 }, 0.5
-		, {}, {}, U"中文")
-		.onClicked = [this] {
-		this->lang.SetLanguage(Languages::cn);
-		this->Refresh();	// unsafe
+	MakeChildren<xx::LabelButton>()->Init(z + 3, cp + XY{ 200, 0 }, 0.5)(U"中文").onClicked = [this] {
+		this->lang.Set(Languages::cn);
+		this->MakeUI();	// unsafe
 	};
 
 	// close
-	MakeChildren<xx::LabelButton>()->Init(z + 3, cp + XY{ 0, -300 + 30 }, { 0.5f, 0 }
-		, {}, {}, lang(Strs::close))
-		.onClicked = [this] {
+	MakeChildren<xx::LabelButton>()->Init(z + 3, cp + XY{ 0, -300 + 30 }, { 0.5f, 0 })(lang(Strs::close)).onClicked = [this] {
 		this->onClose(lang.language);	// unsafe
 	};
 

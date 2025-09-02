@@ -37,7 +37,7 @@ namespace xx {
 
 		// S : literal string u8/32string [view]
 		template<typename S>
-		void SetText(S const& txt_, float lineWidthLimit = 0) {
+		void SetText(S const& txt_ = {}, float maxWidth_ = 0) {
 			auto len = (int32_t)StrLen(txt_);
 			if (!len) {
 				chars.Clear();
@@ -55,8 +55,8 @@ namespace xx {
 				}
 				else if (auto r = bmf->Get(t); r) {
 					auto cw = r->xadvance * baseScale;
-					if (lineWidthLimit > 0) {
-						if (px + cw > lineWidthLimit) {
+					if (maxWidth_ > 0) {
+						if (px + cw > maxWidth_) {
 							if (px > maxpx) {
 								maxpx = px;
 							}
@@ -84,8 +84,10 @@ namespace xx {
 			FillTrans();
 		}
 
-		void SetText() {
-			chars.Clear();
+		// for easy use
+		template<typename S>
+		void operator()(S const& txt_, float maxWidth_ = 0) {
+			SetText(txt_, maxWidth_);
 		}
 
 		virtual void Draw() override {

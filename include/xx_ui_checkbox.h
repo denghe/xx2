@@ -10,9 +10,7 @@ namespace xx {
 		bool value{};
 		std::function<void(int32_t)> onValueChanged = [](bool v) { CoutN("CheckBox value = ", v); };
 
-		template<typename S>
-		CheckBox& Init(int z_, XY position_, XY anchor_, XY fixedSize_, bool keepAspect_
-			, S const& txt_, bool value_
+		CheckBox& Init(int z_, XY position_, XY anchor_, XY fixedSize_, bool value_
 			, Ref<Scale9Config> cfgNormal_ = GameBase_shader::GetInstance()->defaultCfg.s9bN
 			, Ref<Scale9Config> cfgHighlight_ = GameBase_shader::GetInstance()->defaultCfg.s9bH
 			, TinyFrame icon0_ = GameBase_shader::GetInstance()->defaultRes.ui_checkbox_0
@@ -33,7 +31,6 @@ namespace xx {
 			auto& cfg = GetCfg();
 			auto lblLeft = MakeChildren<Label>();
 			lblLeft->Init(z + 1, { cfg.txtPadding.x * cfg.txtScale, cfg.txtPaddingRightBottom.y * cfg.txtScale }, {}, cfg.txtScale, cfg.txtColor);
-			lblLeft->SetText(txt_);
 			auto imgSize = size.y * 0.8f;
 			auto imgSpacing = (size.y - imgSize) * 0.5f;
 			XY imgPos{ size.x - imgSpacing, imgSpacing };
@@ -49,12 +46,23 @@ namespace xx {
 			return *this;
 		}
 
+		template<typename S>
+		CheckBox& operator()(S const& txt_) {
+			RefLabel().SetText(txt_);
+			return *this;
+		}
+
 		void ApplyCfg() override {
 			assert(children.len >= 3);
 			auto& cfg = GetCfg();
 			assert(children[2]->typeId == Scale9::cTypeId);
 			auto bg = (Scale9*)children[2].pointer;
 			bg->Init(z, 0, {}, cfg.borderScale, size / cfg.borderScale, cfg);
+		}
+
+		Label& RefLabel() {
+			assert(children.len == 3);
+			return *(Label*)children[0].pointer;
 		}
 	};
 

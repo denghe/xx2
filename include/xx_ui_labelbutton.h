@@ -9,29 +9,36 @@ namespace xx {
 
 		XY fixedSize{};
 
-		template<typename S1, typename S2 = char const*>
 		LabelButton& Init(int z_, XY position_, XY anchor_
-			, Ref<Scale9Config> cfgNormal_, Ref<Scale9Config> cfgHighlight_
-			, S1 const& txtLeft_, S2 const& txtRight_ = {}, XY fixedSize_ = {}) {
+			, XY fixedSize_ = {}
+			, Ref<Scale9Config> cfgNormal_ = GameBase_ui::GetInstance()->defaultCfg.s9bN
+			, Ref<Scale9Config> cfgHighlight_ = GameBase_ui::GetInstance()->defaultCfg.s9bH
+		) {
 			assert(children.Empty());
 			typeId = cTypeId;
 			isFocus = false;
 			z = z_;
 			position = position_;
 			anchor = anchor_;
-			cfgNormal = cfgNormal_ ? std::move(cfgNormal_) : GameBase_ui::GetInstance()->defaultCfg.s9bN;
-			cfgHighlight = cfgHighlight_ ? std::move(cfgHighlight_) : GameBase_ui::GetInstance()->defaultCfg.s9bH;
 			fixedSize = fixedSize_;
+			cfgNormal = std::move(cfgNormal_);
+			cfgHighlight = std::move(cfgHighlight_);
 
-			MakeChildren<Label>()->SetText(txtLeft_);
-			if (StrLen(txtRight_)) MakeChildren<Label>()->SetText(txtRight_);
+			MakeChildren<Label>();
 			MakeChildren<Scale9>();
+			return *this;
+		}
+
+		// for easy use
+		template<typename S>
+		LabelButton& operator()(S const& txt_ = {}, float maxWidth_ = 0) {
+			RefLabel().SetText(txt_, maxWidth_);
 			ApplyCfg();
 			return *this;
 		}
 
 		void ApplyCfg() override {
-			assert(children.len == 2 || children.len == 3);		// lblLeft [, lblRight], bg
+			assert(children.len == 2);
 			auto& cfg = GetCfg();
 			auto lblLeft = (Label*)children[0].pointer;
 			lblLeft->Init(z + 1, { cfg.txtPadding.x * cfg.txtScale, cfg.txtPaddingRightBottom.y * cfg.txtScale }, {}, cfg.txtScale, cfg.txtColor);
@@ -41,26 +48,15 @@ namespace xx {
 			else {
 				size = lblLeft->GetScaledSize() + cfg.txtPadding * cfg.txtScale + cfg.txtPaddingRightBottom * cfg.txtScale;
 			}
-			Scale9* bg;
-			if (children.len == 3) {
-				((Label*)children[1].pointer)->Init(z + 1, { size.x - cfg.txtPadding.x * cfg.txtScale, cfg.txtPaddingRightBottom.y * cfg.txtScale }, { 1, 0 }, cfg.txtScale, cfg.txtColor);
-				bg = (Scale9*)children[2].pointer;
-			}
-			else {
-				bg = (Scale9*)children[1].pointer;
-			}
+			auto bg = (Scale9*)children[1].pointer;
 			bg->Init(z, {}, {}, cfg.borderScale, size / cfg.borderScale, cfg);
 			FillTransRecursive();
 		}
 
-		Label& LabelLeft() {
-			assert(children.len == 2 || children.len == 3);
+		// for easy use( need call ApplyCfg() after change label content )
+		Label& RefLabel() {
+			assert(children.len == 2);
 			return *(Label*)children[0].pointer;
-		}
-
-		Label& LabelRight() {
-			assert(children.len == 3);
-			return *(Label*)children[1].pointer;
 		}
 	};
 

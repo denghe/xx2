@@ -19,10 +19,10 @@ namespace xx {
 			};
 
 		// InitBegin + set value/ToSting + InitEnd
-		template<typename S>
 		Slider& Init(int z_, XY position_, XY anchor_
-			, float height_, float widthTxtLeft_, float widthBar_, float widthTxtRight_
-			, S const& txtLeft_, double value_
+			, float height_
+			, float widthTxtLeft_, float widthBar_, float widthTxtRight_
+			, double value_
 			, Ref<Scale9Config> cfgNormal_ = GameBase_ui::GetInstance()->defaultCfg.s9bN
 			, Ref<Scale9Config> cfgHighlight_ = GameBase_ui::GetInstance()->defaultCfg.s9bH
 			, Ref<Scale9Config> cfgBar_ = GameBase_ui::GetInstance()->defaultCfg.sbar
@@ -48,7 +48,7 @@ namespace xx {
 			assert(value >= 0 && value <= 1);
 
 			auto& cfg = isFocus ? *cfgHighlight : *cfgNormal;
-			MakeChildren<Label>()->Init(z + 1, { cfg.txtPadding.x * cfg.txtScale, cfg.txtPaddingRightBottom.y * cfg.txtScale }, {}, cfg.txtScale, cfg.txtColor).SetText(txtLeft_);
+			MakeChildren<Label>()->Init(z + 1, { cfg.txtPadding.x * cfg.txtScale, cfg.txtPaddingRightBottom.y * cfg.txtScale }, {}, cfg.txtScale, cfg.txtColor);
 
 			size = { widthTxtLeft + widthBar + widthTxtRight, height };
 
@@ -66,6 +66,12 @@ namespace xx {
 			MakeChildren<Scale9>()->Init(z, {}, {}, cfg.borderScale, size / cfg.borderScale, cfg);
 			FillTransRecursive();
 
+			return *this;
+		}
+
+		template<typename S>
+		Slider& operator()(S const& txtLeft_) {
+			LabelLeft().SetText(txtLeft_);
 			return *this;
 		}
 

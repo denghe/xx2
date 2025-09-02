@@ -20,58 +20,88 @@ void Scene_Settings::Init() {
 	// keyboard remap ?
 	// back:[esc]
 
-#if 1
-	auto ddl = ui->MakeChildren<xx::DropDownList>();
-	ddl->InitBegin(2, gg.p5 + XY{ 0, 100 }, gg.a5, { 500, 80 });
-	ddl->items.Add("1280x720", "1366x768", "1920x1080", "2560x1440", "3840x2160");
-	ddl->InitEnd(2);
-	ddl->onSelectedIndexChanged = [](int32_t idx) {
+	static constexpr XY cSize{ 1000, 80 };
+	static constexpr float cLineHeight{ 100 };
+	static constexpr float cSliderWidths[]{ 400, 450, 150 };
+
+	ui->MakeChildren<xx::Label>()->Init(2, gg.p5 + XY{ 0, 450 }, gg.a5, 5)(gg.lang(Strs::settings));
+
+	auto basePos = gg.p5;
+	auto offset = basePos + XY{ 0, 200 };
+	auto anchor = gg.a5;
+
+	// todo: block unavailable‌ resolutions
+	ddlResolutions = ui->MakeChildren<xx::DropDownList>();
+	ddlResolutions->InitBegin(2, offset, anchor, cSize);
+	ddlResolutions->items.Add("1280x720", "1366x768", "1920x1080", "2560x1440", "3840x2160");
+	ddlResolutions->InitEnd(2);	// todo: restore from backup?
+	ddlResolutions->onSelectedIndexChanged = [](int32_t idx) {
 		switch (idx) {
 		case 0:
-			gg.SetWindowMode({ 1280,720 });
+			gg.SetFullScreenMode({ 1280,720 });
 			break;
 		case 1:
-			gg.SetWindowMode({ 1366,768 });
+			gg.SetFullScreenMode({ 1366,768 });
 			break;
 		case 2:
-			gg.SetWindowMode({ 1920,1080 });
+			gg.SetFullScreenMode({ 1920,1080 });
 			break;
 		case 3:
-			gg.SetWindowMode({ 2560,1440 });
+			gg.SetFullScreenMode({ 2560,1440 });
 			break;
 		case 4:
-			gg.SetWindowMode({ 3840,2160 });
+			gg.SetFullScreenMode({ 3840,2160 });
 			break;
 		default:
 			assert(false);
 		}
 	};
-	//ddl->SetEnabledRecursive(false);
 
-	// todo: need refresh ui values after set xxxxx mode
-	// todo: block unavailable‌ resolutions
-#endif
-
-	ui->MakeChildren<xx::Label>()->Init(2, gg.p5 + XY{ 0, 300 }, gg.a5, 5)
-		.SetText(gg.lang(Strs::settings));
-
-	// borderless logic
-	ui->MakeChildren<xx::CheckBox>()->Init(2, gg.p5 + XY{ 0, 0 }, gg.a5
-		, { 500, 80 }, true
-		, gg.lang(Strs::fullScreen), gg.isBorderless)
-		.onValueChanged = [](bool v) {
-		if (v) {
-			gg.SetBorderlessMode();
+	offset.y += cLineHeight;
+	ddlWindowModes = ui->MakeChildren<xx::DropDownList>();
+	ddlWindowModes->InitBegin(2, offset, anchor, cSize);
+	ddlWindowModes->items.Add("window mode", "full screen (borderless)", "full screen (exclusive)");
+	int i{};
+	if (gg.isFullScreen) {
+		if (gg.isBorderless) {
+			i = 1;
+			ddlResolutions->SetEnabledRecursive(false);
 		}
 		else {
-			gg.SetWindowMode();
+			i = 2;
+			ddlResolutions->SetEnabledRecursive(true);
 		}
+	}
+	else {
+		ddlResolutions->SetEnabledRecursive(false);
+	}
+	ddlWindowModes->InitEnd(i);
+	ddlWindowModes->onSelectedIndexChanged = [this](int i) {
+		switch (i) {
+		case 0:
+			gg.SetWindowMode();
+			break;
+		case 1:
+			gg.SetBorderlessMode();
+			break;
+		case 2:
+			ddlResolutions->onSelectedIndexChanged(ddlResolutions->selectedIndex);
+			break;
+		default:
+			assert(false);
+		}
+		Init();	// unsafe
 	};
 
-	ui->MakeChildren<xx::Slider>()->Init(
-		2, gg.p5 + XY{ 0, -100 }, gg.a5
-		, 80, 400, 450, 150, "asdf", 0.5);
+	offset.y -= cLineHeight * 2;
+	ui->MakeChildren<xx::CheckBox>()->Init(2, offset, anchor, cSize, true)("mute")
+		.onValueChanged = [](bool v) {
+		// todo
+	};
 
+	offset.y -= cLineHeight;
+	ui->MakeChildren<xx::Slider>()->Init(2, offset, anchor, cSize.y
+		, cSliderWidths[0], cSliderWidths[1], cSliderWidths[2], 0.5)("asdf");
 
 }
 

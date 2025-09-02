@@ -30,12 +30,12 @@ namespace i18n {
 		Languages language{ Languages::en };	// current
 		std::u32string_view const* texts{ Textss[(int32_t)language] };
 
-		XX_INLINE void SetLanguage(Languages language_) {
+		XX_INLINE void Set(Languages language_) {
 			language = language_;
 			texts = Textss[(int32_t)language_];
 		}
 
-		XX_INLINE void SetNextLanguage() {
+		XX_INLINE void SetNext() {
 			language = (Languages)((int32_t)language + 1);
 			if (language >= Languages::__MAX__) {
 				language = {};

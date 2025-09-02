@@ -50,13 +50,15 @@ namespace xx {
 		}
 
 		void SetWindowMode(XY size_ = {}) {
+			//glfwRestoreWindow(this->wnd);	// known issue: title bar out of screen
+			SetBorderlessMode();
+
 			auto monitor = glfwGetPrimaryMonitor();
 			auto mode = glfwGetVideoMode(monitor);
 			// todo: min( mode.size, design size )
 			if (size_.x == 0 || size_.y == 0) {
 				size_ = this->designSize;
 			}
-			glfwRestoreWindow(this->wnd);
 			glfwSetWindowAttrib(this->wnd, GLFW_DECORATED, GLFW_TRUE);
 			glfwSetWindowMonitor(this->wnd, NULL, (mode->width - (int)size_.x) / 2, (mode->height - (int)size_.y) / 2
 				, size_.x, size_.y, GLFW_DONT_CARE);
@@ -69,7 +71,7 @@ namespace xx {
 			auto mode = glfwGetVideoMode(monitor);
 			glfwSetWindowAttrib(this->wnd, GLFW_DECORATED, GLFW_FALSE);
 			glfwSetWindowMonitor(this->wnd, NULL, 0, 0, mode->width, mode->height, GLFW_DONT_CARE);
-			this->isFullScreen = false;
+			this->isFullScreen = true;
 			this->isBorderless = true;
 		}
 
