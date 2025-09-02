@@ -9,7 +9,7 @@ namespace xx {
 
 		ImageButton& Init(int z_, XY position_, XY anchor_, XY fixedSize_, bool keepAspect_, XY spacing_
 			, Ref<Scale9Config> cfgNormal_, Ref<Scale9Config> cfgHighlight_
-			, TinyFrame frame_, ImageRadians radians_ = ImageRadians::Zero, RGBA8 color_ = RGBA8_White, float colorplus_ = 1) {
+			, TinyFrame frame_, ImageRadians radians_ = ImageRadians::Zero, RGBA8 color_ = RGBA8_White) {
 			typeId = cTypeId;
 			z = z_;
 			position = position_;
@@ -18,7 +18,7 @@ namespace xx {
 			cfgNormal = std::move(cfgNormal_);
 			cfgHighlight = std::move(cfgHighlight_);
 			FillTrans();
-			MakeChildren<Image>()->Init(z, spacing_, {}, fixedSize_, keepAspect_, std::move(frame_), radians_, color_, colorplus_);
+			MakeChildren<Image>()->Init(z, spacing_, {}, fixedSize_, keepAspect_, std::move(frame_), radians_, color_);
 			auto& cfg = GetCfg();
 			MakeChildren<Scale9>()->Init(z + 1, 0, {}, cfg.borderScale, size / cfg.borderScale, cfg);
 			return *this;

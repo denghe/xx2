@@ -18,11 +18,10 @@ namespace xx {
 		TinyFrame frame;
 		XY fixedScale{};
 		RGBA8 color{};
-		float colorplus{};
 		float radians{};
 
 		Image& Init(int z_, XY position_, XY anchor_, XY fixedSize_, bool keepAspect_
-			, TinyFrame frame_, ImageRadians radians_ = ImageRadians::Zero, RGBA8 color_ = RGBA8_White, float colorplus_ = 1) {
+			, TinyFrame frame_, ImageRadians radians_ = ImageRadians::Zero, RGBA8 color_ = RGBA8_White) {
 			typeId = cTypeId;
 			z = z_;
 			position = position_;
@@ -31,7 +30,6 @@ namespace xx {
 			frame = std::move(frame_);
 			radians = float(M_PI) * 0.5f * (int32_t)radians_;
 			color = color_;
-			colorplus = colorplus_;
 
 			if (keepAspect_) {
 				auto s = fixedSize_.x / frame.textureRect.w;
@@ -51,8 +49,11 @@ namespace xx {
 
 		void Draw() override {
 			if (!frame.tex) return;
+			float cp;
+			if (enabled) cp = 1.f;
+			else cp = 0.5f;
 			GameBase_shader::GetInstance()->Quad().Draw(*frame.tex, frame.textureRect, worldMinXY, 0
-				, worldScale * fixedScale, radians, colorplus, { color.r, color.g, color.b, (uint8_t)(color.a * alpha) });
+				, worldScale * fixedScale, radians, cp, { color.r, color.g, color.b, (uint8_t)(color.a * alpha) });
 		}
 	};
 

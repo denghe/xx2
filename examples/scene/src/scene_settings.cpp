@@ -102,7 +102,6 @@ void Scene_Settings::Init() {
 	offset.y -= cLineHeight;
 	ui->MakeChildren<xx::Slider>()->Init(2, offset, anchor, cSize.y
 		, cSliderWidths[0], cSliderWidths[1], cSliderWidths[2], 0.5)("asdf");
-
 }
 
 void Scene_Settings::Update() {

@@ -10,16 +10,14 @@ namespace xx {
 		UVRect center;
 		RGBA8 color;
 		XY texScale;
-		float colorplus;
 
-		Scale9& Init(int z_, XY position_, XY anchor_, XY scale_, XY size_, Scale9Config const& cfg_, float colorplus_ = 1) {
+		Scale9& Init(int z_, XY position_, XY anchor_, XY scale_, XY size_, Scale9Config const& cfg_) {
 			Node::Init(z_, position_, anchor_, scale_, size_);
 			typeId = cTypeId;
 			frame = cfg_.frame;
 			center = cfg_.center;
 			color = cfg_.color;
 			texScale = cfg_.texScale;
-			colorplus = colorplus_;
 			return *this;
 		}
 
@@ -70,6 +68,9 @@ namespace xx {
 			auto& basePos = worldMinXY;
 
 			RGBA8 c = { color.r, color.g, color.b, (uint8_t)(color.a * alpha) };
+			float cp;
+			if (enabled) cp = 1.f;
+			else cp = 0.5f;
 
 			// draw
 			auto qs = GameBase_shader::GetInstance()->Quad().Alloc(*frame.tex, 9);
@@ -78,7 +79,7 @@ namespace xx {
 			q->anchor = { 0, 1 };
 			q->scale = ts;
 			q->radians = {};
-			q->colorplus = colorplus;
+			q->colorplus = cp;
 			q->color = c;
 			q->texRect = { tx1, ty1, tw1, th1 };
 
@@ -87,7 +88,7 @@ namespace xx {
 			q->anchor = { 0, 1 };
 			q->scale = { sx, ts.y };
 			q->radians = {};
-			q->colorplus = colorplus;
+			q->colorplus = cp;
 			q->color = c;
 			q->texRect = { tx2, ty1, tw2, th1 };
 
@@ -96,7 +97,7 @@ namespace xx {
 			q->anchor = { 0, 1 };
 			q->scale = ts;
 			q->radians = {};
-			q->colorplus = colorplus;
+			q->colorplus = cp;
 			q->color = c;
 			q->texRect = { tx3, ty1, tw3, th1 };
 
@@ -105,7 +106,7 @@ namespace xx {
 			q->anchor = { 0, 1 };
 			q->scale = { ts.x, sy };
 			q->radians = {};
-			q->colorplus = colorplus;
+			q->colorplus = cp;
 			q->color = c;
 			q->texRect = { tx1, ty2, tw1, th2 };
 
@@ -114,7 +115,7 @@ namespace xx {
 			q->anchor = { 0, 1 };
 			q->scale = { sx, sy };
 			q->radians = {};
-			q->colorplus = colorplus;
+			q->colorplus = cp;
 			q->color = c;
 			q->texRect = { tx2, ty2, tw2, th2 };
 
@@ -123,7 +124,7 @@ namespace xx {
 			q->anchor = { 0, 1 };
 			q->scale = { ts.x, sy };
 			q->radians = {};
-			q->colorplus = colorplus;
+			q->colorplus = cp;
 			q->color = c;
 			q->texRect = { tx3, ty2, tw3, th2 };
 
@@ -132,7 +133,7 @@ namespace xx {
 			q->anchor = { 0, 1 };
 			q->scale = ts;
 			q->radians = {};
-			q->colorplus = colorplus;
+			q->colorplus = cp;
 			q->color = c;
 			q->texRect = { tx1, ty3, tw1, th3 };
 
@@ -141,7 +142,7 @@ namespace xx {
 			q->anchor = { 0, 1 };
 			q->scale = { sx, ts.y };
 			q->radians = {};
-			q->colorplus = colorplus;
+			q->colorplus = cp;
 			q->color = c;
 			q->texRect = { tx2, ty3, tw2, th3 };
 
@@ -150,7 +151,7 @@ namespace xx {
 			q->anchor = { 0, 1 };
 			q->scale = ts;
 			q->radians = {};
-			q->colorplus = colorplus;
+			q->colorplus = cp;
 			q->color = c;
 			q->texRect = { tx3, ty3, tw3, th3 };
 		}
