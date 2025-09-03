@@ -25,6 +25,8 @@ void Scene_MainMenu::Init() {
 		gg.MakeScene<Scene_1>()->Init();
 	};
 
+	// todo: settings change to popup panel like language select
+
 	ui->MakeChildren<xx::LabelButton>()->Init(2, gg.p5 + XY{ 0, -100 }, gg.a5, fontSize)(gg.lang(Strs::settings)).onClicked = [this] {
 		gg.MakeScene<Scene_Settings>()->Init();
 	};
