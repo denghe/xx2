@@ -44,15 +44,11 @@ void Game::GLInit() {
 	ui->MakeChildren<xx::Label>()->Init(1, p5 + XY{ 0, -69 }, a5, 2)
 		.SetText("hi");
 
-	ui->MakeChildren<xx::LabelButton>()->Init(2, p5 + XY{ 0, 50 }, a5
-		, cfg.s9bN, cfg.s9bH
-		, "change color!!!").onClicked = [this] {
+	ui->MakeChildren<xx::LabelButton>()->Init(2, p5 + XY{ 0, 50 }, a5)("change color!!!").onClicked = [this] {
 			heart->ChangeColor();
 	};
 
-	ui->MakeChildren<xx::LabelButton>()->Init(3, p5 + XY{ 0, 0 }, a5
-		, cfg.s9bN, cfg.s9bH
-		, "change anim").onClicked = [this] {
+	ui->MakeChildren<xx::LabelButton>()->Init(3, p5 + XY{ 0, 0 }, a5)("change anim").onClicked = [this] {
 			heart->ChangeAnim();
 	};
 
