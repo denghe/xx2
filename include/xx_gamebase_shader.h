@@ -70,18 +70,8 @@ namespace xx {
 			// ...
 
 			// init cfgs
-			defaultCfg.s9bN.Emplace(Scale9Config{
-				.frame = defaultRes.ui_button_n,
-				.texScale = { 1, 1 },
-				.center = { 2, 2, 2, 2 },
-				.color = RGBA8_White,
-				.borderScale = { 4.f },
-				.txtColor = RGBA8_White,
-				.txtPadding = { 15, 7 },
-				.txtPaddingRightBottom = { 15, 7 },
-				.txtScale = { 2 },
-				.iconPadding = { 5 }
-				});
+			defaultCfg.s9bN.Emplace();
+			defaultCfg.s9bN->frame = defaultRes.ui_button_n;
 
 			defaultCfg.s9bH.Emplace(*defaultCfg.s9bN);
 			defaultCfg.s9bH->frame = defaultRes.ui_button_h;

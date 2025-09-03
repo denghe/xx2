@@ -5,48 +5,46 @@ namespace xx {
 
 	struct Scale9 : Node {
 		static constexpr int32_t cTypeId{ 3 };
+		Ref<Scale9Config> cfg;
 
-		TinyFrame frame;
-		UVRect center;
-		RGBA8 color;
-		XY texScale;
-
-		Scale9& Init(int z_, XY position_, XY anchor_, XY scale_, XY size_, Scale9Config const& cfg_) {
-			Node::Init(z_, position_, anchor_, scale_, size_);
-			typeId = cTypeId;
-			frame = cfg_.frame;
-			center = cfg_.center;
-			color = cfg_.color;
-			texScale = cfg_.texScale;
+		// reepeatable call
+		Scale9& Init(int z_, XY position_, XY anchor_, XY size_
+			, Ref<Scale9Config> cfg_ = GameBase_ui::GetInstance()->defaultCfg.s9bg) {
+			assert(typeId == cTypeId);
+			Node::InitDerived<Scale9>(z_, position_, anchor_, 1, size_);
+			cfg = std::move(cfg_);
 			return *this;
 		}
 
-		Scale9& Init(int z_, XY position_, XY anchor_, XY size_) {
-			auto& cfg = *GameBase_ui::GetInstance()->defaultCfg.s9bg;
-			return Init(z_, position_, cfg.borderScale, anchor_, size_ / cfg.borderScale, cfg);
+		Scale9& SetConfig(Ref<Scale9Config> cfg_ = GameBase_ui::GetInstance()->defaultCfg.s9bg) {
+			cfg = std::move(cfg_);
+			return *this;
 		}
 
 		virtual void Draw() override {
 			// calc
-			auto& r = frame.textureRect;
+			auto& rect = cfg->frame.textureRect;
+			auto& center = cfg->center;
+			auto& color = cfg->color;
+			auto& frame = cfg->frame;
 
-			uint16_t tx1 = r.x + 0;
-			uint16_t tx2 = r.x + center.x;
-			uint16_t tx3 = r.x + center.x + center.w;
+			uint16_t tx1 = rect.x + 0;
+			uint16_t tx2 = rect.x + center.x;
+			uint16_t tx3 = rect.x + center.x + center.w;
 
-			uint16_t ty1 = r.y + 0;
-			uint16_t ty2 = r.y + center.y;
-			uint16_t ty3 = r.y + center.y + center.h;
+			uint16_t ty1 = rect.y + 0;
+			uint16_t ty2 = rect.y + center.y;
+			uint16_t ty3 = rect.y + center.y + center.h;
 
 			uint16_t tw1 = center.x;
 			uint16_t tw2 = center.w;
-			uint16_t tw3 = r.w - (center.x + center.w);
+			uint16_t tw3 = rect.w - (center.x + center.w);
 
 			uint16_t th1 = center.y;
 			uint16_t th2 = center.h;
-			uint16_t th3 = r.h - (center.y + center.h);
+			uint16_t th3 = rect.h - (center.y + center.h);
 
-			XY ts{ texScale * worldScale };
+			XY ts{ cfg->textureScale * worldScale };
 
 			float sx = float(worldSize.x - tw1 * ts.x - tw3 * ts.x) / tw2;
 			float sy = float(worldSize.y - th1 * ts.y - th3 * ts.y) / th2;

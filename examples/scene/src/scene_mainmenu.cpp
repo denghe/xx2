@@ -16,19 +16,20 @@ void Scene_MainMenu::Init() {
 		return;
 	}
 
+	auto fontSize = 80 - gg.defaultCfg.s9bN->paddings.TopBottom();
 	// todo: bg
 
-	ui->MakeChildren<xx::Label>()->Init(2, gg.p5 + XY{ 0, 300 }, gg.a5, 5)(gg.lang(Strs::gameName));
+	ui->MakeChildren<xx::Label>()->Init(2, gg.p5 + XY{ 0, 300 }, gg.a5, fontSize * 2)(gg.lang(Strs::gameName));
 
-	ui->MakeChildren<xx::LabelButton>()->Init(2, gg.p5 + XY{ 0, 0 }, gg.a5)(gg.lang(Strs::play)).onClicked = [this] {
+	ui->MakeChildren<xx::LabelButton>()->Init(2, gg.p5 + XY{ 0, 0 }, gg.a5, fontSize)(gg.lang(Strs::play)).onClicked = [this] {
 		gg.MakeScene<Scene_1>()->Init();
 	};
 
-	ui->MakeChildren<xx::LabelButton>()->Init(2, gg.p5 + XY{ 0, -100 }, gg.a5)(gg.lang(Strs::settings)).onClicked = [this] {
+	ui->MakeChildren<xx::LabelButton>()->Init(2, gg.p5 + XY{ 0, -100 }, gg.a5, fontSize)(gg.lang(Strs::settings)).onClicked = [this] {
 		gg.MakeScene<Scene_Settings>()->Init();
 	};
 
-	ui->MakeChildren<xx::LabelButton>()->Init(2, gg.p5 + XY{ 0, -200 }, gg.a5)(gg.lang(Strs::quit)).onClicked = [this] {
+	ui->MakeChildren<xx::LabelButton>()->Init(2, gg.p5 + XY{ 0, -200 }, gg.a5, fontSize)(gg.lang(Strs::quit)).onClicked = [this] {
 		gg.running = false;
 	};
 

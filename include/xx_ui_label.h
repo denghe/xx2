@@ -15,33 +15,36 @@ namespace xx {
 
 		List<LabelChar> chars;
 		Ref<BMFont> bmf = GameBase_shader::GetInstance()->defaultFonts.sys;
-		float fontSize{ 24 };
+		float fontSize{ 32 };
 		float baseScale{ fontSize / bmf->fontSize };
+		float maxWidth{};
 		RGBA8 color{};
 
-		Label& Init(int z_, XY position_, XY anchor_ = 0, XY scale_ = 1, RGBA8 color_ = RGBA8_White) {
-			typeId = cTypeId;
+		Label& Init(int z_, XY position_, XY anchor_ = 0, float fontSize_ = 32, float maxWidth_ = 0, RGBA8 color_ = RGBA8_White) {
+			assert(typeId == cTypeId);
 			z = z_;
 			position = position_;
 			anchor = anchor_;
-			scale = scale_;
 			color = color_;
+			fontSize = fontSize_;
+			baseScale = fontSize / bmf->fontSize;
+			maxWidth = maxWidth_;
 			return *this;
 		}
 
-		Label& SetFont(Ref<BMFont> bmf_, float fontSize_) {
+		Label& SetFont(Ref<BMFont> bmf_) {
 			bmf = std::move(bmf_);
-			fontSize = fontSize_;
 			baseScale = fontSize / bmf->fontSize;
+			return *this;
 		}
 
 		// S : literal string u8/32string [view]
 		template<typename S>
-		void SetText(S const& txt_ = {}, float maxWidth_ = 0) {
+		Label& SetText(S const& txt_ = {}) {
 			auto len = (int32_t)StrLen(txt_);
 			if (!len) {
 				chars.Clear();
-				return;
+				return *this;
 			}
 			chars.Resize(len);
 			float px{}, py{}, maxpx{}, lineHeight = bmf->lineHeight * baseScale
@@ -55,8 +58,8 @@ namespace xx {
 				}
 				else if (auto r = bmf->Get(t); r) {
 					auto cw = r->xadvance * baseScale;
-					if (maxWidth_ > 0) {
-						if (px + cw > maxWidth_) {
+					if (maxWidth > 0) {
+						if (px + cw > maxWidth) {
 							if (px > maxpx) {
 								maxpx = px;
 							}
@@ -82,12 +85,16 @@ namespace xx {
 			}
 			size = { std::max(px, maxpx), -py + lineHeight };
 			FillTrans();
+			return *this;
 		}
 
 		// for easy use
 		template<typename S>
-		void operator()(S const& txt_, float maxWidth_ = 0) {
-			SetText(txt_, maxWidth_);
+		Label& operator()(S const& txt_) {
+			return SetText(txt_);
+		}
+		Label& operator()(Ref<BMFont> bmf_) {
+			return SetFont(std::move(bmf_));
 		}
 
 		virtual void Draw() override {

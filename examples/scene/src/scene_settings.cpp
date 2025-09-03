@@ -24,7 +24,7 @@ void Scene_Settings::Init() {
 	static constexpr float cLineHeight{ 100 };
 	static constexpr float cSliderWidths[]{ 400, 450, 150 };
 
-	ui->MakeChildren<xx::Label>()->Init(2, gg.p5 + XY{ 0, 450 }, gg.a5, 5)(gg.lang(Strs::settings));
+	ui->MakeChildren<xx::Label>()->Init(2, gg.p5 + XY{ 0, 450 }, gg.a5, 120)(gg.lang(Strs::settings));
 
 	auto basePos = gg.p5;
 	auto offset = basePos + XY{ 0, 200 };

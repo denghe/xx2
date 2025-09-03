@@ -16,7 +16,7 @@ namespace xx {
 		std::function<void(double)> onChanged = [](double v) { CoutN("Slider changed. v = ", v); };
 		std::function<std::string(double)> valueToString = [](double v)->std::string {
 			return ToString(int32_t(v * 100));
-			};
+		};
 
 		// InitBegin + set value/ToSting + InitEnd
 		Slider& Init(int z_, XY position_, XY anchor_
@@ -30,8 +30,8 @@ namespace xx {
 		)
 		{
 			assert(children.Empty());
-			typeId = cTypeId;
-			isFocus = false;
+			assert(typeId == cTypeId);
+			focused = false;
 			z = z_;
 			position = position_;
 			anchor = anchor_;
@@ -44,42 +44,31 @@ namespace xx {
 			widthBar = widthBar_;
 			widthTxtRight = widthTxtRight_;
 			blockMoving = false;
-			SetValue(value_);
+			value = valueBak = value_;
 			assert(value >= 0 && value <= 1);
-
-			auto& cfg = isFocus ? *cfgHighlight : *cfgNormal;
-			MakeChildren<Label>()->Init(z + 1, { cfg.txtPadding.x * cfg.txtScale, cfg.txtPaddingRightBottom.y * cfg.txtScale }, {}, cfg.txtScale, cfg.txtColor);
-
 			size = { widthTxtLeft + widthBar + widthTxtRight, height };
+			FillTrans();
 
-			auto barMinWidth = cfgBar->center.x * 2. * cfgBar->borderScale;
-			XY barSize{ std::max(widthBar * value, barMinWidth), height * 0.25f };
-			XY barPos{ widthTxtLeft, (height - barSize.y) * 0.5f };
-			MakeChildren<Scale9>()->Init(z + 1, barPos, {}, cfgBar->borderScale, barSize / cfgBar->borderScale, *cfgBar);
-
-			XY blockSize{ height * 0.6f, height * 0.6f };
-			XY blockPos{ widthTxtLeft + widthBar * value - blockSize.x * 0.5f, (height - blockSize.y) * 0.5f };
-			MakeChildren<Scale9>()->Init(z + 2, blockPos, {}, cfgBlock->borderScale, blockSize / cfgBlock->borderScale, *cfgBlock);
-
-			auto txtRight = valueToString(value);
-			MakeChildren<Label>()->Init(z + 1, { size.x - cfg.txtPadding.x * cfg.txtScale, cfg.txtPaddingRightBottom.y * cfg.txtScale }, { 1, 0 }, cfg.txtScale, cfg.txtColor).SetText(txtRight);
-			MakeChildren<Scale9>()->Init(z, {}, {}, cfg.borderScale, size / cfg.borderScale, cfg);
-			FillTransRecursive();
-
+			auto& cfg = GetCfg();
+			auto fontSize = size.y - cfg->paddings.TopBottom();
+			MakeChildren<Label>()->Init(z + 1, cfg->paddings.LeftBottom(), 0, fontSize);
+			MakeChildren<Scale9>();
+			MakeChildren<Scale9>();
+			MakeChildren<Label>()->Init(z + 1, { size.x - cfg->paddings.right,  cfg->paddings.bottom }, { 1, 0 }, fontSize);
+			MakeChildren<Scale9>();
+			ApplyValue();
+			ApplyCfg();
 			return *this;
 		}
 
 		template<typename S>
 		Slider& operator()(S const& txtLeft_) {
-			LabelLeft().SetText(txtLeft_);
+			At<Label>(0)(txtLeft_);
 			return *this;
 		}
 
 		void ApplyCfg() override {
-			assert(children.len == 5);		// lblLeft, bar, block, lblRight, bg
-			auto& cfg = isFocus ? *cfgHighlight : *cfgNormal;
-			assert(children[4]->typeId == Scale9::cTypeId);
-			((Scale9*)children[4].pointer)->Init(z, {}, {}, cfg.borderScale, size / cfg.borderScale, cfg);
+			At<Scale9>(4).Init(z, 0, 0, size, GetCfg());
 		}
 
 		Slider& SetValue(double v) {
@@ -90,25 +79,21 @@ namespace xx {
 		void ApplyValue() {
 			assert(value >= 0 && value <= 1);
 
-			auto barMinWidth = cfgBar->center.x * 2. * cfgBar->borderScale;
-			XY barSize{ std::max(widthBar * value, barMinWidth), height * 0.25f };
-			XY barPos{ widthTxtLeft, (height - barSize.y) * 0.5f };
-			auto bar = ((Scale9*)children[1].pointer);
-			bar->Init(z + 1, barPos, {}, cfgBar->borderScale, barSize / cfgBar->borderScale, *cfgBar);
+			auto& cfg = GetCfg();
 
-			XY blockSize{ height * 0.6f, height * 0.6f };
+			auto barMinWidth = float(cfgBar->center.x + cfgBar->center.w);// *cfgBar->textureScale;
+			XY barSize{ std::max(widthBar * (float)value, barMinWidth), (height - cfg->paddings.TopBottom()) * 0.33f };
+			XY barPos{ widthTxtLeft, (height - barSize.y) * 0.5f };
+			At<Scale9>(1).Init(z + 1, barPos, 0, barSize, cfgBar);
+
+			XY blockSize{ barSize.y * 2.f };
 			XY blockPos{ widthTxtLeft + widthBar * value - blockSize.x * 0.5f, (height - blockSize.y) * 0.5f };
-			auto block = ((Scale9*)children[2].pointer);
-			block->position = blockPos;
-			block->FillTrans();
+			At<Scale9>(2).Init(z + 2, blockPos, 0, blockSize, cfgBlock);
+
+			auto txtRight = valueToString(value);
+			At<Label>(3)(txtRight);
 
 			LabelRight().SetText(valueToString(value));
-		}
-
-		Label& LabelLeft() {
-			assert(children.len == 5);
-			assert(children[0]->typeId == Label::cTypeId);
-			return *(Label*)children[0].pointer;
 		}
 
 		Label& LabelRight() {
@@ -150,7 +135,7 @@ namespace xx {
 		}
 
 		int32_t OnMouseMove() override {
-			if (!isFocus) {
+			if (!focused) {
 				SetFocus();
 				GameBase::instance->delayFuncs.Emplace([w = WeakFromThis(this)] {
 					auto p = w.TryGetPointer();

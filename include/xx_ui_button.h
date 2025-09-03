@@ -3,42 +3,39 @@
 
 namespace xx {
 
-	// todo: ScrollView Richxxxx
-
 	struct InteractionNode : MouseEventHandlerNode {
-		static constexpr FromTo<int32_t> typeIdRange { 10, 20 };	// is InteractionNode check
-
-		std::function<void()> onFocus = [] {};	// play sound?
-
+		std::function<void()> onFocus = [] {};	// todo: embed play sound?
 		Ref<Scale9Config> cfgNormal, cfgHighlight;
-		bool isFocus{}, alwaysHighlight{};
 
-		virtual void ApplyCfg() {}	// need override
+		Ref<Scale9Config> const& GetCfg() const {
+			if (selected || focused) {
+				return cfgHighlight;
+			}
+			return cfgNormal;
+		}
+		// need override
+		virtual void ApplyCfg() {
+			//At<Scale9>(children.len - 1).Init(.....
+		}
 
 		virtual void SetFocus() {
-			assert(!isFocus);
-			isFocus = true;
-			GameBase::instance->uiHandler = WeakFromThis(this);
+			assert(!focused);
+			focused = true;
+			SetToUIHandler(true);
 			ApplyCfg();
 			onFocus();
 			//CoutN("SetFocus");
 		}
 
 		virtual void LostFocus() {
-			if (!isFocus) return;
-			if (GameBase::instance->uiHandler.TryGetPointer() == this) {
-				GameBase::instance->uiHandler.Reset();
-			}
-			isFocus = false;
+			if (!focused) return;
+			SetToUIHandler(false);
+			focused = false;
 			ApplyCfg();
 			//CoutN("LostFocus");
 		}
 
-		// todo: focus navigate? prev next?
-
-		Scale9Config& GetCfg() {
-			return alwaysHighlight ? *cfgHighlight : (isFocus ? *cfgHighlight : *cfgNormal);
-		}
+		// todo: focus navigate by joystick? ASDW? prev next?
 	};
 
 	struct Button : InteractionNode {
@@ -49,7 +46,7 @@ namespace xx {
 		Button& Init(int z_, XY position_, XY anchor_, XY size_
 			, Ref<Scale9Config> cfgNormal_ = GameBase_shader::GetInstance()->defaultCfg.s9bN
 			, Ref<Scale9Config> cfgHighlight_ = GameBase_shader::GetInstance()->defaultCfg.s9bH) {
-			typeId = cTypeId;
+			assert(typeId == cTypeId);
 			z = z_;
 			position = position_;
 			anchor = anchor_;
@@ -58,16 +55,15 @@ namespace xx {
 			cfgHighlight = std::move(cfgHighlight_);
 			FillTrans();
 			auto& cfg = GetCfg();
-			MakeChildren<Scale9>()->Init(z + 1, 0, {}, cfg.borderScale, size / cfg.borderScale, cfg);
+			MakeChildren<Scale9>()->Init(z + 1, 0, 0, size, cfg);
 			return *this;
 		}
 
 		virtual void ApplyCfg() override {
 			assert(children.len);
 			auto& cfg = GetCfg();
-			//CoutN(cfg.frame.tex->FileName());
 			auto bg = (Scale9*)children[0].pointer;
-			bg->Init(z + 1, 0, {}, cfg.borderScale, size / cfg.borderScale, cfg);
+			bg->Init(z + 1, 0, 0, size, cfg);
 		}
 
 		// todo: enable disable
@@ -82,7 +78,7 @@ namespace xx {
 
 		virtual int32_t OnMouseMove() override {
 			if (!enabled) return 0;
-			if (!isFocus) {
+			if (!focused) {
 				SetFocus();
 				GameBase::instance->delayFuncs.Emplace([w = WeakFromThis(this)] {
 					auto p = w.TryGetPointer();

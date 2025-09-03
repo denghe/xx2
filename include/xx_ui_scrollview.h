@@ -10,7 +10,7 @@ namespace xx {
 		XY basePos{}, dragLimit{};
 
 		void Init(int z_, XY const& position_, XY const& scale_, XY const& anchor_, XY const& size_, XY const& contentSize_) {
-			Node::Init(z_, position_, scale_, anchor_, size_);
+			Node::InitDerived<ScrollView>(z_, position_, scale_, anchor_, size_);
 			children.Clear();
 			auto&& c = MakeChildren<Node>();	// children[0] is content node
 			c->scissor = WeakFromThis(this);
@@ -96,6 +96,7 @@ namespace xx {
 			}
 		}
 
+		// todo: mouse wheel
 		// todo: register delay func scan mouse btn up
 		//virtual void OnMouseUp(int32_t btnId_) override {
 		//	if (btnId_ != GLFW_MOUSE_BUTTON_LEFT) return;

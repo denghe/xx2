@@ -370,6 +370,36 @@ namespace xx {
     /*******************************************************************************************************************************************/
     /*******************************************************************************************************************************************/
 
+    struct Paddings {
+        float top, right, bottom, left;
+        constexpr XY LeftBottom() const { return { left, bottom }; };
+        constexpr XY RightBottom() const { return { right, bottom }; };
+        constexpr float LeftRight() const { return left + right; };
+        constexpr float TopBottom() const { return top + bottom; };
+        constexpr XY Total() const { return { left + right, top + bottom }; };
+    };
+
+    template<typename T>
+    struct StringFuncs<T, std::enable_if_t<std::is_same_v<Paddings, std::remove_cvref_t<T>>>> {
+        static inline void Append(std::string& s, T const& in) {
+            ::xx::Append(s, in.top, ", ", in.right, ", ", in.bottom, ", ", in.left);
+        }
+    };
+
+    template<typename T>
+    struct DataFuncs<T, std::enable_if_t<std::is_same_v<Paddings, std::remove_cvref_t<T>>>> {
+        template<bool needReserve = true>
+        static inline void Write(Data& d, T const& in) {
+            d.Write<needReserve>(in.top, in.right, in.bottom, in.left);
+        }
+        static inline int Read(Data_r& d, T& out) {
+            return d.Read(out.top, out.right, out.bottom, out.left);
+        }
+    };
+
+    /*******************************************************************************************************************************************/
+    /*******************************************************************************************************************************************/
+
     template<typename T>
     struct FromTo {
         T from, to;

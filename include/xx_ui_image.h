@@ -22,7 +22,7 @@ namespace xx {
 
 		Image& Init(int z_, XY position_, XY anchor_, XY fixedSize_, bool keepAspect_
 			, TinyFrame frame_, ImageRadians radians_ = ImageRadians::Zero, RGBA8 color_ = RGBA8_White) {
-			typeId = cTypeId;
+			assert(typeId == cTypeId);
 			z = z_;
 			position = position_;
 			anchor = anchor_;

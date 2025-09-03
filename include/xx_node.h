@@ -18,15 +18,16 @@ namespace xx {
 		XY position{}, anchor{ 0.5, 0.5 }, scale{ 1, 1 }, size{};
 		XY worldMaxXY{}, worldSize{};								// boundingBox. world coordinate. fill by FillTrans()
 
-		int32_t typeId{};											// fill by Init
+		int32_t typeId{};											// fill by MakeChildren( need fill it by other makers )
+		int32_t indexAtParentChildren{-1};							// children[idx] == this
 		int z{};													// global z for event priority or batch combine
-		bool inParentArea{ true };									// panel true ? combo box pop false ?
-		bool visible{ true };										// false: do not draw
-		bool enabled{ true };										// for some logic & draw
-		bool selected{ false };										// for some logic & draw
 		float alpha{ 1 };											// for some logic & draw
-		int32_t indexAtParentChildren{-1};
-		//uint64_t ud{};
+		bool inParentArea{ true };									// for child cut check. dropdownlist = false
+		bool visible{ true };										// false: do not draw
+		bool enabled{ true };										// false: do not callback & colorplus = 0.5f
+		bool selected{ false };										// draw: always highlight
+		bool focused{ false };										// true: highlight
+		// ...
 
 		XX_INLINE XY GetScaledSize() const {
 			return scale * size;
@@ -62,11 +63,6 @@ namespace xx {
 		XX_INLINE bool PosInScissor(XY pos_) const {
 			if (!scissor) return true;
 			return IsIntersect_BoxPointF(scissor->worldMinXY, scissor->worldMaxXY, pos_);
-		}
-
-		// for draw bg
-		XX_INLINE XY CalcBorderSize(XY padding_ = {}) const {
-			return size * scale + padding_;
 		}
 
 		// for update
@@ -107,7 +103,7 @@ namespace xx {
 
 		template<typename Derived>
 		XX_INLINE Derived& InitDerived(int z_ = 0, XY position_ = {}, XY anchor_ = {}, XY scale_ = { 1,1 }, XY size_ = {}) {
-			typeId = Derived::cTypeId;
+			assert(typeId == Derived::cTypeId);
 			z = z_;
 			position = position_;
 			anchor = anchor_;
@@ -130,6 +126,7 @@ namespace xx {
 		XX_INLINE Shared<T>& AddChildren(Shared<T> c) {
 			assert(c);
 			assert(!c->parent);
+			c->typeId = T::cTypeId;
 			c->parent = WeakFromThis(this);
 			c->indexAtParentChildren = children.len;
 			c->scissor = scissor;
@@ -140,6 +137,24 @@ namespace xx {
 		template<typename T, typename = std::enable_if_t<std::is_base_of_v<Node, T>>>
 		XX_INLINE Shared<T>& MakeChildren() {
 			return AddChildren(MakeShared<T>());
+		}
+
+		template<typename T, typename = std::enable_if_t<std::is_base_of_v<Node, T>>>
+		XX_INLINE T& At(int32_t idx_) {
+			assert(children[idx_]->typeId == T::cTypeId);
+			return *(T*)children[idx_].pointer;
+		}
+
+		XX_INLINE void SetToUIHandler(bool handle) {
+			auto& h = GameBase::instance->uiHandler;
+			if (handle) {
+				h = WeakFromThis((struct MouseEventHandlerNode*)this);
+			}
+			else {
+				if ((Node*)h.TryGetPointer() == this) {
+					h.Reset();
+				}
+			}
 		}
 
 		void SwapRemoveFromParent() {

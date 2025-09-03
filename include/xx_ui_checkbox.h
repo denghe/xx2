@@ -16,7 +16,7 @@ namespace xx {
 			, TinyFrame icon0_ = GameBase_shader::GetInstance()->defaultRes.ui_checkbox_0
 			, TinyFrame icon1_ = GameBase_shader::GetInstance()->defaultRes.ui_checkbox_1
 		) {
-			typeId = cTypeId;
+			assert(typeId == cTypeId);
 			z = z_;
 			position = position_;
 			anchor = anchor_;
@@ -29,13 +29,12 @@ namespace xx {
 			FillTrans();
 
 			auto& cfg = GetCfg();
-			auto lblLeft = MakeChildren<Label>();
-			lblLeft->Init(z + 1, { cfg.txtPadding.x * cfg.txtScale, cfg.txtPaddingRightBottom.y * cfg.txtScale }, {}, cfg.txtScale, cfg.txtColor);
-			auto imgSize = size.y * 0.8f;
-			auto imgSpacing = (size.y - imgSize) * 0.5f;
-			XY imgPos{ size.x - imgSpacing, imgSpacing };
-			MakeChildren<Image>()->Init(z + 2, imgPos, { 1, 0 }, imgSize, true, value ? icon1 : icon0);
-			MakeChildren<Scale9>()->Init(z, 0, {}, cfg.borderScale, size / cfg.borderScale, cfg);
+			auto fontSize = size.y - cfg->paddings.TopBottom();
+			MakeChildren<Label>()->Init(z + 1, cfg->paddings.LeftBottom(), 0, fontSize);
+			auto imgSize = XY{ size.y - cfg->paddings.TopBottom() };
+			assert(imgSize.x > 0 && imgSize.y > 0);
+			MakeChildren<Image>()->Init(z + 2, { size.x - cfg->paddings.right, cfg->paddings.bottom }, { 1, 0 }, imgSize, true, value ? icon1 : icon0);
+			MakeChildren<Scale9>()->Init(z, 0, 0, size, cfg);
 
 			onClicked = [this] {
 				value = !value;
@@ -53,11 +52,7 @@ namespace xx {
 		}
 
 		void ApplyCfg() override {
-			assert(children.len >= 3);
-			auto& cfg = GetCfg();
-			assert(children[2]->typeId == Scale9::cTypeId);
-			auto bg = (Scale9*)children[2].pointer;
-			bg->Init(z, 0, {}, cfg.borderScale, size / cfg.borderScale, cfg);
+			At<Scale9>(2).Init(z, 0, 0, size, GetCfg());
 		}
 
 		Label& RefLabel() {
