@@ -31,11 +31,11 @@ void Scene_Settings::Init() {
 	auto anchor = gg.a5;
 
 	// todo: block unavailable‌ resolutions
-	ddlResolutions = ui->MakeChildren<xx::DropDownList>();
-	ddlResolutions->InitBegin(2, offset, anchor, cSize);
-	ddlResolutions->items.Add("1280x720", "1366x768", "1920x1080", "2560x1440", "3840x2160");
-	ddlResolutions->InitEnd(2);	// todo: restore from backup?
-	ddlResolutions->onSelectedIndexChanged = [](int32_t idx) {
+	uiResolutions = ui->MakeChildren<xx::DropDownList>();
+	uiResolutions->InitBegin(2, offset, anchor, cSize);
+	uiResolutions->items.Add(U"1280 x 720", U"1366 x 768", U"1920 x 1080", U"2560 x 1440", U"3840 x 2160");
+	uiResolutions->InitEnd(2);	// todo: restore from backup?
+	uiResolutions->onSelectedIndexChanged = [](int32_t idx) {
 		switch (idx) {
 		case 0:
 			gg.SetFullScreenMode({ 1280,720 });
@@ -58,25 +58,29 @@ void Scene_Settings::Init() {
 	};
 
 	offset.y += cLineHeight;
-	ddlWindowModes = ui->MakeChildren<xx::DropDownList>();
-	ddlWindowModes->InitBegin(2, offset, anchor, cSize);
-	ddlWindowModes->items.Add("window mode", "full screen (borderless)", "full screen (exclusive)");
+	uiWindowModes = ui->MakeChildren<xx::DropDownList>();
+	uiWindowModes->InitBegin(2, offset, anchor, cSize);
+	uiWindowModes->items.Add(
+		gg.lang(Strs::windowMode), 
+		gg.lang(Strs::fullScreenBorderless),
+		gg.lang(Strs::fullScreenExclusive)
+	);
 	int i{};
 	if (gg.isFullScreen) {
 		if (gg.isBorderless) {
 			i = 1;
-			ddlResolutions->SetEnabledRecursive(false);
+			uiResolutions->SetEnabledRecursive(false);
 		}
 		else {
 			i = 2;
-			ddlResolutions->SetEnabledRecursive(true);
+			uiResolutions->SetEnabledRecursive(true);
 		}
 	}
 	else {
-		ddlResolutions->SetEnabledRecursive(false);
+		uiResolutions->SetEnabledRecursive(false);
 	}
-	ddlWindowModes->InitEnd(i);
-	ddlWindowModes->onSelectedIndexChanged = [this](int i) {
+	uiWindowModes->InitEnd(i);
+	uiWindowModes->onSelectedIndexChanged = [this](int i) {
 		switch (i) {
 		case 0:
 			gg.SetWindowMode();
@@ -85,7 +89,7 @@ void Scene_Settings::Init() {
 			gg.SetBorderlessMode();
 			break;
 		case 2:
-			ddlResolutions->onSelectedIndexChanged(ddlResolutions->selectedIndex);
+			uiResolutions->onSelectedIndexChanged(uiResolutions->selectedIndex);
 			break;
 		default:
 			assert(false);
@@ -94,14 +98,27 @@ void Scene_Settings::Init() {
 	};
 
 	offset.y -= cLineHeight * 2;
-	ui->MakeChildren<xx::CheckBox>()->Init(2, offset, anchor, cSize, true)("mute")
-		.onValueChanged = [](bool v) {
+	ui->MakeChildren<xx::CheckBox>()->Init(2, offset, anchor, cSize, false)(gg.lang(Strs::mute))
+		.onValueChanged = [this](bool v) {
+		uiAudioVolume->SetEnabledRecursive(!v);
+		uiMusicVolume->SetEnabledRecursive(!v);
+	};
+
+	offset.y -= cLineHeight;
+	uiAudioVolume = ui->MakeChildren<xx::Slider>();
+	uiAudioVolume->Init(2, offset, anchor, cSize.y
+		, cSliderWidths[0], cSliderWidths[1], cSliderWidths[2], 0.5)(gg.lang(Strs::audioVolume))
+		.onChanged = [this](double v) {
 		// todo
 	};
 
 	offset.y -= cLineHeight;
-	ui->MakeChildren<xx::Slider>()->Init(2, offset, anchor, cSize.y
-		, cSliderWidths[0], cSliderWidths[1], cSliderWidths[2], 0.5)("asdf");
+	uiMusicVolume = ui->MakeChildren<xx::Slider>();
+	uiMusicVolume->Init(2, offset, anchor, cSize.y
+		, cSliderWidths[0], cSliderWidths[1], cSliderWidths[2], 1)(gg.lang(Strs::musicVolume))
+		.onChanged = [this](double v) {
+		// todo
+	};
 }
 
 void Scene_Settings::Update() {

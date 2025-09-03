@@ -38,8 +38,7 @@ namespace xx {
 
 			onClicked = [this] {
 				value = !value;
-				assert(children[1]->typeId == Image::cTypeId);
-				((Image*)children[1].pointer)->frame = value ? icon1 : icon0;
+				At<Image>(1).frame = value ? icon1 : icon0;
 				onValueChanged(value);
 			};
 			return *this;
@@ -47,17 +46,12 @@ namespace xx {
 
 		template<typename S>
 		CheckBox& operator()(S const& txt_) {
-			RefLabel().SetText(txt_);
+			At<Label>(0)(txt_);
 			return *this;
 		}
 
 		void ApplyCfg() override {
 			At<Scale9>(2).Init(z, 0, 0, size, GetCfg());
-		}
-
-		Label& RefLabel() {
-			assert(children.len == 3);
-			return *(Label*)children[0].pointer;
 		}
 	};
 

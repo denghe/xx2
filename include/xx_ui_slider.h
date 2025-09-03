@@ -81,7 +81,7 @@ namespace xx {
 
 			auto& cfg = GetCfg();
 
-			auto barMinWidth = float(cfgBar->center.x + cfgBar->center.w);// *cfgBar->textureScale;
+			auto barMinWidth = float(cfgBar->center.x + cfgBar->center.w) * cfgBar->textureScale.x;
 			XY barSize{ std::max(widthBar * (float)value, barMinWidth), (height - cfg->paddings.TopBottom()) * 0.33f };
 			XY barPos{ widthTxtLeft, (height - barSize.y) * 0.5f };
 			At<Scale9>(1).Init(z + 1, barPos, 0, barSize, cfgBar);
@@ -92,14 +92,6 @@ namespace xx {
 
 			auto txtRight = valueToString(value);
 			At<Label>(3)(txtRight);
-
-			LabelRight().SetText(valueToString(value));
-		}
-
-		Label& LabelRight() {
-			assert(children.len == 5);
-			assert(children[3]->typeId == Label::cTypeId);
-			return *(Label*)children[3].pointer;
 		}
 
 		void DragEnd() {

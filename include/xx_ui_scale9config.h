@@ -5,10 +5,10 @@ namespace xx {
 
 	struct Scale9Config {
 		TinyFrame frame;
-		XY textureScale{ 2, 2 };
+		XY textureScale{ 3, 3 };
 		UVRect center{ 2, 2, 2, 2 };
 		RGBA8 color{ RGBA8_White };
-		Paddings paddings{ 10, 20, 8, 20 };
+		Paddings paddings{ 20, 40, 16, 40 };
 	};
 
 }

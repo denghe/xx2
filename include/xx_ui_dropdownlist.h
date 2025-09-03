@@ -27,7 +27,7 @@ namespace xx {
 		XY totalSize{};
 		int32_t selectedIndex{};
 		Ref<Scale9Config> cfgBG;
-		List<std::string> items;
+		List<std::u32string> items;
 		Weak<Background> itemsBG;
 		Weak<Scale9> itemsBorder;
 		Weak<Node> itemsContent;

@@ -102,12 +102,8 @@ namespace xx {
 			auto& q = GameBase_shader::GetInstance()->Quad();
 			RGBA8 c = { color.r, color.g, color.b, (uint8_t)(color.a * alpha) };
 			float cp;
-			if (enabled) {
-				cp = 1.f;
-			}
-			else {
-				cp = 0.5f;
-			}
+			if (enabled) cp = 1.f;
+			else cp = 0.5f;
 			auto s = worldScale * baseScale;
 			for (auto& f : chars) {
 				q.Draw(f.texId, f.textureRect, worldMinXY + f.offset * worldScale, 0, s, 0, cp, c);

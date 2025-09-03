@@ -15,25 +15,6 @@ void Game::Init() {
 void Game::GLInit() {
 	// load res
 	res.heart = LoadTexture("res/heart.png");
-	res.ui_button_n = LoadTexture("res/ui_button_n.png");
-	res.ui_button_h = LoadTexture("res/ui_button_h.png");
-
-	// init cfgs
-	cfg.s9bN.Emplace(xx::Scale9Config{
-		.frame = res.ui_button_n,
-		.texScale = { 1, 1 },
-		.center = { 2, 2, 2, 2 },
-		.color = xx::RGBA8_White,
-		.borderScale = 4.f,
-		.txtColor = xx::RGBA8_White,
-		.txtPadding = { 20, 5 },
-		.txtPaddingRightBottom = { 20, 10 },
-		.txtScale = 2.f,
-		.iconPadding = 5.f
-	});
-
-	cfg.s9bH.Emplace(*cfg.s9bN);
-	cfg.s9bH->frame = res.ui_button_h;
 
 	// init cam
 	cam.Init(scale, 1.f, {});
@@ -41,14 +22,13 @@ void Game::GLInit() {
 	// init ui
 	ui.Emplace()->InitRoot(scale);
 
-	ui->MakeChildren<xx::Label>()->Init(1, p5 + XY{ 0, -69 }, a5, 2)
-		.SetText("hi");
+	ui->MakeChildren<xx::Label>()->Init(1, p5 + XY{ 0, -69 }, a5, 48)("hi");
 
-	ui->MakeChildren<xx::LabelButton>()->Init(2, p5 + XY{ 0, 50 }, a5)("change color!!!").onClicked = [this] {
+	ui->MakeChildren<xx::LabelButton>()->Init(2, p5 + XY{ 0, 50 }, a5, 48)("change color!!!").onClicked = [this] {
 			heart->ChangeColor();
 	};
 
-	ui->MakeChildren<xx::LabelButton>()->Init(3, p5 + XY{ 0, 0 }, a5)("change anim").onClicked = [this] {
+	ui->MakeChildren<xx::LabelButton>()->Init(3, p5 + XY{ 0, 0 }, a5, 48)("change anim").onClicked = [this] {
 			heart->ChangeAnim();
 	};
 

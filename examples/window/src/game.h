@@ -4,12 +4,9 @@ using XY = xx::XY;
 
 struct Monster;
 struct Game : xx::Game<Game> {
-	struct {
-		xx::Ref<xx::Scale9Config> s9bN, s9bH;
-	} cfg;
 
 	struct {
-		xx::Ref<xx::GLTexture> heart, ui_button_n, ui_button_h;
+		xx::Ref<xx::GLTexture> heart;
 	} res;
 
 	xx::Shared<xx::Node> ui;
