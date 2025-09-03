@@ -28,7 +28,7 @@ xx::Task<> Game::Task() {
 }
 
 void Game::Delay() {
-#if 1
+#if 0
 	// for power saving, fps limit
 	SleepSecs(cDelta - (glfwGetTime() - time));	
 #endif
@@ -41,7 +41,7 @@ void Game::OnResize() {
 }
 
 void Game::Stat() {
-#if 0
+#if 1
 	xx::CoutN("drawFPS = ", drawFPS, " drawCall = "
 		, drawCall, " drawVerts = ", drawVerts
 		, " delayFuncs.len = ", delayFuncs.len

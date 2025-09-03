@@ -25,16 +25,15 @@ void Game::GLInit() {
 	ui->MakeChildren<xx::Label>()->Init(1, p5 + XY{ 0, -69 }, a5, 48)("hi");
 
 	ui->MakeChildren<xx::LabelButton>()->Init(2, p5 + XY{ 0, 50 }, a5, 48)("change color!!!").onClicked = [this] {
-			heart->ChangeColor();
+		heart->ChangeColor();
 	};
 
 	ui->MakeChildren<xx::LabelButton>()->Init(3, p5 + XY{ 0, 0 }, a5, 48)("change anim").onClicked = [this] {
-			heart->ChangeAnim();
+		heart->ChangeAnim();
 	};
 
 	// init logic
 	heart.Emplace()->Init(res.heart);
-	heart->Update();
 }
 
 void Game::Update() {
@@ -72,6 +71,13 @@ void Game::Update() {
 	// draw
 	heart->Draw();
 	DrawNode(ui);
+}
+
+void Game::Delay() {
+#if 1
+	// for power saving, fps limit
+	SleepSecs(cDelta - (glfwGetTime() - time));
+#endif
 }
 
 void Game::OnResize() {
