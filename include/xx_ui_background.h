@@ -10,6 +10,7 @@ namespace xx {
 		Weak<Node> content;
 
 		Background& Init(int z_, Weak<Node> contentArea_) {
+			escHandler = true;
 			Node::InitDerived<Background>(z_, 0, 0.5, 1, GameBase::instance->uiGrid.worldSize);
 			content = std::move(contentArea_);
 			return *this;
@@ -30,6 +31,9 @@ namespace xx {
 			return 1;	// swallow
 		}
 
+		virtual void HandleESC() override {
+			onOutsideClicked();
+		}
 	};
 
 }

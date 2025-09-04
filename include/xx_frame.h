@@ -30,19 +30,25 @@ namespace xx {
         }
     };
 
-    // texture packer element container
     struct Frame : TinyFrame {
+        XY anchor;                              // unset / default: 0.5
+        XY spriteOffset{};                      // content pos for original size
+    };
+
+    // texture packer element container
+    struct TextureFrame {
         std::string key;
-        // std::vector<std::string> aliases;	// unused
-        std::optional<XY> anchor;
+        // List<std::string> aliases;	        // unused
+        XY anchor;                              // unset / default: 0.5
         XY spriteOffset{};                      // content pos for original size
         XY spriteSize{};		                // content size( cut alpha )
         XY spriteSourceSize{};	                // original file size
         bool textureRotated{};
-        size_t ud{};                            // user data
-        std::vector<uint16_t> triangles;
-        std::vector<float> vertices;
-        std::vector<float> verticesUV;
+        List<uint16_t> triangles;
+        List<float> vertices;
+        List<float> verticesUV;
+        Ref<GLTexture> tex;
+        UVRect textureRect{};
     };
 
     //struct AnimFrame {
@@ -50,10 +56,10 @@ namespace xx {
     //    float durationSeconds;
     //};
 
-    //using AnimFrames = std::vector<AnimFrame>;
+    //using AnimFrames = List<AnimFrame>;
 
     //struct Anim {
-    //    std::vector<AnimFrame> animFrames;
+    //    List<AnimFrame> animFrames;
     //    size_t cursor{};
     //    float timePool{};
 

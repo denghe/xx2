@@ -27,6 +27,7 @@ namespace xx {
 		bool enabled{ true };										// false: do not callback & colorplus = 0.5f
 		bool selected{ false };										// draw: always highlight
 		bool focused{ false };										// true: highlight
+		bool escHandler{ false };
 		// ...
 
 		XX_INLINE XY GetScaledSize() const {
@@ -171,6 +172,29 @@ namespace xx {
 			for (auto i = children.len - 1; i >= 0; --i) {
 				children[i]->SwapRemoveFromParent();
 			}
+		}
+
+		void FindTopESCHandler(Node*& out, int32_t& minZ) {
+			if (escHandler && z > minZ) {
+				out = this;
+				minZ = z;
+			}
+			for (auto& c : children) {
+				c->FindTopESCHandler(out, minZ);
+			}
+		}
+
+		// recursive find TOP ESC handler
+		// null: not found
+		Node* FindTopESCHandler() {
+			Node* n{};
+			auto minZ = std::numeric_limits<int32_t>::min();
+			FindTopESCHandler(n, minZ);
+			return n;
+		}
+
+		virtual void HandleESC() {								// maybe need override
+			SwapRemoveFromParent();
 		}
 
 		virtual void TransUpdate() {};
