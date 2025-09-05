@@ -106,6 +106,7 @@ namespace xx {
 		// todo: enable disable
 
 		virtual int32_t OnMouseDown(int32_t btnId_) override {
+			if (!enabled) return 0;
 			if (btnId_ != GLFW_MOUSE_BUTTON_LEFT) return 0;
 			auto mx = GameBase::instance->mousePos.x;
 			auto x1 = worldMinXY.x + widthTxtLeft * worldScale.x;
@@ -127,6 +128,7 @@ namespace xx {
 		}
 
 		int32_t OnMouseMove() override {
+			if (!enabled) return 0;
 			if (!focused) {
 				SetFocus();
 				GameBase::instance->delayFuncs.Emplace([w = WeakFromThis(this)] {

@@ -37,6 +37,7 @@ namespace xx {
 			MakeChildren<Scale9>()->Init(z, 0, 0, size, cfg);
 
 			onClicked = [this] {
+				if (!enabled) return;
 				value = !value;
 				At<Image>(1).frame = value ? icon1 : icon0;
 				onValueChanged(value);

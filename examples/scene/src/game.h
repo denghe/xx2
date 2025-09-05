@@ -20,12 +20,15 @@ struct Game : xx::Game<Game> {
 	struct {
 		xx::Ref<xx::GLTexture>
 			heart;
+		xx::List<xx::Ref<xx::GLTexture>> ui_flags_;
 	} res;
 
 	// config / runtime vars
 	i18n::Lang lang;
-	bool langSelected{};
-	float soundVolume{ 1.f }, musicVolume{ 0.5f };
+	bool langSelected{};	// avoid always popup first language choose panel
+	bool mute{};
+	float audioVolume{ 1.f }, musicVolume{ 0.5f };
+	int32_t resolutionsIndex{ 2 };
 	// ...
 
 	// todo: save & load config

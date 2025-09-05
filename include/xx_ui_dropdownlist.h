@@ -25,12 +25,9 @@ namespace xx {
 		Weak<Label> label;
 		TinyFrame icon, itemHead;
 		XY totalSize{};
-		int32_t selectedIndex{};
-		Ref<Scale9Config> cfgBG;
+		Ref<Scale9Config> cfgBG;	// for popup
 		List<std::u32string> items;
-		Weak<Background> itemsBG;
-		Weak<Scale9> itemsBorder;
-		Weak<Node> itemsContent;
+		int32_t selectedIndex{};
 		std::function<void(int32_t)> onSelectedIndexChanged = [](int32_t idx) { CoutN("DropDownList selectedIndex = ", idx); };
 
 		// init step 1/2
@@ -57,7 +54,7 @@ namespace xx {
 
 		// init step 2/2
 		// need items.Add(...
-		void InitEnd(int32_t selectedIndex_) {
+		void InitEnd(int32_t selectedIndex_ = 0) {
 			selectedIndex = selectedIndex_;
 			totalSize = { size.x, size.y * items.len };
 			auto& cfg = GetCfg();
@@ -77,12 +74,17 @@ namespace xx {
 			};
 		}
 
+		void SetSelectedIndex(int32_t selectedIndex_) {
+			selectedIndex = selectedIndex_;
+			label->SetText(items[selectedIndex]);
+		}
+
 		void PopList() {
-			itemsBorder = MakeChildren<Scale9>();
+			auto itemsBorder = MakeChildren<Scale9>();
 			itemsBorder->Init(z + 1000, 0, { 0, 1 }, totalSize, cfgBG);
 			itemsBorder->inParentArea = false;
 
-			itemsContent = MakeChildren<Node>();
+			auto itemsContent = MakeChildren<Node>();
 			itemsContent->Init(z + 1001, 0, { 0, 1 }, 1, totalSize);
 			itemsContent->inParentArea = false;
 
@@ -91,19 +93,14 @@ namespace xx {
 					, WeakFromThis(this), i, false);
 			}
 
-			itemsBG = MakeChildren<Background>();
+			auto itemsBG = MakeChildren<Background>();
 			itemsBG->Init(z + 999, itemsContent).onOutsideClicked = [this] {
-				assert(itemsBorder);
-				assert(itemsBG);
-				assert(itemsContent);
-				itemsBorder->SwapRemoveFromParent();
-				itemsBG->SwapRemoveFromParent();
-				itemsContent->SwapRemoveFromParent();
+				children.Resize(3);
 			};
 		}
 
 		void ItemCommit(int32_t idx_) {
-			itemsBG->onOutsideClicked();	// unsafe
+			At<Background>(5).onOutsideClicked();	// unsafe
 			if (selectedIndex != idx_) {
 				selectedIndex = idx_;
 				label->SetText(items[idx_]);

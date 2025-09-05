@@ -8,6 +8,7 @@ namespace UI {
 		i18n::Lang lang;
 		void Init(int32_t z_);
 		void MakeUI();
+		void HandleESC() override;
 	};
 
 }

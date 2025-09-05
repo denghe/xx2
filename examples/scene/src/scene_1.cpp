@@ -3,6 +3,16 @@
 #include "scene_mainmenu.h"
 
 void Scene_1::Init() {
+	// init ui
+	static constexpr float cLineHeight{ 100 };
+	static constexpr float cItemHeight{ 80 };
+	static constexpr float cMargin{ 20 };
+	auto fontSize = cItemHeight - gg.defaultCfg.s9bN->paddings.TopBottom();
+	ui.Emplace()->InitRoot(gg.scale);
+	ui->MakeChildren<xx::Label>()->Init(2, gg.p1 + cMargin, gg.a1, fontSize)("ver 0.1");
+	ui->MakeChildren<xx::Label>()->Init(2, gg.p3 + XY{ -cMargin, cMargin }, gg.a3, fontSize)(gg.lang(Strs::escBack));
+
+	// init game logic
 	cam.Init(gg.scale, 1.f);
 
 	int ny = 80;
@@ -34,6 +44,7 @@ void Scene_1::Update() {
 		return;
 	}
 
+	// update game logic
 	auto d = float(std::min((float)gg.delta, gg.cMaxDelta) * timeScale);
 	time += d;
 	timePool += d;
@@ -53,8 +64,11 @@ void Scene_1::Draw() {
 	for (auto& m : monsters) {
 		m->Draw();
 	}
+
+	gg.DrawNode(ui);
 }
 
 void Scene_1::OnResize() {
+	ui->Resize(gg.scale);
 	cam.SetBaseScale(gg.scale);
 }

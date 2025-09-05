@@ -5,16 +5,21 @@ namespace UI {
 
 	/*
 +-----------------------------+
-		   Settings
-
-		   todo
-
+		   title
+        window modes
+		resolutions
+		   mute
+        audio volume
+	    music volume
 					  [ESC]back
 +-----------------------------+
 */
 
+	// todo: Load & Save
+
 	void Settings::Init(int32_t z_) {
 		escHandler = true;
+		children.Clear();	// unsafe
 		InitDerived<Settings>(z_);
 
 		static constexpr XY cSize{ 1100, 800 };
@@ -22,20 +27,48 @@ namespace UI {
 		static constexpr float cLineHeight{ 100 };
 		static constexpr float cSliderWidths[]{ 400, 450, 150 };
 
-		// border
-		MakeChildren<xx::Scale9>()->Init(z + 1, 0, 0.5f, cSize);
-
-		MakeChildren<xx::Label>()->Init(z + 2, gg.p5 + XY{ 0, 450 }, gg.a5, 120)(gg.lang(Strs::settings));
-
 		auto basePos = gg.p5;
-		auto offset = basePos + XY{ 0, 200 };
+		auto offset = basePos + XY{ 0, 300 };
 		auto anchor = gg.a5;
+		auto fontSize = cItemSize.y - gg.defaultCfg.s9bN->paddings.TopBottom();
 
-		// todo: block unavailable‌ resolutions
+		// border
+		auto border = MakeChildren<xx::Scale9>();
+		border->Init(z + 1, 0, 0.5f, cSize);
+
+		// swallow bg
+		MakeChildren<xx::Background>()->Init(z, border.ToWeak()).onOutsideClicked = [] {};
+
+		// title
+		MakeChildren<xx::Label>()->Init(z + 2, offset, anchor, fontSize * 2)(gg.lang(Strs::settings));
+
+		offset.y -= cLineHeight * 1.5;
+		uiWindowModes = MakeChildren<xx::DropDownList>();
+		uiWindowModes->InitBegin(z + 2, offset, anchor, cItemSize);
+		uiWindowModes->items.Add(gg.lang(Strs::windowMode), gg.lang(Strs::fullScreenBorderless), gg.lang(Strs::fullScreenExclusive));
+		uiWindowModes->InitEnd();
+		uiWindowModes->onSelectedIndexChanged = [this](int i) {
+			switch (i) {
+			case 0:
+				gg.SetWindowMode();
+				break;
+			case 1:
+				gg.SetBorderlessMode();
+				break;
+			case 2:
+				uiResolutions->onSelectedIndexChanged(uiResolutions->selectedIndex);
+				break;
+			default:
+				assert(false);
+			}
+			Init(z);	// unsafe
+			};
+
+		offset.y -= cLineHeight;
 		uiResolutions = MakeChildren<xx::DropDownList>();
 		uiResolutions->InitBegin(z + 2, offset, anchor, cItemSize);
-		uiResolutions->items.Add(U"1280 x 720", U"1366 x 768", U"1920 x 1080", U"2560 x 1440", U"3840 x 2160");
-		uiResolutions->InitEnd(2);	// todo: restore from backup?
+		uiResolutions->items.Add(U"1280 x 720", U"1366 x 768", U"1920 x 1080", U"2560 x 1440", U"3840 x 2160");	// todo: block unavailable‌ resolutions
+		uiResolutions->InitEnd(gg.resolutionsIndex);
 		uiResolutions->onSelectedIndexChanged = [](int32_t idx) {
 			switch (idx) {
 			case 0:
@@ -56,69 +89,51 @@ namespace UI {
 			default:
 				assert(false);
 			}
-			};
+			gg.resolutionsIndex = idx;
+		};
 
-		offset.y += cLineHeight;
-		uiWindowModes = MakeChildren<xx::DropDownList>();
-		uiWindowModes->InitBegin(z + 2, offset, anchor, cItemSize);
-		uiWindowModes->items.Add(
-			gg.lang(Strs::windowMode),
-			gg.lang(Strs::fullScreenBorderless),
-			gg.lang(Strs::fullScreenExclusive)
-		);
-		int i{};
+		offset.y -= cLineHeight;
+		MakeChildren<xx::CheckBox>()->Init(z + 2, offset, anchor, cItemSize, gg.mute)(gg.lang(Strs::mute))
+			.onValueChanged = [this](bool v) {
+			gg.mute = v;
+			uiAudioVolume->SetEnabledRecursive(!v);
+			uiMusicVolume->SetEnabledRecursive(!v);
+		};
+
+		offset.y -= cLineHeight;
+		uiAudioVolume = MakeChildren<xx::Slider>();
+		uiAudioVolume->Init(z + 2, offset, anchor, cItemSize.y
+			, cSliderWidths[0], cSliderWidths[1], cSliderWidths[2], gg.audioVolume)(gg.lang(Strs::audioVolume))
+			.onChanged = [this](double v) {
+			gg.audioVolume = v;
+		};
+
+		offset.y -= cLineHeight;
+		uiMusicVolume = MakeChildren<xx::Slider>();
+		uiMusicVolume->Init(z + 2, offset, anchor, cItemSize.y
+			, cSliderWidths[0], cSliderWidths[1], cSliderWidths[2], gg.musicVolume)(gg.lang(Strs::musicVolume))
+			.onChanged = [this](double v) {
+			gg.musicVolume = v;
+		};
+
+		// todo: esc back
+
+		// apply config values
 		if (gg.isFullScreen) {
 			if (gg.isBorderless) {
-				i = 1;
+				uiWindowModes->SetSelectedIndex(1);
 				uiResolutions->SetEnabledRecursive(false);
 			}
 			else {
-				i = 2;
-				uiResolutions->SetEnabledRecursive(true);
+				uiWindowModes->SetSelectedIndex(2);
 			}
 		}
 		else {
 			uiResolutions->SetEnabledRecursive(false);
 		}
-		uiWindowModes->InitEnd(i);
-		uiWindowModes->onSelectedIndexChanged = [this](int i) {
-			switch (i) {
-			case 0:
-				gg.SetWindowMode();
-				break;
-			case 1:
-				gg.SetBorderlessMode();
-				break;
-			case 2:
-				uiResolutions->onSelectedIndexChanged(uiResolutions->selectedIndex);
-				break;
-			default:
-				assert(false);
-			}
-			Init(z);	// unsafe
-			};
-
-		offset.y -= cLineHeight * 2;
-		MakeChildren<xx::CheckBox>()->Init(z + 2, offset, anchor, cItemSize, false)(gg.lang(Strs::mute))
-			.onValueChanged = [this](bool v) {
-			uiAudioVolume->SetEnabledRecursive(!v);
-			uiMusicVolume->SetEnabledRecursive(!v);
-			};
-
-		offset.y -= cLineHeight;
-		uiAudioVolume = MakeChildren<xx::Slider>();
-		uiAudioVolume->Init(z + 2, offset, anchor, cItemSize.y
-			, cSliderWidths[0], cSliderWidths[1], cSliderWidths[2], 0.5)(gg.lang(Strs::audioVolume))
-			.onChanged = [this](double v) {
-			// todo
-			};
-
-		offset.y -= cLineHeight;
-		uiMusicVolume = MakeChildren<xx::Slider>();
-		uiMusicVolume->Init(z + 2, offset, anchor, cItemSize.y
-			, cSliderWidths[0], cSliderWidths[1], cSliderWidths[2], 1)(gg.lang(Strs::musicVolume))
-			.onChanged = [this](double v) {
-			// todo
-			};
+		if (gg.mute) {
+			uiAudioVolume->SetEnabledRecursive(false);
+			uiMusicVolume->SetEnabledRecursive(false);
+		}
 	}
 }

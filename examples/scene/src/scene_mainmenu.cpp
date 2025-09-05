@@ -14,31 +14,59 @@ void Scene_MainMenu::Init() {
 	}
 }
 
+/*
++-----------------------------+
+		   title
+
+           [lang]
+		    play
+		  settings
+		    quit
+
+ver					  [ESC]back
++-----------------------------+
+*/
+
 void Scene_MainMenu::MakeUI() {
 	// init ui
+	static constexpr float cLineHeight{ 100 };
+	static constexpr float cItemHeight{ 80 };
+	static constexpr float cMargin{ 20 };
+
+	auto basePos = gg.p5;
+	auto offset = basePos + XY{ 0, 250 };
+	auto anchor = gg.a5;
+	auto fontSize = cItemHeight - gg.defaultCfg.s9bN->paddings.TopBottom();
+
 	ui.Emplace()->InitRoot(gg.scale);
 
-	// todo: bg
+	ui->MakeChildren<xx::Label>()->Init(2, offset, anchor, fontSize * 2)(gg.lang(Strs::gameName));
 
-	auto fontSize = 80 - gg.defaultCfg.s9bN->paddings.TopBottom();
+	offset.y -= cLineHeight * 1.5;
 
-	ui->MakeChildren<xx::Label>()->Init(2, gg.p5 + XY{ 0, 300 }, gg.a5, fontSize * 2)(gg.lang(Strs::gameName));
+	auto& img = gg.res.ui_flags_[(int32_t)gg.lang.language];
+	ui->MakeChildren<xx::ImageButton>()->Init(2, offset, anchor, cItemHeight, 4, img).onClicked = [this] {
+		ui->MakeChildren<UI::Settings_Lang>()->Init(100);
+	};
 
-	ui->MakeChildren<xx::LabelButton>()->Init(2, gg.p5 + XY{ 0, 0 }, gg.a5, fontSize)(gg.lang(Strs::play)).onClicked = [this] {
+	offset.y -= cLineHeight;
+	ui->MakeChildren<xx::LabelButton>()->Init(2, offset, anchor, fontSize)(gg.lang(Strs::play)).onClicked = [this] {
 		gg.MakeScene<Scene_1>()->Init();
 	};
 
-	ui->MakeChildren<xx::LabelButton>()->Init(2, gg.p5 + XY{ 0, -100 }, gg.a5, fontSize)(gg.lang(Strs::settings)).onClicked = [this] {
+	offset.y -= cLineHeight;
+	ui->MakeChildren<xx::LabelButton>()->Init(2, offset, anchor, fontSize)(gg.lang(Strs::settings)).onClicked = [this] {
 		ui->MakeChildren<UI::Settings>()->Init(100);
 	};
 
-	ui->MakeChildren<xx::LabelButton>()->Init(2, gg.p5 + XY{ 0, -200 }, gg.a5, fontSize)(gg.lang(Strs::quit)).onClicked = [this] {
+	offset.y -= cLineHeight;
+	ui->MakeChildren<xx::LabelButton>()->Init(2, offset, anchor, fontSize)(gg.lang(Strs::quit)).onClicked = [this] {
 		gg.running = false;
 	};
 
-	ui->MakeChildren<xx::Label>()->Init(2, gg.p1 + XY{ 20, 20 }, gg.a1, fontSize)("ver 0.1");
+	ui->MakeChildren<xx::Label>()->Init(2, gg.p1 + cMargin, gg.a1, fontSize)("ver 0.1");
 
-	// todo:  lang icon?
+	ui->MakeChildren<xx::Label>()->Init(2, gg.p3 + XY{ -cMargin, cMargin }, gg.a3, fontSize)(gg.lang(Strs::escBack));
 }
 
 void Scene_MainMenu::Update() {
@@ -54,12 +82,12 @@ void Scene_MainMenu::Update() {
 	}
 
 	if (bak != gg.lang.language) {
-		gg.langSelected = true;
 		Init();
 	}
 }
 
 void Scene_MainMenu::Draw() {
+	// todo: bg?
 	gg.DrawNode(ui);
 }
 

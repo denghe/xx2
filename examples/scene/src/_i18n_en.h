@@ -19,7 +19,7 @@ namespace i18n {
 		U"mute",
 		U"audio volume",
 		U"music volume",
-		U"[Q] back",
+		U"[ESC] back",
 		U"[SPACE] confirm",
 		// ...
 
