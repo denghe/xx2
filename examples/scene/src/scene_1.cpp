@@ -2,6 +2,9 @@
 #include "scene_1.h"
 #include "scene_mainmenu.h"
 
+// todo: equip + bag + props list + log panel
+// game logic: mouse is knife, hit circle monster
+
 void Scene_1::Init() {
 	// init ui
 	static constexpr float cLineHeight{ 100 };

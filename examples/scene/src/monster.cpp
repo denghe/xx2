@@ -25,6 +25,6 @@ void Monster::Update() {
 
 void Monster::Draw() {
 	auto& cam = scene->cam;
-	auto scale = _1scale * cam.scale * (radius / tex->Width());
+	auto scale = _1scale * cam.scale * (radius / tex->size.x);
 	gg.Quad().Draw(*tex, tex->Rect(), cam.ToGLPos(pos), 0.5f, scale);
 }

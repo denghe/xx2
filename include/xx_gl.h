@@ -10,6 +10,92 @@
 
 namespace xx {
 
+	enum class GLResTypes {
+		Shader, Program, VertexArrays, Buffer, Texture, FrameBuffer
+		// ...
+	};
+
+	template<GLResTypes RT>
+	struct GLRes {
+		GLuint id{ (GLuint)-1 };
+		operator GLuint const& () const { return id; }
+		GLRes() = default;
+		GLRes(GLuint id_) : id(id_) {}
+		GLRes(GLRes const&) = delete;
+		GLRes& operator=(GLRes const&) = delete;
+		GLRes(GLRes&& o) noexcept { std::swap(id, o.id); }
+		GLRes& operator=(GLRes&& o) noexcept { std::swap(id, o.id); return *this; }
+		~GLRes() {
+			if (id == -1) return;
+			if constexpr (RT == GLResTypes::Shader) glDeleteShader(id);
+			if constexpr (RT == GLResTypes::Program) glDeleteProgram(id);
+			if constexpr (RT == GLResTypes::VertexArrays) glDeleteVertexArrays(1, &id);
+			if constexpr (RT == GLResTypes::Buffer) glDeleteBuffers(1, &id);
+			if constexpr (RT == GLResTypes::Texture) glDeleteTextures(1, &id);
+			if constexpr (RT == GLResTypes::FrameBuffer) glDeleteFramebuffers(1, &id);
+			id = -1;
+		}
+	};
+
+	using GLShader = GLRes<GLResTypes::Shader>;
+	using GLProgram = GLRes<GLResTypes::Program>;
+	using GLVertexArrays = GLRes<GLResTypes::VertexArrays>;
+	using GLBuffer = GLRes<GLResTypes::Buffer>;
+	using GLFrameBuffer = GLRes<GLResTypes::FrameBuffer>;
+	struct GLTexture : GLRes<GLResTypes::Texture> {
+		XY size{};
+		std::string fileName;
+		UVRect Rect() const {
+			return { 0,0, (uint16_t)size.x, (uint16_t)size.y };
+		}
+
+		// filter:  GL_NEAREST  GL_LINEAR    wraper:  GL_CLAMP_TO_EDGE   GL_REPEAT
+		inline static void SetTexParm(GLuint id_, GLuint minFilter_, GLuint magFilter_, GLuint sWraper_, GLuint tWraper_) {
+			glBindTexture(GL_TEXTURE_2D, id_);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter_);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter_);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, sWraper_);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, tWraper_);
+		}
+		void SetParm(GLuint id_, GLuint minFilter_, GLuint magFilter_, GLuint sWraper_, GLuint tWraper_) {
+			SetTexParm(id, minFilter_, magFilter_, sWraper_, tWraper_);
+		}
+
+		void GenerateMipmap() {
+			glBindTexture(GL_TEXTURE_2D, id);
+			glGenerateMipmap(id);
+		}
+
+		inline static GLuint GenTexture(int textureUnit = 0) {
+			GLuint id{};
+			glGenTextures(1, &id);
+			glActiveTexture(GL_TEXTURE0 + textureUnit);
+			glBindTexture(GL_TEXTURE_2D, id);
+			SetTexParm(id, GL_NEAREST, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
+			return id;
+		}
+		void Init(XY size_, bool hasAlpha_ = true) {
+			assert(id == -1);
+			id = GenTexture();
+			auto c = hasAlpha_ ? GL_RGBA : GL_RGB;
+			glTexImage2D(GL_TEXTURE_2D, 0, c, size_.x, size_.y, 0, c, GL_UNSIGNED_BYTE, {});
+			size = size_;
+		}
+	};
+
+	struct GLVertTexture : GLRes<GLResTypes::Texture> {
+		XY size{};
+		int32_t numVerts{}, numFrames{};
+	};
+
+	struct GLTiledTexture : GLRes<GLResTypes::Texture> {
+		XY size{};
+		XYi sizeXY;
+	};
+
+	/**********************************************************************************************************************************/
+	/**********************************************************************************************************************************/
+
 #ifndef NDEBUG
 	inline void CheckGLErrorAt(const char* file, int line, const char* func) {
 		if (auto e = glGetError(); e != GL_NO_ERROR) {
@@ -21,168 +107,6 @@ namespace xx {
 #else
 #define CheckGLError() ((void)0)
 #endif
-
-	enum class GLResTypes {
-		Shader, Program, VertexArrays, Buffer, Texture, FrameBuffer
-	};
-
-	template<GLResTypes T, typename...VS>
-	struct GLRes {
-
-		std::tuple<GLuint, VS...> vs;
-
-		GLRes(GLuint i) : vs(std::make_tuple(i)) {}
-
-		template<typename...Args>
-		GLRes(GLuint i, Args&&... args) : vs(std::make_tuple(i, std::forward<Args>(args)...)) {}
-
-		operator GLuint const& () const { return std::get<0>(vs); }
-		GLuint const& GetValue() const { return std::get<0>(vs); }
-		GLuint* GetValuePointer() { return &std::get<0>(vs); }
-
-		GLRes(GLRes const&) = delete;
-		GLRes& operator=(GLRes const&) = delete;
-		GLRes() = default;
-		GLRes(GLRes&& o) noexcept {
-			std::swap(vs, o.vs);
-		}
-		GLRes& operator=(GLRes&& o) noexcept {
-			std::swap(vs, o.vs);
-			return *this;
-		}
-
-		~GLRes() {
-			if (!std::get<0>(vs)) return;
-			if constexpr (T == GLResTypes::Shader) {
-				glDeleteShader(std::get<0>(vs));
-			}
-			if constexpr (T == GLResTypes::Program) {
-				glDeleteProgram(std::get<0>(vs));
-			}
-			if constexpr (T == GLResTypes::VertexArrays) {
-				glDeleteVertexArrays(1, &std::get<0>(vs));
-			}
-			if constexpr (T == GLResTypes::Buffer) {
-				glDeleteBuffers(1, &std::get<0>(vs));
-			}
-			if constexpr (T == GLResTypes::Texture) {
-				glDeleteTextures(1, &std::get<0>(vs));
-			}
-			if constexpr (T == GLResTypes::FrameBuffer) {
-				glDeleteFramebuffers(1, &std::get<0>(vs));
-			}
-			std::get<0>(vs) = 0;
-		}
-	};
-
-	using GLShader = GLRes<GLResTypes::Shader>;
-
-	using GLProgram = GLRes<GLResTypes::Program>;
-
-	using GLVertexArrays = GLRes<GLResTypes::VertexArrays>;
-
-	using GLBuffer = GLRes<GLResTypes::Buffer>;
-
-	using GLFrameBuffer = GLRes<GLResTypes::FrameBuffer>;
-
-	using GLTextureCore = GLRes<GLResTypes::Texture>;
-
-
-	template<GLuint filter = GL_NEAREST /* GL_LINEAR */, GLuint wraper = GL_CLAMP_TO_EDGE /* GL_REPEAT */>
-	void GLTexParameteri() {
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wraper);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wraper);
-	}
-
-	inline void GLTexParameteri(GLuint filter, GLuint wraper) {
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wraper);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wraper);
-	}
-
-	template<bool exitBind0 = false, GLuint filter = GL_NEAREST /* GL_LINEAR */, GLuint wraper = GL_CLAMP_TO_EDGE /* GL_REPEAT */>
-	GLuint GLGenTextures() {
-		GLuint t{};
-		glGenTextures(1, &t);
-		glBindTexture(GL_TEXTURE_2D, t);
-		GLTexParameteri<filter, wraper>();
-		if constexpr (exitBind0) {
-			glBindTexture(GL_TEXTURE_2D, 0);
-		}
-		//printf("GLGenTextures t = %d\n", t);
-		return t;
-	}
-
-	struct GLTexture : GLRes<GLResTypes::Texture, GLsizei, GLsizei, std::string> {
-		using BT = GLRes<GLResTypes::Texture, GLsizei, GLsizei, std::string>;
-		using BT::BT;
-
-		template<GLuint filter = GL_NEAREST /* GL_LINEAR */, GLuint wraper = GL_CLAMP_TO_EDGE /* GL_REPEAT */>
-		static GLTexture Create(XYu siz, bool hasAlpha = true) {
-			auto t = GLGenTextures<false, filter, wraper>();
-			auto c = hasAlpha ? GL_RGBA : GL_RGB;
-			glTexImage2D(GL_TEXTURE_2D, 0, c, siz.x, siz.y, 0, c, GL_UNSIGNED_BYTE, {});
-			glBindTexture(GL_TEXTURE_2D, 0);
-			return { t, siz.x, siz.y, "" };
-		}
-
-		template<GLuint filter = GL_NEAREST /* GL_LINEAR */, GLuint wraper = GL_CLAMP_TO_EDGE /* GL_REPEAT */>
-		static Ref<GLTexture> CreateRef(XYu siz, bool hasAlpha = true) {
-			return MakeRef<GLTexture>(Create(siz, hasAlpha));
-		}
-
-		auto const& Width() const { return std::get<1>(vs); }
-		auto const& Height() const { return std::get<2>(vs); }
-		auto const& FileName() const { return std::get<3>(vs); }
-		UVRect Rect() const { return { 0,0, (uint16_t)std::get<1>(vs), (uint16_t)std::get<2>(vs) }; }
-		XY Size() const { return { std::get<1>(vs), std::get<2>(vs) }; }
-
-		template<GLuint filter = GL_NEAREST /* GL_LINEAR */, GLuint wraper = GL_CLAMP_TO_EDGE /* GL_REPEAT */>
-		void SetGLTexParm() {
-			glBindTexture(GL_TEXTURE_2D, GetValue());
-			GLTexParameteri<filter, wraper>();
-			glBindTexture(GL_TEXTURE_2D, 0);
-		}
-
-		void SetGLTexParm(GLuint filter, GLuint wraper) {
-			glBindTexture(GL_TEXTURE_2D, GetValue());
-			GLTexParameteri(filter, wraper);
-			glBindTexture(GL_TEXTURE_2D, 0);
-		}
-
-		void GenerateMipmap() {
-			glBindTexture(GL_TEXTURE_2D, GetValue());
-			glGenerateMipmap(GetValue());
-			glBindTexture(GL_TEXTURE_2D, 0);
-		}
-	};
-
-	struct GLVertTexture : GLRes<GLResTypes::Texture, GLsizei, GLsizei, int32_t, int32_t> {
-		using BT = GLRes<GLResTypes::Texture, GLsizei, GLsizei, int32_t, int32_t>;
-		using BT::BT;
-
-		auto const& Width() const { return std::get<1>(vs); }
-		auto const& Height() const { return std::get<2>(vs); }
-		auto const& NumVerts() const { return std::get<3>(vs); }
-		auto const& NumFrames() const { return std::get<4>(vs); }
-	};
-
-	struct GLTiledTexture : GLRes<GLResTypes::Texture, GLsizei, GLsizei, int32_t, int32_t> {
-		using BT = GLRes<GLResTypes::Texture, GLsizei, GLsizei, int32_t, int32_t>;
-		using BT::BT;
-
-		auto const& Width() const { return std::get<1>(vs); }
-		auto const& Height() const { return std::get<2>(vs); }
-		auto const& SizeX() const { return std::get<3>(vs); }
-		auto const& SizeY() const { return std::get<4>(vs); }
-	};
-
-
-	/**********************************************************************************************************************************/
-	/**********************************************************************************************************************************/
 
 	inline GLShader LoadGLShader(GLenum type, std::initializer_list<std::string_view>&& codes_) {
 		assert(codes_.size() && (type == GL_VERTEX_SHADER || type == GL_FRAGMENT_SHADER));
@@ -274,19 +198,7 @@ namespace xx {
 	/**********************************************************************************************************************************/
 	/**********************************************************************************************************************************/
 
-	// todo: generate mipmap option
-
-	template<GLuint filter = GL_NEAREST /* GL_LINEAR */, GLuint wraper = GL_CLAMP_TO_EDGE /* GL_REPEAT */>
-	inline GLuint LoadGLTexture_core(int textureUnit = 0) {
-		GLuint t{};
-		glGenTextures(1, &t);
-		glActiveTexture(GL_TEXTURE0 + textureUnit);
-		glBindTexture(GL_TEXTURE_2D, t);
-		GLTexParameteri<filter, wraper>();
-		return t;
-	}
-
-	inline GLTexture LoadGLTexture(std::string_view const& buf, std::string_view const& fullPath) {
+	inline GLTexture LoadGLTexture(std::string_view buf, std::string_view fullPath) {
 		assert(buf.size() > 12);
 
 		/***********************************************************************************************************************************/
@@ -299,12 +211,12 @@ namespace xx {
 				if (comp == 4) {
 					glPixelStorei(GL_UNPACK_ALIGNMENT, 8 - 4 * (w & 0x1));
 				}
-				auto t = LoadGLTexture_core();
+				auto id = GLTexture::GenTexture();
 				glTexImage2D(GL_TEXTURE_2D, 0, c, w, h, 0, c, GL_UNSIGNED_BYTE, image);
-				glBindTexture(GL_TEXTURE_2D, 0);
+				//glGenerateMipmap(id);
 				CheckGLError();
 				stbi_image_free(image);
-				return { t, w, h, fullPath };
+				return { id, XY{w, h}, std::string(fullPath) };
 			}
 			else {
 				CoutN("failed to load texture. fn = ", fullPath);
@@ -318,12 +230,12 @@ namespace xx {
 		else if (buf.starts_with("\xFF\xD8"sv)) {
 			int w, h, comp;
 			if (auto image = stbi_load_from_memory((stbi_uc*)buf.data(), (int)buf.size(), &w, &h, &comp, 0)) {
-				auto t = LoadGLTexture_core();
+				auto id = GLTexture::GenTexture();
 				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
-				glBindTexture(GL_TEXTURE_2D, 0);
+				//glGenerateMipmap(id);
 				CheckGLError();
 				stbi_image_free(image);
-				return { t, w, h, fullPath };
+				return { id, XY{w, h}, std::string(fullPath) };
 			}
 			else {
 				CoutN("failed to load texture. fn = ", fullPath);
@@ -340,32 +252,24 @@ namespace xx {
 	}
 
 	// data's bytes len == w * h * sizeof(colorFormat)
-	template<GLuint filter = GL_NEAREST /* GL_LINEAR */, GLuint wraper = GL_CLAMP_TO_EDGE /* GL_REPEAT */>
 	inline GLTexture LoadGLTexture(void* data, GLsizei w, GLsizei h, GLint colorFormat = GL_RGBA) {
-		auto t = LoadGLTexture_core<filter, wraper>();
+		auto id = GLTexture::GenTexture();
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 8 - 4 * (w & 0x1));
 		glTexImage2D(GL_TEXTURE_2D, 0, colorFormat, w, h, 0, colorFormat, GL_UNSIGNED_BYTE, data);
-		glBindTexture(GL_TEXTURE_2D, 0);
-		return { t, w, h, "::memory::" };
+		return { id, {w, h}, "::memory::" };
 	}
 
 	inline GLVertTexture LoadGLVertTexture(void* data, GLsizei w, GLsizei h, int32_t numVerts, int32_t numFrames) {
-		auto t = LoadGLTexture_core<GL_NEAREST, GL_REPEAT>();
+		auto id = GLTexture::GenTexture();
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, w, h, 0, GL_RGBA, GL_FLOAT, data);
-		glBindTexture(GL_TEXTURE_2D, 0);
-		return { t, w, h, numVerts, numFrames };
+		return { id, { w, h }, numVerts, numFrames };
 	}
 
 	inline GLTiledTexture LoadGLTiledTexture(void* data, GLsizei w, GLsizei h, XYi size) {
-		auto t = LoadGLTexture_core<GL_NEAREST, GL_REPEAT>();
+		auto id = GLTexture::GenTexture();
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, w, h, 0, GL_RGBA, GL_FLOAT, data);
-		glBindTexture(GL_TEXTURE_2D, 0);
-		return { t, w, h, size.x, size.y };
+		return { id, {w, h}, size };
 	}
-
-	/**********************************************************************************************************************************/
-	/**********************************************************************************************************************************/
-	// utils
 
 	// ...
 

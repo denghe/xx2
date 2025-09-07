@@ -196,10 +196,10 @@ namespace xx {
 
             // fill texId
             for (auto& c : charArray) {
-                c.texId = texs[c.page]->GetValue();
+                c.texId = texs[c.page]->id;
             }
             for (auto& [k,v] : charMap) {
-                v.texId = texs[v.page]->GetValue();
+                v.texId = texs[v.page]->id;
             }
 
             // store display info when success

@@ -95,9 +95,9 @@ void main() {
             aTexRect = glGetAttribLocation(p, "aTexRect");
             CheckGLError();
 
-            glGenVertexArrays(1, va.GetValuePointer());
-            glGenBuffers(1, ib.GetValuePointer());
-            glGenBuffers(1, vb.GetValuePointer());
+            glGenVertexArrays(1, &va.id);
+            glGenBuffers(1, &ib.id);
+            glGenBuffers(1, &vb.id);
 
             glBindVertexArray(va);
 
