@@ -506,7 +506,7 @@ namespace xx {
 
     template<typename T> constexpr bool IsShared_v = TemplateIsSame_v<std::remove_cvref_t<T>, Shared<AnyType>>;
     template<typename T> constexpr bool IsWeak_v = TemplateIsSame_v<std::remove_cvref_t<T>, Weak<AnyType>>;
-    template<typename T> constexpr bool IsRef_v = TemplateIsSame_v<std::remove_cvref_t<T>, Weak<AnyType>>;
+    template<typename T> constexpr bool IsRef_v = TemplateIsSame_v<std::remove_cvref_t<T>, Ref<AnyType>>;
 
 
     template<typename T, typename...Args>

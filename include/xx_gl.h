@@ -44,9 +44,18 @@ namespace xx {
 	using GLFrameBuffer = GLRes<GLResTypes::FrameBuffer>;
 	struct GLTexture : GLRes<GLResTypes::Texture> {
 		XY size{};
-		std::string fileName;
+		//std::string fileName;
 		UVRect Rect() const {
 			return { 0,0, (uint16_t)size.x, (uint16_t)size.y };
+		}
+
+		inline static GLuint GenTex(int textureUnit = 0) {
+			GLuint id{};
+			glGenTextures(1, &id);
+			//glActiveTexture(GL_TEXTURE0 + textureUnit);
+			glBindTexture(GL_TEXTURE_2D, id);
+			SetTexParm(id, GL_NEAREST, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
+			return id;
 		}
 
 		// filter:  GL_NEAREST  GL_LINEAR    wraper:  GL_CLAMP_TO_EDGE   GL_REPEAT
@@ -57,29 +66,22 @@ namespace xx {
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, sWraper_);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, tWraper_);
 		}
-		void SetParm(GLuint id_, GLuint minFilter_, GLuint magFilter_, GLuint sWraper_, GLuint tWraper_) {
-			SetTexParm(id, minFilter_, magFilter_, sWraper_, tWraper_);
-		}
 
-		void GenerateMipmap() {
-			glBindTexture(GL_TEXTURE_2D, id);
-			glGenerateMipmap(id);
-		}
-
-		inline static GLuint GenTex(int textureUnit = 0) {
-			GLuint id{};
-			glGenTextures(1, &id);
-			glActiveTexture(GL_TEXTURE0 + textureUnit);
-			glBindTexture(GL_TEXTURE_2D, id);
-			SetTexParm(id, GL_NEAREST, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
-			return id;
-		}
 		void Gen(XY size_, bool hasAlpha_ = true) {
 			assert(id == -1);
 			id = GenTex();
 			auto c = hasAlpha_ ? GL_RGBA : GL_RGB;
 			glTexImage2D(GL_TEXTURE_2D, 0, c, size_.x, size_.y, 0, c, GL_UNSIGNED_BYTE, {});
 			size = size_;
+		}
+
+		void SetParm(GLuint minFilter_, GLuint magFilter_, GLuint sWraper_, GLuint tWraper_) {
+			SetTexParm(id, minFilter_, magFilter_, sWraper_, tWraper_);
+		}
+
+		void GenerateMipmap() {
+			glBindTexture(GL_TEXTURE_2D, id);
+			glGenerateMipmap(id);
 		}
 	};
 
@@ -196,7 +198,7 @@ namespace xx {
 		}
 		glTexImage2D(GL_TEXTURE_2D, 0, colorFormat, w, h, 0, colorFormat, GL_UNSIGNED_BYTE, data);
 		CheckGLError();
-		return { id, {w, h}, std::string(fn) };
+		return { id, {w, h}/*, std::string(fn)*/ };
 	}
 
 

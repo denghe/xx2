@@ -22,13 +22,13 @@ void Game::GLInit() {
 	// init ui
 	ui.Emplace()->InitRoot(scale);
 
-	ui->MakeChildren<xx::Label>()->Init(1, p5 + XY{ 0, -69 }, a5, 48)("hi");
+	ui->Make<xx::Label>()->Init(1, p5 + XY{ 0, -69 }, a5, 48)("hi");
 
-	ui->MakeChildren<xx::LabelButton>()->Init(2, p5 + XY{ 0, 50 }, a5, 48)("change color!!!").onClicked = [this] {
+	ui->Make<xx::LabelButton>()->Init(2, p5 + XY{ 0, 50 }, a5, 48)("change color!!!").onClicked = [this] {
 		heart->ChangeColor();
 	};
 
-	ui->MakeChildren<xx::LabelButton>()->Init(3, p5 + XY{ 0, 0 }, a5, 48)("change anim").onClicked = [this] {
+	ui->Make<xx::LabelButton>()->Init(3, p5 + XY{ 0, 0 }, a5, 48)("change anim").onClicked = [this] {
 		heart->ChangeAnim();
 	};
 

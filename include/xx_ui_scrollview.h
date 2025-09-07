@@ -12,7 +12,7 @@ namespace xx {
 		void Init(int z_, XY const& position_, XY const& scale_, XY const& anchor_, XY const& size_, XY const& contentSize_) {
 			Node::InitDerived<ScrollView>(z_, position_, scale_, anchor_, size_);
 			children.Clear();
-			auto&& c = MakeChildren<Node>();	// children[0] is content node
+			auto&& c = Make<Node>();	// children[0] is content node
 			c->scissor = WeakFromThis(this);
 			CalcDragLimit(contentSize_);
 			c->Init(z_, basePos + dragLimit, { 1,1 }, {}, contentSize_);
@@ -22,7 +22,7 @@ namespace xx {
 		XX_INLINE Shared<T>& MakeContent() {
 			auto& c = children[0];
 			assert(c->scissor.pointer() == this);
-			auto& r = c->MakeChildren<T>();
+			auto& r = c->Make<T>();
 			r->scissor = WeakFromThis(this);
 			return r;
 		}

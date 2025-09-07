@@ -9,7 +9,7 @@ void Scene_MainMenu::Init() {
 	MakeUI();
 	// first boot? popup lang select panel
 	if (!gg.langSelected) {
-		ui->MakeChildren<UI::Settings_Lang>()->Init(100);
+		ui->Make<UI::Settings_Lang>()->Init(100);
 		return;
 	}
 }
@@ -40,33 +40,33 @@ void Scene_MainMenu::MakeUI() {
 
 	ui.Emplace()->InitRoot(gg.scale);
 
-	ui->MakeChildren<xx::Label>()->Init(2, offset, anchor, fontSize * 2)(gg.lang(Strs::gameName));
+	ui->Make<xx::Label>()->Init(2, offset, anchor, fontSize * 2)(gg.lang(Strs::gameName));
 
 	offset.y -= cLineHeight * 1.5;
 
 	auto& img = gg.res.ui_flags_[(int32_t)gg.lang.language];
-	ui->MakeChildren<xx::ImageButton>()->Init(2, offset, anchor, cItemHeight, 4, img).onClicked = [this] {
-		ui->MakeChildren<UI::Settings_Lang>()->Init(100);
+	ui->Make<xx::ImageButton>()->Init(2, offset, anchor, cItemHeight, 4, img).onClicked = [this] {
+		ui->Make<UI::Settings_Lang>()->Init(100);
 	};
 
 	offset.y -= cLineHeight;
-	ui->MakeChildren<xx::LabelButton>()->Init(2, offset, anchor, fontSize)(gg.lang(Strs::play)).onClicked = [this] {
+	ui->Make<xx::LabelButton>()->Init(2, offset, anchor, fontSize)(gg.lang(Strs::play)).onClicked = [this] {
 		gg.MakeScene<Scene_1>()->Init();
 	};
 
 	offset.y -= cLineHeight;
-	ui->MakeChildren<xx::LabelButton>()->Init(2, offset, anchor, fontSize)(gg.lang(Strs::settings)).onClicked = [this] {
-		ui->MakeChildren<UI::Settings>()->Init(100);
+	ui->Make<xx::LabelButton>()->Init(2, offset, anchor, fontSize)(gg.lang(Strs::settings)).onClicked = [this] {
+		ui->Make<UI::Settings>()->Init(100);
 	};
 
 	offset.y -= cLineHeight;
-	ui->MakeChildren<xx::LabelButton>()->Init(2, offset, anchor, fontSize)(gg.lang(Strs::quit)).onClicked = [this] {
+	ui->Make<xx::LabelButton>()->Init(2, offset, anchor, fontSize)(gg.lang(Strs::quit)).onClicked = [this] {
 		gg.running = false;
 	};
 
-	ui->MakeChildren<xx::Label>()->Init(2, gg.p1 + cMargin, gg.a1, fontSize)("ver 0.1");
+	ui->Make<xx::Label>()->Init(2, gg.p1 + cMargin, gg.a1, fontSize)("ver 0.1");
 
-	ui->MakeChildren<xx::Label>()->Init(2, gg.p3 + XY{ -cMargin, cMargin }, gg.a3, fontSize)(gg.lang(Strs::escBack));
+	ui->Make<xx::Label>()->Init(2, gg.p3 + XY{ -cMargin, cMargin }, gg.a3, fontSize)(gg.lang(Strs::escBack));
 }
 
 void Scene_MainMenu::Update() {

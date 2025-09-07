@@ -8,7 +8,7 @@ namespace xx {
 		static constexpr int32_t cTypeId{};							// need set typeId in Init
 
 		List<Shared<Node>> children;
-		Weak<Node> parent;											// fill by MakeChildren
+		Weak<Node> parent;											// fill by Make
 		Weak<Node> scissor;											// fill by scroll view MakeContent
 
         XX_INLINE SimpleAffineTransform& trans(){ return (SimpleAffineTransform&)worldScale; }
@@ -18,7 +18,7 @@ namespace xx {
 		XY position{}, anchor{ 0.5, 0.5 }, scale{ 1, 1 }, size{};
 		XY worldMaxXY{}, worldSize{};								// boundingBox. world coordinate. fill by FillTrans()
 
-		int32_t typeId{};											// fill by MakeChildren( need fill it by other makers )
+		int32_t typeId{};											// fill by Make( need fill it by other makers )
 		int32_t indexAtParentChildren{-1};							// children[idx] == this
 		int z{};													// global z for event priority or batch combine
 		float alpha{ 1 };											// for some logic & draw
@@ -124,7 +124,7 @@ namespace xx {
 		}
 
 		template<typename T, typename = std::enable_if_t<std::is_base_of_v<Node, T>>>
-		XX_INLINE Shared<T>& AddChildren(Shared<T> c) {
+		XX_INLINE Shared<T>& Add(Shared<T> c) {
 			assert(c);
 			assert(!c->parent);
 			c->typeId = T::cTypeId;
@@ -136,8 +136,8 @@ namespace xx {
 		}
 
 		template<typename T, typename = std::enable_if_t<std::is_base_of_v<Node, T>>>
-		XX_INLINE Shared<T>& MakeChildren() {
-			return AddChildren(MakeShared<T>());
+		XX_INLINE Shared<T>& Make() {
+			return Add(MakeShared<T>());
 		}
 
 		template<typename T, typename = std::enable_if_t<std::is_base_of_v<Node, T>>>
@@ -158,7 +158,7 @@ namespace xx {
 			}
 		}
 
-		void SwapRemoveFromParent() {
+		void SwapRemove() {
 			assert(parent);
 			assert(parent->children[indexAtParentChildren].pointer == this);
 			auto i = parent->children.Back()->indexAtParentChildren = indexAtParentChildren;
@@ -170,7 +170,7 @@ namespace xx {
 
 		XX_INLINE void Clear() {
 			for (auto i = children.len - 1; i >= 0; --i) {
-				children[i]->SwapRemoveFromParent();
+				children[i]->SwapRemove();
 			}
 		}
 
@@ -194,7 +194,7 @@ namespace xx {
 		}
 
 		virtual void HandleESC() {								// maybe need override
-			SwapRemoveFromParent();
+			SwapRemove();
 		}
 
 		virtual void TransUpdate() {};

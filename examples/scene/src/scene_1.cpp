@@ -12,8 +12,8 @@ void Scene_1::Init() {
 	static constexpr float cMargin{ 20 };
 	auto fontSize = cItemHeight - gg.defaultCfg.s9bN->paddings.TopBottom();
 	ui.Emplace()->InitRoot(gg.scale);
-	ui->MakeChildren<xx::Label>()->Init(2, gg.p1 + cMargin, gg.a1, fontSize)("ver 0.1");
-	ui->MakeChildren<xx::Label>()->Init(2, gg.p3 + XY{ -cMargin, cMargin }, gg.a3, fontSize)(gg.lang(Strs::escBack));
+	ui->Make<xx::Label>()->Init(2, gg.p1 + cMargin, gg.a1, fontSize)("ver 0.1");
+	ui->Make<xx::Label>()->Init(2, gg.p3 + XY{ -cMargin, cMargin }, gg.a3, fontSize)(gg.lang(Strs::escBack));
 
 	// init game logic
 	cam.Init(gg.scale, 1.f);
@@ -30,14 +30,11 @@ void Scene_1::Init() {
 
 	for (auto y = y1; y < y2; y += r) {
 		for (auto x = x1; x < x2; x += r) {
-			monsters.Emplace().Emplace<Monster>()->Init(this
-				, gg.res.heart, { x + r_2, y + r_2 }, r);
+			monsters.Make<Monster>()->Init(this, gg.res.heart, { x + r_2, y + r_2 }, r);
 		}
 	}
-	monsters.Emplace().Emplace<Monster>()->Init(this
-		, gg.res.heart, { -600, 0 }, 128);
-	monsters.Emplace().Emplace<Monster>()->Init(this
-		, gg.res.heart, { 600, 0 }, 128);
+	monsters.Make<Monster>()->Init(this, gg.res.heart, { -600, 0 }, 128);
+	monsters.Make<Monster>()->Init(this, gg.res.heart, { 600, 0 }, 128);
 }
 
 void Scene_1::Update() {

@@ -33,17 +33,17 @@ namespace UI {
 		auto fontSize = cItemSize.y - gg.defaultCfg.s9bN->paddings.TopBottom();
 
 		// border
-		auto border = MakeChildren<xx::Scale9>();
+		auto border = Make<xx::Scale9>();
 		border->Init(z + 1, 0, 0.5f, cSize);
 
 		// swallow bg
-		MakeChildren<xx::Background>()->Init(z, border.ToWeak()).onOutsideClicked = [] {};
+		Make<xx::Background>()->Init(z, border.ToWeak()).onOutsideClicked = [] {};
 
 		// title
-		MakeChildren<xx::Label>()->Init(z + 2, offset, anchor, fontSize * 2)(gg.lang(Strs::settings));
+		Make<xx::Label>()->Init(z + 2, offset, anchor, fontSize * 2)(gg.lang(Strs::settings));
 
 		offset.y -= cLineHeight * 1.5;
-		uiWindowModes = MakeChildren<xx::DropDownList>();
+		uiWindowModes = Make<xx::DropDownList>();
 		uiWindowModes->InitBegin(z + 2, offset, anchor, cItemSize);
 		uiWindowModes->items.Add(gg.lang(Strs::windowMode), gg.lang(Strs::fullScreenBorderless), gg.lang(Strs::fullScreenExclusive));
 		uiWindowModes->InitEnd();
@@ -65,7 +65,7 @@ namespace UI {
 			};
 
 		offset.y -= cLineHeight;
-		uiResolutions = MakeChildren<xx::DropDownList>();
+		uiResolutions = Make<xx::DropDownList>();
 		uiResolutions->InitBegin(z + 2, offset, anchor, cItemSize);
 		uiResolutions->items.Add(U"1280 x 720", U"1366 x 768", U"1920 x 1080", U"2560 x 1440", U"3840 x 2160");	// todo: block unavailable‌ resolutions
 		uiResolutions->InitEnd(gg.resolutionsIndex);
@@ -93,7 +93,7 @@ namespace UI {
 		};
 
 		offset.y -= cLineHeight;
-		MakeChildren<xx::CheckBox>()->Init(z + 2, offset, anchor, cItemSize, gg.mute)(gg.lang(Strs::mute))
+		Make<xx::CheckBox>()->Init(z + 2, offset, anchor, cItemSize, gg.mute)(gg.lang(Strs::mute))
 			.onValueChanged = [this](bool v) {
 			gg.mute = v;
 			uiAudioVolume->SetEnabledRecursive(!v);
@@ -101,7 +101,7 @@ namespace UI {
 		};
 
 		offset.y -= cLineHeight;
-		uiAudioVolume = MakeChildren<xx::Slider>();
+		uiAudioVolume = Make<xx::Slider>();
 		uiAudioVolume->Init(z + 2, offset, anchor, cItemSize.y
 			, cSliderWidths[0], cSliderWidths[1], cSliderWidths[2], gg.audioVolume)(gg.lang(Strs::audioVolume))
 			.onChanged = [this](double v) {
@@ -109,7 +109,7 @@ namespace UI {
 		};
 
 		offset.y -= cLineHeight;
-		uiMusicVolume = MakeChildren<xx::Slider>();
+		uiMusicVolume = Make<xx::Slider>();
 		uiMusicVolume->Init(z + 2, offset, anchor, cItemSize.y
 			, cSliderWidths[0], cSliderWidths[1], cSliderWidths[2], gg.musicVolume)(gg.lang(Strs::musicVolume))
 			.onChanged = [this](double v) {

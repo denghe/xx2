@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "xx_data.h"
 #include "xx_string.h"
+#include "xx_ptr.h"
 
 namespace xx {
 
@@ -218,6 +219,13 @@ namespace xx {
 			} else {
 				return *new (&buf[len++]) T(std::forward<Args>(args)...);
 			}
+		}
+
+		template<typename U = T::ElementType, typename...Args>
+		XX_INLINE Shared<U>& Make(Args&&...args) requires IsShared_v<T> {
+			auto& r = Emplace();
+			r.Emplace<U>(std::forward<Args>(args)...);
+			return (Shared<U>&)r;
 		}
 
 		template<typename ...TS>

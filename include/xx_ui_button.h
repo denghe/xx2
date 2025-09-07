@@ -55,7 +55,7 @@ namespace xx {
 			cfgHighlight = std::move(cfgHighlight_);
 			FillTrans();
 			auto& cfg = GetCfg();
-			MakeChildren<Scale9>()->Init(z + 1, 0, 0, size, cfg);
+			Make<Scale9>()->Init(z + 1, 0, 0, size, cfg);
 			return *this;
 		}
 

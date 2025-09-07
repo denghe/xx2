@@ -32,8 +32,8 @@ namespace xx {
 			else {
 				assert(fontSize_ > 0);
 			}
-			MakeChildren<Label>()->Init(z + 1, cfg->paddings.LeftBottom(), 0, fontSize_);
-			MakeChildren<Scale9>();
+			Make<Label>()->Init(z + 1, cfg->paddings.LeftBottom(), 0, fontSize_);
+			Make<Scale9>();
 			return *this;
 		}
 

@@ -30,11 +30,11 @@ namespace xx {
 
 			auto& cfg = GetCfg();
 			auto fontSize = size.y - cfg->paddings.TopBottom();
-			MakeChildren<Label>()->Init(z + 1, cfg->paddings.LeftBottom(), 0, fontSize);
+			Make<Label>()->Init(z + 1, cfg->paddings.LeftBottom(), 0, fontSize);
 			auto imgSize = XY{ size.y - cfg->paddings.TopBottom() };
 			assert(imgSize.x > 0 && imgSize.y > 0);
-			MakeChildren<Image>()->Init(z + 2, { size.x - cfg->paddings.right, cfg->paddings.bottom }, { 1, 0 }, imgSize, true, value ? icon1 : icon0);
-			MakeChildren<Scale9>()->Init(z, 0, 0, size, cfg);
+			Make<Image>()->Init(z + 2, { size.x - cfg->paddings.right, cfg->paddings.bottom }, { 1, 0 }, imgSize, true, value ? icon1 : icon0);
+			Make<Scale9>()->Init(z, 0, 0, size, cfg);
 
 			onClicked = [this] {
 				if (!enabled) return;

@@ -51,11 +51,11 @@ namespace xx {
 
 			auto& cfg = GetCfg();
 			auto fontSize = size.y - cfg->paddings.TopBottom();
-			MakeChildren<Label>()->Init(z + 1, cfg->paddings.LeftBottom(), 0, fontSize);
-			MakeChildren<Scale9>();
-			MakeChildren<Scale9>();
-			MakeChildren<Label>()->Init(z + 1, { size.x - cfg->paddings.right,  cfg->paddings.bottom }, { 1, 0 }, fontSize);
-			MakeChildren<Scale9>();
+			Make<Label>()->Init(z + 1, cfg->paddings.LeftBottom(), 0, fontSize);
+			Make<Scale9>();
+			Make<Scale9>();
+			Make<Label>()->Init(z + 1, { size.x - cfg->paddings.right,  cfg->paddings.bottom }, { 1, 0 }, fontSize);
+			Make<Scale9>();
 			ApplyValue();
 			ApplyCfg();
 			return *this;

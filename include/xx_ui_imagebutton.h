@@ -22,8 +22,8 @@ namespace xx {
 			cfgNormal = std::move(cfgNormal_);
 			cfgHighlight = std::move(cfgHighlight_);
 			FillTrans();
-			MakeChildren<Image>()->Init(z_ + 1, 0, 0, fixedSize_, true, std::move(frame_));
-			MakeChildren<Scale9>();
+			Make<Image>()->Init(z_ + 1, 0, 0, fixedSize_, true, std::move(frame_));
+			Make<Scale9>();
 			ApplyCfg();
 			return *this;
 		}

@@ -59,14 +59,14 @@ namespace xx {
 			totalSize = { size.x, size.y * items.len };
 			auto& cfg = GetCfg();
 			auto fontSize = size.y - cfg->paddings.TopBottom();
-			label = MakeChildren<Label>();
+			label = Make<Label>();
 			label->Init(z + 1, cfg->paddings.LeftBottom(), 0, fontSize)(items[selectedIndex]);
 			
 			XY imgSize{ size.y - cfg->paddings.TopBottom() };
 			XY imgPos{ size.x - cfg->paddings.right, cfg->paddings.bottom };
-			MakeChildren<Image>()->Init(z + 2, imgPos, {1, 0}, imgSize, true, icon);
+			Make<Image>()->Init(z + 2, imgPos, {1, 0}, imgSize, true, icon);
 
-			MakeChildren<Scale9>()->Init(z, 0, 0, size, cfg);
+			Make<Scale9>()->Init(z, 0, 0, size, cfg);
 
 			onClicked = [w = WeakFromThis(this)] {
 				assert(w);
@@ -80,20 +80,20 @@ namespace xx {
 		}
 
 		void PopList() {
-			auto itemsBorder = MakeChildren<Scale9>();
+			auto itemsBorder = Make<Scale9>();
 			itemsBorder->Init(z + 1000, 0, { 0, 1 }, totalSize, cfgBG);
 			itemsBorder->inParentArea = false;
 
-			auto itemsContent = MakeChildren<Node>();
+			auto itemsContent = Make<Node>();
 			itemsContent->Init(z + 1001, 0, { 0, 1 }, 1, totalSize);
 			itemsContent->inParentArea = false;
 
 			for (int32_t i = 0; i < items.len; ++i) {
-				itemsContent->MakeChildren<DropDownListItem>()->Init(z + 1001
+				itemsContent->Make<DropDownListItem>()->Init(z + 1001
 					, WeakFromThis(this), i, false);
 			}
 
-			auto itemsBG = MakeChildren<Background>();
+			auto itemsBG = Make<Background>();
 			itemsBG->Init(z + 999, itemsContent).onOutsideClicked = [this] {
 				children.Resize(3);
 			};
@@ -127,9 +127,9 @@ namespace xx {
 		auto& cfg = owner->GetCfg();
 		auto imgSize = XY{ size.y - cfg->paddings.TopBottom() };
 		auto imgColor = idx_ == owner->selectedIndex ? RGBA8_Green : RGBA8_White;
-		MakeChildren<Image>()->Init(z, cfg->paddings.LeftBottom(), 0, imgSize, true, owner->itemHead, {}, imgColor);
+		Make<Image>()->Init(z, cfg->paddings.LeftBottom(), 0, imgSize, true, owner->itemHead, {}, imgColor);
 
-		MakeChildren<Label>()->Init(z, cfg->paddings.LeftBottom() + XY{ imgSize.x, 0 }, 0, size.y - cfg->paddings.TopBottom())(owner->items[idx_]);
+		Make<Label>()->Init(z, cfg->paddings.LeftBottom() + XY{ imgSize.x, 0 }, 0, size.y - cfg->paddings.TopBottom())(owner->items[idx_]);
 	}
 
 	inline void DropDownListItem::SetHighLight(bool b) {
