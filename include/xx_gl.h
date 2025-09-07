@@ -66,7 +66,7 @@ namespace xx {
 			glGenerateMipmap(id);
 		}
 
-		inline static GLuint GenTexture(int textureUnit = 0) {
+		inline static GLuint GenTex(int textureUnit = 0) {
 			GLuint id{};
 			glGenTextures(1, &id);
 			glActiveTexture(GL_TEXTURE0 + textureUnit);
@@ -74,23 +74,13 @@ namespace xx {
 			SetTexParm(id, GL_NEAREST, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
 			return id;
 		}
-		void Init(XY size_, bool hasAlpha_ = true) {
+		void Gen(XY size_, bool hasAlpha_ = true) {
 			assert(id == -1);
-			id = GenTexture();
+			id = GenTex();
 			auto c = hasAlpha_ ? GL_RGBA : GL_RGB;
 			glTexImage2D(GL_TEXTURE_2D, 0, c, size_.x, size_.y, 0, c, GL_UNSIGNED_BYTE, {});
 			size = size_;
 		}
-	};
-
-	struct GLVertTexture : GLRes<GLResTypes::Texture> {
-		XY size{};
-		int32_t numVerts{}, numFrames{};
-	};
-
-	struct GLTiledTexture : GLRes<GLResTypes::Texture> {
-		XY size{};
-		XYi sizeXY;
 	};
 
 	/**********************************************************************************************************************************/
@@ -198,79 +188,72 @@ namespace xx {
 	/**********************************************************************************************************************************/
 	/**********************************************************************************************************************************/
 
+	// data's bytes len == w * h * sizeof(colorFormat)
+	inline GLTexture LoadGLTexture(void* data, GLsizei w, GLsizei h, GLint colorFormat, std::string_view fn) {
+		auto id = GLTexture::GenTex();
+		if (colorFormat == GL_RGBA) {
+			glPixelStorei(GL_UNPACK_ALIGNMENT, 8 - 4 * (w & 0x1));
+		}
+		glTexImage2D(GL_TEXTURE_2D, 0, colorFormat, w, h, 0, colorFormat, GL_UNSIGNED_BYTE, data);
+		CheckGLError();
+		return { id, {w, h}, std::string(fn) };
+	}
+
+
 	inline GLTexture LoadGLTexture(std::string_view buf, std::string_view fullPath) {
 		assert(buf.size() > 12);
 
-		/***********************************************************************************************************************************/
 		// png
-
 		if (buf.starts_with("\x89\x50\x4e\x47\x0d\x0a\x1a\x0a"sv)) {
 			int w, h, comp;
 			if (auto image = stbi_load_from_memory((stbi_uc*)buf.data(), (int)buf.size(), &w, &h, &comp, 0)) {
-				auto c = comp == 3 ? GL_RGB : GL_RGBA;
-				if (comp == 4) {
-					glPixelStorei(GL_UNPACK_ALIGNMENT, 8 - 4 * (w & 0x1));
-				}
-				auto id = GLTexture::GenTexture();
-				glTexImage2D(GL_TEXTURE_2D, 0, c, w, h, 0, c, GL_UNSIGNED_BYTE, image);
-				//glGenerateMipmap(id);
-				CheckGLError();
+				assert(comp == 3 || comp == 4);
+				auto t = LoadGLTexture(image, w, h, comp == 3 ? GL_RGB : GL_RGBA, fullPath);
 				stbi_image_free(image);
-				return { id, XY{w, h}, std::string(fullPath) };
-			}
-			else {
-				CoutN("failed to load texture. fn = ", fullPath);
-				throw fullPath;
+				return t;
 			}
 		}
 
-		/***********************************************************************************************************************************/
 		// jpg
-
 		else if (buf.starts_with("\xFF\xD8"sv)) {
 			int w, h, comp;
 			if (auto image = stbi_load_from_memory((stbi_uc*)buf.data(), (int)buf.size(), &w, &h, &comp, 0)) {
-				auto id = GLTexture::GenTexture();
-				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
-				//glGenerateMipmap(id);
-				CheckGLError();
+				assert(comp == 3 || comp == 4);
+				auto t = LoadGLTexture(image, w, h, GL_RGB, fullPath);
 				stbi_image_free(image);
-				return { id, XY{w, h}, std::string(fullPath) };
-			}
-			else {
-				CoutN("failed to load texture. fn = ", fullPath);
-				throw fullPath;
+				return t;
 			}
 		}
 
-		/***********************************************************************************************************************************/
-		// todo: more format support here
+		// ...
 
-		CoutN("unsupported texture type. fn = ", fullPath);
+		CoutN("failed to load texture. fn = ", fullPath);
 		throw fullPath;
 		return {};
 	}
 
-	// data's bytes len == w * h * sizeof(colorFormat)
-	inline GLTexture LoadGLTexture(void* data, GLsizei w, GLsizei h, GLint colorFormat = GL_RGBA) {
-		auto id = GLTexture::GenTexture();
-		glPixelStorei(GL_UNPACK_ALIGNMENT, 8 - 4 * (w & 0x1));
-		glTexImage2D(GL_TEXTURE_2D, 0, colorFormat, w, h, 0, colorFormat, GL_UNSIGNED_BYTE, data);
-		return { id, {w, h}, "::memory::" };
-	}
-
-	inline GLVertTexture LoadGLVertTexture(void* data, GLsizei w, GLsizei h, int32_t numVerts, int32_t numFrames) {
-		auto id = GLTexture::GenTexture();
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, w, h, 0, GL_RGBA, GL_FLOAT, data);
-		return { id, { w, h }, numVerts, numFrames };
-	}
-
-	inline GLTiledTexture LoadGLTiledTexture(void* data, GLsizei w, GLsizei h, XYi size) {
-		auto id = GLTexture::GenTexture();
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, w, h, 0, GL_RGBA, GL_FLOAT, data);
-		return { id, {w, h}, size };
-	}
-
 	// ...
+
+	//struct GLVertTexture : GLRes<GLResTypes::Texture> {
+	//	XY size{};
+	//	int32_t numVerts{}, numFrames{};
+	//};
+
+	//inline GLVertTexture LoadGLVertTexture(void* data, GLsizei w, GLsizei h, int32_t numVerts, int32_t numFrames) {
+	//	auto id = GLTexture::GenTex();
+	//	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, w, h, 0, GL_RGBA, GL_FLOAT, data);
+	//	return { id, { w, h }, numVerts, numFrames };
+	//}
+
+	//struct GLTiledTexture : GLRes<GLResTypes::Texture> {
+	//	XY size{};
+	//	XYi sizeXY;
+	//};
+
+	//inline GLTiledTexture LoadGLTiledTexture(void* data, GLsizei w, GLsizei h, XYi size) {
+	//	auto id = GLTexture::GenTex();
+	//	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, w, h, 0, GL_RGBA, GL_FLOAT, data);
+	//	return { id, {w, h}, size };
+	//}
 
 }
