@@ -562,18 +562,18 @@ namespace xx {
         return (*(Shared<T>*)&thiz).ToWeak();
     }
 
+    // unsafe
+    template<typename T>
+    Ref<T> RefFromThis(T* thiz) {
+        assert(thiz);
+        return *(Ref<T>*)&thiz;
+    }
+
     template<typename T, typename...Args>
     Ref<T> MakeRef(Args &&...args) {
         Ref<T> rtv;
         rtv.Emplace(std::forward<Args>(args)...);
         return rtv;
-    }
-
-    // unsafe
-    template<typename T>
-    Ref<T>& RefFromThis(T* thiz) {
-        assert(thiz);
-        return (Ref<T>&)thiz;
     }
 
     template<typename U, typename T = U>

@@ -14,6 +14,7 @@ void Game::Init() {
 xx::Task<> Game::Task() {
 	// load res
 	res.heart = LoadTexture("res/heart.png");
+	res.gear = LoadTexture("res/gear.png");
 	res.ui_flags_.Emplace(LoadTexture("res/ui_flags_0.png"));
 	res.ui_flags_.Emplace(LoadTexture("res/ui_flags_1.png"));
 

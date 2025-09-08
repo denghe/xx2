@@ -2,29 +2,35 @@
 #include "scene_play.h"
 #include "equip.h"
 
-void Equip::Init(Scene_Play* scene_, xx::Ref<xx::GLTexture> tex_, XY pos_, float radius_) {
-	scene = scene_;
-	tex = std::move(tex_);
-	pos = pos_;
-	radius = radius_;
-	_1scale = cAnimScaleRange.from;
-}
-
-void Equip::Update() {
-	XX_BEGIN(_1);
-	while (true) {
-		for (; _1scale < cAnimScaleRange.to; _1scale += cAnimStepDelay) {
-			XX_YIELD(_1);
-		}
-		for (; _1scale > cAnimScaleRange.from; _1scale -= cAnimStepDelay) {
-			XX_YIELD(_1);
-		}
+void Equip::Init(Player* owner_, xx::Ref<EquipConfig> cfg_) {
+	owner = owner_;
+	scene = owner_->scene;
+	cfg = std::move(cfg_);
+	location = cfg->location;
+	quality = cfg->quality;
+	auto& cps = cfg->props;
+	props.Reserve(cps.len);
+	for (int32_t i = 0; i < cps.len; ++i) {
+		auto& p = cps[i];
+		float v;
+		if (p.value.from == p.value.to) v = p.value.from;
+		else v = gg.rnd.Next<float>(p.value.from, p.value.to);
+		props.Emplace(EquipProp{ p.target, p.index, v });
 	}
-	XX_END(_1);
 }
 
-void Equip::Draw() {
-	auto& cam = scene->cam;
-	auto scale = _1scale * cam.scale * (radius / tex->size.x);
-	gg.Quad().Draw(*tex, tex->Rect(), cam.ToGLPos(pos), 0.5f, scale);
+void Equip::Combine(Equip& tar) {
+	assert(cfg == tar.cfg);
+	assert(props.len == tar.props.len);
+	for (int32_t i = 0; i < props.len; ++i) {
+		auto& p1 = props[i];
+		auto& p2 = tar.props[i];
+		assert(p1.target == p2.target && p1.index == p2.index);
+		p1.value += p2.value;
+	}
+}
+
+xx::Shared<xx::Node> Equip::GetInfoPanel() {
+	// todo
+	return {};
 }

@@ -7,13 +7,13 @@ namespace UI {
 size: 480, 1080
 +-----------------------------+
 
-           head
+           helm
         ring amulet
            armor
-        hand1 hand2
-           foot
+      weapon1 weapon2
+           boots
 
-
+        ( bag area )
     [] [] [] [] [] [] []
     [] [] [] [] [] [] []
     [] [] [] [] [] [] []

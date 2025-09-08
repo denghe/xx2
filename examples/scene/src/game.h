@@ -19,7 +19,9 @@ struct Game : xx::Game<Game> {
 
 	struct {
 		xx::Ref<xx::GLTexture>
-			heart;
+			heart,
+			gear
+			;
 		xx::List<xx::Ref<xx::GLTexture>> ui_flags_;
 	} res;
 
@@ -30,8 +32,9 @@ struct Game : xx::Game<Game> {
 	float audioVolume{ 1.f }, musicVolume{ 0.5f };
 	int32_t resolutionsIndex{ 2 };
 	// ...
-
 	// todo: save & load config
+	xx::Rnd rnd;
+	// ...
 
 	void Init();
 	xx::Task<> Task();

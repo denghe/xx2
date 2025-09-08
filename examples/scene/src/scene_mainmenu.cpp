@@ -55,7 +55,7 @@ void Scene_MainMenu::MakeUI() {
 	};
 
 	offset.y -= cLineHeight;
-	ui->Make<xx::LabelButton>()->Init(2, offset, anchor, fontSize)(gg.lang(Strs::settings)).onClicked = [this] {
+	ui->Make<xx::ImageLabelButton>()->Init(2, offset, anchor, fontSize)(gg.res.gear, cLineHeight, cItemHeight * 0.5f)(gg.lang(Strs::settings)).onClicked = [this] {
 		ui->Make<UI::Settings>()->Init(100);
 	};
 

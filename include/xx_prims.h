@@ -377,6 +377,7 @@ namespace xx {
         constexpr float LeftRight() const { return left + right; };
         constexpr float TopBottom() const { return top + bottom; };
         constexpr XY Total() const { return { left + right, top + bottom }; };
+        constexpr XY RightTopBottom() const { return { right, top + bottom }; };
     };
 
     template<typename T>

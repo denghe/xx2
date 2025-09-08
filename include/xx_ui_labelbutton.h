@@ -9,6 +9,7 @@ namespace xx {
 
 		XY fixedSize{};
 
+		// step1
 		LabelButton& Init(int z_, XY position_, XY anchor_
 			, float fontSize_ = 0, XY fixedSize_ = {}
 			, Ref<Scale9Config> cfgNormal_ = GameBase_ui::GetInstance()->embed.cfg_s9bN
@@ -37,7 +38,7 @@ namespace xx {
 			return *this;
 		}
 
-		// for easy use
+		// step2
 		template<typename S>
 		LabelButton& operator()(S const& txt_ = {}) {
 			At<Label>(0)(txt_);
@@ -48,10 +49,8 @@ namespace xx {
 		void ApplyCfg() override {
 			assert(children.len == 2);
 			auto& cfg = GetCfg();
-			auto& label = At<Label>(0);
-			
 			if (fixedSize.x > 0) size = fixedSize;
-			else size = label.GetScaledSize() + cfg->paddings.Total();
+			else size = At<Label>(0).GetScaledSize() + cfg->paddings.Total();
 			At<Scale9>(1).Init(z, 0, 0, size, cfg);
 			FillTransRecursive();
 		}
