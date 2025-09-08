@@ -30,7 +30,7 @@ namespace UI {
 		auto basePos = gg.p5;
 		auto offset = basePos + XY{ 0, 300 };
 		auto anchor = gg.a5;
-		auto fontSize = cItemSize.y - gg.defaultCfg.s9bN->paddings.TopBottom();
+		auto fontSize = cItemSize.y - gg.embed.cfg_s9bN->paddings.TopBottom();
 
 		// border
 		auto border = Make<xx::Scale9>();
@@ -115,8 +115,6 @@ namespace UI {
 			.onChanged = [this](double v) {
 			gg.musicVolume = v;
 		};
-
-		// todo: esc back
 
 		// apply config values
 		if (gg.isFullScreen) {

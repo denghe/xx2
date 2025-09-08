@@ -11,8 +11,8 @@ namespace xx {
 
 		LabelButton& Init(int z_, XY position_, XY anchor_
 			, float fontSize_ = 0, XY fixedSize_ = {}
-			, Ref<Scale9Config> cfgNormal_ = GameBase_ui::GetInstance()->defaultCfg.s9bN
-			, Ref<Scale9Config> cfgHighlight_ = GameBase_ui::GetInstance()->defaultCfg.s9bH
+			, Ref<Scale9Config> cfgNormal_ = GameBase_ui::GetInstance()->embed.cfg_s9bN
+			, Ref<Scale9Config> cfgHighlight_ = GameBase_ui::GetInstance()->embed.cfg_s9bH
 		) {
 			assert(children.Empty());
 			assert(typeId == cTypeId);

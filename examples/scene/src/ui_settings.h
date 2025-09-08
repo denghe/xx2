@@ -10,6 +10,4 @@ namespace UI {
 		void Init(int32_t z_);
 	};
 
-	// todo: iconbutton richlabel
-
 }

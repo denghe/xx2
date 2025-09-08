@@ -4,7 +4,11 @@
 namespace xx {
 
 	struct InteractionNode : MouseEventHandlerNode {
-		std::function<void()> onFocus = [] {};	// todo: embed play sound?
+		std::function<void()> onFocus = [] {
+			auto g = GameBase_shader::GetInstance();
+			g->Play(g->embed.ss_ui_focus);
+		};
+
 		Ref<Scale9Config> cfgNormal, cfgHighlight;
 
 		Ref<Scale9Config> const& GetCfg() const {
@@ -44,8 +48,8 @@ namespace xx {
 		std::function<void()> onClicked = [] { CoutN("Button clicked."); };
 
 		Button& Init(int z_, XY position_, XY anchor_, XY size_
-			, Ref<Scale9Config> cfgNormal_ = GameBase_shader::GetInstance()->defaultCfg.s9bN
-			, Ref<Scale9Config> cfgHighlight_ = GameBase_shader::GetInstance()->defaultCfg.s9bH) {
+			, Ref<Scale9Config> cfgNormal_ = GameBase_shader::GetInstance()->embed.cfg_s9bN
+			, Ref<Scale9Config> cfgHighlight_ = GameBase_shader::GetInstance()->embed.cfg_s9bH) {
 			assert(typeId == cTypeId);
 			z = z_;
 			position = position_;

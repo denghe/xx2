@@ -2,34 +2,33 @@
 #include "xx_gamebase.h"
 #include "xx_shader_quad.h"
 #include "xx_ui_scale9config.h"
-#include "xx_default_res.h"
+#include "xx_embeds.h"
 #include "xx_bmfont.h"
+#include "xx_sound.h"
 
 namespace xx {
 
 	// shader support
-	struct alignas(8) GameBase_shader : GameBase {
+	struct alignas(8) GameBase_shader : GameBase, Sound {
 		inline static GameBase_shader* GetInstance() {
 			return (GameBase_shader*)GameBase::instance;
 		}
 
-
+		// shaders
 		Shader_Quad shaderQuad;
 		XX_INLINE Shader_Quad& Quad() { return ShaderBegin(shaderQuad); }
 		// ...
 
-
+		// embed res
 		struct {
 			Ref<Scale9Config>
-				s9bN, 
-				s9bH, 
-				s9bg, 
-				sbar, 
-				sblock;
+				cfg_s9bN, 
+				cfg_s9bH, 
+				cfg_s9bg, 
+				cfg_sbar, 
+				cfg_sblock;
 			// ...
-		} defaultCfg;
 
-		struct {
 			Ref<GLTexture>
 				ui_button,
 				ui_button_h,
@@ -42,63 +41,88 @@ namespace xx {
 				ui_dropdownlist_head,
 				ui_panel,
 				ui_slider_bar,
-				ui_slider_block
-				// ...
-				;
-		} defaultRes;
+				ui_slider_block;
+			// ...
 
-		struct {
-			Ref<BMFont> sys;
-		} defaultFonts;
+			Ref<SoundSource>
+				ss_ui_focus;
+			// ...
+
+			Ref<BMFont> font_sys;
+		} embed;
 
 		void BaseGLInit() {
 			GameBase::BaseGLInit();
 
 			// init pngs
-			defaultRes.ui_button = LoadTextureFromData(defaults::res::png::ui_button);
-			defaultRes.ui_button_h = LoadTextureFromData(defaults::res::png::ui_button_h);
-			defaultRes.ui_button_n = LoadTextureFromData(defaults::res::png::ui_button_n);
-			defaultRes.ui_checkbox_0 = LoadTextureFromData(defaults::res::png::ui_checkbox_0);
-			defaultRes.ui_checkbox_1 = LoadTextureFromData(defaults::res::png::ui_checkbox_1);
-			defaultRes.ui_imgbtn_h = LoadTextureFromData(defaults::res::png::ui_imgbtn_h);
-			defaultRes.ui_imgbtn_n = LoadTextureFromData(defaults::res::png::ui_imgbtn_n);
-			defaultRes.ui_dropdownlist_icon = LoadTextureFromData(defaults::res::png::ui_dropdownlist_icon);
-			defaultRes.ui_dropdownlist_head = LoadTextureFromData(defaults::res::png::ui_dropdownlist_head);
-			defaultRes.ui_panel = LoadTextureFromData(defaults::res::png::ui_panel);
-			defaultRes.ui_slider_bar = LoadTextureFromData(defaults::res::png::ui_slider_bar);
-			defaultRes.ui_slider_block = LoadTextureFromData(defaults::res::png::ui_slider_block);
+			embed.ui_button = LoadTextureFromData(embeds::png::ui_button);
+			embed.ui_button_h = LoadTextureFromData(embeds::png::ui_button_h);
+			embed.ui_button_n = LoadTextureFromData(embeds::png::ui_button_n);
+			embed.ui_checkbox_0 = LoadTextureFromData(embeds::png::ui_checkbox_0);
+			embed.ui_checkbox_1 = LoadTextureFromData(embeds::png::ui_checkbox_1);
+			embed.ui_imgbtn_h = LoadTextureFromData(embeds::png::ui_imgbtn_h);
+			embed.ui_imgbtn_n = LoadTextureFromData(embeds::png::ui_imgbtn_n);
+			embed.ui_dropdownlist_icon = LoadTextureFromData(embeds::png::ui_dropdownlist_icon);
+			embed.ui_dropdownlist_head = LoadTextureFromData(embeds::png::ui_dropdownlist_head);
+			embed.ui_panel = LoadTextureFromData(embeds::png::ui_panel);
+			embed.ui_slider_bar = LoadTextureFromData(embeds::png::ui_slider_bar);
+			embed.ui_slider_block = LoadTextureFromData(embeds::png::ui_slider_block);
 			// ...
 
 			// init cfgs
-			defaultCfg.s9bN.Emplace();
-			defaultCfg.s9bN->frame = defaultRes.ui_button_n;
+			embed.cfg_s9bN.Emplace();
+			embed.cfg_s9bN->frame = embed.ui_button_n;
 
-			defaultCfg.s9bH.Emplace(*defaultCfg.s9bN);
-			defaultCfg.s9bH->frame = defaultRes.ui_button_h;
+			embed.cfg_s9bH.Emplace(*embed.cfg_s9bN);
+			embed.cfg_s9bH->frame = embed.ui_button_h;
 
-			defaultCfg.s9bg.Emplace(*defaultCfg.s9bN);
-			defaultCfg.s9bg->frame = defaultRes.ui_panel;
+			embed.cfg_s9bg.Emplace(*embed.cfg_s9bN);
+			embed.cfg_s9bg->frame = embed.ui_panel;
 
-			defaultCfg.sbar.Emplace(*defaultCfg.s9bN);
-			defaultCfg.sbar->frame = defaultRes.ui_slider_bar;
+			embed.cfg_sbar.Emplace(*embed.cfg_s9bN);
+			embed.cfg_sbar->frame = embed.ui_slider_bar;
 
-			defaultCfg.sblock.Emplace(*defaultCfg.s9bN);
-			defaultCfg.sblock->frame = defaultRes.ui_slider_block;
+			embed.cfg_sblock.Emplace(*embed.cfg_s9bN);
+			embed.cfg_sblock->frame = embed.ui_slider_block;
 			// ...
 
 			// init fonts
-			{
-				defaultFonts.sys.Emplace();
-				defaultFonts.sys->texs.Emplace(LoadTextureFromData(defaults::res::png::font_sys));
+			embed.font_sys.Emplace();
+			embed.font_sys->texs.Emplace(LoadTextureFromData(embeds::png::font_sys));
 
-				auto d = LoadDataFromData(defaults::res::fnt::font_sys);
-				defaultFonts.sys->Init(d, "font_sys", false);
+			{
+				auto d = LoadDataFromData(embeds::fnt::font_sys);
+				embed.font_sys->Init(d, "font_sys", false);
 			}
+
+			// init oggs
+			embed.ss_ui_focus = LoadSoundFromData((uint8_t*)embeds::ogg::ui_focus, _countof(embeds::ogg::ui_focus), false);
 
 			// init shaders
 			shaderQuad.Init();
 			// ...
+
+			// init sound
+			Sound::Init();
 		}
+
+		// d: ogg
+		XX_INLINE Ref<SoundSource> LoadSoundFromData(uint8_t* buf, size_t len, bool looping = false) {
+			assert(!IsCompressedData(buf, len));
+			auto rtv = MakeRef<SoundSource>();
+			rtv->wav.loadMem(buf, len, false, false);
+			if (looping) {
+				rtv->wav.setLooping(true);
+			}
+			return rtv;
+		}
+
+		XX_INLINE Ref<SoundSource> LoadSound(std::string_view fn, bool looping = false) {
+			auto [d, p] = LoadFileData(fn);
+			assert(d);
+			return LoadSoundFromData(d.buf, d.len, looping);
+		}
+
 	};
 
 }

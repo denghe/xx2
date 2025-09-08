@@ -5,16 +5,16 @@
 namespace xx {
 
 	struct CheckBox : Button {
-		static constexpr int32_t cTypeId{ 16 };
+		static constexpr int32_t cTypeId{ 17 };
 		TinyFrame icon0, icon1;
 		bool value{};
 		std::function<void(int32_t)> onValueChanged = [](bool v) { CoutN("CheckBox value = ", v); };
 
 		CheckBox& Init(int z_, XY position_, XY anchor_, XY fixedSize_, bool value_
-			, Ref<Scale9Config> cfgNormal_ = GameBase_shader::GetInstance()->defaultCfg.s9bN
-			, Ref<Scale9Config> cfgHighlight_ = GameBase_shader::GetInstance()->defaultCfg.s9bH
-			, TinyFrame icon0_ = GameBase_shader::GetInstance()->defaultRes.ui_checkbox_0
-			, TinyFrame icon1_ = GameBase_shader::GetInstance()->defaultRes.ui_checkbox_1
+			, Ref<Scale9Config> cfgNormal_ = GameBase_shader::GetInstance()->embed.cfg_s9bN
+			, Ref<Scale9Config> cfgHighlight_ = GameBase_shader::GetInstance()->embed.cfg_s9bH
+			, TinyFrame icon0_ = GameBase_shader::GetInstance()->embed.ui_checkbox_0
+			, TinyFrame icon1_ = GameBase_shader::GetInstance()->embed.ui_checkbox_1
 		) {
 			assert(typeId == cTypeId);
 			z = z_;

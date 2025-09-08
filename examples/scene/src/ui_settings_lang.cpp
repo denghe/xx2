@@ -32,7 +32,7 @@ namespace UI {
 
 		// center pos
 		auto cp = size * 0.5f;
-		auto fontSize = 80 - gg.defaultCfg.s9bN->paddings.TopBottom();
+		auto fontSize = 80 - gg.embed.cfg_s9bN->paddings.TopBottom();
 
 		// title
 		Make<xx::Label>()->Init(z + 2, cp + XY{ 0, 180 }, 0.5, fontSize * 2)(lang(Strs::language));

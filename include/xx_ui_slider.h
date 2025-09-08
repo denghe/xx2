@@ -23,10 +23,10 @@ namespace xx {
 			, float height_
 			, float widthTxtLeft_, float widthBar_, float widthTxtRight_
 			, double value_
-			, Ref<Scale9Config> cfgNormal_ = GameBase_ui::GetInstance()->defaultCfg.s9bN
-			, Ref<Scale9Config> cfgHighlight_ = GameBase_ui::GetInstance()->defaultCfg.s9bH
-			, Ref<Scale9Config> cfgBar_ = GameBase_ui::GetInstance()->defaultCfg.sbar
-			, Ref<Scale9Config> cfgBlock_ = GameBase_ui::GetInstance()->defaultCfg.sblock
+			, Ref<Scale9Config> cfgNormal_ = GameBase_ui::GetInstance()->embed.cfg_s9bN
+			, Ref<Scale9Config> cfgHighlight_ = GameBase_ui::GetInstance()->embed.cfg_s9bH
+			, Ref<Scale9Config> cfgBar_ = GameBase_ui::GetInstance()->embed.cfg_sbar
+			, Ref<Scale9Config> cfgBlock_ = GameBase_ui::GetInstance()->embed.cfg_sblock
 		)
 		{
 			assert(children.Empty());

@@ -1,6 +1,6 @@
 ﻿#include "pch.h"
 #include "scene_mainmenu.h"
-#include "scene_1.h"
+#include "scene_play.h"
 #include "ui_settings.h"
 #include "ui_settings_lang.h"
 
@@ -36,7 +36,7 @@ void Scene_MainMenu::MakeUI() {
 	auto basePos = gg.p5;
 	auto offset = basePos + XY{ 0, 250 };
 	auto anchor = gg.a5;
-	auto fontSize = cItemHeight - gg.defaultCfg.s9bN->paddings.TopBottom();
+	auto fontSize = cItemHeight - gg.embed.cfg_s9bN->paddings.TopBottom();
 
 	ui.Emplace()->InitRoot(gg.scale);
 
@@ -51,7 +51,7 @@ void Scene_MainMenu::MakeUI() {
 
 	offset.y -= cLineHeight;
 	ui->Make<xx::LabelButton>()->Init(2, offset, anchor, fontSize)(gg.lang(Strs::play)).onClicked = [this] {
-		gg.MakeScene<Scene_1>()->Init();
+		gg.MakeScene<Scene_Play>()->Init();
 	};
 
 	offset.y -= cLineHeight;

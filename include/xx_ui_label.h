@@ -14,7 +14,7 @@ namespace xx {
 		static constexpr int32_t cTypeId{ 1 };
 
 		List<LabelChar> chars;
-		Ref<BMFont> bmf = GameBase_shader::GetInstance()->defaultFonts.sys;
+		Ref<BMFont> bmf = GameBase_shader::GetInstance()->embed.font_sys;
 		float fontSize{ 32 };
 		float baseScale{ fontSize / bmf->fontSize };
 		float maxWidth{};

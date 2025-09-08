@@ -1,16 +1,16 @@
 ﻿#include "pch.h"
 #include "scene_play.h"
-#include "monster.h"
+#include "equip.h"
 
-void Monster::Init(Scene_Play* scene_, XY pos_, float radius_) {
+void Equip::Init(Scene_Play* scene_, xx::Ref<xx::GLTexture> tex_, XY pos_, float radius_) {
 	scene = scene_;
-	tex = gg.res.heart;
+	tex = std::move(tex_);
 	pos = pos_;
 	radius = radius_;
 	_1scale = cAnimScaleRange.from;
 }
 
-void Monster::Update() {
+void Equip::Update() {
 	XX_BEGIN(_1);
 	while (true) {
 		for (; _1scale < cAnimScaleRange.to; _1scale += cAnimStepDelay) {
@@ -23,7 +23,7 @@ void Monster::Update() {
 	XX_END(_1);
 }
 
-void Monster::Draw() {
+void Equip::Draw() {
 	auto& cam = scene->cam;
 	auto scale = _1scale * cam.scale * (radius / tex->size.x);
 	gg.Quad().Draw(*tex, tex->Rect(), cam.ToGLPos(pos), 0.5f, scale);

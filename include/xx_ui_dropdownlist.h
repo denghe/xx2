@@ -6,7 +6,7 @@ namespace xx {
 
 	struct DropDownList;
 	struct DropDownListItem : MouseEventHandlerNode {
-		static constexpr int32_t cTypeId{ 15 };
+		static constexpr int32_t cTypeId{ 16 };
 		Weak<DropDownList> owner;
 		int32_t idx{ -1 };
 		bool highLight{};
@@ -32,11 +32,11 @@ namespace xx {
 
 		// init step 1/2
 		DropDownList& InitBegin(int32_t z_, XY position_, XY anchor_, XY fixedSize_
-			, Ref<Scale9Config> cfgNormal_ = GameBase_ui::GetInstance()->defaultCfg.s9bN
-			, Ref<Scale9Config> cfgHighlight_ = GameBase_ui::GetInstance()->defaultCfg.s9bH
-			, Ref<Scale9Config> cfgBG_ = GameBase_ui::GetInstance()->defaultCfg.s9bg
-			, TinyFrame icon_ = GameBase_ui::GetInstance()->defaultRes.ui_dropdownlist_icon
-			, TinyFrame itemHead_ = GameBase_ui::GetInstance()->defaultRes.ui_dropdownlist_head) {
+			, Ref<Scale9Config> cfgNormal_ = GameBase_ui::GetInstance()->embed.cfg_s9bN
+			, Ref<Scale9Config> cfgHighlight_ = GameBase_ui::GetInstance()->embed.cfg_s9bH
+			, Ref<Scale9Config> cfgBG_ = GameBase_ui::GetInstance()->embed.cfg_s9bg
+			, TinyFrame icon_ = GameBase_ui::GetInstance()->embed.ui_dropdownlist_icon
+			, TinyFrame itemHead_ = GameBase_ui::GetInstance()->embed.ui_dropdownlist_head) {
 			assert(typeId == cTypeId);
 			focused = false;
 			z = z_;
