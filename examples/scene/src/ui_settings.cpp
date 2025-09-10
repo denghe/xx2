@@ -9,13 +9,12 @@ namespace UI {
         window modes
 		resolutions
 		   mute
+        master volume
         audio volume
 	    music volume
 					  [ESC]back
 +-----------------------------+
 */
-
-	// todo: Load & Save
 
 	void Settings::Init(int32_t z_) {
 		escHandler = true;

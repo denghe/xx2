@@ -7,7 +7,7 @@ struct Monster {
 	static constexpr float cAnimDuration{ 0.5f };
 	static constexpr float cAnimStepDelay{ cAnimScaleRange.Sub() / (Game::cFps * cAnimDuration) };
 	Scene_Play* scene{};
-	xx::Ref<xx::GLTexture> tex;
+	xx::TinyFrame tf;
 	XY pos{};
 	float radius{};
 	int32_t _1{};	// for coroutine

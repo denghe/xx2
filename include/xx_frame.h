@@ -24,6 +24,11 @@ namespace xx {
             textureRect = tex->Rect();
         }
 
+        TinyFrame(Ref<GLTexture> t, int x, int y, int w, int h) {
+            tex = std::move(t);
+            textureRect = { (uint16_t)x, (uint16_t)y, (uint16_t)w, (uint16_t)h };
+        }
+
         void operator=(Ref<GLTexture> t) {
             tex = std::move(t);
             textureRect = tex->Rect();

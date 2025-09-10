@@ -4,6 +4,7 @@
 Game gg;
 
 // todo: ui add try register update to container? call in event lifecycle?
+// todo: ui's pics combine to font pic ?
 
 int32_t main() {
 	// load settings from player data store file
@@ -45,10 +46,7 @@ void Game::GLInit() {
 
 xx::Task<> Game::Task() {
 	// load res
-	res.heart = LoadTexture("res/heart.png");
-	res.gear = LoadTexture("res/gear.png");
-	res.ui_flags_.Emplace(LoadTexture("res/ui_flags_0.png"));
-	res.ui_flags_.Emplace(LoadTexture("res/ui_flags_1.png"));
+	//res.gear = LoadTexture("res/gear.png");
 
 	// init first scene
 	scene.Emplace<Scene_MainMenu>()->Init();

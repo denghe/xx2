@@ -4,7 +4,7 @@
 
 void Monster::Init(Scene_Play* scene_, XY pos_, float radius_) {
 	scene = scene_;
-	tex = gg.res.heart;
+	tf = gg.embed.icon_heart;
 	pos = pos_;
 	radius = radius_;
 	_1scale = cAnimScaleRange.from;
@@ -25,6 +25,6 @@ void Monster::Update() {
 
 void Monster::Draw() {
 	auto& cam = scene->cam;
-	auto scale = _1scale * cam.scale * (radius / tex->size.x);
-	gg.Quad().Draw(*tex, tex->Rect(), cam.ToGLPos(pos), 0.5f, scale);
+	auto scale = _1scale * cam.scale * (radius / tf.textureRect.w);
+	gg.Quad().Draw(*tf.tex, tf.textureRect, cam.ToGLPos(pos), 0.5f, scale);
 }

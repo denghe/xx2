@@ -32,7 +32,7 @@ namespace xx {
 				cfg_sblock;
 			// ...
 
-			Ref<GLTexture>
+			TinyFrame
 				ui_button,
 				ui_button_h,
 				ui_button_n,
@@ -44,8 +44,12 @@ namespace xx {
 				ui_dropdownlist_head,
 				ui_panel,
 				ui_slider_bar,
-				ui_slider_block;
+				ui_slider_block,
+				icon_gear,
+				icon_heart;
 			// ...
+
+			List<TinyFrame> icon_flags_;
 
 			Ref<SoundSource>
 				ss_ui_focus;
@@ -57,20 +61,34 @@ namespace xx {
 		void BaseGLInit() {
 			GameBase::BaseGLInit();
 
-			// init pngs
-			embed.ui_button = LoadTextureFromData(embeds::png::ui_button);
-			embed.ui_button_h = LoadTextureFromData(embeds::png::ui_button_h);
-			embed.ui_button_n = LoadTextureFromData(embeds::png::ui_button_n);
-			embed.ui_checkbox_0 = LoadTextureFromData(embeds::png::ui_checkbox_0);
-			embed.ui_checkbox_1 = LoadTextureFromData(embeds::png::ui_checkbox_1);
-			embed.ui_imgbtn_h = LoadTextureFromData(embeds::png::ui_imgbtn_h);
-			embed.ui_imgbtn_n = LoadTextureFromData(embeds::png::ui_imgbtn_n);
-			embed.ui_dropdownlist_icon = LoadTextureFromData(embeds::png::ui_dropdownlist_icon);
-			embed.ui_dropdownlist_head = LoadTextureFromData(embeds::png::ui_dropdownlist_head);
-			embed.ui_panel = LoadTextureFromData(embeds::png::ui_panel);
-			embed.ui_slider_bar = LoadTextureFromData(embeds::png::ui_slider_bar);
-			embed.ui_slider_block = LoadTextureFromData(embeds::png::ui_slider_block);
-			// ...
+			// init fonts
+			embed.font_sys.Emplace();
+			embed.font_sys->texs.Emplace(LoadTextureFromData(embeds::png::font_sys));
+
+			{
+				auto d = LoadDataFromData(embeds::fnt::font_sys);
+				embed.font_sys->Init(d, "font_sys", false);
+			}
+
+			// init pngs( texture combined with font )
+			auto& ft = embed.font_sys->texs[0];
+			embed.ui_button = { ft, 944, 1008, 6, 6 };
+			embed.ui_button_h = { ft, 944, 992, 6, 6 };
+			embed.ui_button_n = { ft, 928, 992, 6, 6 };
+			embed.ui_checkbox_0 = { ft, 992, 992, 32, 32 };
+			embed.ui_checkbox_1 = { ft, 960, 992, 32, 32 };
+			embed.ui_imgbtn_h = { ft, 848, 992, 6, 6 };
+			embed.ui_imgbtn_n = { ft, 848, 1008, 6, 6 };
+			embed.ui_dropdownlist_icon = { ft, 896, 992, 32, 32 };
+			embed.ui_dropdownlist_head = { ft, 864, 992, 32, 32 };
+			embed.ui_panel = { ft, 928, 1008, 6, 6 };
+			embed.ui_slider_bar = { ft, 832, 1008, 6, 6 };
+			embed.ui_slider_block = { ft, 832, 992, 6, 6 };
+
+			embed.icon_gear = { ft, 768, 992, 32, 32 };
+			embed.icon_heart = { ft, 802, 997, 29, 24 };
+			embed.icon_flags_.Emplace(ft, 751, 1008, 16, 16);
+			embed.icon_flags_.Emplace(ft, 734, 1008, 16, 16);
 
 			// init cfgs
 			embed.cfg_s9bN.Emplace();
@@ -89,24 +107,15 @@ namespace xx {
 			embed.cfg_sblock->frame = embed.ui_slider_block;
 			// ...
 
-			// init fonts
-			embed.font_sys.Emplace();
-			embed.font_sys->texs.Emplace(LoadTextureFromData(embeds::png::font_sys));
-
-			{
-				auto d = LoadDataFromData(embeds::fnt::font_sys);
-				embed.font_sys->Init(d, "font_sys", false);
-			}
-
 			// init oggs
 			embed.ss_ui_focus = LoadSoundFromData((uint8_t*)embeds::ogg::ui_focus, _countof(embeds::ogg::ui_focus), false);
+
+			// init sound
+			sound.Init();
 
 			// init shaders
 			shaderQuad.Init();
 			// ...
-
-			// init sound
-			sound.Init();
 		}
 
 		// d: ogg

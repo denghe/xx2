@@ -19,11 +19,9 @@ struct Game : xx::Game<Game>, Sav {
 	}
 
 	struct {
-		xx::Ref<xx::GLTexture>
-			heart,
-			gear
-			;
-		xx::List<xx::Ref<xx::GLTexture>> ui_flags_;
+		//xx::Ref<xx::GLTexture>
+		//	gear
+		//	;
 	} res;
 
 	// runtime vars

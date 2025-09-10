@@ -5,7 +5,7 @@
 struct Scene_Play;
 struct Player : PlayerProperties {
 	Scene_Play* scene{};
-	xx::Ref<xx::GLTexture> tex;
+	xx::TinyFrame tf;
 	XY pos{};
 	float radius{};
 	void Init(Scene_Play* scene_, XY pos_, float radius_);

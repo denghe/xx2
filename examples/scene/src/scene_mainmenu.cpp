@@ -44,7 +44,7 @@ void Scene_MainMenu::MakeUI() {
 
 	offset.y -= cLineHeight * 1.5;
 
-	auto& img = gg.res.ui_flags_[(int32_t)gg.lang.language];
+	auto& img = gg.embed.icon_flags_[(int32_t)gg.lang.language];
 	ui->Make<xx::ImageButton>()->Init(2, offset, anchor, cItemHeight, 4, img).onClicked = [this] {
 		ui->Make<UI::Settings_Lang>()->Init(100);
 	};
@@ -55,7 +55,7 @@ void Scene_MainMenu::MakeUI() {
 	};
 
 	offset.y -= cLineHeight;
-	ui->Make<xx::ImageLabelButton>()->Init(2, offset, anchor, fontSize)(gg.res.gear, cLineHeight, cItemHeight * 0.5f)(gg.lang(Strs::settings)).onClicked = [this] {
+	ui->Make<xx::ImageLabelButton>()->Init(2, offset, anchor, fontSize)(gg.embed.icon_gear, cLineHeight, cItemHeight * 0.5f)(gg.lang(Strs::settings)).onClicked = [this] {
 		ui->Make<UI::Settings>()->Init(100);
 	};
 
