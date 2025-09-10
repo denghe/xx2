@@ -4,8 +4,6 @@
 
 namespace xx {
 
-	// todo: test
-
 	struct ImageLabelButton : Button {
 		static constexpr int32_t cTypeId{ 18 };
 

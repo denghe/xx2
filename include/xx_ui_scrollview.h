@@ -4,6 +4,16 @@
 
 namespace xx {
 
+	// todo: test
+	// todo: mouse wheel
+	// todo: register delay func scan mouse btn up
+	//virtual void OnMouseUp(int32_t btnId_) override {
+	//	if (btnId_ != GLFW_MOUSE_BUTTON_LEFT) return;
+	//	auto& eb = *GameBase::instance;
+	//	assert(eb.uiHandler.pointer() == this);
+	//	eb.uiHandler.Reset();
+	//}
+
 	// content align: left-top
 	struct ScrollView : MouseEventHandlerNode, Scissor {
 
@@ -96,14 +106,6 @@ namespace xx {
 			}
 		}
 
-		// todo: mouse wheel
-		// todo: register delay func scan mouse btn up
-		//virtual void OnMouseUp(int32_t btnId_) override {
-		//	if (btnId_ != GLFW_MOUSE_BUTTON_LEFT) return;
-		//	auto& eb = *GameBase::instance;
-		//	assert(eb.uiHandler.pointer() == this);
-		//	eb.uiHandler.Reset();
-		//}
 	};
 
 }
