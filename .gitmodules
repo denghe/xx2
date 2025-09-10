@@ -13,3 +13,6 @@
 [submodule "glfw"]
 	path = glfw
 	url = https://github.com/denghe/glfw
+[submodule "lmdb"]
+	path = lmdb
+	url = https://github.com/denghe/lmdb.git

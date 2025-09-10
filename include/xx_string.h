@@ -361,7 +361,7 @@ namespace xx {
     template<typename T>
     struct StringFuncs<T, std::enable_if_t<std::is_base_of_v<std::string_view, T> || std::is_base_of_v<std::u8string_view, T>>> {
         static inline void Append(std::string& s, T const& in) {
-            s.append((std::string_view&)in);
+            s.append((std::string_view const&)in);
         }
     };
 
@@ -373,13 +373,11 @@ namespace xx {
         }
     };
 
-    // 适配 std::string   //( 前后加引号 )
+    // 适配 std::string
     template<typename T>
-    struct StringFuncs<T, std::enable_if_t<std::is_base_of_v<std::string, T>>> {
+    struct StringFuncs<T, std::enable_if_t<std::is_base_of_v<std::string, T> || std::is_base_of_v<std::u8string, T>>> {
         static inline void Append(std::string& s, T const& in) {
-            //s.push_back('\"');
-            s.append(in);
-            //s.push_back('\"');
+            s.append((std::string const&)in);
         }
     };
 
@@ -387,9 +385,16 @@ namespace xx {
     template<typename T>
     struct StringFuncs<T, std::enable_if_t<std::is_base_of_v<std::u32string, T>>> {
         static inline void Append(std::string& s, T const& in) {
-            //s.push_back('\"');
             StringU32ToU8(s, in);
-            //s.push_back('\"');
+        }
+    };
+
+    // 适配 std::filesystem::path
+    template<typename T>
+    struct StringFuncs<T, std::enable_if_t<std::is_base_of_v<std::filesystem::path, T>>> {
+        static inline void Append(std::string& s, T const& in) {
+            auto u8s = in.u8string();
+            s.append((std::string const&)u8s);
         }
     };
 
@@ -397,9 +402,7 @@ namespace xx {
     template<typename T>
     struct StringFuncs<T, std::enable_if_t<std::is_base_of_v<std::type_info, T>>> {
         static inline void Append(std::string& s, T const& in) {
-            //s.push_back('\"');
             s.append(in.name());
-            //s.push_back('\"');
         }
     };
 

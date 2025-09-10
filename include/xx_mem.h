@@ -10,13 +10,13 @@ namespace xx {
     [[nodiscard]] auto MakeScopeGuard(F&& f) noexcept {
         struct ScopeGuard {
             F f;
-            bool cancel;
-            explicit ScopeGuard(F&& f) noexcept : f(std::forward<F>(f)), cancel(false) {}
-            ~ScopeGuard() noexcept { if (!cancel) { f(); } }
-            inline void Cancel() noexcept { cancel = true; }
-            inline void operator()(bool cancel = false) {
+            bool canceled;
+            explicit ScopeGuard(F&& f) noexcept : f(std::forward<F>(f)), canceled(false) {}
+            ~ScopeGuard() noexcept { if (!canceled) { f(); } }
+            inline void Cancel() noexcept { canceled = true; }
+            inline void operator()(bool canceled_ = false) {
                 f();
-                this->cancel = cancel;
+                canceled = canceled_;
             }
         };
         return ScopeGuard(std::forward<F>(f));

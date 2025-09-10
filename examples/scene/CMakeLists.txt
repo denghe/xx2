@@ -21,6 +21,7 @@ include_directories(
 	../../stb
 	../../soloud/include
 	../../glfw/include
+	../../lmdb/libraries/liblmdb
 )
 
 file(GLOB sources
@@ -51,6 +52,9 @@ SET(ZSTD_MULTITHREAD_SUPPORT_DEFAULT OFF CACHE BOOL "ZSTD_MULTITHREAD_SUPPORT_DE
 SET(ZSTD_MULTITHREAD_SUPPORT OFF CACHE BOOL "ZSTD_MULTITHREAD_SUPPORT" FORCE)
 add_subdirectory(../../zstd/build/cmake zstd)
 target_link_libraries(${name} libzstd_static)
+
+add_subdirectory(../../lmdb lmdb)
+target_link_libraries(${name} lmdb)
 
 if (WIN32)
 	target_link_libraries(${name} winmm)

@@ -3,7 +3,34 @@
 #include "scene_mainmenu.h"
 Game gg;
 
+// todo: ui add try register update to container? call in event lifecycle?
+
 int32_t main() {
+    auto cp = std::filesystem::current_path();
+	xx::CoutN( "curr path = ", cp );
+
+    auto value = "asdfasdfasasdfasdfasasdfasdfasasdfasdfasasdfasdfasasdfasdfasasdfasdfasasdfasdfasasdfasdfasasdfasdfas";
+    {
+        auto secs = xx::NowEpochSeconds();
+        for (int i = 0; i < 1000; ++i) {
+            xx::LMDB db;
+            if (db.Init(cp)) return __LINE__;
+            if (db.Save("asdf", value)) return __LINE__;
+        }
+        xx::CoutN(xx::NowEpochSeconds(secs));
+    }
+
+    {
+        auto secs = xx::NowEpochSeconds();
+        for (int i = 0; i < 1000; ++i) {
+			xx::LMDB db;
+            if (db.Init(cp)) return __LINE__;
+            auto v = db.Load("asdf");
+            if (v != value) return __LINE__;
+        }
+        xx::CoutN(xx::NowEpochSeconds(secs));
+    }
+
 	return gg.Run();
 }
 
