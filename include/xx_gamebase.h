@@ -56,6 +56,10 @@ namespace xx {
 		int32_t drawVerts{}, drawCall{}, drawFPS{};			// counters
 		float drawFPSTimePool{};							// for count drawFPS
 
+		float masterVolume{ 1.f }							// global sound settings
+			, audioVolume{ 1.f }
+			, musicVolume{ 0.5f };
+
 		XY mousePos{};
 		std::array<BtnState, GLFW_MOUSE_BUTTON_LAST + 1 + 4> mouse{};	// +4 for wheel up, down, left, right
 		std::array<float, 4> wheelTimeouts{};				// store mouse wheel timeout
@@ -64,10 +68,14 @@ namespace xx {
 		JoyState joy;										// joy = sum(joys) ( easy access for single player )
 
 		bool running{};										// set false: quit app
+
 		bool focused{};										// user readonly
 		bool isFullScreen{};								// user readonly
 		bool isBorderless{};								// user readonly
 		bool minimized{};									// user readonly
+
+		bool mute{};										// global sound settings
+
 		Weak<MouseEventHandlerNode> uiHandler;
 		Grid2dAABB<MouseEventHandlerNode*> uiGrid;
 

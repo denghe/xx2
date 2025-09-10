@@ -194,7 +194,7 @@ namespace xx {
 				if (key < 0) return;    // macos fn key == -1
 				auto g = (Game*)glfwGetWindowUserPointer(wnd);
 				if (key == GLFW_KEY_ENTER && action == GLFW_PRESS && (mods & GLFW_MOD_ALT)) {
-					if (g->isBorderless) {
+					if (g->isFullScreen) {
 						g->SetWindowMode();
 					}
 					else {

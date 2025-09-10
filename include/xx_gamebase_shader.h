@@ -9,10 +9,13 @@
 namespace xx {
 
 	// shader support
-	struct alignas(8) GameBase_shader : GameBase, Sound {
+	struct alignas(8) GameBase_shader : GameBase {
 		inline static GameBase_shader* GetInstance() {
 			return (GameBase_shader*)GameBase::instance;
 		}
+
+		// sound system
+		Sound sound;
 
 		// shaders
 		Shader_Quad shaderQuad;
@@ -103,7 +106,7 @@ namespace xx {
 			// ...
 
 			// init sound
-			Sound::Init();
+			sound.Init();
 		}
 
 		// d: ogg
@@ -123,6 +126,15 @@ namespace xx {
 			return LoadSoundFromData(d.buf, d.len, looping);
 		}
 
+		XX_INLINE int PlayAudio(Ref<SoundSource> const& ss_, float volume_ = 1.f, float pan_ = 0.f, float speed_ = 1.f) {
+			if (mute || audioVolume == 0) return 0;
+			return sound.Play(ss_, volume_ * audioVolume, pan_, speed_);
+		}
+
+		XX_INLINE int PlayMusic(Ref<SoundSource> const& ss_, float volume_ = 1.f, float pan_ = 0.f, float speed_ = 1.f) {
+			if (mute || musicVolume == 0) return 0;
+			return sound.Play(ss_, volume_ * musicVolume, pan_, speed_);
+		}
 	};
 
 }

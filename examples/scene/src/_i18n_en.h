@@ -17,6 +17,7 @@ namespace i18n {
 		U"full screen (borderless)",
 		U"full screen (exclusive)",
 		U"mute",
+		U"master volume",
 		U"audio volume",
 		U"music volume",
 		U"[ESC] back",

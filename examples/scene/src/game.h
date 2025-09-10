@@ -32,6 +32,7 @@ struct Game : xx::Game<Game>, Sav {
 	// ...
 
 	void Init();
+	void GLInit();
 	xx::Task<> Task();
 	void Delay();
 	void Stat();

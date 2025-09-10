@@ -6,7 +6,7 @@ namespace xx {
 	struct InteractionNode : MouseEventHandlerNode {
 		std::function<void()> onFocus = [] {
 			auto g = GameBase_shader::GetInstance();
-			g->Play(g->embed.ss_ui_focus);
+			g->PlayAudio(g->embed.ss_ui_focus);
 		};
 
 		Ref<Scale9Config> cfgNormal, cfgHighlight;

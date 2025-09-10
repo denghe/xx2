@@ -3,11 +3,18 @@
 
 AJSON(Settings
     , language
+
     , langSelected
     , mute
+    , isFullScreen
+    , isBorderless
+
+    , resolutionsIndex
+
+    , masterVolume
     , audioVolume
     , musicVolume
-    , resolutionsIndex
+
 );
 
 int32_t Sav::SavInit(std::filesystem::path const& dir_) {

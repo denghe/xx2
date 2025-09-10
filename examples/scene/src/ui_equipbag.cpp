@@ -37,5 +37,6 @@ size: 480, 1080
             xx::CoutN("EquipBag clicked");
         };
 
+        // todo
 	}
 }

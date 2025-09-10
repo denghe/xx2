@@ -17,6 +17,7 @@ namespace i18n {
 		fullScreenBorderless,
 		fullScreenExclusive,
 		mute,
+		masterVolume,
 		audioVolume,
 		musicVolume,
 		escBack,
