@@ -10,6 +10,7 @@ namespace xx {
         MDB_val key{}, value{};
         MDB_txn* txn{};
         int r{ MDB_SUCCESS };
+        operator int() const{ return r; }
 
         LMDB() = default;
         LMDB(LMDB const&) = delete;

@@ -1,10 +1,11 @@
 ﻿#pragma once
 #include "pch.h"
 #include "_i18n.h"
+#include "sav.h"
 using namespace i18n;
 using XY = xx::XY;
 
-struct Game : xx::Game<Game> {
+struct Game : xx::Game<Game>, Sav {
 	static constexpr float cFps{ 120 };
 	static constexpr float cDelta{ 1.f / cFps };
 	static constexpr float cMaxDelta{ 0.1f };
@@ -25,14 +26,8 @@ struct Game : xx::Game<Game> {
 		xx::List<xx::Ref<xx::GLTexture>> ui_flags_;
 	} res;
 
-	// config / runtime vars
+	// runtime vars
 	i18n::Lang lang;
-	bool langSelected{};	// avoid always popup first language choose panel
-	bool mute{};
-	float audioVolume{ 1.f }, musicVolume{ 0.5f };
-	int32_t resolutionsIndex{ 2 };
-	// ...
-	// todo: save & load config
 	xx::Rnd rnd;
 	// ...
 

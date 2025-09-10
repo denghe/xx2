@@ -68,7 +68,7 @@ namespace UI {
 		uiResolutions = Make<xx::DropDownList>();
 		uiResolutions->InitBegin(z + 2, offset, anchor, cItemSize);
 		uiResolutions->items.Add(U"1280 x 720", U"1366 x 768", U"1920 x 1080", U"2560 x 1440", U"3840 x 2160");	// todo: block unavailable‌ resolutions
-		uiResolutions->InitEnd(gg.resolutionsIndex);
+		uiResolutions->InitEnd(gg.settings.resolutionsIndex);
 		uiResolutions->onSelectedIndexChanged = [](int32_t idx) {
 			switch (idx) {
 			case 0:
@@ -89,13 +89,13 @@ namespace UI {
 			default:
 				assert(false);
 			}
-			gg.resolutionsIndex = idx;
+			gg.settings.resolutionsIndex = idx;
 		};
 
 		offset.y -= cLineHeight;
-		Make<xx::CheckBox>()->Init(z + 2, offset, anchor, cItemSize, gg.mute)(gg.lang(Strs::mute))
+		Make<xx::CheckBox>()->Init(z + 2, offset, anchor, cItemSize, gg.settings.mute)(gg.lang(Strs::mute))
 			.onValueChanged = [this](bool v) {
-			gg.mute = v;
+			gg.settings.mute = v;
 			uiAudioVolume->SetEnabledRecursive(!v);
 			uiMusicVolume->SetEnabledRecursive(!v);
 		};
@@ -103,17 +103,17 @@ namespace UI {
 		offset.y -= cLineHeight;
 		uiAudioVolume = Make<xx::Slider>();
 		uiAudioVolume->Init(z + 2, offset, anchor, cItemSize.y
-			, cSliderWidths[0], cSliderWidths[1], cSliderWidths[2], gg.audioVolume)(gg.lang(Strs::audioVolume))
+			, cSliderWidths[0], cSliderWidths[1], cSliderWidths[2], gg.settings.audioVolume)(gg.lang(Strs::audioVolume))
 			.onChanged = [this](double v) {
-			gg.audioVolume = v;
+			gg.settings.audioVolume = v;
 		};
 
 		offset.y -= cLineHeight;
 		uiMusicVolume = Make<xx::Slider>();
 		uiMusicVolume->Init(z + 2, offset, anchor, cItemSize.y
-			, cSliderWidths[0], cSliderWidths[1], cSliderWidths[2], gg.musicVolume)(gg.lang(Strs::musicVolume))
+			, cSliderWidths[0], cSliderWidths[1], cSliderWidths[2], gg.settings.musicVolume)(gg.lang(Strs::musicVolume))
 			.onChanged = [this](double v) {
-			gg.musicVolume = v;
+			gg.settings.musicVolume = v;
 		};
 
 		// apply config values
@@ -129,9 +129,14 @@ namespace UI {
 		else {
 			uiResolutions->SetEnabledRecursive(false);
 		}
-		if (gg.mute) {
+		if (gg.settings.mute) {
 			uiAudioVolume->SetEnabledRecursive(false);
 			uiMusicVolume->SetEnabledRecursive(false);
 		}
+	}
+
+	void Settings::HandleESC() {
+		gg.Save();	// todo: handle rtv
+		SwapRemove();
 	}
 }

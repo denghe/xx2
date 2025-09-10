@@ -8,7 +8,7 @@ void Scene_MainMenu::Init() {
 	bak = gg.lang.language;
 	MakeUI();
 	// first boot? popup lang select panel
-	if (!gg.langSelected) {
+	if (!gg.settings.langSelected) {
 		ui->Make<UI::Settings_Lang>()->Init(100);
 		return;
 	}

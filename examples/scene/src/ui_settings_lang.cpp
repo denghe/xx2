@@ -56,12 +56,14 @@ namespace UI {
 		// close
 		Make<xx::LabelButton>()->Init(z + 3, cp + XY{ 0, -300 + 30 }, { 0.5f, 0 }, fontSize)(lang(Strs::close)).onClicked = [this] {
 			gg.lang.Set(lang.language);
+			gg.settings.language = (int32_t)lang.language;
 			HandleESC();
 		};
 	}
 
 	void Settings_Lang::HandleESC() {
-		gg.langSelected = true;
+		gg.settings.langSelected = true;
+		gg.Save();	// todo: check return value ? throw error ?
 		SwapRemove();
 	}
 }

@@ -8,6 +8,7 @@ namespace UI {
 		xx::Weak<xx::DropDownList> uiWindowModes, uiResolutions;
 		xx::Weak<xx::Slider> uiAudioVolume, uiMusicVolume;
 		void Init(int32_t z_);
+		void HandleESC() override;
 	};
 
 }
