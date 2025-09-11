@@ -39,20 +39,20 @@ namespace xx {
 			return *this;
 		}
 
-		XX_INLINE XY ToGLPos_Logic(XY logicPos) const {
-			return (logicPos - original - shaker.offset).FlipY() * logicScale;
+		//XX_INLINE XY ToGLPos_Logic(XY logicPos_) const {
+		//	return (logicPos_ - original - shaker.offset).FlipY() * logicScale;
+		//}
+
+		XX_INLINE XY ToGLPos(XY logicPos_) const {
+			return (logicPos_ - original - shaker.offset).FlipY() * scale;
 		}
 
-		XX_INLINE XY ToGLPos(XY logicPos) const {
-			return (logicPos - original - shaker.offset).FlipY() * scale;
+		XX_INLINE XY ToLogicPos(XY glPos_) const {
+			return { glPos_.x * _1_scale + original.x + shaker.offset.x, -glPos_.y * _1_scale + original.y + shaker.offset.y };
 		}
 
-		XX_INLINE XY ToLogicPos(XY glPos) const {
-			return { glPos.x * _1_scale + original.x + shaker.offset.x, -glPos.y * _1_scale + original.y + shaker.offset.y };
-		}
-
-		XX_INLINE void Update(Rnd& rnd, int32_t time) {
-			shaker.Update(rnd, time);
+		XX_INLINE void Update(Rnd& rnd_, float time_) {
+			shaker.Update(rnd_, time_);
 		}
 	};
 }

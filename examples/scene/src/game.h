@@ -19,9 +19,22 @@ struct Game : xx::Game<Game>, Sav {
 	}
 
 	struct {
-		//xx::Ref<xx::GLTexture>
-		//	gear
-		//	;
+		xx::TinyFrame
+			blade,
+			damage_numbers,
+			hpbar,
+			monster,
+			player
+		;
+
+		xx::List<xx::TinyFrame>
+			explosion_
+		;
+
+		xx::Ref<xx::SoundSource>
+			explosion
+		;
+
 	} res;
 
 	// runtime vars

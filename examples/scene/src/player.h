@@ -2,6 +2,8 @@
 #include "game.h"
 #include "player_properties.h"
 
+// todo: auto attack monster logic
+
 struct Scene_Play;
 struct Player : PlayerProperties {
 	Scene_Play* scene{};

@@ -4,7 +4,7 @@
 
 void Player::Init(Scene_Play* scene_, XY pos_, float radius_) {
 	scene = scene_;
-	tf = gg.embed.icon_heart;
+	tf = gg.res.player;
 	pos = pos_;
 	radius = radius_;
 }

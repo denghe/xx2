@@ -21,6 +21,7 @@ void Scene_Play::Init() {
 	// init game logic
 	cam.Init(gg.scale, 1.f);
 
+#if 0
 	int ny = 80;
 	auto r = gg.designSize.y / ny;
 	auto r_2 = r * 0.5f;
@@ -38,6 +39,8 @@ void Scene_Play::Init() {
 	}
 	monsters.Make<Monster>()->Init(this, { -600, 0 }, 128);
 	monsters.Make<Monster>()->Init(this, { 600, 0 }, 128);
+#endif
+	monsters.Make<Monster>()->Init(this, 0, 128);
 }
 
 void Scene_Play::Update() {

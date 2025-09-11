@@ -108,7 +108,7 @@ namespace xx {
 			// ...
 
 			// init oggs
-			embed.ss_ui_focus = LoadSoundFromData((uint8_t*)embeds::ogg::ui_focus, _countof(embeds::ogg::ui_focus), false);
+			embed.ss_ui_focus = LoadSoundSourceFromData((uint8_t*)embeds::ogg::ui_focus, _countof(embeds::ogg::ui_focus), false);
 
 			// init sound
 			sound.Init();
@@ -119,7 +119,7 @@ namespace xx {
 		}
 
 		// d: ogg
-		XX_INLINE Ref<SoundSource> LoadSoundFromData(uint8_t* buf, size_t len, bool looping = false) {
+		XX_INLINE Ref<SoundSource> LoadSoundSourceFromData(uint8_t* buf, size_t len, bool looping = false) {
 			assert(!IsCompressedData(buf, len));
 			auto rtv = MakeRef<SoundSource>();
 			rtv->wav.loadMem(buf, len, false, false);
@@ -129,10 +129,10 @@ namespace xx {
 			return rtv;
 		}
 
-		XX_INLINE Ref<SoundSource> LoadSound(std::string_view fn, bool looping = false) {
+		XX_INLINE Ref<SoundSource> LoadSoundSource(std::string_view fn, bool looping = false) {
 			auto [d, p] = LoadFileData(fn);
 			assert(d);
-			return LoadSoundFromData(d.buf, d.len, looping);
+			return LoadSoundSourceFromData(d.buf, d.len, looping);
 		}
 
 		XX_INLINE int PlayAudio(Ref<SoundSource> const& ss_, float volume_ = 1.f, float pan_ = 0.f, float speed_ = 1.f) {

@@ -4,13 +4,13 @@
 
 void Monster::Init(Scene_Play* scene_, XY pos_, float radius_) {
 	scene = scene_;
-	tf = gg.embed.icon_heart;
-	pos = pos_;
+	tf = gg.res.monster;
+	ori = pos = pos_;
 	radius = radius_;
 	_1scale = cAnimScaleRange.from;
 }
 
-void Monster::Update() {
+void Monster::Idle_1() {
 	XX_BEGIN(_1);
 	while (true) {
 		for (; _1scale < cAnimScaleRange.to; _1scale += cAnimStepDelay) {
@@ -21,6 +21,17 @@ void Monster::Update() {
 		}
 	}
 	XX_END(_1);
+}
+
+void Monster::Update() {
+	if (shaking) {
+		shaker.Update(gg.rnd, scene->time);
+		pos = ori + shaker.offset;
+	}
+	else {
+		pos = ori;
+		Idle_1();
+	}
 }
 
 void Monster::Draw() {

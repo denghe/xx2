@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "xx_prims.h"
+#include "xx_rnd.h"
 
 namespace xx {
 
@@ -42,4 +43,15 @@ namespace xx {
     XX_INLINE static float CalcBounce(float x) {
         return 1.f - std::expf(-5.f * x) * std::cosf(6.f * (float)M_PI * x);
     }
+
+
+    XX_INLINE static XY GetRndPosDoughnut(Rnd& rnd_, float maxRadius_, float safeRadius_) {
+        auto len = maxRadius_ - safeRadius_;
+        auto len_radius = len / maxRadius_;
+        auto safeRadius_radius = safeRadius_ / maxRadius_;
+        auto radius = std::sqrtf(rnd_.Next<float>(0, len_radius) + safeRadius_radius) * maxRadius_;
+        auto radians = rnd_.Next<float>(-M_PI, M_PI);
+        return { std::cosf(radians) * radius, std::sinf(radians) * radius };
+    }
+
 }

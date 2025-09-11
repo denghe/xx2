@@ -43,7 +43,23 @@ void Game::GLInit() {
 
 xx::Task<> Game::Task() {
 	// load res
-	//res.gear = LoadTexture("res/gear.png");
+	res.blade = LoadTexture("res/blade.png");
+	res.damage_numbers = LoadTexture("res/damage_numbers.png");
+	res.hpbar = LoadTexture("res/hpbar.png");
+	res.monster = LoadTexture("res/monster.png");
+	res.player = LoadTexture("res/player.png");
+
+	res.explosion_.Add(
+		LoadTexture("res/explosion_0.png"),
+		LoadTexture("res/explosion_1.png"),
+		LoadTexture("res/explosion_2.png"),
+		LoadTexture("res/explosion_3.png"),
+		LoadTexture("res/explosion_4.png"),
+		LoadTexture("res/explosion_5.png"),
+		LoadTexture("res/explosion_6.png")
+	);
+
+	res.explosion = LoadSoundSource("res/explosion.ogg");
 
 	// init first scene
 	scene.Emplace<Scene_MainMenu>()->Init();
