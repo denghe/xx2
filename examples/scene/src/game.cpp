@@ -3,9 +3,6 @@
 #include "scene_mainmenu.h"
 Game gg;
 
-// todo: ui add try register update to container? call in event lifecycle?
-// todo: ui's pics combine to font pic ?
-
 int32_t main() {
 	// load settings from player data store file
 	if (int r = gg.SavInit(std::filesystem::current_path())) return r;
@@ -77,7 +74,8 @@ void Game::Stat() {
 #if 1
 	xx::CoutN("drawFPS = ", drawFPS, " drawCall = "
 		, drawCall, " drawVerts = ", drawVerts
-		, " delayFuncs.len = ", delayFuncs.len
+		, " uiAutoUpdates.len = ", uiAutoUpdates.len
+		, " delayUpdates.len = ", delayUpdates.len
 	);
 #endif
 }

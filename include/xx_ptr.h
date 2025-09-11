@@ -564,6 +564,13 @@ namespace xx {
 
     // unsafe
     template<typename T>
+    auto WeakPointerFromThis(T* thiz) {
+        assert(thiz);
+        return (*(Shared<T>*) & thiz).GetHeader();
+    }
+
+    // unsafe
+    template<typename T>
     Ref<T> RefFromThis(T* thiz) {
         assert(thiz);
         return *(Ref<T>*)&thiz;

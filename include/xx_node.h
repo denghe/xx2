@@ -4,6 +4,7 @@
 
 namespace xx {
 
+	struct MouseEventHandlerNode;
 	struct alignas(8) Node {
 		static constexpr int32_t cTypeId{};							// need set typeId in Init
 
@@ -149,7 +150,7 @@ namespace xx {
 		XX_INLINE void SetToUIHandler(bool handle) {
 			auto& h = GameBase::instance->uiHandler;
 			if (handle) {
-				h = WeakFromThis((struct MouseEventHandlerNode*)this);
+				h = WeakFromThis((MouseEventHandlerNode*)this);
 			}
 			else {
 				if ((Node*)h.TryGetPointer() == this) {
@@ -197,6 +198,16 @@ namespace xx {
 			SwapRemove();
 		}
 
+		void TryRegisterAutoUpdate() {
+			auto& c = GameBase::instance->uiAutoUpdates;
+			auto w = WeakFromThis(this);
+			for (int32_t i = 0, e = c.len; i < e; ++i) {
+				if (c[i].h == w.h) return;
+			}
+			c.Emplace(std::move(w));
+		}
+
+		virtual int32_t Update() { return 0; };					// return !0 mean quit auto update
 		virtual void TransUpdate() {};
 		virtual void Draw() {};									// draw current node only ( do not contain children )
 		virtual ~Node() {};

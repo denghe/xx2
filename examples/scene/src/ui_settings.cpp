@@ -21,7 +21,7 @@ namespace UI {
 		children.Clear();	// unsafe
 		InitDerived<Settings>(z_);
 
-		static constexpr XY cSize{ 1100, 830 };
+		static constexpr XY cSize{ 1100, 900 };
 		static constexpr XY cItemSize{ 1000, 80 };
 		static constexpr float cLineHeight{ 100 };
 		static constexpr float cSliderWidths[]{ 400, 450, 150 };

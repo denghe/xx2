@@ -16,8 +16,8 @@ namespace xx {
 		void SetHighLight(bool enable);
 
 		virtual int32_t OnMouseDown(int32_t btnId_) override;
-
 		virtual int32_t OnMouseMove() override;
+		virtual int32_t Update() override;
 	};
 
 	struct DropDownList : Button {
@@ -149,17 +149,16 @@ namespace xx {
 	inline int32_t DropDownListItem::OnMouseMove() {
 		if (!highLight) {
 			SetHighLight(true);
-			GameBase::instance->delayFuncs.Emplace([w = WeakFromThis(this)] {
-				auto p = w.TryGetPointer();
-				if (!p) return 1;
-				if (!p->MousePosInArea()) {
-					p->SetHighLight(false);
-					return 1;
-				}
-				return 0;
-				});
+			TryRegisterAutoUpdate();
 		}
 		return 1;
 	}
 
+	inline int32_t DropDownListItem::Update() {
+		if (!MousePosInArea()) {
+			SetHighLight(false);
+			return 1;
+		}
+		return 0;
+	}
 }

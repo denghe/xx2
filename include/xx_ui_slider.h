@@ -131,24 +131,25 @@ namespace xx {
 			if (!enabled) return 0;
 			if (!focused) {
 				SetFocus();
-				GameBase::instance->delayFuncs.Emplace([w = WeakFromThis(this)] {
-					auto p = w.TryGetPointer();
-					if (!p) return 1;
-					if (GameBase::instance->uiHandler.TryGetPointer() != p || !p->MousePosInArea()) {
-						p->LostFocus();
-						p->DragEnd();
-						return 1;
-					}
-					if (!GameBase::instance->mouse[GLFW_MOUSE_BUTTON_LEFT]) {
-						p->DragEnd();
-					}
-					return 0;
-				});
+				TryRegisterAutoUpdate();
 			}
 			if (blockMoving) {
 				OnMouseDown(GLFW_MOUSE_BUTTON_LEFT);
 			}
 			return 1;
+		}
+
+		int32_t Update() override {
+			auto g = GameBase::instance;
+			if (g->uiHandler.TryGetPointer() != this || !MousePosInArea()) {
+				LostFocus();
+				DragEnd();
+				return 1;
+			}
+			if (!g->mouse[GLFW_MOUSE_BUTTON_LEFT]) {
+				DragEnd();
+			}
+			return 0;
 		}
 
 	};

@@ -274,7 +274,7 @@ namespace xx {
 				((Derived*)this)->Update();											// lifeCycle 7 ( loop )
 			}
 
-			this->ExecuteDelayFuncs();												// lifeCycle 8 ( loop )
+			this->ExecuteDelayUpdates();												// lifeCycle 8 ( loop )
 
 			this->ShaderEnd();
 

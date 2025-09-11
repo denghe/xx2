@@ -84,18 +84,17 @@ namespace xx {
 			if (!enabled) return 0;
 			if (!focused) {
 				SetFocus();
-				GameBase::instance->delayFuncs.Emplace([w = WeakFromThis(this)] {
-					auto p = w.TryGetPointer();
-					if (!p) return 1;
-					if (GameBase::instance->uiHandler.TryGetPointer() != p
-						|| !p->MousePosInArea()) {
-						p->LostFocus();
-						return 1;
-					}
-					return 0;
-				});
+				TryRegisterAutoUpdate();
 			}
 			return 1;
+		}
+
+		virtual int32_t Update() override {
+			if (GameBase::instance->uiHandler.TryGetPointer() != this || !MousePosInArea()) {
+				LostFocus();
+				return 1;
+			}
+			return 0;
 		}
 
 	};

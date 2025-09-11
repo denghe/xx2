@@ -9,7 +9,6 @@
 namespace xx {
 
 	struct Node;
-	struct MouseEventHandlerNode;
 
 	// engine base code
 	struct alignas(8) GameBase {
@@ -76,8 +75,9 @@ namespace xx {
 
 		bool mute{};										// global sound settings
 
-		Weak<MouseEventHandlerNode> uiHandler;
-		Grid2dAABB<MouseEventHandlerNode*> uiGrid;
+		Weak<Node> uiHandler;
+		Grid2dAABB<Node*> uiGrid;
+		List<Weak<Node>> uiAutoUpdates;
 
 		Shader* shader{};
 
@@ -85,18 +85,18 @@ namespace xx {
 		std::vector<std::string> searchPaths;
 		std::filesystem::path tmpPath;
 
-		List<std::function<int32_t()>> delayFuncs;			// call after update
+		List<std::function<int32_t()>> delayUpdates;			// call after update
 		Task<> baseTask;
 #ifndef __EMSCRIPTEN__
 		GLFWwindow* wnd{};
 #endif
 
 		// example:
-		// GameBase::instance->delayFuncs.Emplace([w = WeakFromThis(this)] { if (!w) return 1; return 0; });
-		void ExecuteDelayFuncs() {
-			for (int32_t i = delayFuncs.len - 1; i >= 0; --i) {
-				if (delayFuncs[i]()) {
-					delayFuncs.SwapRemoveAt(i);
+		// GameBase::instance->delayUpdates.Emplace([w = WeakFromThis(this)] { if (!w) return 1; return 0; });
+		void ExecuteDelayUpdates() {
+			for (int32_t i = delayUpdates.len - 1; i >= 0; --i) {
+				if (delayUpdates[i]()) {
+					delayUpdates.SwapRemoveAt(i);
 				}
 			}
 		}

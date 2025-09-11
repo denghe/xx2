@@ -126,6 +126,13 @@ namespace xx {
 		}
 
 		void BaseUpdate() {
+			// call ui auto updates
+			for (int32_t i = uiAutoUpdates.len - 1; i >= 0; --i) {
+				auto& o = uiAutoUpdates[i];
+				if (!o || o->Update()) {
+					uiAutoUpdates.SwapRemoveAt(i);
+				}
+			}
 
 			// fill all joystick data
 			joy.ClearValues();
