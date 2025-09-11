@@ -49,7 +49,7 @@ namespace xx {
 			return { 0,0, (uint16_t)size.x, (uint16_t)size.y };
 		}
 
-		inline static GLuint GenTex(int textureUnit = 0) {
+		inline static GLuint MakeTex(int textureUnit = 0) {
 			GLuint id{};
 			glGenTextures(1, &id);
 			//glActiveTexture(GL_TEXTURE0 + textureUnit);
@@ -67,9 +67,9 @@ namespace xx {
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, tWraper_);
 		}
 
-		void Gen(XY size_, bool hasAlpha_ = true) {
+		void Make(XY size_, bool hasAlpha_ = true) {
 			assert(id == -1);
-			id = GenTex();
+			id = MakeTex();
 			auto c = hasAlpha_ ? GL_RGBA : GL_RGB;
 			glTexImage2D(GL_TEXTURE_2D, 0, c, size_.x, size_.y, 0, c, GL_UNSIGNED_BYTE, {});
 			size = size_;
@@ -192,7 +192,7 @@ namespace xx {
 
 	// data's bytes len == w * h * sizeof(colorFormat)
 	inline GLTexture LoadGLTexture(void* data, GLsizei w, GLsizei h, GLint colorFormat, std::string_view fn) {
-		auto id = GLTexture::GenTex();
+		auto id = GLTexture::MakeTex();
 		if (colorFormat == GL_RGBA) {
 			glPixelStorei(GL_UNPACK_ALIGNMENT, 8 - 4 * (w & 0x1));
 		}

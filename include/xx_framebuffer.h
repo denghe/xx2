@@ -10,15 +10,8 @@ namespace xx {
         std::array<uint32_t, 3> bakBlend{};
 
         // need ogl frame env
-        explicit FrameBuffer(bool autoInit = false) {
-            if (autoInit) {
-                Init();
-            }
-        }
-
-        // need ogl frame env
         FrameBuffer& Init() {
-            assert(!fb);   // excessive initializations ?
+            assert(fb == (GLuint)-1);
             fb = MakeGLFrameBuffer();
             return *this;
         }
@@ -44,8 +37,8 @@ namespace xx {
             g.ShaderEnd();
             bakWndSiz = g.windowSize;
             bakBlend = g.blend;
-            bakTexSiz = { t->Width(), t->Height() };
-            g.SetWindowSize(t->Size());
+            bakTexSiz = t->size;
+            g.SetWindowSize(t->size);
             g.flipY = -1;
             BindGLFrameBufferTexture(fb, *t);
             g.GLViewport();

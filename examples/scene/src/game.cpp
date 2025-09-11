@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 #include "game.h"
 #include "scene_mainmenu.h"
+#include "xx_rectpacker.h"
 Game gg;
 
 int32_t main() {
@@ -42,10 +43,15 @@ void Game::GLInit() {
 }
 
 xx::Task<> Game::Task() {
-	// load res
+	// begin load res
+
+	// ogg
+	res.explosion = LoadSoundSource("res/explosion.ogg");
+
+	// png
 	res.blade = LoadTexture("res/blade.png");
-	res.damage_numbers = LoadTexture("res/damage_numbers.png");
-	res.hpbar = LoadTexture("res/hpbar.png");
+	res.damage_numbers = LoadTexture("res/damage_numbers.png");	// do not pack
+	res.hpbar = LoadTexture("res/hpbar.png");					// do not pack
 	res.monster = LoadTexture("res/monster.png");
 	res.player = LoadTexture("res/player.png");
 
@@ -59,7 +65,19 @@ xx::Task<> Game::Task() {
 		LoadTexture("res/explosion_6.png")
 	);
 
-	res.explosion = LoadSoundSource("res/explosion.ogg");
+	// combine some pngs into single texture
+	xx::RectPacker tp;
+	tp.tfs.Add(
+		&res.blade
+		, &res.monster
+		, &res.player
+	);
+	for (auto& tf : res.explosion_) {
+		tp.tfs.Add(&tf);
+	}
+	if (auto r = tp.Pack(256); r) {
+		xx::CoutN("pack failed");
+	}
 
 	// init first scene
 	scene.Emplace<Scene_MainMenu>()->Init();
