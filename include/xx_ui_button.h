@@ -47,7 +47,7 @@ namespace xx {
 
 		std::function<void()> onClicked = [] { CoutN("Button clicked."); };
 
-		Button& Init(int z_, XY position_, XY anchor_, XY size_
+		Button& Init(int32_t z_, XY position_, XY anchor_, XY size_
 			, Ref<Scale9Config> cfgNormal_ = GameBase_shader::GetInstance()->embed.cfg_s9bN
 			, Ref<Scale9Config> cfgHighlight_ = GameBase_shader::GetInstance()->embed.cfg_s9bH) {
 			assert(typeId == cTypeId);

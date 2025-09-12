@@ -10,7 +10,7 @@ namespace xx {
 		bool value{};
 		std::function<void(int32_t)> onValueChanged = [](bool v) { CoutN("CheckBox value = ", v); };
 
-		CheckBox& Init(int z_, XY position_, XY anchor_, XY fixedSize_, bool value_
+		CheckBox& Init(int32_t z_, XY position_, XY anchor_, XY fixedSize_, bool value_
 			, Ref<Scale9Config> cfgNormal_ = GameBase_shader::GetInstance()->embed.cfg_s9bN
 			, Ref<Scale9Config> cfgHighlight_ = GameBase_shader::GetInstance()->embed.cfg_s9bH
 			, TinyFrame icon0_ = GameBase_shader::GetInstance()->embed.ui_checkbox_0

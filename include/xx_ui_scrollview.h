@@ -19,7 +19,7 @@ namespace xx {
 
 		XY basePos{}, dragLimit{};
 
-		void Init(int z_, XY const& position_, XY const& scale_, XY const& anchor_, XY const& size_, XY const& contentSize_) {
+		void Init(int32_t z_, XY const& position_, XY const& scale_, XY const& anchor_, XY const& size_, XY const& contentSize_) {
 			Node::InitDerived<ScrollView>(z_, position_, scale_, anchor_, size_);
 			children.Clear();
 			auto&& c = Make<Node>();	// children[0] is content node

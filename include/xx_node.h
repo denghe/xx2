@@ -4,7 +4,19 @@
 
 namespace xx {
 
+	// for rich label
+	enum class VAligns : uint8_t {
+		Top,
+		Center,
+		Bottom
+	};
+	enum class HAligns : uint8_t {
+		Left,
+		Center,
+		Right
+	};
 	struct MouseEventHandlerNode;
+
 	struct alignas(8) Node {
 		static constexpr int32_t cTypeId{};							// need set typeId in Init
 
@@ -21,15 +33,17 @@ namespace xx {
 
 		int32_t typeId{};											// fill by Make( need fill it by other makers )
 		int32_t indexAtParentChildren{-1};							// children[idx] == this
-		int z{};													// global z for event priority or batch combine
+		int32_t z{};												// global z for event priority or batch combine
 		float alpha{ 1 };											// for some logic & draw
 		bool inParentArea{ true };									// for child cut check. dropdownlist = false
 		bool visible{ true };										// false: do not draw
 		bool enabled{ true };										// false: do not callback & colorplus = 0.5f
 		bool selected{ false };										// draw: always highlight
 		bool focused{ false };										// true: highlight
-		bool escHandler{ false };
+		bool escHandler{ false };									// true for FindTopESCHandler
+		VAligns valign{ VAligns::Center };							// only for ui_richlabel
 		// ...
+
 
 		XX_INLINE XY GetScaledSize() const {
 			return scale * size;
@@ -104,7 +118,7 @@ namespace xx {
 		}
 
 		template<typename Derived>
-		XX_INLINE Derived& InitDerived(int z_ = 0, XY position_ = {}, XY anchor_ = {}, XY scale_ = { 1,1 }, XY size_ = {}) {
+		XX_INLINE Derived& InitDerived(int32_t z_ = 0, XY position_ = {}, XY anchor_ = {}, XY scale_ = { 1,1 }, XY size_ = {}) {
 			assert(typeId == Derived::cTypeId);
 			z = z_;
 			position = position_;
@@ -115,7 +129,7 @@ namespace xx {
 			return (Derived&)*this;
 		}
 
-		XX_INLINE Node& Init(int z_ = 0, XY position_ = {}, XY anchor_ = {}, XY scale_ = { 1,1 }, XY size_ = {}) {
+		XX_INLINE Node& Init(int32_t z_ = 0, XY position_ = {}, XY anchor_ = {}, XY scale_ = { 1,1 }, XY size_ = {}) {
 			return InitDerived<Node>(z_, position_, anchor_, scale_, size_);
 		}
 
@@ -124,6 +138,7 @@ namespace xx {
 			return Init(0, 0, 0, scale_);
 		}
 
+		// warning: return value will failure when children resize if use "auto& rtv = 
 		template<typename T, typename = std::enable_if_t<std::is_base_of_v<Node, T>>>
 		XX_INLINE Shared<T>& Add(Shared<T> c) {
 			assert(c);
@@ -136,6 +151,7 @@ namespace xx {
 			return (Shared<T>&)children.Emplace(std::move(c));
 		}
 
+		// warning: return value will failure when children resize if use "auto& rtv = 
 		template<typename T, typename = std::enable_if_t<std::is_base_of_v<Node, T>>>
 		XX_INLINE Shared<T>& Make() {
 			return Add(MakeShared<T>());

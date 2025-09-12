@@ -9,7 +9,7 @@ namespace xx {
 		std::function<void()> onOutsideClicked = [] { CoutN("Background Outside clicked."); };
 		Weak<Node> content;
 
-		Background& Init(int z_, Weak<Node> contentArea_) {
+		Background& Init(int32_t z_, Weak<Node> contentArea_) {
 			escHandler = true;
 			Node::InitDerived<Background>(z_, 0, 0.5, 1, GameBase::instance->uiGrid.worldSize);
 			content = std::move(contentArea_);

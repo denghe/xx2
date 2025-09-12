@@ -8,7 +8,7 @@ namespace xx {
 		static constexpr int32_t cTypeId{ 12 };
 		float borderWidth{};
 
-		ImageButton& Init(int z_, XY position_, XY anchor_, XY fixedSize_, float borderWidth_
+		ImageButton& Init(int32_t z_, XY position_, XY anchor_, XY fixedSize_, float borderWidth_
 			, TinyFrame frame_
 			, Ref<Scale9Config> cfgNormal_ = GameBase_ui::GetInstance()->embed.cfg_s9bN
 			, Ref<Scale9Config> cfgHighlight_ = GameBase_ui::GetInstance()->embed.cfg_s9bH

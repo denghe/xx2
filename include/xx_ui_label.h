@@ -17,10 +17,9 @@ namespace xx {
 		Ref<BMFont> bmf = GameBase_shader::GetInstance()->embed.font_sys;
 		float fontSize{ 32 };
 		float baseScale{ fontSize / bmf->fontSize };
-		float maxWidth{};
 		RGBA8 color{};
 
-		Label& Init(int z_, XY position_, XY anchor_ = 0, float fontSize_ = 32, float maxWidth_ = 0, RGBA8 color_ = RGBA8_White) {
+		Label& Init(int32_t z_, XY position_, XY anchor_ = 0, float fontSize_ = 32, RGBA8 color_ = RGBA8_White) {
 			assert(typeId == cTypeId);
 			z = z_;
 			position = position_;
@@ -28,7 +27,6 @@ namespace xx {
 			color = color_;
 			fontSize = fontSize_;
 			baseScale = fontSize / bmf->fontSize;
-			maxWidth = maxWidth_;
 			return *this;
 		}
 
@@ -41,34 +39,24 @@ namespace xx {
 		// S : literal string u8/32string [view]
 		template<typename S>
 		Label& SetText(S const& txt_ = {}) {
-			auto len = (int32_t)StrLen(txt_);
-			if (!len) {
+			return SetText(StrPtr(txt_), StrLen(txt_));
+		}
+
+		// S : literal string u8/32string [view]
+		template<typename C>
+		Label& SetText(C const* txt_, size_t len_) {
+			if (!len_) {
 				chars.Clear();
 				return *this;
 			}
-			chars.Resize(len);
 			float px{}, py{}, maxpx{}, lineHeight = bmf->lineHeight * baseScale
 				, fontDefaultWidth = bmf->fontSize * baseScale;
-			for (int i = 0; i < len; ++i) {
+			for (int32_t i = 0; i < len_; ++i) {
 				auto t = txt_[i];
-				if (t == '\r') continue;
-				else if (t == '\n') {
-					px = 0;
-					py -= lineHeight;
-				}
-				else if (auto r = bmf->Get(t); r) {
+				if (t == '\r' || t == '\n') continue;
+				if (auto r = bmf->Get(t); r) {
 					auto cw = r->xadvance * baseScale;
-					if (maxWidth > 0) {
-						if (px + cw > maxWidth) {
-							if (px > maxpx) {
-								maxpx = px;
-							}
-							px = 0;
-							py -= lineHeight;
-						}
-					}
-					auto& c = chars[i];
-
+					auto& c = chars.Emplace();
 					c.offset.x = px + r->xoffset * baseScale;
 					c.offset.y = py - r->yoffset * baseScale;
 					c.textureRect.x = r->x;
@@ -109,6 +97,39 @@ namespace xx {
 				q.Draw(f.texId, f.textureRect, worldMinXY + f.offset * worldScale, 0, s, 0, cp, c);
 			}
 		}
+
+		// for rich label
+		struct CalcResult {
+			float width;
+			int32_t len;
+			bool lineEnd;
+		};
+		// calc & return pixel width & used len & is line end
+		template<typename C>
+		inline static CalcResult Calc(float fontSize_, float maxWidth_
+			, Ref<BMFont> const& bmf_, C const* txt_, int32_t txtLen_) {
+			assert(txtLen_ > 0);
+			auto baseScale = fontSize_ / bmf_->fontSize;
+			float px{};
+			int32_t i{};
+			for (; i < txtLen_; ++i) {
+				auto t = txt_[i];
+				if (t == '\r') continue;
+				else if (t == '\n') {
+					return { px, i + 1, true };
+				}
+				auto r = bmf_->Get(t);
+				float cw;
+				if (r) cw = r->xadvance * baseScale;
+				else cw = fontSize_;
+				if (px + cw > maxWidth_) {
+					return { px, i, true };
+				}
+				px += cw;
+			}
+			return { px, i, false };
+		}
+
 	};
 
 }

@@ -609,6 +609,11 @@ namespace xx {
         }
     }
 
+    template<typename S>
+    inline auto StrPtr(S const& s) {
+        return &s[0];
+    }
+
     constexpr std::string_view base64chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"sv;
 
     inline std::string Base64Encode(std::string_view const& in) {

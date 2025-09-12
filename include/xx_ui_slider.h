@@ -19,7 +19,7 @@ namespace xx {
 		};
 
 		// InitBegin + set value/ToSting + InitEnd
-		Slider& Init(int z_, XY position_, XY anchor_
+		Slider& Init(int32_t z_, XY position_, XY anchor_
 			, float height_
 			, float widthTxtLeft_, float widthBar_, float widthTxtRight_
 			, double value_

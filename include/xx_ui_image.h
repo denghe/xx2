@@ -20,7 +20,7 @@ namespace xx {
 		RGBA8 color{};
 		float radians{};
 
-		Image& Init(int z_, XY position_, XY anchor_, XY fixedSize_, bool keepAspect_
+		Image& Init(int32_t z_, XY position_, XY anchor_, XY fixedSize_, bool keepAspect_
 			, TinyFrame frame_, ImageRadians radians_ = ImageRadians::Zero, RGBA8 color_ = RGBA8_White) {
 			assert(typeId == cTypeId);
 			z = z_;
