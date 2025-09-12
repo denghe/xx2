@@ -64,7 +64,7 @@ namespace xx {
 			
 			XY imgSize{ size.y - cfg->paddings.TopBottom() };
 			XY imgPos{ size.x - cfg->paddings.right, cfg->paddings.bottom };
-			Make<Image>()->Init(z + 2, imgPos, {1, 0}, imgSize, true, icon);
+			Make<Image>()->Init(z + 2, imgPos, {1, 0}, icon, imgSize);
 
 			Make<Scale9>()->Init(z, 0, 0, size, cfg);
 
@@ -127,7 +127,7 @@ namespace xx {
 		auto& cfg = owner->GetCfg();
 		auto imgSize = XY{ size.y - cfg->paddings.TopBottom() };
 		auto imgColor = idx_ == owner->selectedIndex ? RGBA8_Green : RGBA8_White;
-		Make<Image>()->Init(z, cfg->paddings.LeftBottom(), 0, imgSize, true, owner->itemHead, {}, imgColor);
+		Make<Image>()->Init(z, cfg->paddings.LeftBottom(), 0, owner->itemHead, imgSize, true, {}, imgColor);
 
 		Make<Label>()->Init(z, cfg->paddings.LeftBottom() + XY{ imgSize.x, 0 }, 0, size.y - cfg->paddings.TopBottom())(owner->items[idx_]);
 	}

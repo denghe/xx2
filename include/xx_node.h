@@ -42,8 +42,8 @@ namespace xx {
 		bool focused{ false };										// true: highlight
 		bool escHandler{ false };									// true for FindTopESCHandler
 		VAligns valign{ VAligns::Center };							// only for ui_richlabel
+		HAligns halign{ HAligns::Left };							// only for ui_richlabel
 		// ...
-
 
 		XX_INLINE XY GetScaledSize() const {
 			return scale * size;

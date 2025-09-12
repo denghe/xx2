@@ -8,7 +8,6 @@ namespace xx {
 		XY xy{};							// content cursor
 		float lineHeight{};					// for last line
 		int32_t lineItemsCount{};			// for last line
-		HAligns halign{ HAligns::Left };	// when line end, horizontal align current line
 
 		// step 1
 		RichLabel& InitBegin(int32_t z_, XY const& position_, XY const& anchor_, float width_) {
@@ -89,8 +88,32 @@ namespace xx {
 			return *this;
 		}
 
+		RichLabel& Offset(XY p_) {
+			assert(lineItemsCount == 0);
+			xy.x = p_.x;
+			xy.y = -p_.y;
+			return *this;
+		}
+
+		// o: Make<????>().Init(rl.z, rl.xy, {0,1}, ..... )
+		template<typename T>
+		RichLabel& Append(T& o, float lineHeight_ = 0, VAligns valign_ = VAligns::Center) {
+			assert(o.size.x <= size.x);
+			if (lineHeight_ == 0) lineHeight_ = o.size.y;
+			if (lineHeight_ > lineHeight) {
+				lineHeight = lineHeight_;
+			}
+			if (size.x - xy.x < o.size.x) {
+				EndLine();
+			}
+			xy.x += o.size.x;
+			++lineItemsCount;
+			return *this;
+		}
+
 		template<typename S>
-		RichLabel& Text(S const& txt_, float fontSize_
+		RichLabel& Text(S const& txt_
+			, float fontSize_
 			, float lineHeight_ = 0
 			, RGBA8 color_ = RGBA8_White
 			, VAligns valign_ = VAligns::Center
@@ -106,7 +129,7 @@ namespace xx {
 			auto widthLimit = size.x - xy.x;
 			auto r = Label::Calc(fontSize_, widthLimit, bmf_, txt, len);
 			if (r.width > 0) {
-				auto& L = Make<Label>()->Init(z, xy, { 0,1 }, fontSize_, color_).SetFont(bmf_).SetText(txt, r.len);
+				auto& L = Make<Label>()->Init(z, xy, { 0, 1 }, fontSize_, color_).SetFont(bmf_).SetText(txt, r.len);
 				assert(L.size.x == r.width);
 				xy.x += r.width;
 				++lineItemsCount;
@@ -120,6 +143,17 @@ namespace xx {
 			return *this;
 		}
 
-		// ... more make xxx
+		RichLabel& Image(TinyFrame frame_
+			, XY fixedSize_ = 0
+			, bool keepAspect_ = true
+			, ImageRadians radians_ = ImageRadians::Zero
+			, RGBA8 color_ = RGBA8_White
+			, float lineHeight_ = 0, VAligns valign_ = VAligns::Center) {
+			auto& o = Make<::xx::Image>()->Init(z, xy, { 0, 1 }, std::move(frame_), fixedSize_, keepAspect_, radians_, color_);
+			return Append(o, lineHeight_, valign_);
+		}
+
+		// ...
+
 	};
 }

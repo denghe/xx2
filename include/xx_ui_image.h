@@ -20,12 +20,19 @@ namespace xx {
 		RGBA8 color{};
 		float radians{};
 
-		Image& Init(int32_t z_, XY position_, XY anchor_, XY fixedSize_, bool keepAspect_
-			, TinyFrame frame_, ImageRadians radians_ = ImageRadians::Zero, RGBA8 color_ = RGBA8_White) {
+		Image& Init(int32_t z_, XY position_, XY anchor_
+			, TinyFrame frame_
+			, XY fixedSize_ = 0
+			, bool keepAspect_ = true
+			, ImageRadians radians_ = ImageRadians::Zero
+			, RGBA8 color_ = RGBA8_White) {
 			assert(typeId == cTypeId);
 			z = z_;
 			position = position_;
 			anchor = anchor_;
+			if (fixedSize_.IsZeroSimple()) {
+				fixedSize_ = { frame_.textureRect.w, frame_.textureRect.h };
+			}
 			size = fixedSize_;
 			frame = std::move(frame_);
 			radians = float(M_PI) * 0.5f * (int32_t)radians_;

@@ -43,11 +43,11 @@ namespace xx {
 		}
 
 		// step2: set icon( offset_'s pivot: 0.5 )
-		ImageLabelButton& operator()(TinyFrame frame_, XY size_, XY offset_) {
-			At<Image>(1).Init(z + 2, offset_, 0.5f, size_, true, std::move(frame_));
-			if (marginLeft == 0) {
+		ImageLabelButton& operator()(TinyFrame frame_, XY fixedSize_, XY offset_, bool keepAspect_ = true) {
+			At<Image>(1).Init(z + 2, offset_, 0.5f, std::move(frame_), fixedSize_, keepAspect_);
+				if (marginLeft == 0) {
 				auto& cfg = GetCfg();
-				marginLeft = offset_.x + size_.x * 0.5f + cfg->paddings.top;
+				marginLeft = offset_.x + fixedSize_.x * 0.5f + cfg->paddings.top;
 			}
 			return *this;
 		}
