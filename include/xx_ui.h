@@ -11,5 +11,5 @@
 #include "xx_ui_background.h"
 #include "xx_ui_dropdownlist.h"
 #include "xx_ui_scrollview.h"
-#include "xx_ui_richlabel.h"
+#include "xx_ui_layouter.h"
 // ...

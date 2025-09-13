@@ -38,15 +38,5 @@ size: 480, 1080
         };
 
         // todo
-
-
-        auto& rl = Make<xx::RichLabel>()->InitBegin(z + 2, { 30, 200 }, 0, 200);
-        rl.HAlign(xx::HAligns::Center).Text(U"标题\n", 64, 100, xx::RGBA8_Green)
-            .HAlign().Image(gg.res.player)
-            .Text(U" 正文正文正文正文正文正文正文正文正文.\n", 32, 48, xx::RGBA8_White)
-            .InitEnd();
-
-        static constexpr float cMargin{ 15 };
-        auto& s9 = Make<xx::Scale9>()->Init(z + 1, rl.position - cMargin, rl.anchor, rl.size + cMargin * 2);
 	}
 }

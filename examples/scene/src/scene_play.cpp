@@ -18,6 +18,9 @@ void Scene_Play::Init() {
 	uiEquipBag = ui->Make<UI::EquipBag>();
 	uiEquipBag->Init(3);
 
+	uiPropsLog = ui->Make<UI::PropsLog>();
+	uiPropsLog->Init(3);
+
 	// init game logic
 	cam.Init(gg.scale, 1.f);
 

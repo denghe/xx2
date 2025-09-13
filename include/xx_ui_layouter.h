@@ -2,39 +2,42 @@
 #include "xx_node.h"
 
 namespace xx {
-	// todo
-	struct RichLabel : Node {
-		static constexpr int32_t cTypeId{ 19 };
+
+	struct Layouter {
 		XY xy{};							// content cursor
 		float lineHeight{};					// for last line
 		int32_t lineItemsCount{};			// for last line
+		HAligns halign{ HAligns::Left };	// for last line
+		Shared<Node> target;
 
 		// step 1
-		RichLabel& InitBegin(int32_t z_, XY const& position_, XY const& anchor_, float width_) {
+		Layouter& InitBegin(Shared<Node> target_, int32_t z_, XY position_, XY anchor_, float width_) {
 			assert(width_ > 0);
-			Node::InitDerived<RichLabel>(z_, position_, anchor_, 1, { width_, 0 });
+			assert(target_ && target_->children.Empty());
+			target = std::move(target_);
+			target->Init(z_, position_, anchor_, 1, { width_, 0 });
 			xy = {};
 			lineHeight = 0;
 			lineItemsCount = 0;
-			children.Clear();
 			return *this;
 		}
-		// step 2: fill content......
+
+		// step 2: append content......
 
 		// step 3
-		RichLabel& InitEnd() {
+		Layouter& InitEnd() {
 			EndLine();
-			size.y = -xy.y;
-			for (auto& c : children) {
-				c->position.y += size.y;
+			target->size.y = -xy.y;
+			for (auto& c : target->children) {
+				c->position.y += target->size.y;
 			}
-			FillTransRecursive();
+			target->FillTransRecursive();
 			return *this;
 		}
 
-		RichLabel& EndLine() {
-			for (int32_t e = children.len, i = e - lineItemsCount; i < e; ++i) {
-				auto& o = children[i];
+		Layouter& EndLine() {
+			for (int32_t e = target->children.len, i = e - lineItemsCount; i < e; ++i) {
+				auto& o = target->children[i];
 				float leftHeight = lineHeight - o->size.y;
 				assert(leftHeight >= 0);
 				if (o->valign == VAligns::Top) {
@@ -48,13 +51,13 @@ namespace xx {
 				}
 			}
 			if (halign != HAligns::Left) {
-				float left = size.x - xy.x;
+				float left = target->size.x - xy.x;
 				assert(left >= 0);
 				float x;
 				if (halign == HAligns::Right) x = left;
 				else x = left * 0.5f;
-				for (int32_t e = children.len, i = e - lineItemsCount; i < e; ++i) {
-					auto& o = children[i];
+				for (int32_t e = target->children.len, i = e - lineItemsCount; i < e; ++i) {
+					auto& o = target->children[i];
 					o->position.x += x;
 				}
 			}
@@ -65,7 +68,7 @@ namespace xx {
 			return *this;
 		}
 
-		RichLabel& EndLine(HAligns tmpHAlign_) {
+		Layouter& EndLine(HAligns tmpHAlign_) {
 			auto bak = halign;
 			halign = tmpHAlign_;
 			EndLine();
@@ -73,22 +76,22 @@ namespace xx {
 			return *this;
 		}
 
-		RichLabel& HAlign(HAligns halign_ = HAligns::Left) {
+		Layouter& HAlign(HAligns halign_ = HAligns::Left) {
 			halign = halign_;
 			return *this;
 		}
 
-		RichLabel& LineSpace(float h_) {
+		Layouter& LineSpace(float h_) {
 			xy.y -= h_;
 			return *this;
 		}
 
-		RichLabel& LineHeight(float h_) {
+		Layouter& LineHeight(float h_) {
 			lineHeight = h_;
 			return *this;
 		}
 
-		RichLabel& Offset(XY p_) {
+		Layouter& Offset(XY p_) {
 			assert(lineItemsCount == 0);
 			xy.x = p_.x;
 			xy.y = -p_.y;
@@ -97,13 +100,13 @@ namespace xx {
 
 		// o: Make<????>().Init(rl.z, rl.xy, {0,1}, ..... )
 		template<typename T>
-		RichLabel& Append(T& o, float lineHeight_ = 0, VAligns valign_ = VAligns::Center) {
-			assert(o.size.x <= size.x);
+		Layouter& Append(T& o, float lineHeight_ = 0, VAligns valign_ = VAligns::Center) {
+			assert(o.size.x <= target->size.x);
 			if (lineHeight_ == 0) lineHeight_ = o.size.y;
 			if (lineHeight_ > lineHeight) {
 				lineHeight = lineHeight_;
 			}
-			if (size.x - xy.x < o.size.x) {
+			if (target->size.x - xy.x < o.size.x) {
 				EndLine();
 			}
 			xy.x += o.size.x;
@@ -111,8 +114,9 @@ namespace xx {
 			return *this;
 		}
 
+		// append Labels ( text word wrap )
 		template<typename S>
-		RichLabel& Text(S const& txt_
+		Layouter& Text(S const& txt_
 			, float fontSize_
 			, float lineHeight_ = 0
 			, RGBA8 color_ = RGBA8_White
@@ -126,10 +130,11 @@ namespace xx {
 			if (lineHeight_ > lineHeight) {
 				lineHeight = lineHeight_;
 			}
-			auto widthLimit = size.x - xy.x;
+			auto widthLimit = target->size.x - xy.x;
 			auto r = Label::Calc(fontSize_, widthLimit, bmf_, txt, len);
 			if (r.width > 0) {
-				auto& L = Make<Label>()->Init(z, xy, { 0, 1 }, fontSize_, color_).SetFont(bmf_).SetText(txt, r.len);
+				auto& L = target->Make<Label>()->Init(target->z, xy, { 0, 1 }, fontSize_, color_)
+					.SetFont(bmf_).SetText(txt, r.len);
 				assert(L.size.x == r.width);
 				xy.x += r.width;
 				++lineItemsCount;
@@ -143,17 +148,19 @@ namespace xx {
 			return *this;
 		}
 
-		RichLabel& Image(TinyFrame frame_
+		// append Image
+		Layouter& Image(TinyFrame frame_
 			, XY fixedSize_ = 0
 			, bool keepAspect_ = true
 			, ImageRadians radians_ = ImageRadians::Zero
 			, RGBA8 color_ = RGBA8_White
 			, float lineHeight_ = 0, VAligns valign_ = VAligns::Center) {
-			auto& o = Make<::xx::Image>()->Init(z, xy, { 0, 1 }, std::move(frame_), fixedSize_, keepAspect_, radians_, color_);
+			auto& o = target->Make<::xx::Image>()->Init(target->z, xy, { 0, 1 }
+				, std::move(frame_), fixedSize_, keepAspect_, radians_, color_);
 			return Append(o, lineHeight_, valign_);
 		}
 
 		// ...
-
 	};
+
 }

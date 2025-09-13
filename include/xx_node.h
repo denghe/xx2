@@ -41,8 +41,7 @@ namespace xx {
 		bool selected{ false };										// draw: always highlight
 		bool focused{ false };										// true: highlight
 		bool escHandler{ false };									// true for FindTopESCHandler
-		VAligns valign{ VAligns::Center };							// only for ui_richlabel
-		HAligns halign{ HAligns::Left };							// only for ui_richlabel
+		VAligns valign{ VAligns::Center };							// only for ui_layouter
 		// ...
 
 		XX_INLINE XY GetScaledSize() const {
