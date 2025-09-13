@@ -32,10 +32,10 @@ size: 480, 1080
         // border
         Make<xx::Scale9>()->Init(z + 1, 0, 0, size);
 
-        // swallow
-        Make<xx::Button>()->Init(z, 0, 0, size).onClicked = [] {
-            xx::CoutN("EquipBag clicked");
-        };
+        //// swallow
+        //Make<xx::Button>()->Init(z, 0, 0, size).onClicked = [] {
+        //    xx::CoutN("EquipBag clicked");
+        //};
 
         // todo
 	}
