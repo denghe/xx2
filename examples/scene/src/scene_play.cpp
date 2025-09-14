@@ -3,13 +3,13 @@
 #include "scene_mainmenu.h"
 
 // todo: equip + bag + props list + log panel
-// game logic: mouse is knife, hit circle monster
+// game logic: player auto attack monster. monster dead: drop items. monster auto reborn. 
 
 void Scene_Play::Init() {
 	// init ui
 	static constexpr float cLineHeight{ 100 };
 	static constexpr float cItemHeight{ 80 };
-	static constexpr float cMargin{ 20 };
+	static constexpr float cMargin{ cLineHeight - cItemHeight };
 	auto fontSize = cItemHeight - gg.embed.cfg_s9bN->paddings.TopBottom();
 	ui.Emplace()->InitRoot(gg.scale);
 	ui->Make<xx::Label>()->Init(2, gg.p1 + cMargin, gg.a1, fontSize)("ver 0.1");
@@ -43,7 +43,9 @@ void Scene_Play::Init() {
 	monsters.Make<Monster>()->Init(this, { -600, 0 }, 128);
 	monsters.Make<Monster>()->Init(this, { 600, 0 }, 128);
 #endif
-	monsters.Make<Monster>()->Init(this, 0, 128);
+
+	monsters.Make<Monster>()->Init(this, { -80, 0 }, 128);
+	player.Emplace<Player>()->Init(this, { 80, 0 }, 128);
 }
 
 void Scene_Play::Update() {
@@ -53,7 +55,7 @@ void Scene_Play::Update() {
 		return;
 	}
 
-	// update game logic
+	// fixed update
 	auto d = float(std::min((float)gg.delta, gg.cMaxDelta) * timeScale);
 	time += d;
 	timePool += d;
@@ -64,16 +66,19 @@ void Scene_Play::Update() {
 }
 
 void Scene_Play::FixedUpdate() {
+	// update game logic
 	for (auto& m : monsters) {
 		m->Update();
 	}
+	player->Update();
 }
 
 void Scene_Play::Draw() {
+	// todo: order by Y
 	for (auto& m : monsters) {
 		m->Draw();
 	}
-
+	player->Draw();
 	gg.DrawNode(ui);
 }
 

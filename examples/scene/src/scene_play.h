@@ -15,6 +15,7 @@ struct Scene_Play : xx::SceneBase {
 
 	float time{}, timePool{}, timeScale{ 1 };
 
+	xx::Shared<Player> player;
 	xx::List<xx::Shared<Monster>> monsters;
 
 	void Init();

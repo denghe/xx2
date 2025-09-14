@@ -3,39 +3,18 @@
 #include "monster.h"
 
 void Monster::Init(Scene_Play* scene_, XY pos_, float radius_) {
-	scene = scene_;
-	tf = gg.res.monster;
-	ori = pos = pos_;
-	radius = radius_;
-	_1scale = cAnimScaleRange.from;
-}
-
-void Monster::Idle_1() {
-	XX_BEGIN(_1);
-	while (true) {
-		for (; _1scale < cAnimScaleRange.to; _1scale += cAnimStepDelay) {
-			XX_YIELD(_1);
-		}
-		for (; _1scale > cAnimScaleRange.from; _1scale -= cAnimStepDelay) {
-			XX_YIELD(_1);
-		}
-	}
-	XX_END(_1);
+	InitCreature(scene_, pos_, radius_);
 }
 
 void Monster::Update() {
-	if (shaking) {
-		shaker.Update(gg.rnd, scene->time);
-		pos = ori + shaker.offset;
-	}
-	else {
-		pos = ori;
-		Idle_1();
-	}
+	shaker.Update(gg.rnd, scene->time);
+	Idle_2();
 }
 
 void Monster::Draw() {
-	auto& cam = scene->cam;
-	auto scale = _1scale * cam.scale * (radius / tf.textureRect.w);
-	gg.Quad().Draw(*tf.tex, tf.textureRect, cam.ToGLPos(pos), 0.5f, scale);
+	auto& c = scene->cam;
+	auto& f = gg.res.monster;
+	auto s = scale * (c.scale * (radius / f.textureRect.w));
+	auto p = pos + shaker.offset;
+	gg.Quad().Draw(*f.tex, f.textureRect, c.ToGLPos(p), anchor, s, radians);
 }

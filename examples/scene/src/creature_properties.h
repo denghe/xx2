@@ -3,7 +3,7 @@
 #include "xx_rnd.h"
 
 // base & factor
-struct PlayerProperties1 {
+struct CreatureProperties1 {
 	// health
 	float healthMaxPreset{};
 	float healthMaxFactor{};
@@ -48,7 +48,7 @@ struct PlayerProperties1 {
 };
 
 // result & runtime
-struct PlayerProperties2 {
+struct CreatureProperties2 {
 	// health
 	float healthMax{};
 	float health{};						// runtime
@@ -83,7 +83,7 @@ struct PlayerProperties2 {
 	int32_t dropCalcNums{};
 };
 
-struct PlayerProperties : PlayerProperties1, PlayerProperties2 {
+struct CreatureProperties : CreatureProperties1, CreatureProperties2 {
 	int32_t regenerationFrameNumber{};
 
 	// call at player init
