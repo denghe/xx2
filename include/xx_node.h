@@ -222,7 +222,7 @@ namespace xx {
 			c.Emplace(std::move(w));
 		}
 
-		virtual int32_t Update() { return 0; };					// return !0 mean quit auto update
+		virtual int32_t Update() { return 0; };					// return !0 mean unregister auto update
 		virtual void TransUpdate() {};
 		virtual void Draw() {};									// draw current node only ( do not contain children )
 		virtual ~Node() {};

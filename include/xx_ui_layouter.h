@@ -4,11 +4,12 @@
 namespace xx {
 
 	struct Layouter {
+		Shared<Node> target;
 		XY xy{};							// content cursor
+		float width{};
 		float lineHeight{};					// for last line
 		int32_t lineItemsCount{};			// for last line
 		HAligns halign{ HAligns::Left };	// for last line
-		Shared<Node> target;
 
 		// step 1
 		Layouter& InitBegin(Shared<Node> target_, int32_t z_, XY position_, XY anchor_, float width_) {
@@ -17,6 +18,7 @@ namespace xx {
 			target = std::move(target_);
 			target->Init(z_, position_, anchor_, 1, { width_, 0 });
 			xy = {};
+			width = width_;
 			lineHeight = 0;
 			lineItemsCount = 0;
 			return *this;
@@ -35,7 +37,7 @@ namespace xx {
 			return *this;
 		}
 
-		Layouter& EndLine() {
+		Layouter& EndLine(bool changeY = true, float newX_ = 0) {
 			for (int32_t e = target->children.len, i = e - lineItemsCount; i < e; ++i) {
 				auto& o = target->children[i];
 				float leftHeight = lineHeight - o->size.y;
@@ -51,7 +53,7 @@ namespace xx {
 				}
 			}
 			if (halign != HAligns::Left) {
-				float left = target->size.x - xy.x;
+				float left = width - xy.x;
 				assert(left >= 0);
 				float x;
 				if (halign == HAligns::Right) x = left;
@@ -61,17 +63,19 @@ namespace xx {
 					o->position.x += x;
 				}
 			}
-			xy.x = 0;
-			xy.y -= lineHeight;
+			xy.x = newX_;
+			if (changeY) {
+				xy.y -= lineHeight;
+			}
 			lineHeight = 0;
 			lineItemsCount = 0;
 			return *this;
 		}
 
-		Layouter& EndLine(HAligns tmpHAlign_) {
+		Layouter& EndLine(HAligns tmpHAlign_, bool changeY = true, float newX_ = 0) {
 			auto bak = halign;
 			halign = tmpHAlign_;
-			EndLine();
+			EndLine(changeY, newX_);
 			halign = bak;
 			return *this;
 		}
@@ -98,15 +102,15 @@ namespace xx {
 			return *this;
 		}
 
-		// o: Make<????>().Init(rl.z, rl.xy, {0,1}, ..... )
+		// o: Make<????>().Init(L.z, L.xy, {0,1}, ..... )
 		template<typename T>
 		Layouter& Append(T& o, float lineHeight_ = 0, VAligns valign_ = VAligns::Center) {
-			assert(o.size.x <= target->size.x);
+			assert(o.size.x <= width);
 			if (lineHeight_ == 0) lineHeight_ = o.size.y;
 			if (lineHeight_ > lineHeight) {
 				lineHeight = lineHeight_;
 			}
-			if (target->size.x - xy.x < o.size.x) {
+			if (width - xy.x < o.size.x) {
 				EndLine();
 			}
 			xy.x += o.size.x;
@@ -115,7 +119,8 @@ namespace xx {
 		}
 
 		// append Labels ( text word wrap )
-		template<typename S>
+		// char mode: children.len == begin index
+		template<typename T = Label, bool charMode = false, typename S>
 		Layouter& Text(S const& txt_
 			, float fontSize_
 			, float lineHeight_ = 0
@@ -126,14 +131,15 @@ namespace xx {
 			if (lineHeight_ == 0) lineHeight_ = fontSize_;
 			auto txt = StrPtr(txt_);
 			auto len = StrLen(txt_);
+			if (!len) return *this;
 		LabLoop:
 			if (lineHeight_ > lineHeight) {
 				lineHeight = lineHeight_;
 			}
-			auto widthLimit = target->size.x - xy.x;
-			auto r = Label::Calc(fontSize_, widthLimit, bmf_, txt, len);
+			auto widthLimit = width - xy.x;
+			auto r = T::Calc(fontSize_, widthLimit, bmf_, txt, charMode ? 1 : len);
 			if (r.width > 0) {
-				auto& L = target->Make<Label>()->Init(target->z, xy, { 0, 1 }, fontSize_, color_)
+				auto& L = target->Make<T>()->Init(target->z, xy, { 0, 1 }, fontSize_, color_)
 					.SetFont(bmf_).SetText(txt, r.len);
 				assert(L.size.x == r.width);
 				xy.x += r.width;

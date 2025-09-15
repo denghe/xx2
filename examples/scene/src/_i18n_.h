@@ -22,6 +22,20 @@ namespace i18n {
 		musicVolume,
 		escBack,
 		spaceConfirm,
+
+		healthMax,
+		healthRegeneration,
+		manaMax,
+		manaRegeneration,
+		defense,
+		dodge,
+		damage,
+		criticalChance,
+		criticalDamage,
+		movementSpeed,
+		lucky,
+		harvestFactor,
+
 		// ...
 		__MAX__
 	};

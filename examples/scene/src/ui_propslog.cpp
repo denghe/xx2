@@ -24,26 +24,51 @@ player level up to 2!
 +-----------------------------+
 */
 
-	void PropsLog::Init(int32_t z_) {
+	void PropsLog::Init(int32_t z_, xx::Weak<Creature> creature_) {
+        creature = std::move(creature_);
 		children.Clear();	// unsafe
 
-        auto totalSize = XY{ gg.designSize.x / 4, gg.designSize.y };
         static constexpr float cMargin{ 15 };
-
-        InitDerived<PropsLog>(z_, gg.p3, gg.a3, 1, totalSize);
-
-
+        XY totalSize{ gg.designSize.x / 4, gg.designSize.y };
+        auto contentSize = totalSize - cMargin * 2;
+        XY propsSize{ contentSize.x, contentSize.y * 0.5f };
+        XY propsPos{ cMargin, cMargin + contentSize.y };
+        // todo: logs
 
         xx::Layouter L;
+        InitDerived<PropsLog>(z_, gg.p3, gg.a3, 1, totalSize);
 
         // props border
         Make<xx::Scale9>()->Init(z + 1, { 0, size.y * 0.5f }, 0, { size.x, size.y * 0.5f });
 
-        auto props = Make<xx::Node>();
-        //L.InitBegin(props, z + 2, { 0,  })
         // todo
-
-
+        auto props = Make<xx::Node>();
+        L.InitBegin(props, z + 2, propsPos, { 0, 1 }, contentSize.x);
+        L.Text(gg.lang(Strs::healthMax), 32, 40).EndLine(false);
+        L.Text(xx::ToString(creature->healthMax), 32, 40).EndLine(xx::HAligns::Right);
+        L.Text(gg.lang(Strs::healthRegeneration), 32, 40).EndLine(false);
+        L.Text(xx::ToString(creature->healthRegeneration), 32, 40).EndLine(xx::HAligns::Right);
+        L.Text(gg.lang(Strs::manaMax), 32, 40).EndLine(false);
+        L.Text(xx::ToString(creature->manaMax), 32, 40).EndLine(xx::HAligns::Right);
+        L.Text(gg.lang(Strs::manaRegeneration), 32, 40).EndLine(false);
+        L.Text(xx::ToString(creature->manaRegeneration), 32, 40).EndLine(xx::HAligns::Right);
+        L.Text(gg.lang(Strs::defense), 32, 40).EndLine(false);
+        L.Text(xx::ToString(creature->defense), 32, 40).EndLine(xx::HAligns::Right);
+        L.Text(gg.lang(Strs::dodge), 32, 40).EndLine(false);
+        L.Text(xx::ToString(creature->dodge), 32, 40).EndLine(xx::HAligns::Right);
+        L.Text(gg.lang(Strs::damage), 32, 40).EndLine(false);
+        L.Text(xx::ToString(creature->damage), 32, 40).EndLine(xx::HAligns::Right);
+        L.Text(gg.lang(Strs::criticalChance), 32, 40).EndLine(false);
+        L.Text(xx::ToString(creature->criticalChance), 32, 40).EndLine(xx::HAligns::Right);
+        L.Text(gg.lang(Strs::criticalDamage), 32, 40).EndLine(false);
+        L.Text(xx::ToString(creature->criticalDamage), 32, 40).EndLine(xx::HAligns::Right);
+        L.Text(gg.lang(Strs::movementSpeed), 32, 40).EndLine(false);
+        L.Text(xx::ToString(creature->movementSpeed), 32, 40).EndLine(xx::HAligns::Right);
+        L.Text(gg.lang(Strs::lucky), 32, 40).EndLine(false);
+        L.Text(xx::ToString(creature->lucky), 32, 40).EndLine(xx::HAligns::Right);
+        L.Text(gg.lang(Strs::harvestFactor), 32, 40).EndLine(false);
+        L.Text(xx::ToString(creature->harvestFactor), 32, 40).EndLine(xx::HAligns::Right);
+        L.InitEnd();
 
 
         // logs

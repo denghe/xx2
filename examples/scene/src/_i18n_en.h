@@ -22,6 +22,20 @@ namespace i18n {
 		U"music volume",
 		U"[ESC] back",
 		U"[SPACE] confirm",
+
+		U"healthMax",
+		U"healthRegeneration",
+		U"manaMax",
+		U"manaRegeneration",
+		U"defense",
+		U"dodge",
+		U"damage",
+		U"criticalChance",
+		U"criticalDamage",
+		U"movementSpeed",
+		U"lucky",
+		U"harvestFactor",
+
 		// ...
 
 	};

@@ -9,17 +9,16 @@ namespace xx {
 		int32_t n{};
 		XY offset{}, tarOffset{};
 
-		// example: 5, 300.f * Cfg::frameDelay, int32_t(0.5f * Cfg::fps), time
-		XX_INLINE void Shake(float radius_, float speed_, float duration_, float time_) {
+		XX_INLINE void Shake(float radius_, float speed_, float endTime_) {
 			radius = radius_;
 			speed = speed_;
-			endtime = time_ + duration_;
+			endtime = endTime_;
 		}
 
 		XX_INLINE void Update(Rnd& rnd_, float time_) {
 			XX_BEGIN(n);
 		LabWait:
-			while (time_ >= endtime) { XX_YIELD(n); }	// sleepEx
+			while (time_ >= endtime) { XX_YIELD(n); }
 		LabSetTarget:
 			tarOffset = GetRndPosDoughnut(rnd_, radius, 0);
 		LabMove:

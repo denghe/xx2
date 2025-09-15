@@ -104,6 +104,8 @@ namespace xx {
 			int32_t len;
 			bool lineEnd;
 		};
+
+		// for rich label
 		// calc & return pixel width & used len & is line end
 		template<typename C>
 		inline static CalcResult Calc(float fontSize_, float maxWidth_
@@ -122,7 +124,7 @@ namespace xx {
 				float cw;
 				if (r) cw = r->xadvance * baseScale;
 				else cw = fontSize_;
-				if (px + cw > maxWidth_) {
+				if (maxWidth_ > 0 && px + cw > maxWidth_) {
 					return { px, i, true };
 				}
 				px += cw;
@@ -130,6 +132,12 @@ namespace xx {
 			return { px, i, false };
 		}
 
+		template<typename S>
+		inline static CalcResult Calc(float fontSize_, float maxWidth_, S&& txt_
+			, Ref<BMFont> const& bmf_ = GameBase_shader::GetInstance()->embed.font_sys
+		) {
+			return Calc(fontSize_, maxWidth_, bmf_, StrPtr(txt_), StrLen(txt_));
+		}
 	};
 
 }

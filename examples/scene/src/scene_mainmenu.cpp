@@ -3,6 +3,7 @@
 #include "scene_play.h"
 #include "ui_settings.h"
 #include "ui_settings_lang.h"
+#include "ui_animchar.h"
 
 void Scene_MainMenu::Init() {
 	bak = gg.lang.language;
@@ -37,10 +38,17 @@ void Scene_MainMenu::MakeUI() {
 	auto offset = basePos + XY{ 0, 250 };
 	auto anchor = gg.a5;
 	auto fontSize = cItemHeight - gg.embed.cfg_s9bN->paddings.TopBottom();
+	auto titleText = gg.lang(Strs::gameName);
+	auto fontSize2 = fontSize * 2;
 
 	ui.Emplace()->InitRoot(gg.scale);
 
-	ui->Make<xx::Label>()->Init(2, offset, anchor, fontSize * 2)(gg.lang(Strs::gameName));
+#if 0
+	ui->Make<xx::Label>()->Init(2, offset, anchor, fontSize2)(titleText);
+#else
+	xx::Layouter{}.InitBegin(ui->Make<xx::Node>(), 2, offset, anchor, UI::AnimChar::Calc(fontSize2, 0, titleText).width)
+		.Text<UI::AnimChar, true>(titleText, fontSize2).InitEnd();
+#endif
 
 	offset.y -= cLineHeight * 1.5;
 
@@ -55,7 +63,7 @@ void Scene_MainMenu::MakeUI() {
 	};
 
 	offset.y -= cLineHeight;
-	ui->Make<xx::ImageLabelButton>()->Init(2, offset, anchor, fontSize)(gg.embed.icon_gear, cLineHeight, cItemHeight * 0.5f)(gg.lang(Strs::settings)).onClicked = [this] {
+	ui->Make<xx::ImageLabelButton>()->Init(2, offset, anchor, fontSize)(gg.embed.shape_gear, cLineHeight, cItemHeight * 0.5f)(gg.lang(Strs::settings)).onClicked = [this] {
 		ui->Make<UI::Settings>()->Init(100);
 	};
 

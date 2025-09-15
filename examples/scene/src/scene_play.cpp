@@ -6,20 +6,6 @@
 // game logic: player auto attack monster. monster dead: drop items. monster auto reborn. 
 
 void Scene_Play::Init() {
-	// init ui
-	static constexpr float cLineHeight{ 100 };
-	static constexpr float cItemHeight{ 80 };
-	static constexpr float cMargin{ cLineHeight - cItemHeight };
-	auto fontSize = cItemHeight - gg.embed.cfg_s9bN->paddings.TopBottom();
-	ui.Emplace()->InitRoot(gg.scale);
-	ui->Make<xx::Label>()->Init(2, gg.p1 + cMargin, gg.a1, fontSize)("ver 0.1");
-	ui->Make<xx::Label>()->Init(2, gg.p3 + XY{ -cMargin, cMargin }, gg.a3, fontSize)(gg.lang(Strs::escBack));
-
-	uiEquipBag = ui->Make<UI::EquipBag>();
-	uiEquipBag->Init(3);
-
-	uiPropsLog = ui->Make<UI::PropsLog>();
-	uiPropsLog->Init(3);
 
 	// init game logic
 	cam.Init(gg.scale, 1.f);
@@ -46,6 +32,23 @@ void Scene_Play::Init() {
 
 	monsters.Make<Monster>()->Init(this, { -80, 0 }, 128);
 	player.Emplace<Player>()->Init(this, { 80, 0 }, 128);
+
+
+	// init ui
+	static constexpr float cLineHeight{ 100 };
+	static constexpr float cItemHeight{ 80 };
+	static constexpr float cMargin{ cLineHeight - cItemHeight };
+	auto fontSize = cItemHeight - gg.embed.cfg_s9bN->paddings.TopBottom();
+	ui.Emplace()->InitRoot(gg.scale);
+	ui->Make<xx::Label>()->Init(2, gg.p1 + cMargin, gg.a1, fontSize)("ver 0.1");
+	ui->Make<xx::Label>()->Init(2, gg.p3 + XY{ -cMargin, cMargin }, gg.a3, fontSize)(gg.lang(Strs::escBack));
+
+	uiEquipBag = ui->Make<UI::EquipBag>();
+	uiEquipBag->Init(3);
+
+	uiPropsLog = ui->Make<UI::PropsLog>();
+	uiPropsLog->Init(3, player.ToWeak());
+
 }
 
 void Scene_Play::Update() {

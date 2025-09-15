@@ -45,8 +45,9 @@ namespace xx {
 				ui_panel,
 				ui_slider_bar,
 				ui_slider_block,
-				icon_gear,
-				icon_heart;
+				shape_dot,
+				shape_gear,
+				shape_heart;
 			// ...
 
 			List<TinyFrame> icon_flags_;
@@ -85,8 +86,9 @@ namespace xx {
 			embed.ui_slider_bar = { ft, 832, 1008, 6, 6 };
 			embed.ui_slider_block = { ft, 832, 992, 6, 6 };
 
-			embed.icon_gear = { ft, 768, 992, 32, 32 };
-			embed.icon_heart = { ft, 802, 997, 29, 24 };
+			embed.shape_dot = { ft, 752, 992, 1, 1 };
+			embed.shape_gear = { ft, 768, 992, 32, 32 };
+			embed.shape_heart = { ft, 802, 997, 29, 24 };
 			embed.icon_flags_.Emplace(ft, 751, 1008, 16, 16);
 			embed.icon_flags_.Emplace(ft, 734, 1008, 16, 16);
 
