@@ -12,6 +12,7 @@ prop name                value
 prop name                value
 prop name                value
 prop name                value
+...
 +-----------------------------+
 
 size: 480, 540
@@ -31,48 +32,50 @@ player level up to 2!
         static constexpr float cMargin{ 15 };
         XY totalSize{ gg.designSize.x / 4, gg.designSize.y };
         auto contentSize = totalSize - cMargin * 2;
-        XY propsSize{ contentSize.x, contentSize.y * 0.5f };
-        XY propsPos{ cMargin, cMargin + contentSize.y };
-        // todo: logs
-
-        xx::Layouter L;
         InitDerived<PropsLog>(z_, gg.p3, gg.a3, 1, totalSize);
+        xx::Layouter L;
 
-        // props border
-        Make<xx::Scale9>()->Init(z + 1, { 0, size.y * 0.5f }, 0, { size.x, size.y * 0.5f });
-
-        // todo
+        // props
         auto props = Make<xx::Node>();
-        L.InitBegin(props, z + 2, propsPos, { 0, 1 }, contentSize.x);
-        L.Text(gg.lang(Strs::healthMax), 32, 40).EndLine(false);
-        L.Text(xx::ToString(creature->healthMax), 32, 40).EndLine(xx::HAligns::Right);
-        L.Text(gg.lang(Strs::healthRegeneration), 32, 40).EndLine(false);
-        L.Text(xx::ToString(creature->healthRegeneration), 32, 40).EndLine(xx::HAligns::Right);
-        L.Text(gg.lang(Strs::manaMax), 32, 40).EndLine(false);
-        L.Text(xx::ToString(creature->manaMax), 32, 40).EndLine(xx::HAligns::Right);
-        L.Text(gg.lang(Strs::manaRegeneration), 32, 40).EndLine(false);
-        L.Text(xx::ToString(creature->manaRegeneration), 32, 40).EndLine(xx::HAligns::Right);
-        L.Text(gg.lang(Strs::defense), 32, 40).EndLine(false);
-        L.Text(xx::ToString(creature->defense), 32, 40).EndLine(xx::HAligns::Right);
-        L.Text(gg.lang(Strs::dodge), 32, 40).EndLine(false);
-        L.Text(xx::ToString(creature->dodge), 32, 40).EndLine(xx::HAligns::Right);
-        L.Text(gg.lang(Strs::damage), 32, 40).EndLine(false);
-        L.Text(xx::ToString(creature->damage), 32, 40).EndLine(xx::HAligns::Right);
-        L.Text(gg.lang(Strs::criticalChance), 32, 40).EndLine(false);
-        L.Text(xx::ToString(creature->criticalChance), 32, 40).EndLine(xx::HAligns::Right);
-        L.Text(gg.lang(Strs::criticalDamage), 32, 40).EndLine(false);
-        L.Text(xx::ToString(creature->criticalDamage), 32, 40).EndLine(xx::HAligns::Right);
-        L.Text(gg.lang(Strs::movementSpeed), 32, 40).EndLine(false);
-        L.Text(xx::ToString(creature->movementSpeed), 32, 40).EndLine(xx::HAligns::Right);
-        L.Text(gg.lang(Strs::lucky), 32, 40).EndLine(false);
-        L.Text(xx::ToString(creature->lucky), 32, 40).EndLine(xx::HAligns::Right);
-        L.Text(gg.lang(Strs::harvestFactor), 32, 40).EndLine(false);
-        L.Text(xx::ToString(creature->harvestFactor), 32, 40).EndLine(xx::HAligns::Right);
+
+        // props items
+        static constexpr float fontSize{ 32 }, lineHeight{ 48 };
+        L.InitBegin(props, z + 2, { cMargin, cMargin + contentSize.y }, { 0, 1 }, contentSize.x);
+        L.Text(gg.lang(Strs::healthMax), fontSize, lineHeight).EndLine(false);
+        L.Text(xx::ToString(creature->healthMax), fontSize, lineHeight).EndLine(xx::HAligns::Right);
+        L.Text(gg.lang(Strs::healthRegeneration), fontSize, lineHeight).EndLine(false);
+        L.Text(xx::ToString(creature->healthRegeneration), fontSize, lineHeight).EndLine(xx::HAligns::Right);
+        L.Text(gg.lang(Strs::manaMax), fontSize, lineHeight).EndLine(false);
+        L.Text(xx::ToString(creature->manaMax), fontSize, lineHeight).EndLine(xx::HAligns::Right);
+        L.Text(gg.lang(Strs::manaRegeneration), fontSize, lineHeight).EndLine(false);
+        L.Text(xx::ToString(creature->manaRegeneration), fontSize, lineHeight).EndLine(xx::HAligns::Right);
+        L.Text(gg.lang(Strs::defense), fontSize, lineHeight).EndLine(false);
+        L.Text(xx::ToString(creature->defense), fontSize, lineHeight).EndLine(xx::HAligns::Right);
+        L.Text(gg.lang(Strs::dodge), fontSize, lineHeight).EndLine(false);
+        L.Text(xx::ToString(creature->dodge), fontSize, lineHeight).EndLine(xx::HAligns::Right);
+        L.Text(gg.lang(Strs::damage), fontSize, lineHeight).EndLine(false);
+        L.Text(xx::ToString(creature->damage), fontSize, lineHeight).EndLine(xx::HAligns::Right);
+        L.Text(gg.lang(Strs::criticalChance), fontSize, lineHeight).EndLine(false);
+        L.Text(xx::ToString(creature->criticalChance), fontSize, lineHeight).EndLine(xx::HAligns::Right);
+        L.Text(gg.lang(Strs::criticalDamage), fontSize, lineHeight).EndLine(false);
+        L.Text(xx::ToString(creature->criticalDamage), fontSize, lineHeight).EndLine(xx::HAligns::Right);
+        L.Text(gg.lang(Strs::movementSpeed), fontSize, lineHeight).EndLine(false);
+        L.Text(xx::ToString(creature->movementSpeed), fontSize, lineHeight).EndLine(xx::HAligns::Right);
+        L.Text(gg.lang(Strs::lucky), fontSize, lineHeight).EndLine(false);
+        L.Text(xx::ToString(creature->lucky), fontSize, lineHeight).EndLine(xx::HAligns::Right);
+        L.Text(gg.lang(Strs::harvestFactor), fontSize, lineHeight).EndLine(false);
+        L.Text(xx::ToString(creature->harvestFactor), fontSize, lineHeight).EndLine(xx::HAligns::Right);
         L.InitEnd();
 
+        // props border
+        Make<xx::Scale9>()->Init(z + 1, props->position + XY{ -cMargin, cMargin }, props->anchor, props->size + cMargin * 2);
+
+
+        // todo: logs
 
         // logs
-        Make<xx::Scale9>()->Init(z + 1, 0, 0, { size.x, size.y * 0.5f });
+        //XY logsSize{ contentSize.x, contentSize.y -  };
+        //Make<xx::Scale9>()->Init(z + 1, 0, 0, { size.x, size.y * 0.5f });
 
         // todo
 

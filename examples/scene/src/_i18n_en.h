@@ -23,18 +23,18 @@ namespace i18n {
 		U"[ESC] back",
 		U"[SPACE] confirm",
 
-		U"healthMax",
-		U"healthRegeneration",
-		U"manaMax",
-		U"manaRegeneration",
+		U"health max",
+		U"health regeneration",
+		U"mana max",
+		U"mana regeneration",
 		U"defense",
 		U"dodge",
 		U"damage",
-		U"criticalChance",
-		U"criticalDamage",
-		U"movementSpeed",
+		U"critical chance",
+		U"critical damage",
+		U"movement speed",
 		U"lucky",
-		U"harvestFactor",
+		U"harvest factor",
 
 		// ...
 
