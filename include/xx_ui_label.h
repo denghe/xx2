@@ -45,8 +45,8 @@ namespace xx {
 		// S : literal string u8/32string [view]
 		template<typename C>
 		Label& SetText(C const* txt_, size_t len_) {
+			chars.Clear();
 			if (!len_) {
-				chars.Clear();
 				return *this;
 			}
 			float px{}, py{}, maxpx{}, lineHeight = bmf->lineHeight * baseScale
