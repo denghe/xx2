@@ -102,6 +102,11 @@ void Scene_MainMenu::Draw() {
 	gg.DrawNode(ui);
 }
 
-void Scene_MainMenu::OnResize() {
+void Scene_MainMenu::OnResize(bool modeChanged_) {
+	if (modeChanged_) {
+		if (auto o = ui->FindFirstType<UI::Settings>(); o) {
+			o->Init(o->z);
+		}
+	}
 	ui->Resize(gg.scale);
 }

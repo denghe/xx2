@@ -10,5 +10,5 @@ struct Scene_MainMenu : xx::SceneBase {
 	void MakeUI();
 	void Update() override;
 	void Draw() override;
-	void OnResize() override;
+	void OnResize(bool modeChanged_) override;
 };

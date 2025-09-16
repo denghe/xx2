@@ -22,5 +22,5 @@ struct Scene_Play : xx::SceneBase {
 	void Update() override;
 	void FixedUpdate();
 	void Draw() override;
-	void OnResize() override;
+	void OnResize(bool modeChanged_) override;
 };

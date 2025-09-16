@@ -10,7 +10,7 @@ namespace xx {
 	template<typename T> concept Has_Update = requires(T t) { { t.Update() } -> std::same_as<void>; };
 	template<typename T> concept Has_Delay = requires(T t) { { t.Delay() } -> std::same_as<void>; };
 	template<typename T> concept Has_Stat = requires(T t) { { t.Stat() } -> std::same_as<void>; };
-	template<typename T> concept Has_OnResize = requires(T t) { { t.OnResize() } -> std::same_as<void>; };
+	template<typename T> concept Has_OnResize = requires(T t) { { t.OnResize(bool{}) } -> std::same_as<void>; };
 
 
 	// for game scene logic
@@ -18,7 +18,7 @@ namespace xx {
 		virtual ~SceneBase() = default;
 		virtual void Update() {};
 		virtual void Draw() {};
-		virtual void OnResize() {};
+		virtual void OnResize(bool modeChanged_) {};
 	};
 
 
@@ -161,7 +161,7 @@ namespace xx {
 				g->ResizeCalc();
 				g->GLViewport();
 				if constexpr (Has_OnResize<Derived>) {
-					((Derived*)g)->OnResize();
+					((Derived*)g)->OnResize(false);
 				}
 			});
 
@@ -199,6 +199,9 @@ namespace xx {
 					}
 					else {
 						g->SetBorderlessMode();
+					}
+					if constexpr (Has_OnResize<Derived>) {
+						((Derived*)g)->OnResize(true);
 					}
 					return;
 				}

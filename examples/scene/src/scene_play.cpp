@@ -85,7 +85,12 @@ void Scene_Play::Draw() {
 	gg.DrawNode(ui);
 }
 
-void Scene_Play::OnResize() {
+void Scene_Play::OnResize(bool modeChanged_) {
+	if (modeChanged_) {
+		if (auto o = ui->FindFirstType<UI::Settings>(); o) {
+			o->Init(o->z);
+		}
+	}
 	ui->Resize(gg.scale);
 	cam.SetBaseScale(gg.scale);
 }

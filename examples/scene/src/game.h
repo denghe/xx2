@@ -47,6 +47,6 @@ struct Game : xx::Game<Game>, Sav {
 	xx::Task<> Task();
 	void Delay();
 	void Stat();
-	void OnResize();
+	void OnResize(bool modeChanged_);
 };
 extern Game gg;

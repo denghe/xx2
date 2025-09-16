@@ -98,9 +98,9 @@ void Game::Delay() {
 #endif
 }
 
-void Game::OnResize() {
+void Game::OnResize(bool modeChanged_) {
 	if (scene) {
-		scene->OnResize();
+		scene->OnResize(modeChanged_);
 	}
 }
 

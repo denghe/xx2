@@ -239,6 +239,20 @@ namespace xx {
 			FillTransRecursive();
 		}
 
+		XX_INLINE Node* FindFirstTypeId(int32_t typeId_) {
+			if (this->typeId == typeId_) return this;
+			for (int32_t i = 0; i < children.len; ++i) {
+				if (children[i]->typeId == typeId_) {
+					return children[i].pointer;
+				}
+			}
+			return {};
+		}
+
+		template<typename T>
+		T* FindFirstType() {
+			return (T*)FindFirstTypeId(T::cTypeId);
+		}
 	};
 
 	/**********************************************************************************************/
