@@ -109,8 +109,8 @@ namespace xx {
 			embed.cfg_sblock->frame = embed.ui_slider_block;
 			// ...
 
-			// init oggs
-			embed.ss_ui_focus = LoadSoundSourceFromData((uint8_t*)embeds::ogg::ui_focus, _countof(embeds::ogg::ui_focus), false);
+			// init sound sources
+			embed.ss_ui_focus = LoadSoundSourceFromData(embeds::wav::ui_focus);
 
 			// init sound
 			sound.Init();
@@ -124,11 +124,17 @@ namespace xx {
 		XX_INLINE Ref<SoundSource> LoadSoundSourceFromData(uint8_t* buf, size_t len, bool looping = false) {
 			assert(!IsCompressedData(buf, len));
 			auto rtv = MakeRef<SoundSource>();
-			rtv->wav.loadMem(buf, len, false, false);
+			auto r = rtv->wav.loadMem(buf, len, false, false);
+			assert(!r);
 			if (looping) {
 				rtv->wav.setLooping(true);
 			}
 			return rtv;
+		}
+
+		template<size_t len>
+		XX_INLINE Ref<SoundSource> LoadSoundSourceFromData(const uint8_t(&buf)[len], bool looping = false) {
+			return LoadSoundSourceFromData((uint8_t*)buf, len, looping);
 		}
 
 		XX_INLINE Ref<SoundSource> LoadSoundSource(std::string_view fn, bool looping = false) {
