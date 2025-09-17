@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "game.h"
 struct Scene_Play;
-struct Player;
+struct Creature;
 
 enum class EquipLocations : uint8_t {
 	Unknown,
@@ -16,6 +16,7 @@ enum class EquipLocations : uint8_t {
 	Weapon2,
 	Boots,
 	// ...
+	__EQUIPED_MAX__ = Boots,
 	/*********************/
 	// in the bag
 	/*********************/
@@ -23,6 +24,7 @@ enum class EquipLocations : uint8_t {
 	Materials,
 	Consumables,
 	// ...
+	__MAX__
 };
 
 enum class EquipQualities : uint8_t {
@@ -62,20 +64,47 @@ struct EquipProp {
 
 // instance
 struct Equip {
+	static constexpr int32_t cTypeId{};
 	xx::Ref<EquipConfig> cfg;
 	Scene_Play* scene{};
-	Player* owner{};
+	Creature* owner{};
+
+	int32_t typeId{};			// fill at Make
 	EquipLocations location;
 	EquipQualities quality;
 	xx::List<EquipProp> props;
 	// ... more flags
-	void Init(Player* owner_, xx::Ref<EquipConfig> cfg_);
+
+	void EquipInit(Creature* owner_, xx::Ref<EquipConfig> cfg_);
 	void Combine(Equip& tar);	// attach tar's props to this
-	xx::Shared<xx::Node> GetInfoPanel();
+
+	xx::Shared<xx::Node> GenInfoPanel();	// parent == Scene_Play::ui
 	virtual void Update() {}
 	virtual void Cast() {};
-	virtual void Draw(XY pos, XY scale) {}
+	virtual void Draw(XY pos_, XY anchor_, XY size_) {}
+
+	template<typename T> requires std::is_base_of_v<Equip, T>
+	static xx::Shared<T> Make() {
+		auto r = xx::MakeShared<T>();
+		r->typeId = T::cTypeId;
+		return r;
+	}
 };
 
+// todo: quantity?
 // todo: equip config manager ?
 // todo: drop rate table ?
+
+struct Equip_Blade : Equip {
+	void Draw(XY pos_, XY anchor_, XY size_) override;
+};
+
+struct Equip_Blood : Equip {
+	void Draw(XY pos_, XY anchor_, XY size_) override;
+};
+
+struct Equip_Bomb : Equip {
+	void Draw(XY pos_, XY anchor_, XY size_) override;
+};
+
+// ...

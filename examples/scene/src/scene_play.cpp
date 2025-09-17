@@ -44,7 +44,7 @@ void Scene_Play::Init() {
 	ui->Make<xx::Label>()->Init(2, gg.p3 + XY{ -cMargin, cMargin }, gg.a3, fontSize)(gg.lang(Strs::escBack));
 
 	uiEquipBag = ui->Make<UI::EquipBag>();
-	uiEquipBag->Init(3);
+	uiEquipBag->Init(3, player.ToWeak());
 
 	uiPropsLog = ui->Make<UI::PropsLog>();
 	uiPropsLog->Init(3, player.ToWeak());

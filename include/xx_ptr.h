@@ -354,6 +354,30 @@ namespace xx {
             return {};
         }
 
+        // unsafe
+        template<typename U>
+        U* CastPointer() const {
+            static_assert(std::is_base_of_v<T, U> || std::is_same_v<T, U>);
+            static_assert(PtrAlignCheck_v<T, U>);
+            return (U*)&h->data;
+        }
+
+        // unsafe
+        template<typename U>
+        U& CastRef() const {
+            static_assert(std::is_base_of_v<T, U> || std::is_same_v<T, U>);
+            static_assert(PtrAlignCheck_v<T, U>);
+            return (U&)h->data;
+        }
+
+        // unsafe
+        template<typename U>
+        Weak<U>& Cast() const {
+            static_assert(std::is_base_of_v<T, U> || std::is_same_v<T, U>);
+            static_assert(PtrAlignCheck_v<T, U>);
+            return *(Weak<U>*)this;
+        }
+
         template<typename ...Args>
         decltype(auto) operator()(Args&&...args) {
             return (*pointer())(std::forward<Args>(args)...);

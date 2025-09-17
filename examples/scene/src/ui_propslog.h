@@ -5,7 +5,7 @@
 namespace UI {
 
 	struct PropsLog : xx::Node {
-		static constexpr int32_t cTypeId{ 105 };
+		static constexpr int32_t cTypeId{ 106 };
 		xx::Weak<Creature> creature;
 		void Init(int32_t z_, xx::Weak<Creature> creature_);
 	};

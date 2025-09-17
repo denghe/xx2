@@ -19,6 +19,13 @@ namespace xx {
         TinyFrame& operator=(TinyFrame const&) = default;
         TinyFrame& operator=(TinyFrame &&) = default;
 
+        XX_INLINE operator GLuint const&() const {
+            return tex->id;
+        }
+        XX_INLINE operator UVRect const&() const {
+            return textureRect;
+        }
+
         TinyFrame(Ref<GLTexture> t) {
             tex = std::move(t);
             textureRect = tex->Rect();

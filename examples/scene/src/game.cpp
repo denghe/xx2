@@ -105,7 +105,7 @@ void Game::OnResize(bool modeChanged_) {
 }
 
 void Game::Stat() {
-#if 1
+#if 0
 	xx::CoutN("drawFPS = ", drawFPS, " drawCall = "
 		, drawCall, " drawVerts = ", drawVerts
 		, " uiAutoUpdates.len = ", uiAutoUpdates.len

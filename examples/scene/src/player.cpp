@@ -4,6 +4,14 @@
 
 void Player::Init(Scene_Play* scene_, XY pos_, float radius_) {
 	InitCreature(scene_, pos_, radius_);
+	// todo: load player data from sav?
+	bag.Resize(6 * 10);
+
+	// todo: fill some equip & bag item for test
+	bag[0] = Equip::Make<Equip_Blade>();
+	bag[1] = Equip::Make<Equip_Blood>();
+	bag[2] = Equip::Make<Equip_Bomb>();
+	// ...
 }
 
 void Player::Update() {
