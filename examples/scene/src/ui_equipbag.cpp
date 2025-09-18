@@ -50,37 +50,37 @@ size: 480, 1080
         // helm
         XY offset{ totalSize.x / 2, totalSize.y - cMargin - cCellSize.y / 2 };
         Make<EquipBagCell>()->Init(z + 2, offset, 0.5f, cCellSize)
-            (EquipLocations::Helm, &owner->equips[(int32_t)EquipLocations::Helm]);
+            .FillContent(EquipLocations::Helm, &owner->equips[(int32_t)EquipLocations::Helm]);
 
         // ring
         offset -= cCellSize;
         Make<EquipBagCell>()->Init(z + 2, offset, 0.5f, cCellSize)
-            (EquipLocations::Ring, &owner->equips[(int32_t)EquipLocations::Ring]);
+            .FillContent(EquipLocations::Ring, &owner->equips[(int32_t)EquipLocations::Ring]);
 
         // amulet
         offset.x += cCellSize.x * 2;
         Make<EquipBagCell>()->Init(z + 2, offset, 0.5f, cCellSize)
-            (EquipLocations::Amulet, &owner->equips[(int32_t)EquipLocations::Amulet]);
+            .FillContent(EquipLocations::Amulet, &owner->equips[(int32_t)EquipLocations::Amulet]);
 
         // armor
         offset -= cCellSize;
         Make<EquipBagCell>()->Init(z + 2, offset, 0.5f, cCellSize)
-            (EquipLocations::Armor, &owner->equips[(int32_t)EquipLocations::Armor]);
+            .FillContent(EquipLocations::Armor, &owner->equips[(int32_t)EquipLocations::Armor]);
 
         // weapon1
         offset -= cCellSize;
         Make<EquipBagCell>()->Init(z + 2, offset, 0.5f, cCellSize)
-            (EquipLocations::Weapon1, &owner->equips[(int32_t)EquipLocations::Weapon1]);
+            .FillContent(EquipLocations::Weapon1, &owner->equips[(int32_t)EquipLocations::Weapon1]);
 
         // weapon2
         offset.x += cCellSize.x * 2;
         Make<EquipBagCell>()->Init(z + 2, offset, 0.5f, cCellSize)
-            (EquipLocations::Weapon2, &owner->equips[(int32_t)EquipLocations::Weapon2]);
+            .FillContent(EquipLocations::Weapon2, &owner->equips[(int32_t)EquipLocations::Weapon2]);
 
         // boots
         offset -= cCellSize;
         Make<EquipBagCell>()->Init(z + 2, offset, 0.5f, cCellSize)
-            (EquipLocations::Boots, &owner->equips[(int32_t)EquipLocations::Boots]);
+            .FillContent(EquipLocations::Boots, &owner->equips[(int32_t)EquipLocations::Boots]);
 
         offset.y -= cCellSize.y / 2 + cMargin;
         XY cellsSize{ totalSize.x - cMargin * 2, offset.y - cMargin };
@@ -100,19 +100,25 @@ size: 480, 1080
                 pos.y = basePos.y + cellsSize.y - y * (cCellSize.y + cCellMarginV);
                 auto& bagCell = owner->bag[y * w + x];
                 Make<EquipBagCell>()->Init(z + 2, pos, {0,1}, cCellSize)
-                    (EquipLocations::__MAX__, &bagCell);
+                    .FillContent(EquipLocations::__MAX__, &bagCell);
             }
         }
 	}
 
     int32_t EquipBag::Update() {
         // todo: auto sync memory?
+        // todo: drag & drop
+
+        if (draggingItem) {
+            draggingItem->position = gg.mousePos;
+            draggingItem->FillTransRecursive();
+        }
+
         // check mouse pos & popup tips panel
         if (gg.uiHandler && gg.uiHandler->typeId == EquipBagCell::cTypeId) {
             if (focusedCell != gg.uiHandler) {
                 if (infoPanel) {
                     infoPanel->SwapRemove();
-                    infoPanel.Reset();
                     xx::CoutN("SwapRemove infoPanel");
                 }
                 focusedCell = gg.uiHandler;
@@ -139,7 +145,6 @@ size: 480, 1080
             infoPanelPopupTime = 0;
             if (infoPanel) {
                 infoPanel->SwapRemove();
-                infoPanel.Reset();
                 xx::CoutN("SwapRemove infoPanel");
             }
         }
@@ -159,17 +164,60 @@ size: 480, 1080
         FillTrans();
         auto& cfg = GetCfg();
         Make<xx::Scale9>()->Init(z + 1, 0, 0, size, cfg);
+
+        onClicked = [this] {
+            auto& eb = parent.CastRef<EquipBag>();
+            if (eb.draggingItem) {
+                auto& cell = eb.draggingItem->cell;
+                if (cell.TryGetPointer() == this) {
+                    // cancel select
+                }
+                else if (*equipPtr) {   // swap
+                    // todo: equip location auth
+                    assert(equipItem);
+                    assert(cell->equipItem);
+                    assert(*cell->equipPtr);
+                    assert(*cell->equipPtr != *equipPtr);
+                    std::swap(*cell->equipPtr, *equipPtr);
+                    equipItem->SwapRemove();
+                    cell->equipItem->SwapRemove();
+                    FillContent(equipLocation, equipPtr);
+                    cell->FillContent(cell->equipLocation, cell->equipPtr);
+                }
+                else {  // move
+                    // todo: equip location auth
+                    assert(!equipItem);
+                    assert(cell->equipItem);
+                    assert(*cell->equipPtr);
+                    std::swap(*cell->equipPtr, *equipPtr);
+                    cell->equipItem->SwapRemove();
+                    FillContent(equipLocation, equipPtr);
+                }
+                eb.draggingItem->SwapRemove();
+            } else if (equipItem) {
+                // select
+                eb.draggingItem = eb.parent->Make<DraggingItem>();
+                eb.draggingItem->Init(xx::WeakFromThis(this), z + 10, gg.mousePos, 0.5, size);
+            }
+            else {
+                // do nothing
+            }
+        };
         return *this;
     }
 
-    void EquipBagCell::operator()(EquipLocations equipLocation_, xx::Shared<Equip>* equipPtr_) {
+    void EquipBagCell::FillContent(EquipLocations equipLocation_, xx::Shared<Equip>* equipPtr_) {
         assert(equipPtr_);
         equipLocation = equipLocation_;
         equipPtr = equipPtr_;
         if (*equipPtr) {
             static constexpr float cMargin{ 5 };
             assert(size.x > cMargin * 2 && size.y > cMargin * 2);
-            Make<EquipItem>()->Init(z + 1, size * 0.5f, 0.5, size - cMargin * 2);
+            equipItem = Make<EquipItem>();
+            equipItem->Init(z + 1, size * 0.5f, 0.5, size - cMargin * 2);
+        }
+        else if (equipItem) {
+            equipItem->SwapRemove();
         }
     }
 
@@ -181,15 +229,25 @@ size: 480, 1080
         return *this;
     }
 
-    int32_t EquipItem::Update() {
-        // todo: handle mouse drag
-        return 0;
-    }
-
     void EquipItem::Draw() {
         assert(parent);
         assert(parent->typeId == EquipBagCell::cTypeId);
         auto& equip = *parent.CastRef<EquipBagCell>().equipPtr;
+        equip->Draw(worldMinXY, {}, worldSize);
+    }
+
+
+
+    DraggingItem& DraggingItem::Init(xx::Weak<EquipBagCell> cell_, int32_t z_, XY position_, XY anchor_, XY size_) {
+        InitDerived<DraggingItem>(z_, position_, anchor_, 1, size_);
+        assert(parent->typeId == 0);
+        cell = std::move(cell_);
+        return *this;
+    }
+
+    void DraggingItem::Draw() {
+        assert(cell);
+        auto& equip = *cell->equipPtr;
         equip->Draw(worldMinXY, {}, worldSize);
     }
 
