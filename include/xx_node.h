@@ -57,7 +57,7 @@ namespace xx {
 			}
 
 			worldMaxXY = trans()(size);
-			worldSize = worldMaxXY - trans().Offset();
+			worldSize = worldMaxXY - worldMinXY;
 
 			TransUpdate();
 		}

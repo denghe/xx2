@@ -9,6 +9,7 @@ void Equip::EquipInit(Creature* owner_, xx::Ref<EquipConfig> cfg_) {
 	location = cfg->location;
 	quality = cfg->quality;
 	auto& cps = cfg->props;
+	if (!cps.len) return;
 	props.Reserve(cps.len);
 	for (int32_t i = 0; i < cps.len; ++i) {
 		auto& p = cps[i];
@@ -42,17 +43,22 @@ xx::Shared<xx::Node> Equip::GenInfoPanel() {
 	return r;
 }
 
+
 void Equip_Blade::Draw(XY pos_, XY anchor_, XY size_) {
 	auto& f = gg.res.blade;
 	gg.Quad().Draw(f, f, pos_, anchor_, { size_.x / f.textureRect.w, size_.y / f.textureRect.h });
 }
+
 
 void Equip_Blood::Draw(XY pos_, XY anchor_, XY size_) {
 	auto& f = gg.embed.shape_heart;
 	gg.Quad().Draw(f, f, pos_, anchor_, { size_.x / f.textureRect.w, size_.y / f.textureRect.h });
 }
 
+
 void Equip_Bomb::Draw(XY pos_, XY anchor_, XY size_) {
 	auto& f = gg.res.explosion_[0];
 	gg.Quad().Draw(f, f, pos_, anchor_, { size_.x / f.textureRect.w, size_.y / f.textureRect.h });
 }
+
+// ...

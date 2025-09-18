@@ -14,6 +14,8 @@ struct alignas(8) Creature {
 	std::array<xx::Shared<Equip>, (int32_t)EquipLocations::__EQUIPED_MAX__ + 1> equips;
 	xx::List<xx::Shared<Equip>> bag;
 
+	xx::Shared<Equip>* FindFirstEmptyBagCell();
+
 	int32_t _1{};
 	void Idle_1();
 

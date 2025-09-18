@@ -45,12 +45,13 @@ namespace xx {
 	struct Button : InteractionNode {
 		static constexpr int32_t cTypeId{ 10 };
 
-		std::function<void()> onClicked = [] { CoutN("Button clicked."); };
+		std::function<void()> onClicked = [] { CoutN("Button1 clicked."); };
+		std::function<void()> onClicked2 = [] { CoutN("Button2 clicked."); };
 
 		Button& Init(int32_t z_, XY position_, XY anchor_, XY size_
 			, Ref<Scale9Config> cfgNormal_ = GameBase_shader::GetInstance()->embed.cfg_s9bN
 			, Ref<Scale9Config> cfgHighlight_ = GameBase_shader::GetInstance()->embed.cfg_s9bH) {
-			assert(typeId == cTypeId);
+			//assert(typeId == cTypeId);
 			z = z_;
 			position = position_;
 			anchor = anchor_;
@@ -59,24 +60,27 @@ namespace xx {
 			cfgHighlight = std::move(cfgHighlight_);
 			FillTrans();
 			auto& cfg = GetCfg();
-			Make<Scale9>()->Init(z + 1, 0, 0, size, cfg);
+			Make<Scale9>()->Init(z, 0, 0, size, cfg);
 			return *this;
 		}
 
 		virtual void ApplyCfg() override {
-			assert(children.len);
-			auto& cfg = GetCfg();
-			auto bg = (Scale9*)children[0].pointer;
-			bg->Init(z + 1, 0, 0, size, cfg);
+			At<Scale9>(0).Init(z, 0, 0, size, GetCfg());
 		}
 
 		// todo: enable disable
 
 		virtual int32_t OnMouseDown(int32_t btnId_) override {
-			if (btnId_ != GLFW_MOUSE_BUTTON_LEFT) return 0;
+			if (btnId_ != GLFW_MOUSE_BUTTON_LEFT
+				&& btnId_ != GLFW_MOUSE_BUTTON_RIGHT) return 0;
 			if (!enabled) return 0;
 			LostFocus();
-			onClicked();
+			if (btnId_ == GLFW_MOUSE_BUTTON_LEFT) {
+				onClicked();
+			}
+			else {
+				onClicked2();
+			}
 			return 1;
 		}
 

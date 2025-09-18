@@ -11,6 +11,14 @@ void Creature::InitCreature(Scene_Play* scene_, XY pos_, float radius_) {
 	radius = radius_;
 }
 
+xx::Shared<Equip>* Creature::FindFirstEmptyBagCell() {
+	for (auto& c : bag) {
+		if (!c) return &c;
+	}
+	return {};
+}
+
+
 void Creature::Idle_1() {
 	static constexpr xx::FromTo<float> cScaleRange{ .5f, 1.f };
 	static constexpr float cDuration{ 0.5f };

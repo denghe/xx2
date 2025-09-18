@@ -7,10 +7,15 @@ void Player::Init(Scene_Play* scene_, XY pos_, float radius_) {
 	// todo: load player data from sav?
 	bag.Resize(6 * 10);
 
+	// todo: equip config manage
+	Equip_Blade::_cfg.Emplace()->location = EquipLocations::Weapon1;
+	Equip_Blood::_cfg.Emplace()->location = EquipLocations::Armor;
+	Equip_Bomb::_cfg.Emplace()->location = EquipLocations::Helm;
+
 	// todo: fill some equip & bag item for test
-	bag[0] = Equip::Make<Equip_Blade>();
-	bag[1] = Equip::Make<Equip_Blood>();
-	bag[2] = Equip::Make<Equip_Bomb>();
+	bag[0] = Equip::Make<Equip_Blade>(this);
+	bag[1] = Equip::Make<Equip_Blood>(this);
+	bag[2] = Equip::Make<Equip_Bomb>(this);
 	// ...
 }
 
