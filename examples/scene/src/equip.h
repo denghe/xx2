@@ -81,7 +81,7 @@ struct Equip {
 	xx::Shared<xx::Node> GenInfoPanel();	// parent == Scene_Play::ui
 	virtual void Update() {}
 	virtual void Cast() {};
-	virtual void Draw(XY pos_, XY anchor_, XY size_) {}
+	virtual void Draw(XY pos_, XY anchor_, XY size_, float colorplus_) {}
 
 	template<typename T> requires std::is_base_of_v<Equip, T>
 	static xx::Shared<T> Make(Creature* owner_) {
@@ -99,19 +99,19 @@ struct Equip {
 struct Equip_Blade : Equip {
 	static constexpr int32_t cTypeId{ 1 };
 	inline static xx::Ref<EquipConfig> _cfg;
-	void Draw(XY pos_, XY anchor_, XY size_) override;
+	void Draw(XY pos_, XY anchor_, XY size_, float colorplus_) override;
 };
 
 struct Equip_Blood : Equip {
 	static constexpr int32_t cTypeId{ 2 };
 	inline static xx::Ref<EquipConfig> _cfg;
-	void Draw(XY pos_, XY anchor_, XY size_) override;
+	void Draw(XY pos_, XY anchor_, XY size_, float colorplus_) override;
 };
 
 struct Equip_Bomb : Equip {
 	static constexpr int32_t cTypeId{ 3 };
 	inline static xx::Ref<EquipConfig> _cfg;
-	void Draw(XY pos_, XY anchor_, XY size_) override;
+	void Draw(XY pos_, XY anchor_, XY size_, float colorplus_) override;
 };
 
 // ...

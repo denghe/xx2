@@ -44,6 +44,13 @@ namespace xx {
 		VAligns valign{ VAligns::Center };							// only for ui_layouter
 		// ...
 
+		XX_INLINE XY ToLocalPos(XY worldPos_) {
+			return trans().MakeInvert()(worldPos_);
+		}
+		XX_INLINE XY ToParentLocalPos(XY worldPos_) {
+			return parent->trans().MakeInvert()(worldPos_);
+		}
+
 		XX_INLINE XY GetScaledSize() const {
 			return scale * size;
 		}

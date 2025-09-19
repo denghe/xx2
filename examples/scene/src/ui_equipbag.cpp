@@ -106,8 +106,27 @@ size: 480, 1080
     int32_t EquipBag::Update() {
         // sync dragging pos
         if (draggingItem) {
-            draggingItem->position = gg.mousePos;
-            draggingItem->FillTransRecursive();
+            if (auto& equip = *draggingItem->cell->equipPtr; equip) {
+                draggingItem->position = draggingItem->ToParentLocalPos(gg.mousePos);
+                draggingItem->FillTransRecursive();
+                if (equip->location <= EquipLocations::__EQUIPED_MAX__) {
+                    // todo: set draggingItem's child border to cell
+                    //// highlight cell
+                    //for (auto& c : children) {
+                    //    if (c->typeId == EquipBagCell::cTypeId) {
+                    //        auto& ebc = c.Cast<EquipBagCell>();
+                    //        if (ebc->equipLocation == EquipLocations::__MAX__) break;
+                    //        if (ebc->equipLocation == equip->location) {
+                    //            ebc->selected = true;
+                    //            ebc->ApplyCfg();
+                    //        }
+                    //    }
+                    //}
+                }
+            }
+            else {
+                draggingItem->SwapRemove();
+            }
         }
 
         // handle tips panel
@@ -125,9 +144,12 @@ size: 480, 1080
                         infoPanel = equip->GenInfoPanel();
                     }
                 }
-                else if (infoPanel->position != gg.mousePos) {
-                    infoPanel->position = gg.mousePos;
-                    infoPanel->FillTransRecursive();
+                else {
+                    auto mp = infoPanel->ToParentLocalPos(gg.mousePos);
+                    if (infoPanel->position != mp) {
+                        infoPanel->position = mp;
+                        infoPanel->FillTransRecursive();
+                    }
                 }
             }
         }
@@ -177,9 +199,7 @@ size: 480, 1080
                                 std::swap(*cell->equipPtr, *equipPtr);
                                 eb.owner->CalcProps();
                             }
-                            else {
-                                // do nothing (cancel select)
-                            }
+                            // else { // do nothing (cancel select)
                         }
                     }
                     else {
@@ -191,14 +211,9 @@ size: 480, 1080
                                 std::swap(*cell->equipPtr, *equipPtr);
                                 eb.owner->CalcProps();
                             }
-                            else {
-                                // do nothing (cancel select)
-                            }
+                            // else { // do nothing (cancel select)
                         }
-                        else {
-                            // equips : equips
-                            // do nothing (cancel select)
-                        }
+                        // else { // equips : equips // do nothing (cancel select)
                     }
                 }
                 else {
@@ -216,14 +231,9 @@ size: 480, 1080
                                 std::swap(*cell->equipPtr, *equipPtr);
                                 eb.owner->CalcProps();
                             }
-                            else {
-                                // do nothing (cancel select)
-                            }
+                            // else { // do nothing (cancel select)
                         }
-                        else {
-                            // equips : equips
-                            // do nothing (cancel select)
-                        }
+                        // else { // equips : equips // do nothing (cancel select)
                     }
                 }
                 eb.draggingItem->SwapRemove();
@@ -232,9 +242,7 @@ size: 480, 1080
                 eb.draggingItem = eb.parent->Make<DraggingItem>();
                 eb.draggingItem->Init(xx::WeakFromThis(this), z + 10, gg.mousePos, 0.5, size);
             }
-            else {
-                // do nothing
-            }
+            // else { // do nothing
         };
 
         onClicked2 = [this] {
@@ -271,11 +279,14 @@ size: 480, 1080
     }
 
     void CellItem::Draw() {
-        assert(parent);
         assert(parent->typeId == EquipBagCell::cTypeId);
-        if (auto& equip = *parent.CastRef<EquipBagCell>().equipPtr; equip) {
-            // todo: check draggingItem == this, change colorPlus
-            equip->Draw(worldMinXY, {}, worldSize);
+        auto& ebc = parent.CastRef<EquipBagCell>();
+        if (auto& equip = *ebc.equipPtr; equip) {
+            auto& eb = ebc.parent.CastRef<EquipBag>();
+            float colorplus;
+            if (eb.draggingItem && eb.draggingItem->cell.pointer() == &ebc) colorplus = 0.5f;
+            else colorplus = 1.f;
+            equip->Draw(worldMinXY, {}, worldSize, colorplus);
         }
     }
 
@@ -291,7 +302,7 @@ size: 480, 1080
     void DraggingItem::Draw() {
         assert(cell);
         auto& equip = *cell->equipPtr;
-        equip->Draw(worldMinXY, {}, worldSize);
+        equip->Draw(worldMinXY, {}, worldSize, 1);
     }
 
 }

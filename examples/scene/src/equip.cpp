@@ -44,21 +44,21 @@ xx::Shared<xx::Node> Equip::GenInfoPanel() {
 }
 
 
-void Equip_Blade::Draw(XY pos_, XY anchor_, XY size_) {
+void Equip_Blade::Draw(XY pos_, XY anchor_, XY size_, float colorplus_) {
 	auto& f = gg.res.blade;
-	gg.Quad().Draw(f, f, pos_, anchor_, { size_.x / f.textureRect.w, size_.y / f.textureRect.h });
+	gg.Quad().Draw(f, f, pos_, anchor_, { size_.x / f.textureRect.w, size_.y / f.textureRect.h }, 0, colorplus_);
 }
 
 
-void Equip_Blood::Draw(XY pos_, XY anchor_, XY size_) {
+void Equip_Blood::Draw(XY pos_, XY anchor_, XY size_, float colorplus_) {
 	auto& f = gg.embed.shape_heart;
-	gg.Quad().Draw(f, f, pos_, anchor_, { size_.x / f.textureRect.w, size_.y / f.textureRect.h });
+	gg.Quad().Draw(f, f, pos_, anchor_, { size_.x / f.textureRect.w, size_.y / f.textureRect.h }, 0, colorplus_);
 }
 
 
-void Equip_Bomb::Draw(XY pos_, XY anchor_, XY size_) {
+void Equip_Bomb::Draw(XY pos_, XY anchor_, XY size_, float colorplus_) {
 	auto& f = gg.res.explosion_[0];
-	gg.Quad().Draw(f, f, pos_, anchor_, { size_.x / f.textureRect.w, size_.y / f.textureRect.h });
+	gg.Quad().Draw(f, f, pos_, anchor_, { size_.x / f.textureRect.w, size_.y / f.textureRect.h }, 0, colorplus_);
 }
 
 // ...
