@@ -109,20 +109,6 @@ size: 480, 1080
             if (auto& equip = *draggingItem->cell->equipPtr; equip) {
                 draggingItem->position = draggingItem->ToParentLocalPos(gg.mousePos);
                 draggingItem->FillTransRecursive();
-                if (equip->location <= EquipLocations::__EQUIPED_MAX__) {
-                    // todo: set draggingItem's child border to cell
-                    //// highlight cell
-                    //for (auto& c : children) {
-                    //    if (c->typeId == EquipBagCell::cTypeId) {
-                    //        auto& ebc = c.Cast<EquipBagCell>();
-                    //        if (ebc->equipLocation == EquipLocations::__MAX__) break;
-                    //        if (ebc->equipLocation == equip->location) {
-                    //            ebc->selected = true;
-                    //            ebc->ApplyCfg();
-                    //        }
-                    //    }
-                    //}
-                }
             }
             else {
                 draggingItem->SwapRemove();
@@ -293,9 +279,26 @@ size: 480, 1080
 
 
     DraggingItem& DraggingItem::Init(xx::Weak<EquipBagCell> cell_, int32_t z_, XY position_, XY anchor_, XY size_) {
-        InitDerived<DraggingItem>(z_, position_, anchor_, 1, size_);
+        InitDerived<DraggingItem>(z_ + 1, position_, anchor_, 1, size_);
         assert(parent->typeId == 0);
         cell = std::move(cell_);
+        assert(cell->equipPtr);
+        auto& equip = *cell->equipPtr;
+        if (equip->location <= EquipLocations::__EQUIPED_MAX__) {
+            // search target cell & make border
+            for (auto& c : cell->parent->children) {
+                if (c->typeId == EquipBagCell::cTypeId) {
+                    auto& ebc = c.Cast<EquipBagCell>();
+                    assert(ebc->equipLocation != EquipLocations::__MAX__);
+                    if (ebc->equipLocation == equip->location) {
+                        border = ebc->parent->Make<xx::Scale9>();
+                        border->Init(z_, ebc->position, ebc->anchor, ebc->size);
+                        break;
+                    }
+                }
+            }
+        }
+
         return *this;
     }
 
@@ -303,6 +306,10 @@ size: 480, 1080
         assert(cell);
         auto& equip = *cell->equipPtr;
         equip->Draw(worldMinXY, {}, worldSize, 1);
+    }
+
+    DraggingItem::~DraggingItem() {
+        if (border) border->SwapRemove();
     }
 
 }

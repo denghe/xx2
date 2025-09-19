@@ -42,7 +42,9 @@ namespace UI {
 	struct DraggingItem : xx::Node {
 		static constexpr int32_t cTypeId{ 106 };
 		xx::Weak<EquipBagCell> cell;
+		xx::Weak<xx::Scale9> border;
 		DraggingItem& Init(xx::Weak<EquipBagCell> cell_, int32_t z_, XY position_, XY anchor_, XY size_);
 		void Draw() override;
+		~DraggingItem();
 	};
 }
