@@ -5,82 +5,82 @@
 // base & factor
 struct CreatureProperties1 {
 	// health
-	float healthMaxPreset{};
-	float healthMaxFactor{};
+	float healthMaxPreset{};	// 0
+	float healthMaxFactor{};	// 1
 	// health regeneration
-	float healthRegenerationPreset{};
-	float healthRegenerationFactor{};
+	float healthRegenerationPreset{};	// 2
+	float healthRegenerationFactor{};	// 3
 	// mana
-	float manaMaxPreset{};
-	float manaMaxFactor{};
+	float manaMaxPreset{};	// 4
+	float manaMaxFactor{};	// 5
 	// mana regeneration
-	float manaRegenerationPreset{};
-	float manaRegenerationFactor{};
+	float manaRegenerationPreset{};	// 6
+	float manaRegenerationFactor{};	// 7
 	// defense
-	float defensePreset{};
-	float defenseFactor{};
+	float defensePreset{};	// 8
+	float defenseFactor{};	// 9
 	// dodge
-	float dodgePreset{};
-	float dodgeFactor{};
+	float dodgePreset{};	// 10
+	float dodgeFactor{};	// 11
 	// invincible frame( seconds )
-	float invincibleFrameDurationPreset{};
-	float invincibleFrameDurationFactor{};
+	float invincibleFrameDurationPreset{};	// 12
+	float invincibleFrameDurationFactor{};	// 13
 	// damage ratio
-	float damagePreset{};
+	float damagePreset{};	// 14
 	// critical ratio
-	float criticalChancePreset{};
-	float criticalChanceFactor{};
+	float criticalChancePreset{};	// 15
+	float criticalChanceFactor{};	// 16
 	// critical damage
-	float criticalDamagePreset{};
-	float criticalDamageFactor{};
+	float criticalDamagePreset{};	// 17
+	float criticalDamageFactor{};	// 18
 	// movement speed( pixel distance per seconds )
-	float movementSpeedPreset{};
-	float movementSpeedFactor{};
+	float movementSpeedPreset{};	// 19
+	float movementSpeedFactor{};	// 20
 	// jump height( pixel distance max val map to 0 ~ 1 )
-	float jumpHeightPreset{};
-	float jumpHeightFactor{};
+	float jumpHeightPreset{};	// 21
+	float jumpHeightFactor{};	// 22
 	// jump extra times
-	float jumpExtraNumsPreset{};
-	float jumpExtraNumsFactor{};
+	float jumpExtraNumsPreset{};	// 23
+	float jumpExtraNumsFactor{};	// 24
 	// lucky
-	float luckyPreset{};
-	float luckyFactor{};
+	float luckyPreset{};	// 25
+	float luckyFactor{};	// 26
 };
 
 // result & runtime
 struct CreatureProperties2 {
 	// health
-	float healthMax{};
-	float health{};						// runtime
+	float healthMax{};	// 27
+	float health{};	// 28
 	// health regeneration
-	float healthRegeneration{};
+	float healthRegeneration{};	// 29
 	// mana
-	float manaMax{};
-	float mana{};						// runtime
+	float manaMax{};	// 30
+	float mana{};	// 31
 	// mana regeneration
-	float manaRegeneration{};
-	// defense
-	float defense{};					// damage reduce percentage
-	// dodge
-	float dodge{};						// miss success percentage
+	float manaRegeneration{};	// 32
+	// defense( damage reduce percentage
+	float defense{};	// 33
+	// dodge( miss success percentage
+	float dodge{};	// 34
 	// invincible frame
-	float invincibleFrameDuration{};
+	float invincibleFrameDuration{};	// 35
 	// damage ratio
-	float damage{};
+	float damage{};	// 36
 	// critical ratio
-	float criticalChance{};
+	float criticalChance{};	// 37
 	// critical damage ratio
-	float criticalDamage{};
+	float criticalDamage{};	// 38
 	// movement speed
-	float movementSpeed{};
+	float movementSpeed{};	// 39
 	// jump height
-	float jumpHeight{};
+	float jumpHeight{};	// 40
 	// jump extra times
-	float jumpExtraNums{};
+	float jumpExtraNums{};	// 41
 	// lucky
-	float lucky{};
-	float harvestFactor{};
-	int32_t dropCalcNums{};
+	float lucky{};	// 42
+	float harvestFactor{};	// 43
+	float dropCalcNums{};	// 44
 };
 
 struct CreatureProperties : CreatureProperties1, CreatureProperties2 {
