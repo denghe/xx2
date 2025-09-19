@@ -162,15 +162,69 @@ size: 480, 1080
                 if (cell.TryGetPointer() == this) {
                     // do nothing (cancel select)
                 }
-                else if (*equipPtr) {   // swap
-                    // todo: equip location auth
-                    std::swap(*cell->equipPtr, *equipPtr);
-                    // todo: calc props
+                else if (*equipPtr) {
+                    // swap
+                    if (equipLocation == EquipLocations::__MAX__) {
+                        // bag : ?
+                        if (cell->equipLocation == EquipLocations::__MAX__) {
+                            // bag : bag
+                            std::swap(*cell->equipPtr, *equipPtr);
+                        }
+                        else {
+                            // bag : equips
+                            if (cell->equipLocation == (*equipPtr)->location) {
+                                // location auth success
+                                std::swap(*cell->equipPtr, *equipPtr);
+                                eb.owner->CalcProps();
+                            }
+                            else {
+                                // do nothing (cancel select)
+                            }
+                        }
+                    }
+                    else {
+                        // equips : ?
+                        if (cell->equipLocation == EquipLocations::__MAX__) {
+                            // equips : bag
+                            if (equipLocation == (*cell->equipPtr)->location) {
+                                // location auth success
+                                std::swap(*cell->equipPtr, *equipPtr);
+                                eb.owner->CalcProps();
+                            }
+                            else {
+                                // do nothing (cancel select)
+                            }
+                        }
+                        else {
+                            // equips : equips
+                            // do nothing (cancel select)
+                        }
+                    }
                 }
-                else {  // move
-                    // todo: equip location auth
-                    std::swap(*cell->equipPtr, *equipPtr);
-                    // todo: calc props
+                else {
+                    // move
+                    if (equipLocation == EquipLocations::__MAX__) {
+                        // bag : ?
+                        std::swap(*cell->equipPtr, *equipPtr);
+                    }
+                    else {
+                        // equips : ?
+                        if (cell->equipLocation == EquipLocations::__MAX__) {
+                            // equips : bag
+                            if (equipLocation == (*cell->equipPtr)->location) {
+                                // location auth success
+                                std::swap(*cell->equipPtr, *equipPtr);
+                                eb.owner->CalcProps();
+                            }
+                            else {
+                                // do nothing (cancel select)
+                            }
+                        }
+                        else {
+                            // equips : equips
+                            // do nothing (cancel select)
+                        }
+                    }
                 }
                 eb.draggingItem->SwapRemove();
             } else if (*equipPtr) {
@@ -193,16 +247,15 @@ size: 480, 1080
                     // unequip
                     if (auto c = eb.owner->FindFirstEmptyBagCell(); c) {
                         std::swap(*c, *equipPtr);
-                        // todo: calc props
+                        eb.owner->CalcProps();
                     }
                 }
                 else {
                     if ((int32_t)equip->location <= (int32_t)EquipLocations::__EQUIPED_MAX__) {
-
+                        // equip
+                        std::swap(eb.owner->equips[(int32_t)equip->location], equip);
+                        eb.owner->CalcProps();
                     }
-                    // todo: auto equip
-
-                    // todo: calc props
                 }
             }
         };

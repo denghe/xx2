@@ -11,6 +11,23 @@ void Creature::InitCreature(Scene_Play* scene_, XY pos_, float radius_) {
 	radius = radius_;
 }
 
+void Creature::CalcProps() {
+	// todo: scene props init
+	props.Init();
+	for (auto& e : equips) {
+		if (!e) continue;
+		for (auto& p : e->props) {
+			if (p.target == EquipTargets::Creature) {
+				props.At(p.index) += p.value;
+			}
+			else {
+				// todo: add to scene props
+			}
+		}
+	}
+	props.CalcAll();
+}
+
 xx::Shared<Equip>* Creature::FindFirstEmptyBagCell() {
 	for (auto& c : bag) {
 		if (!c) return &c;

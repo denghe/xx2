@@ -84,7 +84,9 @@ struct CreatureProperties2 {
 };
 
 struct CreatureProperties : CreatureProperties1, CreatureProperties2 {
-	int32_t regenerationFrameNumber{};
+	static constexpr int32_t numProps{ (sizeof(CreatureProperties1) 
+		+ sizeof(CreatureProperties2)) / sizeof(float) };
+	float regenerationTime{};
 
 	// call at player init
 	void Init() {
@@ -115,6 +117,12 @@ struct CreatureProperties : CreatureProperties1, CreatureProperties2 {
 		jumpExtraNumsFactor = 1.f;
 		luckyPreset = 0.f;
 		luckyFactor = 1.f;
+	}
+
+	// used by foreach equip & add values
+	float& At(int32_t idx_) const {
+		assert(idx_ >= 0 && idx_ < numProps);
+		return ((float*)this)[idx_];
 	}
 
 	// call at player init & equipment changed
@@ -165,15 +173,14 @@ struct CreatureProperties : CreatureProperties1, CreatureProperties2 {
 	}
 
 	// return regeneration quantity health, mana, success ( call for every frame update )
-	XX_INLINE std::tuple<float, float, bool> TryRegeneration(int32_t numIntervalFrames, int32_t currentFrameNumber) {
-		if (regenerationFrameNumber > currentFrameNumber) return {};
+	XX_INLINE std::tuple<float, float, bool> TryRegeneration(float interval_, float time_) {
+		if (regenerationTime > time_) return {};
 		auto bakHealth = health;
 		auto bakMana = mana;
 		health = std::min(health + healthRegeneration, healthMax);
 		mana = std::min(mana + manaRegeneration, manaMax);
-		regenerationFrameNumber += numIntervalFrames;
+		regenerationTime += interval_;
 		return { health - bakHealth, mana - bakMana, true };
 	}
 	// ... more funcs
 };
-

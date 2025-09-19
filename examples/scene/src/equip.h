@@ -39,7 +39,7 @@ enum class EquipQualities : uint8_t {
 };
 
 enum class EquipTargets : uint8_t {
-	Player,
+	Creature,
 	Scene
 	// ...
 };

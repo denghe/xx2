@@ -10,7 +10,7 @@ void Player::Init(Scene_Play* scene_, XY pos_, float radius_) {
 	// todo: equip config manage
 	Equip_Blade::_cfg.Emplace()->location = EquipLocations::Weapon1;
 	Equip_Blood::_cfg.Emplace()->location = EquipLocations::Armor;
-	Equip_Bomb::_cfg.Emplace()->location = EquipLocations::Helm;
+	Equip_Bomb::_cfg.Emplace()->location = EquipLocations::Weapon1;
 
 	// todo: fill some equip & bag item for test
 	bag[0] = Equip::Make<Equip_Blade>(this);

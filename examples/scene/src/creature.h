@@ -13,6 +13,7 @@ struct alignas(8) Creature {
 	CreatureProperties props;
 	std::array<xx::Shared<Equip>, (int32_t)EquipLocations::__EQUIPED_MAX__ + 1> equips;
 	xx::List<xx::Shared<Equip>> bag;
+	void CalcProps();
 
 	xx::Shared<Equip>* FindFirstEmptyBagCell();
 
