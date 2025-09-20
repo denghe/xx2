@@ -32,6 +32,18 @@ void Equip::Combine(Equip& tar) {
 }
 
 xx::Shared<xx::Node> Equip::GenInfoPanel() {
+	/*
+	+-------------------+
+	| [icon] name       |
+	| type              |
+	| props       value |
+	| props       value |
+	| props       value |
+	| ...         ...   |
+	|                   |
+	| $           rank  |
+	+-------------------+
+	*/
 	//auto r = parent_->Make<xx::Node>();
 	//auto pos = gg.mousePos;// +gg.worldMaxXY;
 	//r->InitDerived<xx::Node>(r->z, pos, { 0, 1 }, 1, { 200, 300 });
