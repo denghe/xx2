@@ -7,15 +7,26 @@ void Player::Init(Scene_Play* scene_, XY pos_, float radius_) {
 	// todo: load player data from sav?
 	bag.Resize(6 * 10);
 
-	// todo: equip config manage
-	Equip_Blade::_cfg.Emplace()->location = EquipLocations::Weapon1;
-	Equip_Blood::_cfg.Emplace()->location = EquipLocations::Armor;
-	Equip_Bomb::_cfg.Emplace()->location = EquipLocations::Weapon1;
-
 	// todo: fill some equip & bag item for test
-	bag[0] = Equip::Make<Equip_Blade>(this);
-	bag[1] = Equip::Make<Equip_Blood>(this);
-	bag[2] = Equip::Make<Equip_Bomb>(this);
+	int32_t i{};
+	bag[i++] = Equip::Make<Equip_amulet_1>(this);
+	bag[i++] = Equip::Make<Equip_armor_1>(this);
+	bag[i++] = Equip::Make<Equip_armor_2>(this);
+	bag[i++] = Equip::Make<Equip_armor_3>(this);
+	bag[i++] = Equip::Make<Equip_boots_1>(this);
+	bag[i++] = Equip::Make<Equip_consumable_1>(this);
+	bag[i++] = Equip::Make<Equip_currency_1>(this);
+	bag[i++] = Equip::Make<Equip_currency_2>(this);
+	bag[i++] = Equip::Make<Equip_helm_1>(this);
+	bag[i++] = Equip::Make<Equip_material_1>(this);
+	bag[i++] = Equip::Make<Equip_ring_1>(this);
+	bag[i++] = Equip::Make<Equip_ring_2>(this);
+	bag[i++] = Equip::Make<Equip_ring_3>(this);
+	bag[i++] = Equip::Make<Equip_ring_4>(this);
+	bag[i++] = Equip::Make<Equip_weapon1_1>(this);
+	bag[i++] = Equip::Make<Equip_weapon1_2>(this);
+	bag[i++] = Equip::Make<Equip_weapon1_3>(this);
+	bag[i++] = Equip::Make<Equip_weapon2_1>(this);
 	// ...
 }
 

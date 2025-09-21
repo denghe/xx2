@@ -36,6 +36,25 @@ namespace i18n {
 		lucky,
 		harvestFactor,
 
+		normal,
+		excellent,
+		rare,
+		epic,
+		legendary,
+		ancient,
+		myth,
+
+		helm,
+		ring,
+		amulet,
+		armor,
+		weapon1,
+		weapon2,
+		boots,
+		currency,
+		materials,
+		consumables,
+
 		// ...
 		__MAX__
 	};

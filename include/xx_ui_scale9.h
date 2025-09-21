@@ -5,28 +5,28 @@ namespace xx {
 
 	struct Scale9 : Node {
 		static constexpr int32_t cTypeId{ 3 };
-		Ref<Scale9Config> cfg;
+		Scale9Config cfg;
 
 		// reepeatable call
 		Scale9& Init(int32_t z_, XY position_, XY anchor_, XY size_
 			, Ref<Scale9Config> cfg_ = GameBase_ui::GetInstance()->embed.cfg_s9bg) {
 			assert(typeId == cTypeId);
 			Node::InitDerived<Scale9>(z_, position_, anchor_, 1, size_);
-			cfg = std::move(cfg_);
+			cfg = *cfg_;
 			return *this;
 		}
 
 		Scale9& SetConfig(Ref<Scale9Config> cfg_ = GameBase_ui::GetInstance()->embed.cfg_s9bg) {
-			cfg = std::move(cfg_);
+			cfg = *cfg_;
 			return *this;
 		}
 
 		virtual void Draw() override {
 			// calc
-			auto& rect = cfg->frame.textureRect;
-			auto& center = cfg->center;
-			auto& color = cfg->color;
-			auto& frame = cfg->frame;
+			auto& rect = cfg.frame.textureRect;
+			auto& center = cfg.center;
+			auto& color = cfg.color;
+			auto& frame = cfg.frame;
 
 			uint16_t tx1 = rect.x + 0;
 			uint16_t tx2 = rect.x + center.x;
@@ -44,7 +44,7 @@ namespace xx {
 			uint16_t th2 = center.h;
 			uint16_t th3 = rect.h - (center.y + center.h);
 
-			XY ts{ cfg->textureScale * worldScale };
+			XY ts{ cfg.textureScale * worldScale };
 
 			float sx = float(worldSize.x - tw1 * ts.x - tw3 * ts.x) / tw2;
 			float sy = float(worldSize.y - th1 * ts.y - th3 * ts.y) / th2;

@@ -43,7 +43,9 @@ size: 480, 1080
         Make<xx::Scale9>()->Init(z + 1, 0, 0, size);
 
         // swallow
-        Make<xx::Button>()->Init(z, 0, 0, size).onClicked = [] {};
+        auto& swallow = Make<xx::Button>()->Init(z, 0, 0, size);
+        swallow.onClicked = [] {};
+        swallow.onFocus = [] {};
 
         // helm
         XY offset{ totalSize.x / 2, totalSize.y - cMargin - cCellSize.y / 2 };
@@ -130,8 +132,11 @@ size: 480, 1080
                         infoPanel = equip->GenInfoPanel();
                     }
                 }
-                else {
+                if (infoPanel) {
                     auto mp = infoPanel->ToParentLocalPos(gg.mousePos);
+                    if (mp.y - infoPanel->size.y < gg.designSize.y * -0.5f) {   // avoid panel out of screen
+                        mp.y = gg.designSize.y * -0.5f + infoPanel->size.y;
+                    }
                     if (infoPanel->position != mp) {
                         infoPanel->position = mp;
                         infoPanel->FillTransRecursive();
@@ -160,8 +165,7 @@ size: 480, 1080
         equipPtr = equipPtr_;
         static constexpr float cMargin{ 5 };
         assert(size.x > cMargin * 2 && size.y > cMargin * 2);
-        cellItem = Make<CellItem>();
-        cellItem->Init(z + 1, size * 0.5f, 0.5, size - cMargin * 2);
+        Make<CellItem>()->Init(z_ + 1, size * 0.5f, 0.5, size - cMargin * 2);
 
         onClicked = [this] {
             auto& eb = parent.CastRef<EquipBag>();
@@ -272,6 +276,10 @@ size: 480, 1080
             float colorplus;
             if (eb.draggingItem && eb.draggingItem->cell.pointer() == &ebc) colorplus = 0.5f;
             else colorplus = 1.f;
+            gg.Quad().Draw(gg.res.cell_bg, gg.res.cell_bg, worldMinXY, {}
+                , worldSize / gg.res.cell_bg.Size(), 0, colorplus
+                , EquipQualityColors[(int32_t)equip->quality]);
+            // todo: shadow effect
             equip->Draw(worldMinXY, {}, worldSize, colorplus);
         }
     }

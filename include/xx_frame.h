@@ -22,8 +22,13 @@ namespace xx {
         XX_INLINE operator GLuint const&() const {
             return tex->id;
         }
+
         XX_INLINE operator UVRect const&() const {
             return textureRect;
+        }
+
+        XX_INLINE XY Size() const {
+            return { textureRect.w, textureRect.h };
         }
 
         TinyFrame(Ref<GLTexture> t) {

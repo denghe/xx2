@@ -20,11 +20,33 @@ struct Game : xx::Game<Game>, Sav {
 
 	struct {
 		xx::TinyFrame
-			blade,
 			damage_numbers,
-			hpbar,
+			hpbar;
+
+		xx::TinyFrame
+			blade,
 			monster,
-			player
+			player,
+			cell_bg,
+
+			helm_1,
+			amulet_1,
+			ring_1,
+			ring_2,
+			ring_3,
+			ring_4,
+			armor_1,
+			armor_2,
+			armor_3,
+			weapon1_1,
+			weapon1_2,
+			weapon1_3,
+			weapon2_1,
+			boots_1,
+			currency_2,
+			currency_1,
+			material_1,
+			consumable_1
 		;
 
 		xx::List<xx::TinyFrame>

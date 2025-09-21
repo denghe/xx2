@@ -36,6 +36,25 @@ namespace i18n {
 		U"lucky",
 		U"harvest factor",
 
+		U"normal",
+		U"excellent",
+		U"rare",
+		U"epic",
+		U"legendary",
+		U"ancient",
+		U"myth",
+
+		U"helm",
+		U"ring",
+		U"amulet",
+		U"armor",
+		U"weapon1",
+		U"weapon2",
+		U"boots",
+		U"currency",
+		U"material",
+		U"consumable",
+
 		// ...
 
 	};

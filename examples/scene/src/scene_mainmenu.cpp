@@ -96,8 +96,10 @@ void Scene_MainMenu::Update() {
 
 void Scene_MainMenu::Draw() {
 	// bg?
-	gg.Quad().Draw(*gg.res.blade.tex, gg.res.blade.tex->Rect(), {-500, 0}, 0);
-	gg.Quad().Draw(*gg.res.player.tex, gg.res.player.textureRect, {500, 0}, 0);
+#if 1
+	auto& tex = *gg.res.blade.tex;
+	gg.Quad().Draw(tex, tex.Rect(), {300, 0}, 0);
+#endif
 
 	gg.DrawNode(ui);
 }

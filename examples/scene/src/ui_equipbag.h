@@ -26,7 +26,6 @@ namespace UI {
 		static constexpr int32_t cTypeId{ 104 };
 		EquipLocations equipLocation{};
 		xx::Shared<Equip>* equipPtr{};
-		xx::Weak<CellItem> cellItem;
 
 		EquipBagCell& Init(int32_t z_, XY position_, XY anchor_, XY size_, EquipLocations equipLocation_, xx::Shared<Equip>* equipPtr_);
 	};
