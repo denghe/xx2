@@ -15,6 +15,7 @@ size: 480, 1080
       weapon1 weapon2
            boots
 
+[auto equip]            [sort]
         ( bag area )
     [] [] [] [] [] [] []
     [] [] [] [] [] [] []
@@ -22,7 +23,7 @@ size: 480, 1080
     [] [] [] [] [] [] []
     [] [] [] [] [] [] []
 
-        [trash can]
+        [trash can]?
 
 +-----------------------------+
 */
@@ -276,8 +277,8 @@ size: 480, 1080
             float colorplus;
             if (eb.draggingItem && eb.draggingItem->cell.pointer() == &ebc) colorplus = 0.5f;
             else colorplus = 1.f;
-            gg.Quad().Draw(gg.res.cell_bg, gg.res.cell_bg, worldMinXY, {}
-                , worldSize / gg.res.cell_bg.Size(), 0, colorplus
+            gg.Quad().Draw(gg.res.cell_bg1, gg.res.cell_bg1, worldMinXY, {}
+                , worldSize / gg.res.cell_bg1.Size(), 0, colorplus
                 , EquipQualityColors[(int32_t)equip->quality]);
             // todo: shadow effect
             equip->Draw(worldMinXY, {}, worldSize, colorplus);

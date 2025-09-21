@@ -28,6 +28,8 @@ struct Game : xx::Game<Game>, Sav {
 			monster,
 			player,
 			cell_bg,
+			cell_bg1,
+			cell_bg2,
 
 			helm_1,
 			amulet_1,

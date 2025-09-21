@@ -57,6 +57,8 @@ xx::Task<> Game::Task() {
 	res.monster = LoadTexture("res/monster.png");
 	res.player = LoadTexture("res/player.png");
 	res.cell_bg = LoadTexture("res/cell_bg.png");
+	res.cell_bg1 = LoadTexture("res/cell_bg1.png");
+	res.cell_bg2 = LoadTexture("res/cell_bg2.png");
 
 	res.helm_1 = LoadTexture("res/helm_1.png");
 	res.amulet_1 = LoadTexture("res/amulet_1.png");
@@ -100,157 +102,7 @@ xx::Task<> Game::Task() {
 	}
 
 	// init equip configs
-	{
-		auto& c = Equip_amulet_1::_cfg;
-		c.Emplace();
-		c->icon = res.amulet_1;
-		c->location = EquipLocations::Amulet;
-		c->quality = EquipQualities::Normal;
-		//c->props.Emplace(......)
-	}
-	{
-		auto& c = Equip_armor_1::_cfg;
-		c.Emplace();
-		c->icon = res.armor_1;
-		c->location = EquipLocations::Armor;
-		c->quality = EquipQualities::Normal;
-		//c->props.Emplace(......)
-	}
-	{
-		auto& c = Equip_armor_2::_cfg;
-		c.Emplace();
-		c->icon = res.armor_2;
-		c->location = EquipLocations::Armor;
-		c->quality = EquipQualities::Excellent;
-		//c->props.Emplace(......)
-	}
-	{
-		auto& c = Equip_armor_3::_cfg;
-		c.Emplace();
-		c->icon = res.armor_3;
-		c->location = EquipLocations::Armor;
-		c->quality = EquipQualities::Rare;
-		//c->props.Emplace(......)
-	}
-	{
-		auto& c = Equip_boots_1::_cfg;
-		c.Emplace();
-		c->icon = res.boots_1;
-		c->location = EquipLocations::Boots;
-		c->quality = EquipQualities::Normal;
-		//c->props.Emplace(......)
-	}
-	{
-		auto& c = Equip_consumable_1::_cfg;
-		c.Emplace();
-		c->icon = res.consumable_1;
-		c->location = EquipLocations::Consumables;
-		c->quality = EquipQualities::Normal;
-		//c->props.Emplace(......)
-	}
-	{
-		auto& c = Equip_currency_1::_cfg;
-		c.Emplace();
-		c->icon = res.currency_1;
-		c->location = EquipLocations::Currency;
-		c->quality = EquipQualities::Normal;
-		//c->props.Emplace(......)
-	}
-	{
-		auto& c = Equip_currency_2::_cfg;
-		c.Emplace();
-		c->icon = res.currency_2;
-		c->location = EquipLocations::Currency;
-		c->quality = EquipQualities::Normal;
-		//c->props.Emplace(......)
-	}
-	{
-		auto& c = Equip_helm_1::_cfg;
-		c.Emplace();
-		c->icon = res.helm_1;
-		c->location = EquipLocations::Helm;
-		c->quality = EquipQualities::Normal;
-		//c->props.Emplace(......)
-	}
-	{
-		auto& c = Equip_material_1::_cfg;
-		c.Emplace();
-		c->icon = res.material_1;
-		c->location = EquipLocations::Materials;
-		c->quality = EquipQualities::Normal;
-		//c->props.Emplace(......)
-	}
-	{
-		auto& c = Equip_ring_1::_cfg;
-		c.Emplace();
-		c->icon = res.ring_1;
-		c->location = EquipLocations::Ring;
-		c->quality = EquipQualities::Rare;
-		//c->props.Emplace(......)
-	}
-	{
-		auto& c = Equip_ring_2::_cfg;
-		c.Emplace();
-		c->icon = res.ring_2;
-		c->location = EquipLocations::Ring;
-		c->quality = EquipQualities::Epic;
-		//c->props.Emplace(......)
-	}
-	{
-		auto& c = Equip_ring_3::_cfg;
-		c.Emplace();
-		c->icon = res.ring_3;
-		c->location = EquipLocations::Ring;
-		c->quality = EquipQualities::Legendary;
-		//c->props.Emplace(......)
-	}
-	{
-		auto& c = Equip_ring_4::_cfg;
-		c.Emplace();
-		c->icon = res.ring_4;
-		c->location = EquipLocations::Ring;
-		c->quality = EquipQualities::Ancient;
-		//c->props.Emplace(......)
-	}
-	{
-		auto& c = Equip_weapon1_1::_cfg;
-		c.Emplace();
-		c->icon = res.weapon1_1;
-		c->location = EquipLocations::Weapon1;
-		c->quality = EquipQualities::Normal;
-		//c->props.Emplace(......)
-	}
-	{
-		auto& c = Equip_weapon1_2::_cfg;
-		c.Emplace();
-		c->icon = res.weapon1_2;
-		c->location = EquipLocations::Weapon1;
-		c->quality = EquipQualities::Excellent;
-		//c->props.Emplace(......)
-	}
-	{
-		auto& c = Equip_weapon1_3::_cfg;
-		c.Emplace();
-		c->icon = res.weapon1_3;
-		c->location = EquipLocations::Weapon1;
-		c->quality = EquipQualities::Epic;
-		//c->props.Emplace(......)
-	}
-	{
-		auto& c = Equip_weapon2_1::_cfg;
-		c.Emplace();
-		c->icon = res.weapon2_1;
-		c->location = EquipLocations::Weapon2;
-		c->quality = EquipQualities::Normal;
-		//c->props.Emplace(......)
-	}
-
-
-
-
-
-
-
+	Equip::InitAllCfgs();
 
 	// init first scene
 	scene.Emplace<Scene_MainMenu>()->Init();

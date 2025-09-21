@@ -39,7 +39,7 @@ enum class EquipQualities : uint8_t {
 };
 
 static constexpr xx::RGBA8 EquipQualityColors[] = {
-	{255, 255, 255, 255},
+	{127, 127, 127, 255},
 	{0, 255, 0, 255},
 	{0, 127, 255, 255},
 	{255, 0, 255, 255},
@@ -101,6 +101,8 @@ struct Equip {
 		r->EquipInit(owner_, T::_cfg);
 		return r;
 	}
+
+	static void InitAllCfgs();
 };
 
 // todo: quantity?
