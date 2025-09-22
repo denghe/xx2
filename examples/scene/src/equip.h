@@ -28,17 +28,17 @@ enum class EquipLocations : uint8_t {
 };
 
 static constexpr i18n::Strs EquipLocationsStrs[] = {
-		i18n::Strs::gameName,	// map to Unknown
-		i18n::Strs::helm,
-		i18n::Strs::ring,
-		i18n::Strs::amulet,
-		i18n::Strs::armor,
-		i18n::Strs::weapon1,
-		i18n::Strs::weapon2,
-		i18n::Strs::boots,
-		i18n::Strs::currency,
-		i18n::Strs::materials,
-		i18n::Strs::consumables,
+	i18n::Strs::gameName,	// Unknown
+	i18n::Strs::EquipLocations_Helm,
+	i18n::Strs::EquipLocations_Ring,
+	i18n::Strs::EquipLocations_Amulet,
+	i18n::Strs::EquipLocations_Armor,
+	i18n::Strs::EquipLocations_Weapon1,
+	i18n::Strs::EquipLocations_Weapon2,
+	i18n::Strs::EquipLocations_Boots,
+	i18n::Strs::EquipLocations_Currency,
+	i18n::Strs::EquipLocations_Materials,
+	i18n::Strs::EquipLocations_Consumables,
 };
 
 enum class EquipQualities : uint8_t {
@@ -53,13 +53,13 @@ enum class EquipQualities : uint8_t {
 };
 
 static constexpr i18n::Strs EquipQualitiesStrs[] = {
-	i18n::Strs::normal,
-	i18n::Strs::excellent,
-	i18n::Strs::rare,
-	i18n::Strs::epic,
-	i18n::Strs::legendary,
-	i18n::Strs::ancient,
-	i18n::Strs::myth,
+	i18n::Strs::EquipQualities_Normal,
+	i18n::Strs::EquipQualities_Excellent,
+	i18n::Strs::EquipQualities_Rare,
+	i18n::Strs::EquipQualities_Epic,
+	i18n::Strs::EquipQualities_Legendary,
+	i18n::Strs::EquipQualities_Ancient,
+	i18n::Strs::EquipQualities_Myth,
 };
 
 static constexpr xx::RGBA8 EquipQualityColors[] = {

@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "xx_prims.h"
 #include "xx_rnd.h"
+#include "_i18n_.h"
 
 // base & factor
 struct CreatureProperties1 {
@@ -81,6 +82,54 @@ struct CreatureProperties2 {
 	float lucky{};	// 42
 	float harvestFactor{};	// 43
 	float dropCalcNums{};	// 44
+};
+
+static constexpr i18n::Strs CreaturePropertiesStrs[] = {
+	i18n::Strs::CreatureProperties_healthMaxPreset,
+	i18n::Strs::CreatureProperties_healthMaxFactor,
+	i18n::Strs::CreatureProperties_healthRegenerationPreset,
+	i18n::Strs::CreatureProperties_healthRegenerationFactor,
+	i18n::Strs::CreatureProperties_manaMaxPreset,
+	i18n::Strs::CreatureProperties_manaMaxFactor,
+	i18n::Strs::CreatureProperties_manaRegenerationPreset,
+	i18n::Strs::CreatureProperties_manaRegenerationFactor,
+	i18n::Strs::CreatureProperties_defensePreset,
+	i18n::Strs::CreatureProperties_defenseFactor,
+	i18n::Strs::CreatureProperties_dodgePreset,
+	i18n::Strs::CreatureProperties_dodgeFactor,
+	i18n::Strs::CreatureProperties_invincibleFrameDurationPreset,
+	i18n::Strs::CreatureProperties_invincibleFrameDurationFactor,
+	i18n::Strs::CreatureProperties_damagePreset,
+	i18n::Strs::CreatureProperties_criticalChancePreset,
+	i18n::Strs::CreatureProperties_criticalChanceFactor,
+	i18n::Strs::CreatureProperties_criticalDamagePreset,
+	i18n::Strs::CreatureProperties_criticalDamageFactor,
+	i18n::Strs::CreatureProperties_movementSpeedPreset,
+	i18n::Strs::CreatureProperties_movementSpeedFactor,
+	i18n::Strs::CreatureProperties_jumpHeightPreset,
+	i18n::Strs::CreatureProperties_jumpHeightFactor,
+	i18n::Strs::CreatureProperties_jumpExtraNumsPreset,
+	i18n::Strs::CreatureProperties_jumpExtraNumsFactor,
+	i18n::Strs::CreatureProperties_luckyPreset,
+	i18n::Strs::CreatureProperties_luckyFactor,
+	i18n::Strs::CreatureProperties_healthMax,
+	i18n::Strs::CreatureProperties_health,
+	i18n::Strs::CreatureProperties_healthRegeneration,
+	i18n::Strs::CreatureProperties_manaMax,
+	i18n::Strs::CreatureProperties_mana,
+	i18n::Strs::CreatureProperties_manaRegeneration,
+	i18n::Strs::CreatureProperties_defense,
+	i18n::Strs::CreatureProperties_dodge,
+	i18n::Strs::CreatureProperties_invincibleFrameDuration,
+	i18n::Strs::CreatureProperties_damage,
+	i18n::Strs::CreatureProperties_criticalChance,
+	i18n::Strs::CreatureProperties_criticalDamage,
+	i18n::Strs::CreatureProperties_movementSpeed,
+	i18n::Strs::CreatureProperties_jumpHeight,
+	i18n::Strs::CreatureProperties_jumpExtraNums,
+	i18n::Strs::CreatureProperties_lucky,
+	i18n::Strs::CreatureProperties_harvestFactor,
+	i18n::Strs::CreatureProperties_dropCalcNums
 };
 
 struct CreatureProperties : CreatureProperties1, CreatureProperties2 {
