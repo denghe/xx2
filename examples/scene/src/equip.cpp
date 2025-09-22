@@ -43,30 +43,35 @@ xx::Shared<xx::Node> Equip::GenInfoPanel(Equip* cmp_) {
 	| props       value |
 	| props       value |
 	| ...         ...   |
-	|                   |
+	| desc desc desc de |
+	| ...         ...   |
 	| $         quality |
 	+-------------------+
 	*/
 	auto& ui = gg.scene.Cast<Scene_Play>()->ui;	// root
 	// todo: handle cmp_
 
+	static constexpr float fontSize{ 32 }, lineHeight{ 48 }, margin{ 12 };
+
 	// container
 	auto& r = ui->Make<xx::Node>();
+
+	// content
 	xx::Layouter L;
-	L.InitBegin(r, ui->z + 100, 0, { 0, 1 }, 600);
-	L.Image(cfg->icon, 96);
-	L.EndLine(false, 96 + 10);
-	L.Text(gg.lang(cfg->name), 32, 48);
-	L.EndLine(true, 96 + 10);
-	L.Text(gg.lang(EquipLocationsStrs[(int32_t)cfg->location]), 32, 48);
+	L.InitBegin(r, ui->z + 100, 0, { 0, 1 }, fontSize * 20 + margin * 2);
+	L.Image(cfg->icon, lineHeight * 2);
+	L.EndLine(false, lineHeight * 2 + margin);
+	L.Text(gg.lang(cfg->name), fontSize, lineHeight);
+	L.EndLine(true, lineHeight * 2 + margin);
+	L.Text(gg.lang(EquipLocationsStrs[(int32_t)cfg->location]), fontSize, lineHeight);
 	L.EndLine();
 	assert(cfg->props.len == props.len);
 	for (int32_t i = 0; i < props.len; ++i) {
 		auto& o = props[i];
 		auto& c = cfg->props[i];
-		L.Text(gg.lang(CreaturePropertiesStrs[o.index]), 32, 48);
+		L.Text(gg.lang(CreaturePropertiesStrs[o.index]), fontSize, lineHeight);
 		L.EndLine(false);
-		L.Text(xx::ToString(o.value, " (", c.value.from, " ~ ", c.value.to, ")"), 32, 48);
+		L.Text(xx::ToString(o.value, " (", c.value.from, " ~ ", c.value.to, ")"), fontSize, lineHeight);
 		L.EndLine(xx::HAligns::Right);
 	}
 	// ...
@@ -75,8 +80,9 @@ xx::Shared<xx::Node> Equip::GenInfoPanel(Equip* cmp_) {
 	// quality
 	L.InitEnd();
 
-	// bg
-	r->Make<xx::Scale9>()->Init(r->z - 1, -10, 0, r->size + 20).cfg.color = EquipQualityColors[(int32_t)cfg->quality];
+	// bg / border
+	r->Make<xx::Scale9>()->Init(r->z - 1, -margin, 0, r->size + margin * 2)
+		.cfg.color = EquipQualityColors[(int32_t)cfg->quality];
 	return r;
 }
 
