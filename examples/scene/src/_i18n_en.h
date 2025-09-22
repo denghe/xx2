@@ -55,8 +55,26 @@ namespace i18n {
 		U"material",
 		U"consumable",
 
-		// ...
+		U"ruby amulet",
+		U"golden armor",
+		U"iron armor",
+		U"wizard armor",
+		U"leather boots",
+		U"magic potion",
+		U"silver coin",
+		U"ruby",
+		U"iron helm",
+		U"wood",
+		U"glaze ring",
+		U"silver ring",
+		U"sapphire ring",
+		U"skull ring",
+		U"iron sword",
+		U"wood bow",
+		U"staff",
+		U"wood shield",
 
+		// ...
 	};
 
 }

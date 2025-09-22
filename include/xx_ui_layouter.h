@@ -37,7 +37,7 @@ namespace xx {
 			return *this;
 		}
 
-		Layouter& EndLine(bool changeY = true, float newX_ = 0) {
+		Layouter& EndLine(bool changeY_ = true, float newX_ = 0) {
 			for (int32_t e = target->children.len, i = e - lineItemsCount; i < e; ++i) {
 				auto& o = target->children[i];
 				float leftHeight = lineHeight - o->size.y;
@@ -64,7 +64,7 @@ namespace xx {
 				}
 			}
 			xy.x = newX_;
-			if (changeY) {
+			if (changeY_) {
 				xy.y -= lineHeight;
 			}
 			lineHeight = 0;
@@ -126,6 +126,7 @@ namespace xx {
 			, float lineHeight_ = 0
 			, RGBA8 color_ = RGBA8_White
 			, VAligns valign_ = VAligns::Center
+			, float newX_ = 0
 			, Ref<BMFont> bmf_ = GameBase_shader::GetInstance()->embed.font_sys
 		) {
 			if (lineHeight_ == 0) lineHeight_ = fontSize_;
@@ -146,7 +147,7 @@ namespace xx {
 				++lineItemsCount;
 			}
 			if (r.lineEnd) {
-				EndLine();
+				EndLine(true, newX_);
 			}
 			len -= r.len;
 			txt += r.len;

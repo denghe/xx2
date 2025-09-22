@@ -185,7 +185,7 @@ size: 480, 1080
                         }
                         else {
                             // bag : equips
-                            if (cell->equipLocation == (*equipPtr)->location) {
+                            if (cell->equipLocation == (*equipPtr)->cfg->location) {
                                 // location auth success
                                 std::swap(*cell->equipPtr, *equipPtr);
                                 eb.owner->CalcProps();
@@ -197,7 +197,7 @@ size: 480, 1080
                         // equips : ?
                         if (cell->equipLocation == EquipLocations::__MAX__) {
                             // equips : bag
-                            if (equipLocation == (*cell->equipPtr)->location) {
+                            if (equipLocation == (*cell->equipPtr)->cfg->location) {
                                 // location auth success
                                 std::swap(*cell->equipPtr, *equipPtr);
                                 eb.owner->CalcProps();
@@ -217,7 +217,7 @@ size: 480, 1080
                         // equips : ?
                         if (cell->equipLocation == EquipLocations::__MAX__) {
                             // equips : bag
-                            if (equipLocation == (*cell->equipPtr)->location) {
+                            if (equipLocation == (*cell->equipPtr)->cfg->location) {
                                 // location auth success
                                 std::swap(*cell->equipPtr, *equipPtr);
                                 eb.owner->CalcProps();
@@ -250,9 +250,9 @@ size: 480, 1080
                     }
                 }
                 else {
-                    if ((int32_t)equip->location <= (int32_t)EquipLocations::__EQUIPED_MAX__) {
+                    if ((int32_t)equip->cfg->location <= (int32_t)EquipLocations::__EQUIPED_MAX__) {
                         // equip
-                        std::swap(eb.owner->equips[(int32_t)equip->location], equip);
+                        std::swap(eb.owner->equips[(int32_t)equip->cfg->location], equip);
                         eb.owner->CalcProps();
                     }
                 }
@@ -279,7 +279,7 @@ size: 480, 1080
             else colorplus = 1.f;
             gg.Quad().Draw(gg.res.cell_bg1, gg.res.cell_bg1, worldMinXY, {}
                 , worldSize / gg.res.cell_bg1.Size(), 0, colorplus
-                , EquipQualityColors[(int32_t)equip->quality]);
+                , EquipQualityColors[(int32_t)equip->cfg->quality]);
             // todo: shadow effect
             equip->Draw(worldMinXY, {}, worldSize, colorplus);
         }
@@ -293,13 +293,13 @@ size: 480, 1080
         cell = std::move(cell_);
         assert(cell->equipPtr);
         auto& equip = *cell->equipPtr;
-        if (equip->location <= EquipLocations::__EQUIPED_MAX__) {
+        if (equip->cfg->location <= EquipLocations::__EQUIPED_MAX__) {
             // search target cell & make border
             for (auto& c : cell->parent->children) {
                 if (c->typeId == EquipBagCell::cTypeId) {
                     auto& ebc = c.Cast<EquipBagCell>();
                     assert(ebc->equipLocation != EquipLocations::__MAX__);
-                    if (ebc->equipLocation == equip->location) {
+                    if (ebc->equipLocation == equip->cfg->location) {
                         border = ebc->parent->Make<xx::Scale9>();
                         border->Init(z_, ebc->position, ebc->anchor, ebc->size);
                         break;

@@ -27,6 +27,20 @@ enum class EquipLocations : uint8_t {
 	__MAX__
 };
 
+static constexpr i18n::Strs EquipLocationsStrs[] = {
+		i18n::Strs::gameName,	// map to Unknown
+		i18n::Strs::helm,
+		i18n::Strs::ring,
+		i18n::Strs::amulet,
+		i18n::Strs::armor,
+		i18n::Strs::weapon1,
+		i18n::Strs::weapon2,
+		i18n::Strs::boots,
+		i18n::Strs::currency,
+		i18n::Strs::materials,
+		i18n::Strs::consumables,
+};
+
 enum class EquipQualities : uint8_t {
 	Normal,			// white
 	Excellent,		// green
@@ -36,6 +50,16 @@ enum class EquipQualities : uint8_t {
 	Ancient,		// red
 	Myth			// iridescent
 	// ...
+};
+
+static constexpr i18n::Strs EquipQualitiesStrs[] = {
+	i18n::Strs::normal,
+	i18n::Strs::excellent,
+	i18n::Strs::rare,
+	i18n::Strs::epic,
+	i18n::Strs::legendary,
+	i18n::Strs::ancient,
+	i18n::Strs::myth,
 };
 
 static constexpr xx::RGBA8 EquipQualityColors[] = {
@@ -61,9 +85,11 @@ struct EquipConfigProp {
 };
 
 struct EquipConfig {
+	int32_t typeId{};
+	EquipLocations location{};
+	EquipQualities quality{};
+	i18n::Strs name{};
 	xx::TinyFrame icon;
-	EquipLocations location;
-	EquipQualities quality;
 	xx::List<EquipConfigProp> props;
 };
 
@@ -79,12 +105,8 @@ struct Equip {
 	xx::Ref<EquipConfig> cfg;
 	Scene_Play* scene{};
 	Creature* owner{};
-
-	int32_t typeId{};			// fill at Make
-	EquipLocations location;
-	EquipQualities quality;
-	xx::List<EquipProp> props;
-	// ... more flags
+	xx::List<EquipProp> props;	// cfg's props calc result
+	// ...
 
 	void EquipInit(Creature* owner_, xx::Ref<EquipConfig> cfg_);
 	void Combine(Equip& tar);	// attach tar's props to this
@@ -97,12 +119,11 @@ struct Equip {
 	template<typename T> requires std::is_base_of_v<Equip, T>
 	static xx::Shared<T> Make(Creature* owner_) {
 		auto r = xx::MakeShared<T>();
-		r->typeId = T::cTypeId;
 		r->EquipInit(owner_, T::_cfg);
 		return r;
 	}
 
-	static void InitAllCfgs();
+	static void InitAllCfgs();	// Equip_xxxxx::_cfg = .......
 };
 
 // todo: quantity?

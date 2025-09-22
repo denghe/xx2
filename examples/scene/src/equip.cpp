@@ -6,8 +6,6 @@ void Equip::EquipInit(Creature* owner_, xx::Ref<EquipConfig> cfg_) {
 	owner = owner_;
 	scene = owner_->scene;
 	cfg = std::move(cfg_);
-	location = cfg->location;
-	quality = cfg->quality;
 	auto& cps = cfg->props;
 	if (!cps.len) return;
 	props.Reserve(cps.len);
@@ -40,7 +38,7 @@ xx::Shared<xx::Node> Equip::GenInfoPanel(Equip* cmp_) {
 	/*
 	+-------------------+
 	| [icon] name       |
-	| type              |
+	| [icon] location   |
 	| props       value |
 	| props       value |
 	| props       value |
@@ -49,24 +47,30 @@ xx::Shared<xx::Node> Equip::GenInfoPanel(Equip* cmp_) {
 	| $         quality |
 	+-------------------+
 	*/
-	// root
-	auto& ui = gg.scene.Cast<Scene_Play>()->ui;
-
+	auto& ui = gg.scene.Cast<Scene_Play>()->ui;	// root
 	// todo: handle cmp_
 
 	// container
 	auto& r = ui->Make<xx::Node>();
-	r->Init(ui->z + 100, gg.mousePos, { 0, 1 }, 1, { 200, 300 });
-
-	// bg
-	r->Make<xx::Scale9>()->Init(r->z, 0, 0, r->size).cfg.color = EquipQualityColors[(int32_t)quality];
-
-	// icon
-	// name
+	xx::Layouter L;
+	L.InitBegin(r, ui->z + 100, 0, { 0, 1 }, 600);
+	L.Image(cfg->icon, 128);
+	L.EndLine(false, 138);
+	L.Text(gg.lang(cfg->name), 48, 64);
+	L.EndLine(true, 138);
+	L.Text(gg.lang(EquipLocationsStrs[(int32_t)cfg->location]), 48, 64);
+	L.EndLine();
+	for (auto& o : cfg->props) {
+		// todo
+	}
 	// ...
-	// desc translate to rich node?
+	// todo: desc. translate to rich node?
 	// price
 	// quality
+	L.InitEnd();
+
+	// bg
+	r->Make<xx::Scale9>()->Init(r->z - 1, 0, 0, r->size).cfg.color = EquipQualityColors[(int32_t)cfg->quality];
 	return r;
 }
 
@@ -74,6 +78,7 @@ void Equip::InitAllCfgs() {
 	{
 		auto& c = Equip_amulet_1::_cfg;
 		c.Emplace();
+		c->name = i18n::Strs::equip_amulet_1;
 		c->icon = gg.res.amulet_1;
 		c->location = EquipLocations::Amulet;
 		c->quality = EquipQualities::Normal;
@@ -82,6 +87,7 @@ void Equip::InitAllCfgs() {
 	{
 		auto& c = Equip_armor_1::_cfg;
 		c.Emplace();
+		c->name = i18n::Strs::equip_armor_1;
 		c->icon = gg.res.armor_1;
 		c->location = EquipLocations::Armor;
 		c->quality = EquipQualities::Normal;
@@ -90,6 +96,7 @@ void Equip::InitAllCfgs() {
 	{
 		auto& c = Equip_armor_2::_cfg;
 		c.Emplace();
+		c->name = i18n::Strs::equip_armor_2;
 		c->icon = gg.res.armor_2;
 		c->location = EquipLocations::Armor;
 		c->quality = EquipQualities::Excellent;
@@ -98,6 +105,7 @@ void Equip::InitAllCfgs() {
 	{
 		auto& c = Equip_armor_3::_cfg;
 		c.Emplace();
+		c->name = i18n::Strs::equip_armor_3;
 		c->icon = gg.res.armor_3;
 		c->location = EquipLocations::Armor;
 		c->quality = EquipQualities::Rare;
@@ -106,6 +114,7 @@ void Equip::InitAllCfgs() {
 	{
 		auto& c = Equip_boots_1::_cfg;
 		c.Emplace();
+		c->name = i18n::Strs::equip_boots_1;
 		c->icon = gg.res.boots_1;
 		c->location = EquipLocations::Boots;
 		c->quality = EquipQualities::Normal;
@@ -114,6 +123,7 @@ void Equip::InitAllCfgs() {
 	{
 		auto& c = Equip_consumable_1::_cfg;
 		c.Emplace();
+		c->name = i18n::Strs::equip_consumable_1;
 		c->icon = gg.res.consumable_1;
 		c->location = EquipLocations::Consumables;
 		c->quality = EquipQualities::Normal;
@@ -122,6 +132,7 @@ void Equip::InitAllCfgs() {
 	{
 		auto& c = Equip_currency_1::_cfg;
 		c.Emplace();
+		c->name = i18n::Strs::equip_currency_1;
 		c->icon = gg.res.currency_1;
 		c->location = EquipLocations::Currency;
 		c->quality = EquipQualities::Normal;
@@ -130,6 +141,7 @@ void Equip::InitAllCfgs() {
 	{
 		auto& c = Equip_currency_2::_cfg;
 		c.Emplace();
+		c->name = i18n::Strs::equip_currency_2;
 		c->icon = gg.res.currency_2;
 		c->location = EquipLocations::Currency;
 		c->quality = EquipQualities::Normal;
@@ -138,6 +150,7 @@ void Equip::InitAllCfgs() {
 	{
 		auto& c = Equip_helm_1::_cfg;
 		c.Emplace();
+		c->name = i18n::Strs::equip_helm_1;
 		c->icon = gg.res.helm_1;
 		c->location = EquipLocations::Helm;
 		c->quality = EquipQualities::Normal;
@@ -146,6 +159,7 @@ void Equip::InitAllCfgs() {
 	{
 		auto& c = Equip_material_1::_cfg;
 		c.Emplace();
+		c->name = i18n::Strs::equip_material_1;
 		c->icon = gg.res.material_1;
 		c->location = EquipLocations::Materials;
 		c->quality = EquipQualities::Normal;
@@ -154,6 +168,7 @@ void Equip::InitAllCfgs() {
 	{
 		auto& c = Equip_ring_1::_cfg;
 		c.Emplace();
+		c->name = i18n::Strs::equip_ring_1;
 		c->icon = gg.res.ring_1;
 		c->location = EquipLocations::Ring;
 		c->quality = EquipQualities::Rare;
@@ -162,6 +177,7 @@ void Equip::InitAllCfgs() {
 	{
 		auto& c = Equip_ring_2::_cfg;
 		c.Emplace();
+		c->name = i18n::Strs::equip_ring_2;
 		c->icon = gg.res.ring_2;
 		c->location = EquipLocations::Ring;
 		c->quality = EquipQualities::Epic;
@@ -170,6 +186,7 @@ void Equip::InitAllCfgs() {
 	{
 		auto& c = Equip_ring_3::_cfg;
 		c.Emplace();
+		c->name = i18n::Strs::equip_ring_3;
 		c->icon = gg.res.ring_3;
 		c->location = EquipLocations::Ring;
 		c->quality = EquipQualities::Legendary;
@@ -178,6 +195,7 @@ void Equip::InitAllCfgs() {
 	{
 		auto& c = Equip_ring_4::_cfg;
 		c.Emplace();
+		c->name = i18n::Strs::equip_ring_4;
 		c->icon = gg.res.ring_4;
 		c->location = EquipLocations::Ring;
 		c->quality = EquipQualities::Ancient;
@@ -186,6 +204,7 @@ void Equip::InitAllCfgs() {
 	{
 		auto& c = Equip_weapon1_1::_cfg;
 		c.Emplace();
+		c->name = i18n::Strs::equip_weapon1_1;
 		c->icon = gg.res.weapon1_1;
 		c->location = EquipLocations::Weapon1;
 		c->quality = EquipQualities::Normal;
@@ -194,6 +213,7 @@ void Equip::InitAllCfgs() {
 	{
 		auto& c = Equip_weapon1_2::_cfg;
 		c.Emplace();
+		c->name = i18n::Strs::equip_weapon1_2;
 		c->icon = gg.res.weapon1_2;
 		c->location = EquipLocations::Weapon1;
 		c->quality = EquipQualities::Excellent;
@@ -202,6 +222,7 @@ void Equip::InitAllCfgs() {
 	{
 		auto& c = Equip_weapon1_3::_cfg;
 		c.Emplace();
+		c->name = i18n::Strs::equip_weapon1_3;
 		c->icon = gg.res.weapon1_3;
 		c->location = EquipLocations::Weapon1;
 		c->quality = EquipQualities::Epic;
@@ -210,6 +231,7 @@ void Equip::InitAllCfgs() {
 	{
 		auto& c = Equip_weapon2_1::_cfg;
 		c.Emplace();
+		c->name = i18n::Strs::equip_weapon2_1;
 		c->icon = gg.res.weapon2_1;
 		c->location = EquipLocations::Weapon2;
 		c->quality = EquipQualities::Normal;
