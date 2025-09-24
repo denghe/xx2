@@ -28,7 +28,7 @@ namespace UI {
 		border->Init(z + 1, 0, 0, size);
 
 		// swallow bg
-		Make<xx::Background>()->Init(z, border.ToWeak()).onOutsideClicked = [] {};
+		Make<xx::Background>()->Init(z, border).onOutsideClicked = [] {};
 
 		// center pos
 		auto cp = size * 0.5f;

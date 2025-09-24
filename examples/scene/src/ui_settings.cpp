@@ -36,7 +36,7 @@ namespace UI {
 		border->Init(z + 1, 0, 0.5f, cSize);
 
 		// swallow bg
-		Make<xx::Background>()->Init(z, border.ToWeak()).onOutsideClicked = [] {};
+		Make<xx::Background>()->Init(z, border).onOutsideClicked = [] {};
 
 		// title
 		Make<xx::Label>()->Init(z + 2, offset, anchor, fontSize * 2)(gg.lang(Strs::settings));

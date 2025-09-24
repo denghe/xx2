@@ -400,7 +400,7 @@ namespace xx {
             static_assert(PtrAlignCheck_v<T, U>);
             Reset();
             if (s.pointer) {
-                h = s.GetHeader();
+                h = (HeaderType*)s.GetHeader();
                 ++h->weakCount;
             }
         }
