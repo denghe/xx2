@@ -80,7 +80,7 @@ void Game::Delay() {
 #endif
 }
 
-void Game::OnResize() {
+void Game::OnResize(bool modeChanged_) {
 	ui->Resize(scale);
 	cam.SetBaseScale(scale);
 }

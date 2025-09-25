@@ -14,7 +14,6 @@ namespace xx {
 		XX_INLINE void Init() {
 			// small buffer for low latency. default is 0 ( auto: 4096 )
 			soloud.init(SoLoud::Soloud::CLIP_ROUNDOFF, 0, 0, 1024);
-			// todo: test popup sound device
 		}
 
 		XX_INLINE void SetGlobalVolume(float v) {

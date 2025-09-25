@@ -20,6 +20,6 @@ struct Game : xx::Game<Game> {
 	void Update();
 	void Delay();
 	void Stat();
-	void OnResize();
+	void OnResize(bool modeChanged_);
 };
 extern Game gg;
