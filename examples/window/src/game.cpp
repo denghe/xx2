@@ -88,6 +88,6 @@ void Game::OnResize() {
 void Game::Stat() {
 	xx::CoutN("drawFPS = ", drawFPS, " drawCall = "
 		, drawCall, " drawVerts = ", drawVerts
-		, " delayFuncs.len = ", delayFuncs.len
+		, " delayUpdates.len = ", delayUpdates.len
 	);
 }

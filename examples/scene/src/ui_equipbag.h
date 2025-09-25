@@ -2,6 +2,7 @@
 #include "game.h"
 #include "equip.h"
 
+struct Player;
 namespace UI {
 
 	struct DraggingItem;
@@ -11,13 +12,13 @@ namespace UI {
 	// panel
 	struct EquipBag : xx::Node {
 		static constexpr int32_t cTypeId{ 103 };
-		xx::Weak<Creature> owner;
+		xx::Weak<Player> owner;
 		xx::Weak<Node> focusedCell;
 		float infoPanelPopupTime{};
 		xx::Weak<Node> infoPanel;
 		xx::Weak<DraggingItem> draggingItem;
 
-		void Init(int32_t z_, xx::Weak<Creature> owner_);
+		void Init(int32_t z_, xx::Weak<Player> owner_);
 		int32_t Update() override;
 	};
 

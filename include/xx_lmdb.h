@@ -33,6 +33,10 @@ namespace xx {
             return 0;
         }
 
+        XX_INLINE bool NotFound() const {
+            return r == MDB_NOTFOUND;
+        }
+
         // return empty mean error. need check if r == MDB_NOTFOUND
         std::string_view Load(std::string_view k_) {
             if (r = mdb_txn_begin(env, nullptr, 0, &txn); r != MDB_SUCCESS) return {};

@@ -1,6 +1,6 @@
 ﻿#include "pch.h"
 #include "ui_equipbag.h"
-#include "creature.h"
+#include "player.h"
 #include "scene_play.h"
 
 namespace UI {
@@ -28,7 +28,7 @@ size: 480, 1080
 +-----------------------------+
 */
 
-	void EquipBag::Init(int32_t z_, xx::Weak<Creature> owner_) {
+	void EquipBag::Init(int32_t z_, xx::Weak<Player> owner_) {
         assert(owner_);
         owner = std::move(owner_);
         TryRegisterAutoUpdate();
@@ -182,12 +182,14 @@ size: 480, 1080
                         if (cell->equipLocation == EquipLocations::__MAX__) {
                             // bag : bag
                             std::swap(*cell->equipPtr, *equipPtr);
+                            eb.owner->SaveData();
                         }
                         else {
                             // bag : equips
                             if (cell->equipLocation == (*equipPtr)->cfg->location) {
                                 // location auth success
                                 std::swap(*cell->equipPtr, *equipPtr);
+                                eb.owner->SaveData();
                                 eb.owner->CalcProps();
                             }
                             // else { // do nothing (cancel select)
@@ -200,6 +202,7 @@ size: 480, 1080
                             if (equipLocation == (*cell->equipPtr)->cfg->location) {
                                 // location auth success
                                 std::swap(*cell->equipPtr, *equipPtr);
+                                eb.owner->SaveData();
                                 eb.owner->CalcProps();
                             }
                             // else { // do nothing (cancel select)
@@ -212,6 +215,7 @@ size: 480, 1080
                     if (equipLocation == EquipLocations::__MAX__) {
                         // bag : ?
                         std::swap(*cell->equipPtr, *equipPtr);
+                        eb.owner->SaveData();
                     }
                     else {
                         // equips : ?
@@ -220,6 +224,7 @@ size: 480, 1080
                             if (equipLocation == (*cell->equipPtr)->cfg->location) {
                                 // location auth success
                                 std::swap(*cell->equipPtr, *equipPtr);
+                                eb.owner->SaveData();
                                 eb.owner->CalcProps();
                             }
                             // else { // do nothing (cancel select)
@@ -246,6 +251,7 @@ size: 480, 1080
                     // unequip
                     if (auto c = eb.owner->FindFirstEmptyBagCell(); c) {
                         std::swap(*c, *equipPtr);
+                        eb.owner->SaveData();
                         eb.owner->CalcProps();
                     }
                 }
@@ -253,6 +259,7 @@ size: 480, 1080
                     if ((int32_t)equip->cfg->location <= (int32_t)EquipLocations::__EQUIPED_MAX__) {
                         // equip
                         std::swap(eb.owner->equips[(int32_t)equip->cfg->location], equip);
+                        eb.owner->SaveData();
                         eb.owner->CalcProps();
                     }
                 }

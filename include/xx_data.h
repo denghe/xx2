@@ -116,7 +116,10 @@ namespace xx {
         // 引用一个 含有 buf + len 成员的对象的数据
         template<typename T, typename = std::enable_if_t<std::is_class_v<T>>>
         [[maybe_unused]] Data_r(T const& d, size_t offset = 0) {
-            if constexpr (Has_GetBuf<T> && Has_GetLen<T>) {
+            if constexpr (std::is_same_v<std::string_view, std::decay_t<T>>) {
+                Reset(d.data(), d.size(), offset);
+            }
+            else if constexpr (Has_GetBuf<T> && Has_GetLen<T>) {
                 Reset(d.GetBuf(), d.GetLen(), offset);
             } else {
                 Reset(d.buf, d.len, offset);

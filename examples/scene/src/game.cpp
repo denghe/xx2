@@ -101,8 +101,8 @@ xx::Task<> Game::Task() {
 		xx::CoutN("pack failed");
 	}
 
-	// init equip configs
-	Equip::InitAllCfgs();
+	// init equip static configs & makers
+	Equip::InitCfgs();
 
 	// init first scene
 	scene.Emplace<Scene_MainMenu>()->Init();

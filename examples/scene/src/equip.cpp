@@ -2,7 +2,7 @@
 #include "scene_play.h"
 #include "equip.h"
 
-void Equip::EquipInit(Creature* owner_, xx::Ref<EquipConfig> cfg_) {
+void Equip::Init(Creature* owner_, xx::Ref<EquipConfig> cfg_) {
 	owner = owner_;
 	scene = owner_->scene;
 	cfg = std::move(cfg_);
@@ -86,9 +86,48 @@ xx::Shared<xx::Node> Equip::GenInfoPanel(Equip* cmp_) {
 	return r;
 }
 
-void Equip::InitAllCfgs() {
+void Equip::WriteTo(xx::Data& d) {
+	d.Write(cfg->typeId);
+	for (int32_t i = 0; i < props.len; ++i) {
+		d.Write(props[i].value);
+	}
+}
+
+int Equip::ReadFrom(xx::Data_r& dr_, Creature* owner_, xx::Shared<Equip>& tar_) {
+	uint32_t typeId{};
+	if (auto r = dr_.Read(typeId)) return r;
+	if (typeId == 0) return 0;
+	if (typeId >= cfgs.len) return __LINE__;
+	tar_ = makers[typeId]();
+	tar_->owner = owner_;
+	tar_->scene = owner_->scene;
+	tar_->cfg = cfgs[typeId];
+	auto& cps = tar_->cfg->props;
+	if (!cps.len) return 0;
+	tar_->props.Reserve(cps.len);
+	for (int32_t i = 0; i < cps.len; ++i) {
+		auto& p = cps[i];
+		float v{};
+		if (auto r = dr_.Read(v)) return {};
+		if (v < p.value.from || v > p.value.to) return {};
+		tar_->props.Emplace(EquipProp{ p.target, p.index, v });
+	}
+	return 0;
+}
+
+xx::Shared<Equip> Equip::Make(Creature* owner_, uint32_t typeId_) {
+	auto r = makers[typeId_]();
+	r->Init(owner_, cfgs[typeId_]);
+	return r;
+}
+
+void Equip::InitCfgs() {
+	assert(cfgs.Empty());
+	assert(makers.Empty());
+	cfgs.Emplace();
+	makers.Emplace();
 	{
-		auto& c = Equip_amulet_1::_cfg.Emplace();
+		auto& c = MakeMakerAndCfg<Equip_amulet_1>();
 		c->name = i18n::Strs::Equip_amulet_1;
 		c->icon = gg.res.amulet_1;
 		c->location = EquipLocations::Amulet;
@@ -97,7 +136,7 @@ void Equip::InitAllCfgs() {
 		c->props.Emplace(EquipConfigProp{ EquipTargets::Creature, 25, {3, 5} });
 	}
 	{
-		auto& c = Equip_armor_1::_cfg.Emplace();
+		auto& c = MakeMakerAndCfg<Equip_armor_1>();
 		c->name = i18n::Strs::Equip_armor_1;
 		c->icon = gg.res.armor_1;
 		c->location = EquipLocations::Armor;
@@ -105,7 +144,7 @@ void Equip::InitAllCfgs() {
 		//c->props.Emplace(......)
 	}
 	{
-		auto& c = Equip_armor_2::_cfg.Emplace();
+		auto& c = MakeMakerAndCfg<Equip_armor_2>();
 		c->name = i18n::Strs::Equip_armor_2;
 		c->icon = gg.res.armor_2;
 		c->location = EquipLocations::Armor;
@@ -113,7 +152,7 @@ void Equip::InitAllCfgs() {
 		//c->props.Emplace(......)
 	}
 	{
-		auto& c = Equip_armor_3::_cfg.Emplace();
+		auto& c = MakeMakerAndCfg<Equip_armor_3>();
 		c->name = i18n::Strs::Equip_armor_3;
 		c->icon = gg.res.armor_3;
 		c->location = EquipLocations::Armor;
@@ -121,7 +160,7 @@ void Equip::InitAllCfgs() {
 		//c->props.Emplace(......)
 	}
 	{
-		auto& c = Equip_boots_1::_cfg.Emplace();
+		auto& c = MakeMakerAndCfg<Equip_boots_1>();
 		c->name = i18n::Strs::Equip_boots_1;
 		c->icon = gg.res.boots_1;
 		c->location = EquipLocations::Boots;
@@ -129,7 +168,7 @@ void Equip::InitAllCfgs() {
 		//c->props.Emplace(......)
 	}
 	{
-		auto& c = Equip_consumable_1::_cfg.Emplace();
+		auto& c = MakeMakerAndCfg<Equip_consumable_1>();
 		c->name = i18n::Strs::Equip_consumable_1;
 		c->icon = gg.res.consumable_1;
 		c->location = EquipLocations::Consumables;
@@ -137,7 +176,7 @@ void Equip::InitAllCfgs() {
 		//c->props.Emplace(......)
 	}
 	{
-		auto& c = Equip_currency_1::_cfg.Emplace();
+		auto& c = MakeMakerAndCfg<Equip_currency_1>();
 		c->name = i18n::Strs::Equip_currency_1;
 		c->icon = gg.res.currency_1;
 		c->location = EquipLocations::Currency;
@@ -145,7 +184,7 @@ void Equip::InitAllCfgs() {
 		//c->props.Emplace(......)
 	}
 	{
-		auto& c = Equip_currency_2::_cfg.Emplace();
+		auto& c = MakeMakerAndCfg<Equip_currency_2>();
 		c->name = i18n::Strs::Equip_currency_2;
 		c->icon = gg.res.currency_2;
 		c->location = EquipLocations::Currency;
@@ -153,7 +192,7 @@ void Equip::InitAllCfgs() {
 		//c->props.Emplace(......)
 	}
 	{
-		auto& c = Equip_helm_1::_cfg.Emplace();
+		auto& c = MakeMakerAndCfg<Equip_helm_1>();
 		c->name = i18n::Strs::Equip_helm_1;
 		c->icon = gg.res.helm_1;
 		c->location = EquipLocations::Helm;
@@ -161,7 +200,7 @@ void Equip::InitAllCfgs() {
 		//c->props.Emplace(......)
 	}
 	{
-		auto& c = Equip_material_1::_cfg.Emplace();
+		auto& c = MakeMakerAndCfg<Equip_material_1>();
 		c->name = i18n::Strs::Equip_material_1;
 		c->icon = gg.res.material_1;
 		c->location = EquipLocations::Materials;
@@ -169,7 +208,7 @@ void Equip::InitAllCfgs() {
 		//c->props.Emplace(......)
 	}
 	{
-		auto& c = Equip_ring_1::_cfg.Emplace();
+		auto& c = MakeMakerAndCfg<Equip_ring_1>();
 		c->name = i18n::Strs::Equip_ring_1;
 		c->icon = gg.res.ring_1;
 		c->location = EquipLocations::Ring;
@@ -177,7 +216,7 @@ void Equip::InitAllCfgs() {
 		//c->props.Emplace(......)
 	}
 	{
-		auto& c = Equip_ring_2::_cfg.Emplace();
+		auto& c = MakeMakerAndCfg<Equip_ring_2>();
 		c->name = i18n::Strs::Equip_ring_2;
 		c->icon = gg.res.ring_2;
 		c->location = EquipLocations::Ring;
@@ -185,7 +224,7 @@ void Equip::InitAllCfgs() {
 		//c->props.Emplace(......)
 	}
 	{
-		auto& c = Equip_ring_3::_cfg.Emplace();
+		auto& c = MakeMakerAndCfg<Equip_ring_3>();
 		c->name = i18n::Strs::Equip_ring_3;
 		c->icon = gg.res.ring_3;
 		c->location = EquipLocations::Ring;
@@ -193,7 +232,7 @@ void Equip::InitAllCfgs() {
 		//c->props.Emplace(......)
 	}
 	{
-		auto& c = Equip_ring_4::_cfg.Emplace();
+		auto& c = MakeMakerAndCfg<Equip_ring_4>();
 		c->name = i18n::Strs::Equip_ring_4;
 		c->icon = gg.res.ring_4;
 		c->location = EquipLocations::Ring;
@@ -201,7 +240,7 @@ void Equip::InitAllCfgs() {
 		//c->props.Emplace(......)
 	}
 	{
-		auto& c = Equip_weapon1_1::_cfg.Emplace();
+		auto& c = MakeMakerAndCfg<Equip_weapon1_1>();
 		c->name = i18n::Strs::Equip_weapon1_1;
 		c->icon = gg.res.weapon1_1;
 		c->location = EquipLocations::Weapon1;
@@ -209,7 +248,7 @@ void Equip::InitAllCfgs() {
 		//c->props.Emplace(......)
 	}
 	{
-		auto& c = Equip_weapon1_2::_cfg.Emplace();
+		auto& c = MakeMakerAndCfg<Equip_weapon1_2>();
 		c->name = i18n::Strs::Equip_weapon1_2;
 		c->icon = gg.res.weapon1_2;
 		c->location = EquipLocations::Weapon1;
@@ -217,7 +256,7 @@ void Equip::InitAllCfgs() {
 		//c->props.Emplace(......)
 	}
 	{
-		auto& c = Equip_weapon1_3::_cfg.Emplace();
+		auto& c = MakeMakerAndCfg<Equip_weapon1_3>();
 		c->name = i18n::Strs::Equip_weapon1_3;
 		c->icon = gg.res.weapon1_3;
 		c->location = EquipLocations::Weapon1;
@@ -226,7 +265,7 @@ void Equip::InitAllCfgs() {
 		c->props.Emplace(EquipConfigProp{ EquipTargets::Creature, 6, {2, 2} });
 	}
 	{
-		auto& c = Equip_weapon2_1::_cfg.Emplace();
+		auto& c = MakeMakerAndCfg<Equip_weapon2_1>();
 		c->name = i18n::Strs::Equip_weapon2_1;
 		c->icon = gg.res.weapon2_1;
 		c->location = EquipLocations::Weapon2;
