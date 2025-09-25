@@ -4,18 +4,13 @@
 #include "xx_ui_scale9config.h"
 #include "xx_embeds.h"
 #include "xx_bmfont.h"
-#include "xx_sound.h"
 
 namespace xx {
 
-	// shader support
 	struct alignas(8) GameBase_shader : GameBase {
 		inline static GameBase_shader* GetInstance() {
 			return (GameBase_shader*)GameBase::instance;
 		}
-
-		// sound system
-		Sound sound;
 
 		// shaders
 		Shader_Quad shaderQuad;
@@ -25,15 +20,16 @@ namespace xx {
 		// embed res
 		struct {
 			Ref<Scale9Config>
-				cfg_s9bN, 
-				cfg_s9bH, 
-				cfg_s9bg, 
-				cfg_sbar, 
+				cfg_s9,
+				cfg_s9bN,
+				cfg_s9bH,
+				cfg_s9bg,
+				cfg_sbar,
 				cfg_sblock;
 			// ...
 
 			TinyFrame
-				ui_button,
+				ui_s9,
 				ui_button_h,
 				ui_button_n,
 				ui_checkbox_0,
@@ -73,7 +69,7 @@ namespace xx {
 
 			// init pngs( texture combined with font )
 			auto& ft = embed.font_sys->texs[0];
-			embed.ui_button = { ft, 944, 1008, 6, 6 };
+			embed.ui_s9 = { ft, 944, 1008, 6, 6 };
 			embed.ui_button_h = { ft, 944, 992, 6, 6 };
 			embed.ui_button_n = { ft, 928, 992, 6, 6 };
 			embed.ui_checkbox_0 = { ft, 992, 992, 32, 32 };
@@ -93,6 +89,9 @@ namespace xx {
 			embed.icon_flags_.Emplace(ft, 734, 1008, 16, 16);
 
 			// init cfgs
+			embed.cfg_s9.Emplace();
+			embed.cfg_s9->frame = embed.ui_s9;
+
 			embed.cfg_s9bN.Emplace();
 			embed.cfg_s9bN->frame = embed.ui_button_n;
 
@@ -112,46 +111,11 @@ namespace xx {
 			// init sound sources
 			embed.ss_ui_focus = LoadSoundSourceFromData(embeds::wav::ui_focus);
 
-			// init sound
-			sound.Init();
-
 			// init shaders
 			shaderQuad.Init();
 			// ...
 		}
 
-		// d: ogg
-		XX_INLINE Ref<SoundSource> LoadSoundSourceFromData(uint8_t* buf, size_t len, bool looping = false) {
-			assert(!IsCompressedData(buf, len));
-			auto rtv = MakeRef<SoundSource>();
-			auto r = rtv->wav.loadMem(buf, len, false, false);
-			assert(!r);
-			if (looping) {
-				rtv->wav.setLooping(true);
-			}
-			return rtv;
-		}
-
-		template<size_t len>
-		XX_INLINE Ref<SoundSource> LoadSoundSourceFromData(const uint8_t(&buf)[len], bool looping = false) {
-			return LoadSoundSourceFromData((uint8_t*)buf, len, looping);
-		}
-
-		XX_INLINE Ref<SoundSource> LoadSoundSource(std::string_view fn, bool looping = false) {
-			auto [d, p] = LoadFileData(fn);
-			assert(d);
-			return LoadSoundSourceFromData(d.buf, d.len, looping);
-		}
-
-		XX_INLINE int PlayAudio(Ref<SoundSource> const& ss_, float volume_ = 1.f, float pan_ = 0.f, float speed_ = 1.f) {
-			if (mute || audioVolume == 0) return 0;
-			return sound.Play(ss_, volume_ * audioVolume, pan_, speed_);
-		}
-
-		XX_INLINE int PlayMusic(Ref<SoundSource> const& ss_, float volume_ = 1.f, float pan_ = 0.f, float speed_ = 1.f) {
-			if (mute || musicVolume == 0) return 0;
-			return sound.Play(ss_, volume_ * musicVolume, pan_, speed_);
-		}
 	};
 
 }

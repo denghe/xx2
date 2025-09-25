@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include "xx_gamebase.h"
 #include <soloud.h>
 #include <soloud_wav.h>
 #include <soloud_file.h>

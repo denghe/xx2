@@ -5,6 +5,7 @@
 #include "xx_zstd.h"
 #include "xx_grid2d_aabb.h"
 #include "xx_input.h"
+#include "xx_sound.h"
 
 namespace xx {
 
@@ -80,6 +81,8 @@ namespace xx {
 		List<Weak<Node>> uiAutoUpdates;
 
 		Shader* shader{};
+
+		Sound sound;
 
 		std::string rootPath;
 		std::vector<std::string> searchPaths;
@@ -338,12 +341,52 @@ namespace xx {
 			return LoadTextureFromData(buf, len, fn);
 		}
 
+
+
+		// d: ogg / wav
+		XX_INLINE Ref<SoundSource> LoadSoundSourceFromData(uint8_t* buf, size_t len, bool looping = false) {
+			assert(!IsCompressedData(buf, len));
+			auto rtv = MakeRef<SoundSource>();
+			auto r = rtv->wav.loadMem(buf, len, false, false);
+			assert(!r);
+			if (looping) {
+				rtv->wav.setLooping(true);
+			}
+			return rtv;
+		}
+
+		template<size_t len>
+		XX_INLINE Ref<SoundSource> LoadSoundSourceFromData(const uint8_t(&buf)[len], bool looping = false) {
+			return LoadSoundSourceFromData((uint8_t*)buf, len, looping);
+		}
+
+		XX_INLINE Ref<SoundSource> LoadSoundSource(std::string_view fn, bool looping = false) {
+			auto [d, p] = LoadFileData(fn);
+			assert(d);
+			return LoadSoundSourceFromData(d.buf, d.len, looping);
+		}
+
+		XX_INLINE int PlayAudio(Ref<SoundSource> const& ss_, float volume_ = 1.f, float pan_ = 0.f, float speed_ = 1.f) {
+			if (mute || audioVolume == 0) return 0;
+			return sound.Play(ss_, volume_ * audioVolume, pan_, speed_);
+		}
+
+		XX_INLINE int PlayMusic(Ref<SoundSource> const& ss_, float volume_ = 1.f, float pan_ = 0.f, float speed_ = 1.f) {
+			if (mute || musicVolume == 0) return 0;
+			return sound.Play(ss_, volume_ * musicVolume, pan_, speed_);
+		}
+
+
+
 		// life cycle 1
 		void BaseInit() {
+			sound.Init();
+
 #ifdef WIN32
 			SetConsoleOutputCP(CP_UTF8);
 			timeBeginPeriod(1);
 #endif
+
 			auto currDir = std::filesystem::absolute("./").u8string();
 			this->rootPath = this->ToSearchPath((std::string&)currDir);
 			this->searchPaths.clear();

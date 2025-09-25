@@ -301,7 +301,7 @@ size: 480, 1080
                     assert(ebc->equipLocation != EquipLocations::__MAX__);
                     if (ebc->equipLocation == equip->cfg->location) {
                         border = ebc->parent->Make<xx::Scale9>();
-                        border->Init(z_, ebc->position, ebc->anchor, ebc->size);
+                        border->Init(z_, ebc->position, ebc->anchor, ebc->size, gg.embed.cfg_s9);
                         break;
                     }
                 }

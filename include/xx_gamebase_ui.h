@@ -3,7 +3,7 @@
 #include "xx_node.h"
 
 namespace xx {
-	// font support
+
 	struct GameBase_ui : GameBase_shader {
 		inline static GameBase_ui* GetInstance() {
 			return (GameBase_ui*)GameBase::instance;
