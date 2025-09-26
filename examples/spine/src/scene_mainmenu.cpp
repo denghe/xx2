@@ -32,6 +32,7 @@ void Scene_MainMenu::MakeUI() {
 		//gg.MakeScene<Scene_Test2>()->Init();
 	};
 	offset.y -= cLineHeight;
+
 }
 
 void Scene_MainMenu::Update() {

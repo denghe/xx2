@@ -1,6 +1,9 @@
 ﻿#pragma once
 #include "xx_gamebase.h"
 #include "xx_shader_quad.h"
+#include "xx_shader_spine.h"
+#include "xx_shader_texvert.h"
+
 #include "xx_ui_scale9config.h"
 #include "xx_embeds.h"
 #include "xx_bmfont.h"
@@ -15,6 +18,12 @@ namespace xx {
 		// shaders
 		Shader_Quad shaderQuad;
 		XX_INLINE Shader_Quad& Quad() { return ShaderBegin(shaderQuad); }
+
+		Shader_Spine shaderSpine;
+		XX_INLINE Shader_Spine& Spine() { return ShaderBegin(shaderSpine); }
+
+		Shader_TexVert shaderTexVert;
+		XX_INLINE Shader_TexVert& TexVert() { return ShaderBegin(shaderTexVert); }
 		// ...
 
 		// embed res
@@ -113,6 +122,8 @@ namespace xx {
 
 			// init shaders
 			shaderQuad.Init();
+			shaderSpine.Init();
+			shaderTexVert.Init();
 			// ...
 		}
 

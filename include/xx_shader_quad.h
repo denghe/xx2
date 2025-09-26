@@ -27,10 +27,10 @@ namespace xx {
         GLVertexArrays va;
         GLBuffer vb, ib;
 
-        static constexpr int32_t maxQuadNums{ 200000 };
+        static constexpr int32_t maxNums{ 200000 };
         GLuint lastTextureId{};
-        std::unique_ptr<Shader_QuadData[]> data = std::make_unique_for_overwrite<Shader_QuadData[]>(maxQuadNums);
-        int32_t quadCount{};
+        std::unique_ptr<Shader_QuadData[]> data = std::make_unique_for_overwrite<Shader_QuadData[]>(maxNums);
+        int32_t count{};
 
         void Init() {
 
@@ -140,35 +140,35 @@ void main() {
 
         virtual void End() override {
             assert(GameBase::instance->shader == this);
-            if (quadCount) {
+            if (count) {
                 Commit();
             }
         }
 
         void Commit() {
             glBindBuffer(GL_ARRAY_BUFFER, vb);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(Shader_QuadData) * quadCount, data.get(), GL_STREAM_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, sizeof(Shader_QuadData) * count, data.get(), GL_STREAM_DRAW);
 
             glBindTexture(GL_TEXTURE_2D, lastTextureId);
-            glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, quadCount);
+            glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, count);
             CheckGLError();
 
-            GameBase::instance->drawVerts += quadCount * 6;
+            GameBase::instance->drawVerts += count * 6;
             GameBase::instance->drawCall += 1;
 
             lastTextureId = 0;
-            quadCount = 0;
+            count = 0;
         }
 
-        XX_INLINE Shader_QuadData* Alloc(GLuint texId_, int32_t numQuads_) {
+        XX_INLINE Shader_QuadData* Alloc(GLuint texId_, int32_t num_) {
             assert(GameBase::instance->shader == this);
-            assert(numQuads_ <= maxQuadNums);
-            if (quadCount + numQuads_ > maxQuadNums || (lastTextureId && lastTextureId != texId_)) {
+            assert(num_ <= maxNums);
+            if (count + num_ > maxNums || (lastTextureId && lastTextureId != texId_)) {
                 Commit();
             }
             lastTextureId = texId_;
-            auto r = &data[quadCount];
-            quadCount += numQuads_;
+            auto r = &data[count];
+            count += num_;
             return r;
         }
 

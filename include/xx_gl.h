@@ -79,6 +79,10 @@ namespace xx {
 			SetTexParm(id, minFilter_, magFilter_, sWraper_, tWraper_);
 		}
 
+		void SetParm(GLuint minmagFilter_, GLuint stWraper_) {
+			SetTexParm(id, minmagFilter_, minmagFilter_, stWraper_, stWraper_);
+		}
+
 		void GenerateMipmap() {
 			glBindTexture(GL_TEXTURE_2D, id);
 			glGenerateMipmap(id);
@@ -236,16 +240,19 @@ namespace xx {
 
 	// ...
 
-	//struct GLVertTexture : GLRes<GLResTypes::Texture> {
-	//	XY size{};
-	//	int32_t numVerts{}, numFrames{};
-	//};
+	/**********************************************************************************************************************************/
+	/**********************************************************************************************************************************/
 
-	//inline GLVertTexture LoadGLVertTexture(void* data, GLsizei w, GLsizei h, int32_t numVerts, int32_t numFrames) {
-	//	auto id = GLTexture::GenTex();
-	//	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, w, h, 0, GL_RGBA, GL_FLOAT, data);
-	//	return { id, { w, h }, numVerts, numFrames };
-	//}
+	struct GLVertTexture : GLRes<GLResTypes::Texture> {
+		XY size{};
+		int32_t numVerts{}, numFrames{};
+	};
+
+	inline GLVertTexture LoadGLVertTexture(void* data, GLsizei w, GLsizei h, int32_t numVerts, int32_t numFrames) {
+		auto id = GLTexture::MakeTex();
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, w, h, 0, GL_RGBA, GL_FLOAT, data);
+		return { id, { w, h }, numVerts, numFrames };
+	}
 
 	//struct GLTiledTexture : GLRes<GLResTypes::Texture> {
 	//	XY size{};
