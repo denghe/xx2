@@ -21,6 +21,8 @@ include_directories(
 	../../stb
 	../../soloud/include
 	../../glfw/include
+	../../lmdb/libraries/liblmdb
+	../../spine-runtimes-cpp-38/include
 )
 
 file(GLOB sources
@@ -51,6 +53,12 @@ SET(ZSTD_MULTITHREAD_SUPPORT_DEFAULT OFF CACHE BOOL "ZSTD_MULTITHREAD_SUPPORT_DE
 SET(ZSTD_MULTITHREAD_SUPPORT OFF CACHE BOOL "ZSTD_MULTITHREAD_SUPPORT" FORCE)
 add_subdirectory(../../zstd/build/cmake zstd)
 target_link_libraries(${name} libzstd_static)
+
+add_subdirectory(../../lmdb lmdb)
+target_link_libraries(${name} lmdb)
+
+add_subdirectory(../../spine-runtimes-cpp-38 spine)
+target_link_libraries(${name} spine)
 
 if (WIN32)
 	target_link_libraries(${name} winmm)

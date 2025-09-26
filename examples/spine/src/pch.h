@@ -4,8 +4,5 @@
 #define _XX_GAME_PCH_
 
 #include <xx_game.h>
-#include <xx_camera.h>
-#include <xx_ui.h>
-#include <xx_spine.h>
 
 #endif

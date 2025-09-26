@@ -87,7 +87,7 @@ namespace xx {
 		template<bool skeletonFileIsJson = false>
 		void Load(std::string const& baseFileNameWithPath, spine::SkeletonData*& sd, xx::Ref<xx::GLTexture>& tex, float scale = 1.f);
 	};
-	inline SpineEnv gSpineEnv;
+	inline SpineEnv gSpineEnv;	// need init at GameBase
 
 
 	/*****************************************************************************************************************************************************************************************/

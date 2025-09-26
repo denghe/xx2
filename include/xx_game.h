@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "xx_gamebase_ui.h"
 #include "xx_ui.h"
+#include "xx_camera.h"
 
 namespace xx {
 	// derived member checkers
