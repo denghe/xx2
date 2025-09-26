@@ -16,3 +16,6 @@
 [submodule "lmdb"]
 	path = lmdb
 	url = https://github.com/denghe/lmdb.git
+[submodule "spine-runtimes-cpp-38"]
+	path = spine-runtimes-cpp-38
+	url = https://github.com/denghe/spine-runtimes-cpp-38.git
