@@ -1,5 +1,6 @@
 ﻿#include "pch.h"
 #include "scene_mainmenu.h"
+#include "scene_test1.h"
 
 void Scene_MainMenu::Init() {
 	MakeUI();
@@ -24,7 +25,7 @@ void Scene_MainMenu::MakeUI() {
 	offset.y -= cLineHeight * 1.5;
 
 	ui->Make<xx::LabelButton>()->Init(2, offset, anchor, fontSize)("test1").onClicked = [this] {
-		//gg.MakeScene<Scene_Test1>()->Init();
+		gg.MakeScene<Scene_Test1>()->Init();
 	};
 	offset.y -= cLineHeight;
 
