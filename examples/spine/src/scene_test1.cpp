@@ -3,9 +3,26 @@
 #include "scene_mainmenu.h"
 
 void Scene_Test1::Init() {
-	// init game logic
-	cam.Init(gg.scale, 1.f);
+	cam.Init(gg.scale, 0.5f);
 	ui.Emplace()->InitRoot(gg.scale);
+
+	sp.Emplace(gg.res.spineOwl_skel);
+	sp->SetUsePremultipliedAlpha(true);
+	sp->SetAnimation(0, "idle", true);
+	sp->SetAnimation(1, "blink", true);
+
+	left = sp->SetAnimation(2, "left", true);
+	right = sp->SetAnimation(3, "right", true);
+	up = sp->SetAnimation(4, "up", true);
+	down = sp->SetAnimation(5, "down", true);
+	left->setAlpha(0);
+	left->setMixBlend(spine::MixBlend_Add);
+	right->setAlpha(0);
+	right->setMixBlend(spine::MixBlend_Add);
+	up->setAlpha(0);
+	up->setMixBlend(spine::MixBlend_Add);
+	down->setAlpha(0);
+	down->setMixBlend(spine::MixBlend_Add);
 }
 
 void Scene_Test1::Update() {
@@ -26,9 +43,32 @@ void Scene_Test1::Update() {
 }
 
 void Scene_Test1::FixedUpdate() {
+	float x = gg.mousePos.x / gg.designSize.x;
+	if (x < 0) {
+		left->setAlpha(0);
+		right->setAlpha(-x * 2);
+	}
+	else {
+		left->setAlpha(x * 2);
+		right->setAlpha(0);
+	}
+
+	float y = gg.mousePos.y / gg.designSize.y;
+	if (x < 0) {
+		up->setAlpha(0);
+		down->setAlpha(-y * 2);
+	}
+	else {
+		up->setAlpha(y * 2);
+		down->setAlpha(0);
+	}
+
+	sp->skeleton.setToSetupPose();
+	sp->Update(gg.cDelta);
 }
 
 void Scene_Test1::Draw() {
+	sp->Draw(cam.scale);
 	gg.DrawNode(ui);
 }
 

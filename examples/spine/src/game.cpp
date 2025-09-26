@@ -14,7 +14,18 @@ void Game::Init() {
 
 xx::Task<> Game::Task() {
 	// begin load res
-	// todo
+	// load spine res & parse
+	auto& se = xx::gSpineEnv;
+
+	se.Load("res/owl-pro", res.spineOwl_skel, res.spineOwl_tex);
+	res.spineOwl_tex->GenerateMipmap();
+	res.spineOwl_idle = res.spineOwl_skel->findAnimation("idle");
+	res.spineOwl_blink = res.spineOwl_skel->findAnimation("blink");
+
+	//se.Load("res/spineboy-ess", res_SpineBoy_skel, res_SpineBoy_tex);
+	//res_SpineBoy_walk = res_SpineBoy_skel->findAnimation("walk");
+	//res_SpineBoy_jump = res_SpineBoy_skel->findAnimation("jump");
+	//res_SpineBoy_run = res_SpineBoy_skel->findAnimation("run");
 
 	// init first scene
 	scene.Emplace<Scene_MainMenu>()->Init();
@@ -29,7 +40,7 @@ xx::Task<> Game::Task() {
 }
 
 void Game::Delay() {
-#if 1
+#if 0
 	// for power saving, fps limit
 	SleepSecs(cDelta - (glfwGetTime() - time));	
 #endif
@@ -42,7 +53,7 @@ void Game::OnResize(bool modeChanged_) {
 }
 
 void Game::Stat() {
-#if 0
+#if 1
 	xx::CoutN("drawFPS = ", drawFPS, " drawCall = "
 		, drawCall, " drawVerts = ", drawVerts
 		, " uiAutoUpdates.len = ", uiAutoUpdates.len

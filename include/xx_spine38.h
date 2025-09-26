@@ -13,14 +13,12 @@ namespace xx {
 		void callback(spine::AnimationState* state, spine::EventType type, spine::TrackEntry* entry, spine::Event* e) override;
 	};
 
-	// todo: more enhance like rotate ??
 	struct SpinePlayer {
 		spine::AnimationStateData animationStateData;
 		spine::Skeleton skeleton;
 		spine::AnimationState animationState;
 		SpineListener spineListener;							// can SetCallBack( func )
 		float timeScale{ 1 };
-		mutable bool usePremultipliedAlpha{ false };
 
 		SpinePlayer(spine::SkeletonData* skeletonData);
 		SpinePlayer() = delete;
@@ -43,10 +41,11 @@ namespace xx {
 		SpinePlayer& SetFirstScale(XY const& scale);	// first bone
 		SpinePlayer& SetMix(spine::Animation* from, spine::Animation* to, float duration);
 		SpinePlayer& SetMix(std::string_view fromName, std::string_view toName, float duration);
-		SpinePlayer& SetAnimation(size_t trackIndex, spine::Animation* anim, bool loop);
-		SpinePlayer& SetAnimation(size_t trackIndex, std::string_view animationName, bool loop);
-		SpinePlayer& AddAnimation(size_t trackIndex, spine::Animation* anim, bool loop, float delay);
-		SpinePlayer& AddAnimation(size_t trackIndex, std::string_view animationName, bool loop, float delay);
+		spine::TrackEntry* SetAnimation(size_t trackIndex, spine::Animation* anim, bool loop);
+		spine::TrackEntry* SetAnimation(size_t trackIndex, std::string_view animationName, bool loop);
+		spine::TrackEntry* AddAnimation(size_t trackIndex, spine::Animation* anim, bool loop, float delay);
+		spine::TrackEntry* AddAnimation(size_t trackIndex, std::string_view animationName, bool loop, float delay);
+		// ...
 
 	protected:
 		mutable spine::Vector<float> worldVertices;
@@ -54,6 +53,7 @@ namespace xx {
 		mutable spine::Vector<spine::Color> tempColors;
 		mutable spine::Vector<unsigned short> quadIndices;
 		mutable spine::SkeletonClipping clipper;
+		mutable bool usePremultipliedAlpha{ false };
 	};
 
 	struct SpineTextureLoader : public spine::TextureLoader {
@@ -92,7 +92,7 @@ namespace xx {
 
 	/*****************************************************************************************************************************************************************************************/
 	/*****************************************************************************************************************************************************************************************/
-
+	// ref: spine-sfml.cpp
 
 	inline SpinePlayer::SpinePlayer(spine::SkeletonData* skeletonData)
 		: animationStateData(skeletonData)
@@ -109,50 +109,54 @@ namespace xx {
 		quadIndices.add(2);
 		quadIndices.add(3);
 		quadIndices.add(0);
-
-		//skeleton->setToSetupPose();
 	}
 
 	inline SpinePlayer& SpinePlayer::Update(float delta) {
 		animationState.update(delta * timeScale);
 		animationState.apply(skeleton);
+		skeleton.update(delta * timeScale);
 		skeleton.updateWorldTransform();
 		return *this;
 	}
 
 	inline void SpinePlayer::Draw(float cameraScale) {
 		auto& eg = *GameBase_shader::GetInstance();
-		auto&& shader = eg.ShaderBegin(eg.shaderSpine);
+		auto&& shader = eg.Spine();
 
 		// Early out if skeleton is invisible
 		if (skeleton.getColor().a == 0) return;
 
-		RGBA8 c{};
-		GLTexture* tex{};
+		// if (vertexEffect != NULL)
 
+		RGBA8 color{};
+		GLTexture* texture{};
 		for (size_t i = 0, e = skeleton.getSlots().size(); i < e; ++i) {
-
 			auto&& slot = *skeleton.getDrawOrder()[i];
 			auto&& attachment = slot.getAttachment();
-			if (!attachment) continue;
+			if (!attachment) {
+				clipper.clipEnd(slot);
+				continue;
+			}
+			auto&& attachmentRTTI = attachment->getRTTI();
 
-			if (slot.getColor().a == 0 || !slot.getBone().isActive()) {
+			// Early out if the slot color is 0 or the bone is not active
+			if ((slot.getColor().a == 0 || !slot.getBone().isActive()) && !attachmentRTTI.isExactly(spine::ClippingAttachment::rtti)) {
 				clipper.clipEnd(slot);
 				continue;
 			}
 
 			spine::Vector<float>* vertices = &worldVertices;
+			size_t verticesCount{};
 			spine::Vector<float>* uvs{};
 			spine::Vector<unsigned short>* indices{};
 			size_t indicesCount{};
 			spine::Color* attachmentColor{};
 
-			auto&& attachmentRTTI = attachment->getRTTI();
 			if (attachmentRTTI.isExactly(spine::RegionAttachment::rtti)) {
-
 				auto&& regionAttachment = (spine::RegionAttachment*)attachment;
 				attachmentColor = &regionAttachment->getColor();
 
+				// Early out if the slot color is 0
 				if (attachmentColor->a == 0) {
 					clipper.clipEnd(slot);
 					continue;
@@ -160,46 +164,43 @@ namespace xx {
 
 				worldVertices.setSize(8, 0);
 				regionAttachment->computeWorldVertices(slot.getBone(), worldVertices, 0, 2);
+				verticesCount = 4;
 				uvs = &regionAttachment->getUVs();
 				indices = &quadIndices;
 				indicesCount = 6;
-				tex = (GLTexture*)((spine::AtlasRegion*)regionAttachment->getRendererObject())->page->getRendererObject();
+				texture = (GLTexture*)((spine::AtlasRegion*)regionAttachment->getRendererObject())->page->getRendererObject();
 			}
 			else if (attachmentRTTI.isExactly(spine::MeshAttachment::rtti)) {
-
 				auto&& mesh = (spine::MeshAttachment*)attachment;
 				attachmentColor = &mesh->getColor();
 
+				// Early out if the slot color is 0
 				if (attachmentColor->a == 0) {
 					clipper.clipEnd(slot);
 					continue;
 				}
 
 				worldVertices.setSize(mesh->getWorldVerticesLength(), 0);
+				texture = (GLTexture*)((spine::AtlasRegion*)mesh->getRendererObject())->page->getRendererObject();
 				mesh->computeWorldVertices(slot, 0, mesh->getWorldVerticesLength(), worldVertices.buffer(), 0, 2);
+				verticesCount = mesh->getWorldVerticesLength() >> 1;
 				uvs = &mesh->getUVs();
 				indices = &mesh->getTriangles();
 				indicesCount = mesh->getTriangles().size();
-				tex = (GLTexture*)((spine::AtlasRegion*)mesh->getRendererObject())->page->getRendererObject();
 			}
 			else if (attachmentRTTI.isExactly(spine::ClippingAttachment::rtti)) {
-
 				spine::ClippingAttachment* clip = (spine::ClippingAttachment*)slot.getAttachment();
 				clipper.clipStart(slot, clip);
 				continue;
-
 			}
-			else
-				continue;
+			else continue;
 
 			auto&& skc = skeleton.getColor();
 			auto&& slc = slot.getColor();
-			c.r = (uint8_t)(skc.r * slc.r * attachmentColor->r * 255);
-			c.g = (uint8_t)(skc.g * slc.g * attachmentColor->g * 255);
-			c.b = (uint8_t)(skc.b * slc.b * attachmentColor->b * 255);
-			c.a = (uint8_t)(skc.a * slc.a * attachmentColor->a * 255);
-
-			std::pair<uint32_t, uint32_t> blend;
+			color.r = (uint8_t)(skc.r * slc.r * attachmentColor->r * 255);
+			color.g = (uint8_t)(skc.g * slc.g * attachmentColor->g * 255);
+			color.b = (uint8_t)(skc.b * slc.b * attachmentColor->b * 255);
+			color.a = (uint8_t)(skc.a * slc.a * attachmentColor->a * 255);
 
 			// normal, additive, multiply, screen
 			static const constexpr std::array<std::pair<uint32_t, uint32_t>, 4> nonpmaBlendFuncs{ std::pair<uint32_t, uint32_t>
@@ -209,44 +210,45 @@ namespace xx {
 			static const constexpr std::array<std::pair<uint32_t, uint32_t>, 4> pmaBlendFuncs{ std::pair<uint32_t, uint32_t>
 			{ GL_ONE, GL_ONE_MINUS_SRC_ALPHA }, { GL_ONE, GL_ONE }, { GL_DST_COLOR, GL_ONE_MINUS_SRC_ALPHA }, { GL_ONE, GL_ONE_MINUS_SRC_COLOR } };
 
+			std::pair<uint32_t, uint32_t> blend;
+			auto bm = slot.getData().getBlendMode();
 			if (!usePremultipliedAlpha) {
-				blend = nonpmaBlendFuncs[slot.getData().getBlendMode()];
+				blend = nonpmaBlendFuncs[bm];
 			}
 			else {
-				blend = pmaBlendFuncs[slot.getData().getBlendMode()];
+				blend = pmaBlendFuncs[bm];
 			}
-
 			if (eg.blend[0] != blend.first || eg.blend[1] != blend.second || eg.blend[2] != GL_FUNC_ADD) {
 				eg.ShaderEnd();
 				eg.GLBlendFunc({ blend.first, blend.second, GL_FUNC_ADD });
 			}
 
-			// todo: sync offical code
 
 			if (clipper.isClipping()) {
 				clipper.clipTriangles(worldVertices, *indices, *uvs, 2);
 				vertices = &clipper.getClippedVertices();
+				verticesCount = clipper.getClippedVertices().size() >> 1;
 				uvs = &clipper.getClippedUVs();
 				indices = &clipper.getClippedTriangles();
 				indicesCount = clipper.getClippedTriangles().size();
 			}
 
-			auto vs = shader.Alloc(*tex, (int32_t)indicesCount);
+			// if (vertexEffect != NULL) else {
+			auto vs = shader.Alloc(*texture, (int32_t)indicesCount);
 			for (size_t ii = 0; ii < indicesCount; ++ii) {
 				auto index = (*indices)[ii] << 1;
-				auto&& vertex = vs[ii];
-				vertex.pos.x = (*vertices)[index] * cameraScale;
-				vertex.pos.y = (*vertices)[index + 1] * cameraScale;
-				vertex.uv.x = (*uvs)[index] * tex->size.x;
-				vertex.uv.y = (*uvs)[index + 1] * tex->size.y;
-				(uint32_t&)vertex.color = (uint32_t&)c;
-				//xx::CoutN("{ .pos = {", vertex.pos, " }, .uv = { ", vertex.uv, "}, .color = xx::RGBA8_White }");
+				auto&& v = vs[ii];
+				v.pos.x = (*vertices)[index] * cameraScale;
+				v.pos.y = (*vertices)[index + 1] * cameraScale;
+				v.uv.x = (*uvs)[index] * texture->size.x;
+				v.uv.y = (*uvs)[index + 1] * texture->size.y;
+				(uint32_t&)v.color = (uint32_t&)color;
 			}
-
 			clipper.clipEnd(slot);
 		}
-
 		clipper.clipEnd();
+
+		// if (vertexEffect != NULL)
 	}
 
 	XX_INLINE spine::Vector<spine::Animation*>& SpinePlayer::GetAnimations() {
@@ -308,24 +310,20 @@ namespace xx {
 		return *this;
 	}
 
-	XX_INLINE SpinePlayer& SpinePlayer::SetAnimation(size_t trackIndex, std::string_view animationName, bool loop) {
-		animationState.setAnimation(trackIndex, animationName, loop);
-		return *this;
+	XX_INLINE spine::TrackEntry* SpinePlayer::SetAnimation(size_t trackIndex, std::string_view animationName, bool loop) {
+		return animationState.setAnimation(trackIndex, animationName, loop);
 	}
 
-	XX_INLINE SpinePlayer& SpinePlayer::SetAnimation(size_t trackIndex, spine::Animation* anim, bool loop) {
-		animationState.setAnimation(trackIndex, anim, loop);
-		return *this;
+	XX_INLINE spine::TrackEntry* SpinePlayer::SetAnimation(size_t trackIndex, spine::Animation* anim, bool loop) {
+		return animationState.setAnimation(trackIndex, anim, loop);
 	}
 
-	XX_INLINE SpinePlayer& SpinePlayer::AddAnimation(size_t trackIndex, spine::Animation* anim, bool loop, float delay) {
-		animationState.addAnimation(trackIndex, anim, loop, delay);
-		return *this;
+	XX_INLINE spine::TrackEntry* SpinePlayer::AddAnimation(size_t trackIndex, spine::Animation* anim, bool loop, float delay) {
+		return animationState.addAnimation(trackIndex, anim, loop, delay);
 	}
 
-	XX_INLINE SpinePlayer& SpinePlayer::AddAnimation(size_t trackIndex, std::string_view animationName, bool loop, float delay) {
-		animationState.addAnimation(trackIndex, animationName, loop, delay);
-		return *this;
+	XX_INLINE spine::TrackEntry* SpinePlayer::AddAnimation(size_t trackIndex, std::string_view animationName, bool loop, float delay) {
+		return animationState.addAnimation(trackIndex, animationName, loop, delay);
 	}
 
 	// todo: multi anim pack to 1 tex
@@ -407,13 +405,16 @@ namespace xx {
 
 		page.width = tex->size.x;
 		page.height = tex->size.y;
-		++tex.GetHeader()->sharedCount;			// unsafe: ref
+
+		// unsafe: ref tex
+		++tex.GetHeader()->sharedCount;
 		page.setRendererObject(tex.pointer);
 	}
 
 	inline void SpineTextureLoader::unload(void* texture) {
+		// unsafe: deref tex
 		xx::Ref<xx::GLTexture> tex;
-		tex.pointer = (xx::GLTexture*)texture;	// unsafe: deref
+		tex.pointer = (xx::GLTexture*)texture;
 	}
 
 	/*****************************************************************************************************************************************************************************************/
@@ -440,16 +441,16 @@ namespace xx {
 		// todo: error check?
 		auto& eg = *GameBase_shader::GetInstance();
 		textures.emplace(fnTex, eg.LoadTexture(fnTex));
-		fileDatas.emplace(fnAtlas, eg.LoadFileData(fnAtlas));
+		fileDatas.emplace(fnAtlas, eg.LoadFileData(fnAtlas).first);
 		auto a = AddAtlas(fnAtlas);
 		if constexpr (skeletonFileIsJson) {
 			auto fnJson = baseFileNameWithPath + ".json";
-			fileDatas.emplace(fnJson, eg.LoadFileData(fnJson));
+			fileDatas.emplace(fnJson, eg.LoadFileData(fnJson).first);
 			sd = AddSkeletonData<true>(a, fnJson, scale);
 		}
 		else {
 			auto fnSkel = baseFileNameWithPath + ".skel";
-			fileDatas.emplace(fnSkel, eg.LoadFileData(fnSkel));
+			fileDatas.emplace(fnSkel, eg.LoadFileData(fnSkel).first);
 			sd = AddSkeletonData<false>(a, fnSkel, scale);
 		}
 		tex = textures[fnTex];

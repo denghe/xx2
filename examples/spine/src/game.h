@@ -16,7 +16,10 @@ struct Game : xx::Game<Game> {
 	}
 
 	struct {
-		// todo
+		xx::Ref<xx::GLTexture> spineOwl_tex;
+		spine::SkeletonData* spineOwl_skel{};
+		spine::Animation* spineOwl_idle{};
+		spine::Animation* spineOwl_blink{};
 	} res;
 
 	// runtime vars
