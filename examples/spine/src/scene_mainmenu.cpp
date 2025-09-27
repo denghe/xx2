@@ -3,6 +3,7 @@
 #include "scene_test1.h"
 #include "scene_test2.h"
 #include "scene_test3.h"
+#include "scene_test4.h"
 
 void Scene_MainMenu::Init() {
 	MakeUI();
@@ -26,21 +27,25 @@ void Scene_MainMenu::MakeUI() {
 
 	offset.y -= cLineHeight * 1.5;
 
-	ui->Make<xx::LabelButton>()->Init(2, offset, anchor, fontSize)("test1").onClicked = [this] {
+	ui->Make<xx::LabelButton>()->Init(2, offset, anchor, fontSize)("test1 ( owl )").onClicked = [this] {
 		gg.MakeScene<Scene_Test1>()->Init();
 	};
 	offset.y -= cLineHeight;
 
-	ui->Make<xx::LabelButton>()->Init(2, offset, anchor, fontSize)("test2").onClicked = [this] {
+	ui->Make<xx::LabelButton>()->Init(2, offset, anchor, fontSize)("test2 ( 1500 owl )").onClicked = [this] {
 		gg.MakeScene<Scene_Test2>()->Init();
 	};
 	offset.y -= cLineHeight;
 
-	ui->Make<xx::LabelButton>()->Init(2, offset, anchor, fontSize)("test3").onClicked = [this] {
+	ui->Make<xx::LabelButton>()->Init(2, offset, anchor, fontSize)("test3 ( spineboy aim )").onClicked = [this] {
 		gg.MakeScene<Scene_Test3>()->Init();
 	};
 	offset.y -= cLineHeight;
 
+	ui->Make<xx::LabelButton>()->Init(2, offset, anchor, fontSize)("test4 ( 1500 spineboy aim )").onClicked = [this] {
+		gg.MakeScene<Scene_Test4>()->Init();
+	};
+	offset.y -= cLineHeight;
 }
 
 void Scene_MainMenu::Update() {
