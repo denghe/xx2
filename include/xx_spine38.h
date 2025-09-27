@@ -41,10 +41,10 @@ namespace xx {
 		SpinePlayer& SetFirstScale(XY const& scale);	// first bone
 		SpinePlayer& SetMix(spine::Animation* from, spine::Animation* to, float duration);
 		SpinePlayer& SetMix(std::string_view fromName, std::string_view toName, float duration);
-		spine::TrackEntry* SetAnimation(size_t trackIndex, spine::Animation* anim, bool loop);
 		spine::TrackEntry* SetAnimation(size_t trackIndex, std::string_view animationName, bool loop);
-		spine::TrackEntry* AddAnimation(size_t trackIndex, spine::Animation* anim, bool loop, float delay);
 		spine::TrackEntry* AddAnimation(size_t trackIndex, std::string_view animationName, bool loop, float delay);
+		spine::TrackEntry* SetAnimation(size_t trackIndex, spine::Animation* anim, bool loop);
+		spine::TrackEntry* AddAnimation(size_t trackIndex, spine::Animation* anim, bool loop, float delay);
 		// ...
 
 	protected:
@@ -112,9 +112,9 @@ namespace xx {
 	}
 
 	inline SpinePlayer& SpinePlayer::Update(float delta) {
+		skeleton.update(delta * timeScale);
 		animationState.update(delta * timeScale);
 		animationState.apply(skeleton);
-		skeleton.update(delta * timeScale);
 		skeleton.updateWorldTransform();
 		return *this;
 	}
@@ -306,12 +306,16 @@ namespace xx {
 	}
 
 	XX_INLINE SpinePlayer& SpinePlayer::SetPosition(float x, float y) {
-		skeleton.setPosition(x, -y);
+		skeleton.setPosition(x, y);
 		return *this;
 	}
 
 	XX_INLINE spine::TrackEntry* SpinePlayer::SetAnimation(size_t trackIndex, std::string_view animationName, bool loop) {
 		return animationState.setAnimation(trackIndex, animationName, loop);
+	}
+
+	XX_INLINE spine::TrackEntry* SpinePlayer::AddAnimation(size_t trackIndex, std::string_view animationName, bool loop, float delay) {
+		return animationState.addAnimation(trackIndex, animationName, loop, delay);
 	}
 
 	XX_INLINE spine::TrackEntry* SpinePlayer::SetAnimation(size_t trackIndex, spine::Animation* anim, bool loop) {
@@ -320,10 +324,6 @@ namespace xx {
 
 	XX_INLINE spine::TrackEntry* SpinePlayer::AddAnimation(size_t trackIndex, spine::Animation* anim, bool loop, float delay) {
 		return animationState.addAnimation(trackIndex, anim, loop, delay);
-	}
-
-	XX_INLINE spine::TrackEntry* SpinePlayer::AddAnimation(size_t trackIndex, std::string_view animationName, bool loop, float delay) {
-		return animationState.addAnimation(trackIndex, animationName, loop, delay);
 	}
 
 	// todo: multi anim pack to 1 tex

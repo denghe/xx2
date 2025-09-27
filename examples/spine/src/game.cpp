@@ -12,31 +12,37 @@ void Game::Init() {
 	title = "examples_spine";
 }
 
-xx::Task<> Game::Task() {
+void Game::GLInit() {
 	// begin load res
+
+	auto o = LoadTexture("res/spineboy-pro.png");
+	CheckGLError();
 	// load spine res & parse
 	auto& se = xx::gSpineEnv;
 
-	se.Load("res/owl-pro", res.spineOwl_skel, res.spineOwl_tex);
-	res.spineOwl_tex->GenerateMipmap();
-	res.spineOwl_idle = res.spineOwl_skel->findAnimation("idle");
-	res.spineOwl_blink = res.spineOwl_skel->findAnimation("blink");
+	se.Load("res/owl-pro", res.owl.skel, res.owl.tex);
+	//res.owl.tex->GenerateMipmap();
+	res.owl.idle = res.owl.skel->findAnimation("idle");
+	res.owl.blink = res.owl.skel->findAnimation("blink");
+	res.owl.up = res.owl.skel->findAnimation("up");
+	res.owl.right = res.owl.skel->findAnimation("right");
+	res.owl.down = res.owl.skel->findAnimation("down");
+	res.owl.left = res.owl.skel->findAnimation("left");
 
-	//se.Load("res/spineboy-ess", res_SpineBoy_skel, res_SpineBoy_tex);
-	//res_SpineBoy_walk = res_SpineBoy_skel->findAnimation("walk");
-	//res_SpineBoy_jump = res_SpineBoy_skel->findAnimation("jump");
-	//res_SpineBoy_run = res_SpineBoy_skel->findAnimation("run");
+	se.Load("res/spineboy-pro", res.spineBoy.skel, res.spineBoy.tex);
+	res.spineBoy.walk = res.spineBoy.skel->findAnimation("walk");
+	res.spineBoy.aim = res.spineBoy.skel->findAnimation("aim");
+	//res.spineBoy.crosshair = res.spineBoy.skel->findBone("crosshair");
 
 	// init first scene
 	scene.Emplace<Scene_MainMenu>()->Init();
+}
 
-	// game loop
-	while (true) {
-		scene->Update();
-		scene->Draw();
-		if (oldScene) oldScene.Reset();
-		co_yield 0;
-	}
+// game loop
+void Game::Update() {
+	scene->Update();
+	scene->Draw();
+	if (oldScene) oldScene.Reset();
 }
 
 void Game::Delay() {

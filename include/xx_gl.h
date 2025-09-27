@@ -84,6 +84,8 @@ namespace xx {
 		}
 
 		void GenerateMipmap() {
+			assert(size.x == size.y);
+			assert(Round2n((size_t)size.x) == (size_t)size.x);
 			glBindTexture(GL_TEXTURE_2D, id);
 			glGenerateMipmap(id);
 		}

@@ -6,15 +6,16 @@ void Scene_Test1::Init() {
 	cam.Init(gg.scale, 0.5f);
 	ui.Emplace()->InitRoot(gg.scale);
 
-	sp.Emplace(gg.res.spineOwl_skel);
+	sp.Emplace(gg.res.owl.skel);
 	sp->SetUsePremultipliedAlpha(true);
-	sp->SetAnimation(0, "idle", true);
-	sp->SetAnimation(1, "blink", true);
+	sp->SetAnimation(0, gg.res.owl.idle, true);
+	sp->SetAnimation(1, gg.res.owl.blink, true);
 
-	left = sp->SetAnimation(2, "left", true);
-	right = sp->SetAnimation(3, "right", true);
-	up = sp->SetAnimation(4, "up", true);
-	down = sp->SetAnimation(5, "down", true);
+	left = sp->SetAnimation(2, gg.res.owl.left, true);
+	right = sp->SetAnimation(3, gg.res.owl.right, true);
+	up = sp->SetAnimation(4, gg.res.owl.up, true);
+	down = sp->SetAnimation(5, gg.res.owl.down, true);
+
 	left->setAlpha(0);
 	left->setMixBlend(spine::MixBlend_Add);
 	right->setAlpha(0);

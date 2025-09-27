@@ -16,10 +16,23 @@ struct Game : xx::Game<Game> {
 	}
 
 	struct {
-		xx::Ref<xx::GLTexture> spineOwl_tex;
-		spine::SkeletonData* spineOwl_skel{};
-		spine::Animation* spineOwl_idle{};
-		spine::Animation* spineOwl_blink{};
+		struct {
+			xx::Ref<xx::GLTexture> tex;
+			spine::SkeletonData* skel{};
+			spine::Animation* idle{};
+			spine::Animation* blink{};
+			spine::Animation* up{};
+			spine::Animation* right{};
+			spine::Animation* down{};
+			spine::Animation* left{};
+		} owl;
+		struct {
+			xx::Ref<xx::GLTexture> tex;
+			spine::SkeletonData* skel{};
+			spine::Animation* walk{};
+			spine::Animation* aim{};
+			//spine::Bone* crosshair{};
+		} spineBoy;
 	} res;
 
 	// runtime vars
@@ -27,7 +40,8 @@ struct Game : xx::Game<Game> {
 	// ...
 
 	void Init();
-	xx::Task<> Task();
+	void GLInit();
+	void Update();
 	void Delay();
 	void Stat();
 	void OnResize(bool modeChanged_);
