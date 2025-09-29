@@ -5,6 +5,7 @@
 #include "scene_test3.h"
 #include "scene_test4.h"
 #include "scene_test5.h"
+#include "scene_test6.h"
 
 void Scene_MainMenu::Init() {
 	MakeUI();
@@ -50,6 +51,11 @@ void Scene_MainMenu::MakeUI() {
 
 	ui->Make<xx::LabelButton>()->Init(2, offset, anchor, fontSize)("test5 ( round head idle )").onClicked = [this] {
 		gg.MakeScene<Scene_Test5>()->Init();
+	};
+	offset.y -= cLineHeight;
+
+	ui->Make<xx::LabelButton>()->Init(2, offset, anchor, fontSize)("test6 ( eye )").onClicked = [this] {
+		gg.MakeScene<Scene_Test6>()->Init();
 	};
 	offset.y -= cLineHeight;
 }

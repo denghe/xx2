@@ -38,6 +38,9 @@ void Game::GLInit() {
 	res.man1.tex->TryGenerateMipmap();
 	res.man1.idle = res.man1.skel->findAnimation("idle");
 
+	se.Load("res/eye", res.eye.skel, res.eye.tex);
+	res.eye.tex->TryGenerateMipmap();
+
 	// init first scene
 	scene.Emplace<Scene_MainMenu>()->Init();
 }

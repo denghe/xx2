@@ -28,6 +28,7 @@ namespace xx {
 		spine::Vector<spine::Animation*>& GetAnimations();
 		spine::Animation* FindAnimation(std::string_view name);
 		spine::Bone* FindBone(std::string_view name);
+		spine::Slot* FindSlot(std::string_view name);
 		SpinePlayer& Update(float delta);
 		GLVertTexture AnimToTexture(spine::Animation* anim, float frameDelay);
 		GLVertTexture AnimToTexture(std::string_view animName, float frameDelay);
@@ -261,6 +262,10 @@ namespace xx {
 
 	XX_INLINE spine::Bone* SpinePlayer::FindBone(std::string_view name) {
 		return skeleton.findBone(name);
+	}
+
+	XX_INLINE spine::Slot* SpinePlayer::FindSlot(std::string_view name) {
+		return skeleton.findSlot(name);
 	}
 
 	XX_INLINE SpinePlayer& SpinePlayer::SetMix(spine::Animation* from, spine::Animation* to, float duration) {

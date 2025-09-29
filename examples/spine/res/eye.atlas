@@ -1,0 +1,34 @@
+
+eye.png
+size: 1024,1024
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+1
+  rotate: false
+  xy: 0, 460
+  size: 300, 300
+  orig: 300, 300
+  offset: 0, 0
+  index: -1
+2
+  rotate: false
+  xy: 0, 0
+  size: 160, 160
+  orig: 160, 160
+  offset: 0, 0
+  index: -1
+3
+  rotate: false
+  xy: 0, 160
+  size: 300, 300
+  orig: 300, 300
+  offset: 0, 0
+  index: -1
+4
+  rotate: false
+  xy: 160, 0
+  size: 160, 160
+  orig: 160, 160
+  offset: 0, 0
+  index: -1

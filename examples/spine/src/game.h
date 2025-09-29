@@ -37,6 +37,10 @@ struct Game : xx::Game<Game> {
 			spine::SkeletonData* skel{};
 			spine::Animation* idle{};
 		} man1;
+		struct {
+			xx::Ref<xx::GLTexture> tex;
+			spine::SkeletonData* skel{};
+		} eye;
 	} res;
 
 	// runtime vars
