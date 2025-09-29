@@ -21,7 +21,7 @@ void Game::GLInit() {
 	auto& se = xx::gSpineEnv;
 
 	se.Load("res/owl-pro", res.owl.skel, res.owl.tex);
-	//res.owl.tex->GenerateMipmap();
+	res.owl.tex->TryGenerateMipmap();
 	res.owl.idle = res.owl.skel->findAnimation("idle");
 	res.owl.blink = res.owl.skel->findAnimation("blink");
 	res.owl.up = res.owl.skel->findAnimation("up");
@@ -30,9 +30,13 @@ void Game::GLInit() {
 	res.owl.left = res.owl.skel->findAnimation("left");
 
 	se.Load("res/spineboy-pro", res.spineBoy.skel, res.spineBoy.tex);
+	res.spineBoy.tex->TryGenerateMipmap();
 	res.spineBoy.walk = res.spineBoy.skel->findAnimation("walk");
 	res.spineBoy.aim = res.spineBoy.skel->findAnimation("aim");
-	//res.spineBoy.crosshair = res.spineBoy.skel->findBone("crosshair");
+
+	se.Load("res/man1", res.man1.skel, res.man1.tex);
+	res.man1.tex->TryGenerateMipmap();
+	res.man1.idle = res.man1.skel->findAnimation("idle");
 
 	// init first scene
 	scene.Emplace<Scene_MainMenu>()->Init();

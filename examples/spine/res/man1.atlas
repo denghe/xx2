@@ -1,0 +1,13 @@
+
+man1.png
+size: 1024,1024
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+man1
+  rotate: false
+  xy: 0, 0
+  size: 400, 532
+  orig: 400, 532
+  offset: 0, 0
+  index: -1

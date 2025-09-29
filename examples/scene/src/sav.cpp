@@ -25,7 +25,7 @@ int32_t Sav::Load() {
     if (auto v = db.Load("Settings"); v.size()) {
         ajson::load_from_buff(settings, v.data(), v.size());
     }
-    else if (db != MDB_NOTFOUND) return __LINE__;
+    else if (!db.NotFound()) return __LINE__;
     return 0;
 }
 

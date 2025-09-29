@@ -10,6 +10,22 @@
 
 namespace xx {
 
+#ifndef NDEBUG
+	inline void CheckGLErrorAt(const char* file, int line, const char* func) {
+		if (auto e = glGetError(); e != GL_NO_ERROR) {
+			printf("glGetError() == %d file = %s line = %d\n", e, file, line);
+			throw e;
+		}
+	}
+#define CheckGLError() ::xx::CheckGLErrorAt(__FILE__, __LINE__, __FUNCTION__)
+#else
+#define CheckGLError() ((void)0)
+#endif
+
+	/**********************************************************************************************************************************/
+	/**********************************************************************************************************************************/
+
+
 	enum class GLResTypes {
 		Shader, Program, VertexArrays, Buffer, Texture, FrameBuffer
 		// ...
@@ -83,28 +99,17 @@ namespace xx {
 			SetTexParm(id, minmagFilter_, minmagFilter_, stWraper_, stWraper_);
 		}
 
-		void GenerateMipmap() {
-			assert(size.x == size.y);
-			assert(Round2n((size_t)size.x) == (size_t)size.x);
-			glBindTexture(GL_TEXTURE_2D, id);
-			glGenerateMipmap(id);
+		void TryGenerateMipmap() {
+			if (size.x == size.y && Round2n((size_t)size.x) == (size_t)size.x) {
+				glBindTexture(GL_TEXTURE_2D, id);
+				glGenerateMipmap(GL_TEXTURE_2D);
+				CheckGLError();
+			}
 		}
 	};
 
 	/**********************************************************************************************************************************/
 	/**********************************************************************************************************************************/
-
-#ifndef NDEBUG
-	inline void CheckGLErrorAt(const char* file, int line, const char* func) {
-		if (auto e = glGetError(); e != GL_NO_ERROR) {
-			printf("glGetError() == %d file = %s line = %d\n", e, file, line);
-			throw e;
-		}
-	}
-#define CheckGLError() ::xx::CheckGLErrorAt(__FILE__, __LINE__, __FUNCTION__)
-#else
-#define CheckGLError() ((void)0)
-#endif
 
 	inline GLShader LoadGLShader(GLenum type, std::initializer_list<std::string_view>&& codes_) {
 		assert(codes_.size() && (type == GL_VERTEX_SHADER || type == GL_FRAGMENT_SHADER));
