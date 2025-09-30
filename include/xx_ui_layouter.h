@@ -5,11 +5,16 @@ namespace xx {
 
 	struct Layouter {
 		Shared<Node> target;
-		XY xy{};							// content cursor
-		float width{};
-		float lineHeight{};					// for last line
-		int32_t lineItemsCount{};			// for last line
-		HAligns halign{ HAligns::Left };	// for last line
+		XY xy{};											// content cursor
+
+		float width{};										// total
+
+		float lineHeight{};									// last line / current
+		int32_t lineItemsCount{};							//
+		HAligns halign{ HAligns::Left };					//
+
+		float defaultLineHeight{};							// defaults
+		float leftMargin{};									//
 
 		// step 1
 		Layouter& InitBegin(Shared<Node> target_, int32_t z_, XY position_, XY anchor_, float width_) {
@@ -37,8 +42,8 @@ namespace xx {
 			return *this;
 		}
 
-		Layouter& EndLine(bool changeY_ = true, float newX_ = 0) {
-			for (int32_t e = target->children.len, i = e - lineItemsCount; i < e; ++i) {
+		Layouter& EndLine(bool changeY_ = true, float newX_ = 0, float newLineHeight_ = 0, int32_t skip_ = 0) {
+			for (int32_t e = target->children.len - skip_, i = e - lineItemsCount; i < e; ++i) {
 				auto& o = target->children[i];
 				float leftHeight = lineHeight - o->size.y;
 				assert(leftHeight >= 0);
@@ -58,7 +63,7 @@ namespace xx {
 				float x;
 				if (halign == HAligns::Right) x = left;
 				else x = left * 0.5f;
-				for (int32_t e = target->children.len, i = e - lineItemsCount; i < e; ++i) {
+				for (int32_t e = target->children.len - skip_, i = e - lineItemsCount; i < e; ++i) {
 					auto& o = target->children[i];
 					o->position.x += x;
 				}
@@ -67,7 +72,7 @@ namespace xx {
 			if (changeY_) {
 				xy.y -= lineHeight;
 			}
-			lineHeight = 0;
+			lineHeight = newLineHeight_;
 			lineItemsCount = 0;
 			return *this;
 		}
@@ -102,20 +107,36 @@ namespace xx {
 			return *this;
 		}
 
+
+		Layouter& LeftMargin(float v_) {
+			leftMargin = v_;
+			return *this;
+		}
+
+		Layouter& DefaultLineHeight(float v_) {
+			defaultLineHeight = v_;
+			return *this;
+		}
+
 		// o: Make<????>().Init(L.z, L.xy, {0,1}, ..... )
-		template<typename T>
-		Layouter& Append(T& o, float lineHeight_ = 0, VAligns valign_ = VAligns::Center) {
+		template<typename T> requires std::derived_from<T, Node>
+		T& Append(T& o, VAligns valign_ = VAligns::Center) {
 			assert(o.size.x <= width);
-			if (lineHeight_ == 0) lineHeight_ = o.size.y;
+			auto lineHeight_ = std::max(defaultLineHeight, o.size.y);
 			if (lineHeight_ > lineHeight) {
 				lineHeight = lineHeight_;
 			}
-			if (width - xy.x < o.size.x) {
-				EndLine();
+			if (width - xy.x < o.size.x + leftMargin) {
+				EndLine(true, 0, lineHeight_, 1);
 			}
+			else {
+				xy.x += leftMargin;
+			}
+			o.position = xy;
+			o.anchor = { 0, 1 };
 			xy.x += o.size.x;
 			++lineItemsCount;
-			return *this;
+			return o;
 		}
 
 		// append Labels ( text word wrap )
@@ -161,10 +182,11 @@ namespace xx {
 			, bool keepAspect_ = true
 			, ImageRadians radians_ = ImageRadians::Zero
 			, RGBA8 color_ = RGBA8_White
-			, float lineHeight_ = 0, VAligns valign_ = VAligns::Center) {
-			auto& o = target->Make<::xx::Image>()->Init(target->z, xy, { 0, 1 }
+			, VAligns valign_ = VAligns::Center) {
+			auto& o = target->Make<::xx::Image>()->Init(target->z, 0, 0
 				, std::move(frame_), fixedSize_, keepAspect_, radians_, color_);
-			return Append(o, lineHeight_, valign_);
+			Append(o, valign_);
+			return *this;
 		}
 
 		// ...

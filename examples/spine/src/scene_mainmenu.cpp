@@ -12,52 +12,47 @@ void Scene_MainMenu::Init() {
 }
 
 void Scene_MainMenu::MakeUI() {
-	// init ui
 	static constexpr float cLineHeight{ 100 };
 	static constexpr float cItemHeight{ 80 };
 	static constexpr float cMargin{ 20 };
-
-	auto basePos = gg.p5;
-	auto offset = basePos + XY{ 0, 250 };
-	auto anchor = gg.a5;
 	auto fontSize = cItemHeight - gg.embed.cfg_s9bN->paddings.TopBottom();
-	auto fontSize2 = fontSize * 2;
 
 	ui.Emplace()->InitRoot(gg.scale);
+	auto C = ui->Make<xx::Node>();
+	xx::Layouter L;
+	L.InitBegin(C, 2, gg.p7 + XY{ 30, 0 }, { 0, 1 }, gg.designSize.x - 60)
+		.HAlign(xx::HAligns::Center)
+		.LeftMargin(cMargin)
+		.DefaultLineHeight(cLineHeight);
 
-	ui->Make<xx::Label>()->Init(2, offset, anchor, fontSize2)("spine tests");
+	L.Append(C->Make<xx::Label>()->Init(2, 0, 0, fontSize * 2)("spine tests"));
+	L.EndLine();
 
-	offset.y -= cLineHeight * 1.5;
-
-	ui->Make<xx::LabelButton>()->Init(2, offset, anchor, fontSize)("test1 ( owl )").onClicked = [this] {
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test1 ( owl )")).onClicked = [this] {
 		gg.MakeScene<Scene_Test1>()->Init();
 	};
-	offset.y -= cLineHeight;
 
-	ui->Make<xx::LabelButton>()->Init(2, offset, anchor, fontSize)("test2 ( 1500 owl )").onClicked = [this] {
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test2 ( 1500 owl )")).onClicked = [this] {
 		gg.MakeScene<Scene_Test2>()->Init();
 	};
-	offset.y -= cLineHeight;
 
-	ui->Make<xx::LabelButton>()->Init(2, offset, anchor, fontSize)("test3 ( spineboy aim )").onClicked = [this] {
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test3 ( spineboy aim )")).onClicked = [this] {
 		gg.MakeScene<Scene_Test3>()->Init();
 	};
-	offset.y -= cLineHeight;
 
-	ui->Make<xx::LabelButton>()->Init(2, offset, anchor, fontSize)("test4 ( 1500 spineboy aim )").onClicked = [this] {
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test4 ( 1500 spineboy aim )")).onClicked = [this] {
 		gg.MakeScene<Scene_Test4>()->Init();
 	};
-	offset.y -= cLineHeight;
 
-	ui->Make<xx::LabelButton>()->Init(2, offset, anchor, fontSize)("test5 ( round head idle )").onClicked = [this] {
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test5 ( round head idle )")).onClicked = [this] {
 		gg.MakeScene<Scene_Test5>()->Init();
 	};
-	offset.y -= cLineHeight;
 
-	ui->Make<xx::LabelButton>()->Init(2, offset, anchor, fontSize)("test6 ( eye )").onClicked = [this] {
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test6 ( eye )")).onClicked = [this] {
 		gg.MakeScene<Scene_Test6>()->Init();
 	};
-	offset.y -= cLineHeight;
+
+	L.InitEnd();
 }
 
 void Scene_MainMenu::Update() {
