@@ -33,6 +33,8 @@ void Game::GLInit() {
 	res.spineBoy.tex->TryGenerateMipmap();
 	res.spineBoy.walk = res.spineBoy.skel->findAnimation("walk");
 	res.spineBoy.aim = res.spineBoy.skel->findAnimation("aim");
+	res.spineBoy.jump = res.spineBoy.skel->findAnimation("jump");
+	res.spineBoy.shoot = res.spineBoy.skel->findAnimation("shoot");
 
 	se.Load("res/man1", res.man1.skel, res.man1.tex);
 	res.man1.tex->TryGenerateMipmap();

@@ -20,6 +20,16 @@ void Scene_Test3::Update() {
 		gg.MakeScene<Scene_MainMenu>()->Init();
 		return;
 	}
+
+	if (gg.mouse[GLFW_MOUSE_BUTTON_1](0.2f)) {
+		sp->SetAnimation(2, gg.res.spineBoy.shoot, false);
+	}
+
+	// todo: bug fix
+	//if (gg.keyboard[GLFW_KEY_SPACE](0.2f)) {
+	//	sp->SetAnimation(3, gg.res.spineBoy.jump, false);
+	//}
+
 	sp->Update(gg.delta);
 
 	float boneCoordsX{}, boneCoordsY{};

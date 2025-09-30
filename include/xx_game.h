@@ -191,7 +191,6 @@ namespace xx {
 
 			// keyboard
 			glfwSetKeyCallback(this->wnd, [](GLFWwindow* wnd, int key, int scancode, int action, int mods) {
-				// action 1: down  0: up  2: repeat
 				if (key < 0) return;    // macos fn key == -1
 				auto g = (Game*)glfwGetWindowUserPointer(wnd);
 				if (key == GLFW_KEY_ENTER && action == GLFW_PRESS && (mods & GLFW_MOD_ALT)) {

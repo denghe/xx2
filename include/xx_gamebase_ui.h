@@ -78,7 +78,7 @@ namespace xx {
 				if (n->OnMouseDown(idx)) break;
 			}
 			tmpZNodes.Clear();
-			mouse[idx].Press(time);
+			mouse[idx].Press();
 		}
 
 		void HandleMouseButtonReleased(int32_t idx) {
@@ -88,25 +88,25 @@ namespace xx {
 
 		void HandleMouseWheel(double xoffset, double yoffset) {
 			if (yoffset > 0) {
-				mouse[GLFW_MOUSE_BUTTON_LAST + 1].Press(time);
+				mouse[GLFW_MOUSE_BUTTON_LAST + 1].Press();
 				wheelTimeouts[0] = time + 0.05f;
 			}
 			else if (yoffset < 0) {
-				mouse[GLFW_MOUSE_BUTTON_LAST + 2].Press(time);
+				mouse[GLFW_MOUSE_BUTTON_LAST + 2].Press();
 				wheelTimeouts[1] = time + 0.05f;
 			}
 			if (xoffset > 0) {
-				mouse[GLFW_MOUSE_BUTTON_LAST + 3].Press(time);
+				mouse[GLFW_MOUSE_BUTTON_LAST + 3].Press();
 				wheelTimeouts[2] = time + 0.05f;
 			}
 			else if (xoffset < 0) {
-				mouse[GLFW_MOUSE_BUTTON_LAST + 4].Press(time);
+				mouse[GLFW_MOUSE_BUTTON_LAST + 4].Press();
 				wheelTimeouts[3] = time + 0.05f;
 			}
 		}
 
 		void HandleKeyboardPressed(int32_t idx) {
-			keyboard[idx].Press(time);
+			keyboard[idx].Press();
 		}
 
 		void HandleKeyboardReleased(int32_t idx) {
@@ -115,6 +115,7 @@ namespace xx {
 
 		void HandleJoystickConnected(int jid) {
 			auto& joy = joys.Emplace();
+			joy.Init(&time);
 			joy.jid = jid;
 			joy.name = glfwGetGamepadName(jid);
 		}
@@ -147,8 +148,8 @@ namespace xx {
 					if (glfwGetGamepadState(jid, &gs)) {
 						for (auto i = 0; i <= GLFW_GAMEPAD_BUTTON_LAST; i++) {
 							if (gs.buttons[i]) {
-								j.btns[i].Press(time);
-								joy.btns[i].Press(time);
+								j.btns[i].Press();
+								joy.btns[i].Press();
 							}
 							else {
 								j.btns[i].Release();
@@ -173,13 +174,13 @@ namespace xx {
 
 						// LT -> L2, RT -> R2
 						if (j.axes[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER] > -0.5f) {
-							j.btns[GLFW_GAMEPAD_BUTTON_LEFT_THUMB].Press(time);
+							j.btns[GLFW_GAMEPAD_BUTTON_LEFT_THUMB].Press();
 						}
 						else {
 							j.btns[GLFW_GAMEPAD_BUTTON_LEFT_THUMB].Release();
 						}
 						if (j.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > -0.5f) {
-							j.btns[GLFW_GAMEPAD_BUTTON_RIGHT_THUMB].Press(time);
+							j.btns[GLFW_GAMEPAD_BUTTON_RIGHT_THUMB].Press();
 						}
 						else {
 							j.btns[GLFW_GAMEPAD_BUTTON_RIGHT_THUMB].Release();
@@ -192,13 +193,13 @@ namespace xx {
 
 				// LT -> L2, RT -> R2
 				if (joy.axes[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER] > -0.5f) {
-					joy.btns[GLFW_GAMEPAD_BUTTON_LEFT_THUMB].Press(time);
+					joy.btns[GLFW_GAMEPAD_BUTTON_LEFT_THUMB].Press();
 				}
 				else {
 					joy.btns[GLFW_GAMEPAD_BUTTON_LEFT_THUMB].Release();
 				}
 				if (joy.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > -0.5f) {
-					joy.btns[GLFW_GAMEPAD_BUTTON_RIGHT_THUMB].Press(time);
+					joy.btns[GLFW_GAMEPAD_BUTTON_RIGHT_THUMB].Press();
 				}
 				else {
 					joy.btns[GLFW_GAMEPAD_BUTTON_RIGHT_THUMB].Release();
@@ -208,7 +209,7 @@ namespace xx {
 			// timeout
 			for (int32_t i = 0; i < 4; ++i) {
 				if (time < wheelTimeouts[i]) {
-					mouse[GLFW_MOUSE_BUTTON_LAST + 1 + i].Press(time);
+					mouse[GLFW_MOUSE_BUTTON_LAST + 1 + i].Press();
 				}
 				else {
 					mouse[GLFW_MOUSE_BUTTON_LAST + 1 + i].Release();

@@ -30,7 +30,9 @@ struct Game : xx::Game<Game> {
 			xx::Ref<xx::GLTexture> tex;
 			spine::SkeletonData* skel{};
 			spine::Animation* walk{};
+			spine::Animation* jump{};
 			spine::Animation* aim{};
+			spine::Animation* shoot{};
 		} spineBoy;
 		struct {
 			xx::Ref<xx::GLTexture> tex;

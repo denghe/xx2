@@ -387,6 +387,10 @@ namespace xx {
 			timeBeginPeriod(1);
 #endif
 
+			for (auto& o : keyboard) o.globalTime = &time;
+			for (auto& o : mouse) o.globalTime = &time;
+			joy.Init(&time);
+
 			auto currDir = std::filesystem::absolute("./").u8string();
 			this->rootPath = this->ToSearchPath((std::string&)currDir);
 			this->searchPaths.clear();
