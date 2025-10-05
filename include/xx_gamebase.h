@@ -6,6 +6,9 @@
 #include "xx_grid2d_aabb.h"
 #include "xx_input.h"
 #include "xx_sound.h"
+#ifdef WIN32
+#pragma comment (lib ,"imm32.lib")
+#endif
 
 namespace xx {
 
@@ -93,6 +96,14 @@ namespace xx {
 #ifndef __EMSCRIPTEN__
 		GLFWwindow* wnd{};
 #endif
+
+		// call at Init / Run
+		void DisableIME() {
+#ifdef WIN32
+			ImmDisableIME(0);
+#endif
+			// todo: more platform support
+		}
 
 		// example:
 		// GameBase::instance->delayUpdates.Emplace([w = WeakFromThis(this)] { if (!w) return 1; return 0; });

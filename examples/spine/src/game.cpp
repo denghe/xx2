@@ -9,6 +9,7 @@ int32_t main() {
 }
 
 void Game::Init() {
+	DisableIME();
 	title = "examples_spine";
 }
 

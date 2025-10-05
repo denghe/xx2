@@ -8,6 +8,7 @@ int32_t main() {
 }
 
 void Game::Init() {
+	DisableIME();
 	title = "examples_window";
 	windowSize = designSize = { 1024, 768 };
 }
