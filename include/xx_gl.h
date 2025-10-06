@@ -214,7 +214,7 @@ namespace xx {
 
 
 	inline GLTexture LoadGLTexture(std::string_view buf, std::string_view fullPath) {
-		assert(buf.size() > 12);
+		assert(buf.size() >= 16);
 
 		// png
 		if (buf.starts_with("\x89\x50\x4e\x47\x0d\x0a\x1a\x0a"sv)) {
@@ -236,6 +236,34 @@ namespace xx {
 				stbi_image_free(image);
 				return t;
 			}
+		}
+
+		// pkm ( do not support MACOS )
+		else if (buf.starts_with("PKM 20"sv)) {
+			auto p = (uint8_t*)buf.data();
+			uint16_t format = (p[6] << 8) | p[7];				// 1 ETC2_RGB_NO_MIPMAPS, 3 ETC2_RGBA_NO_MIPMAPS
+			uint16_t encodedWidth = (p[8] << 8) | p[9];			// 4 align width
+			uint16_t encodedHeight = (p[10] << 8) | p[11];		// 4 align height
+			uint16_t width = (p[12] << 8) | p[13];				// width
+			uint16_t height = (p[14] << 8) | p[15];				// height
+			assert(width > 0 && height > 0 && encodedWidth >= width && encodedWidth - width < 4 && encodedHeight >= height && encodedHeight - height < 4);
+			if (format == 1) {
+				assert(buf.size() == 16 + encodedWidth * encodedHeight / 2);
+			}
+			else if (format == 3) {
+				assert(buf.size() == 16 + encodedWidth * encodedHeight);
+				glPixelStorei(GL_UNPACK_ALIGNMENT, 8 - 4 * (width & 0x1));
+			}
+			else {
+				CoutN("unsppported PKM 20 format. only support ETC2_RGB_NO_MIPMAPS & ETC2_RGBA_NO_MIPMAPS. fn = ", fullPath);
+				assert(false);
+			}
+			auto id = GLTexture::MakeTex();
+			glCompressedTexImage2D(GL_TEXTURE_2D, 0, format == 3 ? /*GL_COMPRESSED_RGBA8_ETC2_EAC*/0x9278
+				: /*GL_COMPRESSED_RGB8_ETC2*/0x9274, (GLsizei)width, (GLsizei)height, 0, (GLsizei)(buf.size() - 16), p + 16);
+			glBindTexture(GL_TEXTURE_2D, 0);
+			CheckGLError();
+			return { id, {width, height}/*, fullPath*/ };
 		}
 
 		// ...
