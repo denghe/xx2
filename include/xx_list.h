@@ -221,12 +221,12 @@ namespace xx {
 			}
 		}
 
-		template<typename U = T::ElementType, typename...Args>
-		XX_INLINE Shared<U>& Make(Args&&...args) requires IsShared_v<T> {
-			auto& r = Emplace();
-			r.Emplace<U>(std::forward<Args>(args)...);
-			return (Shared<U>&)r;
-		}
+		// template<typename U = T::ElementType, typename...Args>
+		// XX_INLINE Shared<U>& Make(Args&&...args) requires IsShared_v<T> {
+		// 	auto& r = Emplace();
+		// 	r.Emplace<U>(std::forward<Args>(args)...);
+		// 	return (Shared<U>&)r;
+		// }
 
 		template<typename ...TS>
 		XX_INLINE void Add(TS&&...vs) noexcept {
