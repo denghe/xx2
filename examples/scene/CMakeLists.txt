@@ -60,11 +60,15 @@ target_link_libraries(${name} lmdb)
 add_subdirectory(../../spine-runtimes-cpp-38 spine)
 target_link_libraries(${name} spine)
 
+add_subdirectory(../../soloud soloud)
+target_link_libraries(${name} soloud)
+if (APPLE)
+	find_library(AUDIOTOOLBOX_FRAMEWORK AudioToolbox)
+	target_link_libraries(${name} ${AUDIOTOOLBOX_FRAMEWORK})
+endif()
+
 if (WIN32)
 	target_link_libraries(${name} winmm)
-	
-	add_subdirectory(../../soloud soloud)
-	target_link_libraries(${name} soloud)
 endif()
 
 SET(GLFW_BUILD_DOCS OFF CACHE BOOL "GLFW_BUILD_DOCS" FORCE)

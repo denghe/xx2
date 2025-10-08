@@ -25,7 +25,8 @@ namespace xx {
 
         template<typename Func>
         Ref<GLTexture> Draw(XYu const& wh, bool hasAlpha, std::optional<RGBA8> const& c, Func&& func, Data* store = {}) {
-            auto t = MakeRef<GLTexture>(GLTexture::Create(wh.x, wh.y, hasAlpha));
+            auto t = MakeRef<GLTexture>();
+            t->Make({wh.x, wh.y}, hasAlpha);
             DrawTo(t, c, std::forward<Func>(func), store);
             return t;
         }

@@ -15,9 +15,6 @@ void Game::Init() {
 
 void Game::GLInit() {
 	// begin load res
-
-	auto o = LoadTexture("res/spineboy-pro.png");
-	CheckGLError();
 	// load spine res & parse
 	auto& se = xx::gSpineEnv;
 

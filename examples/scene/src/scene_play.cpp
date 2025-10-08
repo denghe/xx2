@@ -30,7 +30,7 @@ void Scene_Play::Init() {
 	monsters.Make<Monster>()->Init(this, { 600, 0 }, 128);
 #endif
 
-	monsters.Make<Monster>()->Init(this, { -80, 0 }, 128);
+	monsters.Emplace().Emplace<Monster>()->Init(this, { -80, 0 }, 128);
 	player.Emplace<Player>()->Init(this, { 80, 0 }, 128);
 
 
