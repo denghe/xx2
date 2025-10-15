@@ -15,9 +15,9 @@ struct Scene_Test7;
 struct Grass1 {
 	Scene_Test7* scene{};
 	XY pos{};
-	float scale{ 1 };
+	float scale{};
 	int32_t frameIndex{};
-	void Init(Scene_Test7* scene_);
+	void Init(Scene_Test7* scene_, XY pos_ = {}, float scale_ = 1);
 	void Update();
 	void Draw();
 };

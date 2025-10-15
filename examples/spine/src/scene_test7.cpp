@@ -3,7 +3,6 @@
 #include "scene_mainmenu.h"
 
 void SpineFrameBatch::Init(spine::SkeletonData* sd_, spine::Animation* a_) {
-
 	xx::SpinePlayer sp(sd_);
 	sp.SetAnimation(0, a_, true);
 	sp.skeleton.setToSetupPose();
@@ -31,10 +30,10 @@ void SpineFrameBatch::Init(spine::SkeletonData* sd_, spine::Animation* a_) {
 	XY aPos { size.x / 2 - oPos.x, size.y / 2 - oPos.y };
 	anchor = aPos / size;
 
-	auto d = gg.res.grass1.idle->getDuration();
-	numFrames = d / gg.cDelta;
-
 	// spine frames -> tex
+	numFrames = gg.res.grass1.idle->getDuration() / gg.cDelta;
+
+	// calculate tex max size
 	int32_t texSize{ 256 };
 LabRetry:
 	numCols = texSize / (int32_t)size.x;
@@ -47,6 +46,7 @@ LabRetry:
 	stepY = texSize / numRows;
 	XY origin{ -texSize / 2 };
 
+	// fill tex
 	tex = xx::FrameBuffer{}.Init().Draw(texSize, true, {}, [&] {
 		int32_t i{};
 		for (int32_t y = 0; y < numRows; ++y) {
@@ -61,6 +61,7 @@ LabRetry:
 			}
 		}
 	});
+	tex->TryGenerateMipmap();
 }
 
 xx::UVRect SpineFrameBatch::GetUvRect(int32_t frameIndex_) const {
@@ -77,13 +78,16 @@ xx::UVRect SpineFrameBatch::GetUvRect(int32_t frameIndex_) const {
 
 
 
-void Grass1::Init(Scene_Test7* scene_) {
+void Grass1::Init(Scene_Test7* scene_, XY pos_, float scale_) {
 	scene = scene_;
+	pos = pos_;
+	scale = scale_;
+	frameIndex = gg.rnd.Next<int32_t>(scene->sfb.numFrames);
+	assert(frameIndex <= scene->sfb.numFrames);
 }
 
 void Grass1::Update() {
 	++frameIndex;
-	assert(frameIndex <= scene->sfb.numFrames);
 	if (frameIndex == scene->sfb.numFrames) {
 		frameIndex = 0;
 	}
@@ -91,7 +95,7 @@ void Grass1::Update() {
 
 void Grass1::Draw() {
 	// cam? scale? logic pos?
-	gg.Quad().Draw(*scene->sfb.tex, scene->sfb.GetUvRect(frameIndex), 0, scene->sfb.anchor);
+	gg.Quad().Draw(*scene->sfb.tex, scene->sfb.GetUvRect(frameIndex), pos, scene->sfb.anchor, scale);
 }
 
 
@@ -104,9 +108,16 @@ void Scene_Test7::Init() {
 
 	sfb.Init(gg.res.grass1.skel, gg.res.grass1.idle);
 	grasses.Reserve(10000);
+	xx::FromTo<float> xRange{ -gg.designSize.x / 2, gg.designSize.x / 2 };
+	xx::FromTo<float> yRange{ -gg.designSize.y / 2, gg.designSize.y / 2 };
 	for (size_t i = 0; i < 10000; i++) {
-		grasses.Emplace().Init(this);
+		XY pos{ gg.rnd.Next<float>(xRange.from, xRange.to)
+			, gg.rnd.Next<float>(yRange.from, yRange.to) };
+		grasses.Emplace().Init(this, pos, 0.1f);
 	}
+	std::sort(grasses.buf, grasses.buf + grasses.len, [](auto& a, auto& b)->bool {
+		return a.pos.y > b.pos.y;
+	});
 }
 
 void Scene_Test7::Update() {
