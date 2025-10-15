@@ -8,7 +8,6 @@ struct Eye {
 	spine::Bone* control{};
 	XY controlOriginal{};
 	XY eyeOriginalOffset{};
-	static constexpr float neckFollowSpeed{ 1500.f };
 	void Init(Scene_Test6* scene_);
 	void Update();
 	void Draw();

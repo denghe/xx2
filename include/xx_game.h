@@ -2,6 +2,7 @@
 #include "xx_gamebase_ui.h"
 #include "xx_ui.h"
 #include "xx_camera.h"
+#include "xx_framebuffer.h"
 
 namespace xx {
 	// derived member checkers

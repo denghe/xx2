@@ -1,0 +1,20 @@
+
+grass1.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+dot
+  rotate: false
+  xy: 0, 0
+  size: 1, 1
+  orig: 1, 1
+  offset: 0, 0
+  index: -1
+grass1
+  rotate: false
+  xy: 0, 1
+  size: 304, 440
+  orig: 304, 440
+  offset: 0, 0
+  index: -1

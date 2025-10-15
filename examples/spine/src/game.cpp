@@ -41,6 +41,10 @@ void Game::GLInit() {
 	se.Load("res/eye", res.eye.skel, res.eye.tex);
 	res.eye.tex->TryGenerateMipmap();
 
+	se.Load("res/grass1", res.grass1.skel, res.grass1.tex);
+	res.grass1.tex->TryGenerateMipmap();
+	res.grass1.idle = res.grass1.skel->findAnimation("idle");
+
 	// init first scene
 	scene.Emplace<Scene_MainMenu>()->Init();
 }

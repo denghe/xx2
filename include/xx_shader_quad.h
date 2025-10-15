@@ -7,7 +7,7 @@ namespace xx {
         XY pos{}, anchor{ 0.5, 0.5 };                           // float * 4
         XY scale{ 1, 1 }; float radians{}, colorplus{ 1 };      // float * 4
         RGBA8 color{ 255, 255, 255, 255 };                      // u8n * 4
-        UVRect texRect{};                                       // u16 * 4
+        UVRect texRect{};                                       // u16 * 4 ( left-top: 0,0 )
 
         XX_INLINE void Fill(UVRect rect_, XY pos_ = {}, XY anchor_ = 0.5f, XY scale_ = 1.f
             , float radians_ = 0.f, float colorplus_ = 1.f, RGBA8 color_ = RGBA8_White) {
@@ -172,7 +172,7 @@ void main() {
             return r;
         }
 
-        XX_INLINE void Draw(GLuint texId_, UVRect rect_ = {}, XY pos_ = {}, XY anchor_ = 0.5f
+        XX_INLINE void Draw(GLuint texId_, UVRect rect_, XY pos_ = {}, XY anchor_ = 0.5f
             , XY scale_ = 1.f, float radians_ = 0.f, float colorplus_ = 1.f, RGBA8 color_ = RGBA8_White) {
             Alloc(texId_, 1)->Fill(rect_, pos_, anchor_, scale_, radians_, colorplus_, color_);
         }
