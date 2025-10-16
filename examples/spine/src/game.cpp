@@ -14,6 +14,9 @@ void Game::Init() {
 }
 
 void Game::GLInit() {
+	// init shader
+	shaderGrass.Init();
+
 	// begin load res
 	// load spine res & parse
 	auto& se = xx::gSpineEnv;

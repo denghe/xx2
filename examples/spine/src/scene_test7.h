@@ -7,17 +7,17 @@ struct SpineFrameBatch {
 	int32_t numFrames{};
 	int32_t numCols{}, numRows{};
 	int32_t stepX{}, stepY{};
-	void Init(spine::SkeletonData* sd_, spine::Animation* a_);
+	void Init(spine::SkeletonData* sd_, spine::Animation* a_, XY scale_);
 	xx::UVRect GetUvRect(int32_t frameIndex_) const;
 };
 
 struct Scene_Test7;
 struct Grass1 {
 	Scene_Test7* scene{};
-	XY pos{};
-	float scale{};
+	XY pos{}, scale{};
 	int32_t frameIndex{};
-	void Init(Scene_Test7* scene_, XY pos_ = {}, float scale_ = 1);
+	float colorPlus{};
+	void Init(Scene_Test7* scene_, XY pos_ = {});
 	void Update();
 	void Draw();
 };
@@ -28,6 +28,7 @@ struct Scene_Test7 : xx::SceneBase {
 	float time{}, timePool{}, timeScale{ 1 };
 	SpineFrameBatch sfb;
 	xx::List<Grass1> grasses;
+	xx::Ref<xx::GLTexture> texBG;
 
 	void Init();
 	void FixedUpdate();

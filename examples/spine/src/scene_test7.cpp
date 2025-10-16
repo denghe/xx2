@@ -2,8 +2,9 @@
 #include "scene_test7.h"
 #include "scene_mainmenu.h"
 
-void SpineFrameBatch::Init(spine::SkeletonData* sd_, spine::Animation* a_) {
+void SpineFrameBatch::Init(spine::SkeletonData* sd_, spine::Animation* a_, XY scale_) {
 	xx::SpinePlayer sp(sd_);
+	sp.SetScale(scale_);
 	sp.SetAnimation(0, a_, true);
 	sp.skeleton.setToSetupPose();
 
@@ -26,7 +27,9 @@ void SpineFrameBatch::Init(spine::SkeletonData* sd_, spine::Animation* a_) {
 	// calculate anchor
 	auto a = (spine::RegionAttachment*)sp.FindSlot("size")->getAttachment();
 	size = { a->getScaleX() * a->getWidth(), a->getScaleY() * a->getHeight() };
+	size *= scale_;
 	XY oPos { a->getX(), a->getY() };
+	oPos *= scale_;
 	XY aPos { size.x / 2 - oPos.x, size.y / 2 - oPos.y };
 	anchor = aPos / size;
 
@@ -78,11 +81,12 @@ xx::UVRect SpineFrameBatch::GetUvRect(int32_t frameIndex_) const {
 
 
 
-void Grass1::Init(Scene_Test7* scene_, XY pos_, float scale_) {
+void Grass1::Init(Scene_Test7* scene_, XY pos_) {
 	scene = scene_;
 	pos = pos_;
-	scale = scale_;
+	scale = gg.rnd.Next<float>(0.7, 1.f);
 	frameIndex = gg.rnd.Next<int32_t>(scene->sfb.numFrames);
+	colorPlus = gg.rnd.Next<float>(0.3, 1.f);
 	assert(frameIndex <= scene->sfb.numFrames);
 }
 
@@ -95,7 +99,9 @@ void Grass1::Update() {
 
 void Grass1::Draw() {
 	// cam? scale? logic pos?
-	gg.Quad().Draw(*scene->sfb.tex, scene->sfb.GetUvRect(frameIndex), pos, scene->sfb.anchor, scale);
+	gg.Quad().Draw(*scene->sfb.tex, scene->sfb.GetUvRect(frameIndex)
+		, pos * scene->cam.scale, scene->sfb.anchor, scale * scene->cam.scale
+	, 0, colorPlus);
 }
 
 
@@ -103,20 +109,29 @@ void Grass1::Draw() {
 
 
 void Scene_Test7::Init() {
-	cam.Init(gg.scale, 0.25f);
+	cam.Init(gg.scale, 1.f);
 	ui.Emplace()->InitRoot(gg.scale);
 
-	sfb.Init(gg.res.grass1.skel, gg.res.grass1.idle);
+	// spine prepare
+	sfb.Init(gg.res.grass1.skel, gg.res.grass1.idle, 0.1f);
+
+	// gen grasses
 	grasses.Reserve(10000);
 	xx::FromTo<float> xRange{ -gg.designSize.x / 2, gg.designSize.x / 2 };
 	xx::FromTo<float> yRange{ -gg.designSize.y / 2, gg.designSize.y / 2 };
 	for (size_t i = 0; i < 10000; i++) {
 		XY pos{ gg.rnd.Next<float>(xRange.from, xRange.to)
 			, gg.rnd.Next<float>(yRange.from, yRange.to) };
-		grasses.Emplace().Init(this, pos, 0.1f);
+		grasses.Emplace().Init(this, pos);
 	}
 	std::sort(grasses.buf, grasses.buf + grasses.len, [](auto& a, auto& b)->bool {
 		return a.pos.y > b.pos.y;
+	});
+
+	// gen bg tex
+	texBG = xx::FrameBuffer{}.Init().Draw(gg.designSize, true, {}, [&] {
+		gg.Grass().Draw({ 0, 0, uint16_t(gg.designSize.x * 2), uint16_t(gg.designSize.y * 2) }
+		, 0, 0.5f, 1.f / 2);
 	});
 }
 
@@ -144,8 +159,9 @@ void Scene_Test7::FixedUpdate() {
 }
 
 void Scene_Test7::Draw() {
+	gg.Quad().Draw(*texBG, texBG->Rect(), 0, 0.5f, cam.scale);
 #if 0
-	gg.Quad().Draw(*sfb.tex, sfb.tex->Rect(), 0, 0.5f, gg.designSize.y / sfb.tex->size.y);
+	gg.Quad().Draw(*sfb.tex, sfb.tex->Rect());// , 0, 0.5f);// , gg.designSize.y / sfb.tex->size.y);
 #else
 	for (auto& o : grasses) {
 		o.Draw();

@@ -42,7 +42,7 @@ void Man1::Update() {
 }
 
 void Man1::Draw() {
-	sp->Draw(scene->cam.scale);
+	sp->Draw();
 }
 
 
@@ -64,6 +64,7 @@ void Scene_Test5::Update() {
 
 void Scene_Test5::Draw() {
 	man1.Draw();
+	gg.GLBlendFunc(gg.blendDefault);
 	gg.DrawNode(ui);
 }
 

@@ -33,7 +33,7 @@ void Scene_Test4::Update() {
 	float boneCoordsX{}, boneCoordsY{};
 	for (auto& sb : sbs) {
 		sb.sp->Update(gg.delta);
-		sb.crosshair->getParent()->worldToLocal(gg.mousePos.x * cam._1_scale, gg.mousePos.y * cam._1_scale, boneCoordsX, boneCoordsY);
+		sb.crosshair->getParent()->worldToLocal(gg.mousePos.x, gg.mousePos.y, boneCoordsX, boneCoordsY);
 		sb.crosshair->setX(boneCoordsX);
 		sb.crosshair->setY(boneCoordsY);
 		sb.crosshair->setAppliedValid(false);
@@ -43,8 +43,9 @@ void Scene_Test4::Update() {
 
 void Scene_Test4::Draw() {
 	for (auto& sb : sbs) {
-		sb.sp->Draw(cam.scale);
+		sb.sp->Draw();
 	}
+	gg.GLBlendFunc(gg.blendDefault);
 	gg.DrawNode(ui);
 }
 

@@ -76,6 +76,7 @@ void main() {
 
         virtual void Begin() override {
             assert(!GameBase::instance->shader);
+            assert(count == 0);
             glUseProgram(p);
             glActiveTexture(GL_TEXTURE0/* + textureUnit*/);
             glUniform1i(uTex0, 0);

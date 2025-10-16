@@ -53,7 +53,6 @@ namespace xx {
 		RGBA8 clearColor{};									// for glClearColor
 		std::array<uint32_t, 3> blendDefault{ GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_FUNC_ADD };
 		std::array<uint32_t, 3> blend{ blendDefault };
-		std::array<uint32_t, 3> blendBackup{};
 
 		double time{}, delta{};								// usually for ui logic
 		int32_t drawVerts{}, drawCall{}, drawFPS{};			// counters
@@ -149,18 +148,12 @@ namespace xx {
 
 		void GLClear(RGBA8 c) {
 			glClearColor(c.r / 255.f, c.g / 255.f, c.b / 255.f, c.a / 255.f);
-			glClear(GL_COLOR_BUFFER_BIT);
+			glClear(GL_COLOR_BUFFER_BIT);// | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 		}
 
-		template<bool backup = false, bool autoEndShader = true>
 		void GLBlendFunc(std::array<uint32_t, 3> const& args) {
-			if constexpr (backup) {
-				blendBackup = blendDefault;
-			}
 			if (blend != args) {
-				if constexpr (autoEndShader) {
-					ShaderEnd();
-				}
+				ShaderEnd();
 				blend = args;
 				glBlendFunc(args[0], args[1]);
 				glBlendEquation(args[2]);
@@ -171,11 +164,6 @@ namespace xx {
 			blend = blendDefault;
 			glBlendFunc(blendDefault[0], blendDefault[1]);
 			glBlendEquation(blendDefault[2]);
-		}
-
-		template<bool autoEndShader = true>
-		void GLBlendFuncRestore() {
-			GLBlendFunc<false, autoEndShader>(blendBackup);
 		}
 
 		template<typename ST>

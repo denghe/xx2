@@ -7,6 +7,7 @@ void Scene_Test1::Init() {
 	ui.Emplace()->InitRoot(gg.scale);
 
 	sp.Emplace(gg.res.owl.skel);
+	sp->SetScale(0.7f);
 	sp->SetUsePremultipliedAlpha(true);
 	sp->SetAnimation(0, gg.res.owl.idle, true);
 	sp->SetAnimation(1, gg.res.owl.blink, true);
@@ -69,7 +70,8 @@ void Scene_Test1::FixedUpdate() {
 }
 
 void Scene_Test1::Draw() {
-	sp->Draw(cam.scale);
+	sp->Draw();
+	gg.GLBlendFunc(gg.blendDefault);
 	gg.DrawNode(ui);
 }
 

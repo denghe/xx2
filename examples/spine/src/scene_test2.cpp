@@ -72,8 +72,9 @@ void Scene_Test2::Update() {
 
 void Scene_Test2::Draw() {
 	for (auto& owl : owls) {
-		owl.sp->Draw(cam.scale);
+		owl.sp->Draw();
 	}
+	gg.GLBlendFunc(gg.blendDefault);
 	gg.DrawNode(ui);
 }
 

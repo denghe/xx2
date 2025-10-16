@@ -7,6 +7,7 @@ void Scene_Test3::Init() {
 	ui.Emplace()->InitRoot(gg.scale);
 
 	sp.Emplace(gg.res.spineBoy.skel);
+	//sp->SetScale(cam.scale);
 	sp->SetPosition({ 0, -300 });
 	sp->SetUsePremultipliedAlpha(true);
 	sp->SetAnimation(0, gg.res.spineBoy.walk, true);
@@ -33,7 +34,7 @@ void Scene_Test3::Update() {
 	sp->Update(gg.delta);
 
 	float boneCoordsX{}, boneCoordsY{};
-	crosshair->getParent()->worldToLocal(gg.mousePos.x * cam._1_scale, gg.mousePos.y * cam._1_scale, boneCoordsX, boneCoordsY);
+	crosshair->getParent()->worldToLocal(gg.mousePos.x, gg.mousePos.y, boneCoordsX, boneCoordsY);
 	crosshair->setX(boneCoordsX);
 	crosshair->setY(boneCoordsY);
 	crosshair->setAppliedValid(false);
@@ -41,7 +42,8 @@ void Scene_Test3::Update() {
 }
 
 void Scene_Test3::Draw() {
-	sp->Draw(cam.scale);
+	sp->Draw();
+	gg.GLBlendFunc(gg.blendDefault);
 	gg.DrawNode(ui);
 }
 

@@ -21,7 +21,7 @@ void Eye::Update() {
 }
 
 void Eye::Draw() {
-	sp->Draw(scene->cam.scale);
+	sp->Draw();
 }
 
 
@@ -43,6 +43,7 @@ void Scene_Test6::Update() {
 
 void Scene_Test6::Draw() {
 	eye.Draw();
+	gg.GLBlendFunc(gg.blendDefault);
 	gg.DrawNode(ui);
 }
 

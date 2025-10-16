@@ -32,7 +32,7 @@ namespace xx {
 		SpinePlayer& Update(float delta);
 		GLVertTexture AnimToTexture(spine::Animation* anim, float frameDelay);
 		GLVertTexture AnimToTexture(std::string_view animName, float frameDelay);
-		void Draw(float cameraScale = 1.f);
+		void Draw();	// careful: blend maybe changed
 		SpinePlayer& SetTimeScale(float t);
 		SpinePlayer& SetUsePremultipliedAlpha(bool b);
 		SpinePlayer& SetPosition(float x, float y);
@@ -120,9 +120,8 @@ namespace xx {
 		return *this;
 	}
 
-	inline void SpinePlayer::Draw(float cameraScale) {
+	inline void SpinePlayer::Draw() {
 		auto& eg = *GameBase_shader::GetInstance();
-		auto&& shader = eg.Spine();
 
 		// Early out if skeleton is invisible
 		if (skeleton.getColor().a == 0) return;
@@ -219,10 +218,7 @@ namespace xx {
 			else {
 				blend = pmaBlendFuncs[bm];
 			}
-			if (eg.blend[0] != blend.first || eg.blend[1] != blend.second || eg.blend[2] != GL_FUNC_ADD) {
-				eg.ShaderEnd();
-				eg.GLBlendFunc({ blend.first, blend.second, GL_FUNC_ADD });
-			}
+			eg.GLBlendFunc({ blend.first, blend.second, GL_FUNC_ADD });
 
 
 			if (clipper.isClipping()) {
@@ -235,12 +231,12 @@ namespace xx {
 			}
 
 			// if (vertexEffect != NULL) else {
-			auto vs = shader.Alloc(*texture, (int32_t)indicesCount);
+			auto vs = eg.Spine().Alloc(*texture, (int32_t)indicesCount);
 			for (size_t ii = 0; ii < indicesCount; ++ii) {
 				auto index = (*indices)[ii] << 1;
 				auto&& v = vs[ii];
-				v.pos.x = (*vertices)[index] * cameraScale;
-				v.pos.y = (*vertices)[index + 1] * cameraScale;
+				v.pos.x = (*vertices)[index];
+				v.pos.y = (*vertices)[index + 1];
 				v.uv.x = (*uvs)[index] * texture->size.x;
 				v.uv.y = (*uvs)[index + 1] * texture->size.y;
 				(uint32_t&)v.color = (uint32_t&)color;

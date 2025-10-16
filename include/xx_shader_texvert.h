@@ -103,6 +103,9 @@ void main() {
 
         virtual void Begin() override {
             assert(!GameBase::instance->shader);
+            assert(lastTextureId == 0);
+            assert(lastVertTextureId == 0);
+            assert(count == 0);
             glUseProgram(p);
             glActiveTexture(GL_TEXTURE0 + 0);
             glActiveTexture(GL_TEXTURE0 + 1);

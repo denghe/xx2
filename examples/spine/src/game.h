@@ -7,6 +7,9 @@ struct Game : xx::Game<Game> {
 	static constexpr float cDelta{ 1.f / cFps };
 	static constexpr float cMaxDelta{ 0.1f };
 
+	xx::Shader_Grass shaderGrass;
+	XX_INLINE xx::Shader_Grass& Grass() { return ShaderBegin(shaderGrass); }
+
 	xx::Shared<xx::SceneBase> scene, oldScene;	// oldScene: delay remove( after draw )
 	template<typename T>
 	xx::Shared<T>& MakeScene() {
