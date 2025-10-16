@@ -101,7 +101,7 @@ void Grass1::Draw() {
 	// cam? scale? logic pos?
 	gg.Quad().Draw(*scene->sfb.tex, scene->sfb.GetUvRect(frameIndex)
 		, pos * scene->cam.scale, scene->sfb.anchor, scale * scene->cam.scale
-	, 0, colorPlus);
+	, 0, colorPlus/*, xx::RGBA8_Red*/);
 }
 
 
@@ -159,7 +159,7 @@ void Scene_Test7::FixedUpdate() {
 }
 
 void Scene_Test7::Draw() {
-	gg.Quad().Draw(*texBG, texBG->Rect(), 0, 0.5f, cam.scale);
+	gg.Quad().Draw(*texBG, texBG->Rect(), 0, 0.5f, cam.scale, 0, 1/*, xx::RGBA8_Red*/);
 #if 0
 	gg.Quad().Draw(*sfb.tex, sfb.tex->Rect());// , 0, 0.5f);// , gg.designSize.y / sfb.tex->size.y);
 #else

@@ -81,7 +81,7 @@ namespace xx {
 
 			auto& cfg = GetCfg();
 
-			auto barMinWidth = float(cfgBar->center.x + cfgBar->center.w) * cfgBar->textureScale.x;
+			auto barMinWidth = float(cfgBar->center.x + cfgBar->center.w) * cfgBar->textureScale.x + 1;
 			XY barSize{ std::max(widthBar * (float)value, barMinWidth), (height - cfg->paddings.TopBottom()) * 0.33f };
 			XY barPos{ widthTxtLeft, (height - barSize.y) * 0.5f };
 			At<Scale9>(1).Init(z + 1, barPos, 0, barSize, cfgBar);
