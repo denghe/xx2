@@ -1,7 +1,6 @@
 ﻿#include "pch.h"
 #include "game.h"
 #include "scene_mainmenu.h"
-#include "xx_rectpacker.h"
 #include "equip.h"
 Game gg;
 

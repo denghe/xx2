@@ -6,7 +6,7 @@ namespace xx {
 
 	struct LabelChar {
 		GLuint texId;
-		UVRect textureRect;
+		UVRect uvRect;
 		XY offset;
 	};
 
@@ -59,10 +59,10 @@ namespace xx {
 					auto& c = chars.Emplace();
 					c.offset.x = px + r->xoffset * baseScale;
 					c.offset.y = py - r->yoffset * baseScale;
-					c.textureRect.x = r->x;
-					c.textureRect.y = r->y;
-					c.textureRect.w = r->width;
-					c.textureRect.h = r->height;
+					c.uvRect.x = r->x;
+					c.uvRect.y = r->y;
+					c.uvRect.w = r->width;
+					c.uvRect.h = r->height;
 					c.texId = r->texId;
 
 					px += cw;
@@ -94,7 +94,7 @@ namespace xx {
 			else cp = 0.5f;
 			auto s = worldScale * baseScale;
 			for (auto& f : chars) {
-				q.Draw(f.texId, f.textureRect, worldMinXY + f.offset * worldScale, 0, s, 0, cp, c);
+				q.Draw(f.texId, f.uvRect, worldMinXY + f.offset * worldScale, 0, s, 0, cp, c);
 			}
 		}
 

@@ -19,6 +19,7 @@ struct Game : xx::Game<Game> {
 	}
 
 	struct {
+		std::array<xx::TinyFrame, 15> brush_;
 		struct {
 			xx::Ref<xx::GLTexture> tex;
 			spine::SkeletonData* skel{};

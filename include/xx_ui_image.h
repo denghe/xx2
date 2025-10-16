@@ -31,7 +31,7 @@ namespace xx {
 			position = position_;
 			anchor = anchor_;
 			if (fixedSize_.IsZeroSimple()) {
-				fixedSize_ = { frame_.textureRect.w, frame_.textureRect.h };
+				fixedSize_ = { frame_.uvRect.w, frame_.uvRect.h };
 			}
 			size = fixedSize_;
 			frame = std::move(frame_);
@@ -39,15 +39,15 @@ namespace xx {
 			color = color_;
 
 			if (keepAspect_) {
-				auto s = fixedSize_.x / frame.textureRect.w;
-				if (frame.textureRect.h * s > fixedSize_.y) {
-					s = fixedSize_.y / frame.textureRect.h;
+				auto s = fixedSize_.x / frame.uvRect.w;
+				if (frame.uvRect.h * s > fixedSize_.y) {
+					s = fixedSize_.y / frame.uvRect.h;
 				}
 				fixedScale = s;
 			}
 			else {
-				fixedScale.x = fixedSize_.x / frame.textureRect.w;
-				fixedScale.y = fixedSize_.y / frame.textureRect.h;
+				fixedScale.x = fixedSize_.x / frame.uvRect.w;
+				fixedScale.y = fixedSize_.y / frame.uvRect.h;
 			}
 
 			FillTrans();
@@ -59,7 +59,7 @@ namespace xx {
 			float cp;
 			if (enabled) cp = 1.f;
 			else cp = 0.5f;
-			GameBase_shader::GetInstance()->Quad().Draw(*frame.tex, frame.textureRect, worldMinXY, 0
+			GameBase_shader::GetInstance()->Quad().Draw(*frame.tex, frame.uvRect, worldMinXY, 0
 				, worldScale * fixedScale, radians, cp, { color.r, color.g, color.b, (uint8_t)(color.a * alpha) });
 		}
 	};

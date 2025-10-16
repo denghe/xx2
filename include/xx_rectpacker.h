@@ -1,7 +1,8 @@
 ﻿#pragma once
 #include <stb_rect_pack.h>
-#include <xx_frame.h>
-#include <xx_framebuffer.h>
+#include "xx_frame.h"
+#include "xx_framebuffer.h"
+#include "xx_gamebase_shader.h"
 
 namespace xx {
 
@@ -24,8 +25,8 @@ namespace xx {
 				auto& tf = tfs[i];
 				auto& rect = rects.Emplace();
 				rect.id = i;
-				rect.w = tf->textureRect.w + grow.x;
-				rect.h = tf->textureRect.h + grow.y;
+				rect.w = tf->uvRect.w + grow.x;
+				rect.h = tf->uvRect.h + grow.y;
 			}
 
 			stbrp_context c;
@@ -43,14 +44,14 @@ namespace xx {
 					o.x += padding_.x;
 					o.y += padding_.y;
 					auto pos = basePos + XY{ o.x, o.y };
-					gg.Quad().Draw(*tf.tex, tf.textureRect, pos, 0);
+					GameBase_shader::GetInstance()->Quad().Draw(*tf.tex, tf.uvRect, pos, 0);
 				}
 			});
 			for (auto& o : rects) {
 				auto& tf = *tfs[o.id];
 				tf.tex = t;
-				tf.textureRect.x = uint16_t(o.x);
-				tf.textureRect.y = uint16_t(texSize_.y - o.y - tf.textureRect.h);
+				tf.uvRect.x = uint16_t(o.x);
+				tf.uvRect.y = uint16_t(texSize_.y - o.y - tf.uvRect.h);
 			}
 
 			tfs.Clear();

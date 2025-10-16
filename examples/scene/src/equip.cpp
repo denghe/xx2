@@ -31,7 +31,7 @@ void Equip::Combine(Equip& tar) {
 
 void Equip::Draw(XY pos_, XY anchor_, XY size_, float colorplus_) {
 	auto& f = cfg->icon;
-	gg.Quad().Draw(f, f, pos_, anchor_, { size_.x / f.textureRect.w, size_.y / f.textureRect.h }, 0, colorplus_);
+	gg.Quad().Draw(f, f, pos_, anchor_, { size_.x / f.uvRect.w, size_.y / f.uvRect.h }, 0, colorplus_);
 }
 
 xx::Shared<xx::Node> Equip::GenInfoPanel(Equip* cmp_) {

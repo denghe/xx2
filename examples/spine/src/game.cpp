@@ -18,6 +18,24 @@ void Game::GLInit() {
 	shaderGrass.Init();
 
 	// begin load res
+
+	// load pngs
+	for (size_t i = 1; i <= 15; i++) {
+		res.brush_[i-1] = LoadTexture(xx::ToStringFormat("res/brush_{}.png", i));
+	}
+	// combine some pngs into single texture
+	xx::RectPacker rp;
+	for (auto& tf : res.brush_) {
+		rp.tfs.Add(&tf);
+	}
+	if (auto r = rp.Pack(2048); r) {
+		xx::CoutN("pack failed");
+	}
+	else {
+		res.brush_[0].tex->TryGenerateMipmap();
+	}
+
+	
 	// load spine res & parse
 	auto& se = xx::gSpineEnv;
 

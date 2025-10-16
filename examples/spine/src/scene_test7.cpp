@@ -25,6 +25,7 @@ void SpineFrameBatch::Init(spine::SkeletonData* sd_, spine::Animation* a_, XY sc
 	*/
 
 	// calculate anchor
+	// todo: args set size when no slot: size
 	auto a = (spine::RegionAttachment*)sp.FindSlot("size")->getAttachment();
 	size = { a->getScaleX() * a->getWidth(), a->getScaleY() * a->getHeight() };
 	size *= scale_;
@@ -84,7 +85,7 @@ xx::UVRect SpineFrameBatch::GetUvRect(int32_t frameIndex_) const {
 void Grass1::Init(Scene_Test7* scene_, XY pos_) {
 	scene = scene_;
 	pos = pos_;
-	scale = gg.rnd.Next<float>(0.7, 1.f);
+	scale = gg.rnd.Next<float>(0.3, 1.f);
 	frameIndex = gg.rnd.Next<int32_t>(scene->sfb.numFrames);
 	colorPlus = gg.rnd.Next<float>(0.3, 1.f);
 	assert(frameIndex <= scene->sfb.numFrames);
@@ -116,10 +117,11 @@ void Scene_Test7::Init() {
 	sfb.Init(gg.res.grass1.skel, gg.res.grass1.idle, 0.1f);
 
 	// gen grasses
-	grasses.Reserve(10000);
+	static constexpr int32_t numGrasses{ 5000 };
+	grasses.Reserve(numGrasses);
 	xx::FromTo<float> xRange{ -gg.designSize.x / 2, gg.designSize.x / 2 };
 	xx::FromTo<float> yRange{ -gg.designSize.y / 2, gg.designSize.y / 2 };
-	for (size_t i = 0; i < 10000; i++) {
+	for (size_t i = 0; i < numGrasses; i++) {
 		XY pos{ gg.rnd.Next<float>(xRange.from, xRange.to)
 			, gg.rnd.Next<float>(yRange.from, yRange.to) };
 		grasses.Emplace().Init(this, pos);
@@ -129,10 +131,22 @@ void Scene_Test7::Init() {
 	});
 
 	// gen bg tex
-	texBG = xx::FrameBuffer{}.Init().Draw(gg.designSize, true, {}, [&] {
+
+	texBG = xx::FrameBuffer{}.Init().Draw(gg.designSize, true, xx::RGBA8{ 54, 128, 41, 255 }, [&] {
 		gg.Grass().Draw({ 0, 0, uint16_t(gg.designSize.x * 2), uint16_t(gg.designSize.y * 2) }
 		, 0, 0.5f, 1.f / 2);
+		for (size_t i = 0; i < 10000; i++) {
+			auto idx = gg.rnd.Next<int32_t>(gg.res.brush_.size() - 1);
+			auto& tf = gg.res.brush_[idx];
+			XY pos{ gg.rnd.Next<float>(xRange.from, xRange.to)
+				, gg.rnd.Next<float>(yRange.from, yRange.to) };
+			auto r = gg.rnd.Next<float>(-M_PI, M_PI);
+			auto colorPlus = gg.rnd.Next<float>(0.5f, 1.f);
+			gg.Quad().Draw(tf.tex->id, tf.uvRect, pos, 0.5f, 0.05f, r, colorPlus);
+		}
 	});
+	texBG->TryGenerateMipmap();
+
 }
 
 void Scene_Test7::Update() {

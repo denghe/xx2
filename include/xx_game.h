@@ -3,6 +3,7 @@
 #include "xx_ui.h"
 #include "xx_camera.h"
 #include "xx_framebuffer.h"
+#include "xx_rectpacker.h"
 
 namespace xx {
 	// derived member checkers

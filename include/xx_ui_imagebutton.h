@@ -20,7 +20,7 @@ namespace xx {
 			position = position_;
 			anchor = anchor_;
 			if (fixedSize_.IsZeroSimple()) {
-				fixedSize_ = { frame_.textureRect.w, frame_.textureRect.h };
+				fixedSize_ = { frame_.uvRect.w, frame_.uvRect.h };
 			}
 			size = fixedSize_;
 			borderWidth = borderWidth_;

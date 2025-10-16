@@ -60,9 +60,9 @@ void Player::Update() {
 void Player::Draw() {
 	auto& c = scene->cam;
 	auto& f = gg.res.player;
-	auto s = scale * (c.scale * (radius / f.textureRect.w));
+	auto s = scale * (c.scale * (radius / f.uvRect.w));
 	auto p = pos + shaker.offset;
-	gg.Quad().Draw(*f.tex, f.textureRect, c.ToGLPos(p), anchor, s, radians);
+	gg.Quad().Draw(*f.tex, f.uvRect, c.ToGLPos(p), anchor, s, radians);
 }
 
 // todo: auto attack monster logic

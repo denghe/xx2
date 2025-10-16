@@ -5,13 +5,13 @@ namespace xx {
 
     struct FontFrame {
         GLuint texId;
-        UVRect textureRect;
+        UVRect uvRect;
     };
 
     // sprite frame
     struct TinyFrame {
         Ref<GLTexture> tex;
-        UVRect textureRect{};
+        UVRect uvRect{};
 
         TinyFrame() = default;
         TinyFrame(TinyFrame const&) = default;
@@ -24,26 +24,26 @@ namespace xx {
         }
 
         XX_INLINE operator UVRect const&() const {
-            return textureRect;
+            return uvRect;
         }
 
         XX_INLINE XY Size() const {
-            return { textureRect.w, textureRect.h };
+            return { uvRect.w, uvRect.h };
         }
 
         TinyFrame(Ref<GLTexture> t) {
             tex = std::move(t);
-            textureRect = tex->Rect();
+            uvRect = tex->Rect();
         }
 
         TinyFrame(Ref<GLTexture> t, int x, int y, int w, int h) {
             tex = std::move(t);
-            textureRect = { (uint16_t)x, (uint16_t)y, (uint16_t)w, (uint16_t)h };
+            uvRect = { (uint16_t)x, (uint16_t)y, (uint16_t)w, (uint16_t)h };
         }
 
         void operator=(Ref<GLTexture> t) {
             tex = std::move(t);
-            textureRect = tex->Rect();
+            uvRect = tex->Rect();
         }
     };
 
@@ -65,7 +65,7 @@ namespace xx {
         List<float> vertices;
         List<float> verticesUV;
         Ref<GLTexture> tex;
-        UVRect textureRect{};
+        UVRect uvRect{};
     };
 
     //struct AnimFrame {

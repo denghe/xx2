@@ -23,7 +23,7 @@ namespace xx {
 
 		virtual void Draw() override {
 			// calc
-			auto& rect = cfg.frame.textureRect;
+			auto& rect = cfg.frame.uvRect;
 			auto& center = cfg.center;
 			auto& color = cfg.color;
 			auto& frame = cfg.frame;
