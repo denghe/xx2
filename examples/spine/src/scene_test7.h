@@ -17,19 +17,41 @@ struct Grass1 {
 	XY pos{}, scale{};
 	int32_t frameIndex{};
 	float colorPlus{};
-	void Init(Scene_Test7* scene_, XY pos_ = {});
+	void Init(Scene_Test7* scene_, XY pos_, xx::FromTo<float> scale_, xx::FromTo<float> colorPlus_);
 	void Update();
 	void Draw();
 };
 
 struct Scene_Test7 : xx::SceneBase {
 	xx::Shared<xx::Node> ui;
+
+	xx::FromTo<float> cGrassScale{}, cGrassColorPlus{};
+	xx::Shared<xx::Slider> uiGrassScaleFrom, uiGrassScaleTo, uiGrassColorPlusFrom, uiGrassColorPlusTo;
+
+	static constexpr xx::FromTo<int32_t> cGrassCountRange{ 0, 100000 };
+	int32_t cGrassCount{};
+	xx::Shared<xx::Slider> uiGrassCount;
+
+	// todo: leaf size?
+	static constexpr xx::FromTo<int32_t> cLeafCountRange{ 0, 100000 };
+	int32_t cLeafCount{};
+	xx::Shared<xx::Slider> uiLeafCount;
+
+	// todo: bg color? colorplus?
+	static constexpr xx::FromTo<float> cBGTilingRange{ 0.15, 3 };
+	float cBGTiling{};
+	xx::Shared<xx::Slider> uiBGTiling;
+
 	xx::Camera cam;
 	float time{}, timePool{}, timeScale{ 1 };
 	SpineFrameBatch sfb;
 	xx::List<Grass1> grasses;
-	xx::Ref<xx::GLTexture> texBG;
+	xx::Ref<xx::GLTexture> texBG, texLeaf;
+	xx::FromTo<float> xRange, yRange;
 
+	void GenGrass();
+	void GenLeaf();
+	void GenBG();
 	void Init();
 	void FixedUpdate();
 	void Update() override;
