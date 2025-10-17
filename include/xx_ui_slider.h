@@ -8,6 +8,7 @@ namespace xx {
 	struct Slider : InteractionNode {
 		static constexpr int32_t cTypeId{ 13 };
 
+		bool callbackWhenBlockMoving{};	// user can set directly
 		Ref<Scale9Config> cfgBar, cfgBlock;
 		float height{}, widthTxtLeft{}, widthBar{}, widthTxtRight{};
 		double value{}, valueBak{};	// 0 ~ 1
@@ -148,6 +149,10 @@ namespace xx {
 			}
 			if (!g->mouse[GLFW_MOUSE_BUTTON_LEFT]) {
 				DragEnd();
+			} else if (callbackWhenBlockMoving && blockMoving && valueBak != value) {
+				onChanged(value);
+				valueBak = value;
+				ApplyValue();
 			}
 			return 0;
 		}

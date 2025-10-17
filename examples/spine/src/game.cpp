@@ -78,7 +78,7 @@ void Game::Update() {
 }
 
 void Game::Delay() {
-#if 0
+#if 1
 	// for power saving, fps limit
 	SleepSecs(cDelta - (glfwGetTime() - time));	
 #endif
@@ -91,7 +91,7 @@ void Game::OnResize(bool modeChanged_) {
 }
 
 void Game::Stat() {
-#if 1
+#if 0
 	xx::CoutN("drawFPS = ", drawFPS, " drawCall = "
 		, drawCall, " drawVerts = ", drawVerts
 		, " uiAutoUpdates.len = ", uiAutoUpdates.len
