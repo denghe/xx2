@@ -11,7 +11,7 @@ void Scene_Test8::Init() {
 	xx::FromTo<float> yRange{ -gg.designSize.y / 2, gg.designSize.y / 2 };
 	texBG = xx::FrameBuffer{}.Init().Draw(gg.designSize, true, xx::RGBA8{ 54, 128, 41, 255 }, [&] {
 		for (size_t i = 0; i < 100000; i++) {
-			auto idx = gg.rnd.Next<int32_t>(gg.res.brush_.size() - 1);
+			auto idx = gg.rnd.Next<int32_t>(gg.res.brush_.size());
 			auto& tf = gg.res.brush_[idx];
 			XY pos{ gg.rnd.Next<float>(xRange.from, xRange.to)
 				, gg.rnd.Next<float>(yRange.from, yRange.to) };

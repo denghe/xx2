@@ -1,0 +1,48 @@
+
+grass_1.png
+size: 1024,1024
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+1
+  rotate: false
+  xy: 99, 0
+  size: 179, 243
+  orig: 179, 243
+  offset: 0, 0
+  index: -1
+2
+  rotate: false
+  xy: 0, 171
+  size: 99, 443
+  orig: 99, 443
+  offset: 0, 0
+  index: -1
+3
+  rotate: false
+  xy: 99, 243
+  size: 125, 371
+  orig: 125, 371
+  offset: 0, 0
+  index: -1
+4
+  rotate: false
+  xy: 278, 158
+  size: 103, 148
+  orig: 103, 148
+  offset: 0, 0
+  index: -1
+5
+  rotate: false
+  xy: 224, 306
+  size: 138, 308
+  orig: 138, 308
+  offset: 0, 0
+  index: -1
+size
+  rotate: false
+  xy: 0, 170
+  size: 1, 1
+  orig: 1, 1
+  offset: 0, 0
+  index: -1

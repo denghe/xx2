@@ -20,8 +20,8 @@ void Game::GLInit() {
 	// begin load res
 
 	// load pngs
-	for (size_t i = 1; i <= 15; i++) {
-		res.brush_[i-1] = LoadTexture(xx::ToStringFormat("res/brush_{}.png", i));
+	for (size_t i = 0; i < res.brush_.size(); i++) {
+		res.brush_[i] = LoadTexture(xx::ToStringFormat("res/brush_{}.png", i + 1));
 	}
 	// combine some pngs into single texture
 	xx::RectPacker rp;
@@ -62,9 +62,19 @@ void Game::GLInit() {
 	se.Load("res/eye", res.eye.skel, res.eye.tex);
 	res.eye.tex->TryGenerateMipmap();
 
-	se.Load("res/grass1", res.grass1.skel, res.grass1.tex);
-	res.grass1.tex->TryGenerateMipmap();
-	res.grass1.idle = res.grass1.skel->findAnimation("idle");
+	for (size_t i = 1; i <= 2; i++) {
+		auto& o = res.flower_.Emplace();
+		se.Load(xx::ToString("res/flower_", i), o.skel, o.tex);
+		o.tex->TryGenerateMipmap();
+		o.idle = o.skel->findAnimation("idle");
+	}
+	for (size_t i = 1; i <= 3; i++) {
+		auto& o = res.grass_.Emplace();
+		se.Load(xx::ToString("res/grass_", i), o.skel, o.tex);
+		o.tex->TryGenerateMipmap();
+		o.idle = o.skel->findAnimation("idle");
+	}
+
 
 	// init first scene
 	scene.Emplace<Scene_MainMenu>()->Init();
@@ -78,7 +88,7 @@ void Game::Update() {
 }
 
 void Game::Delay() {
-#if 1
+#if 0
 	// for power saving, fps limit
 	SleepSecs(cDelta - (glfwGetTime() - time));	
 #endif
@@ -91,7 +101,7 @@ void Game::OnResize(bool modeChanged_) {
 }
 
 void Game::Stat() {
-#if 0
+#if 1
 	xx::CoutN("drawFPS = ", drawFPS, " drawCall = "
 		, drawCall, " drawVerts = ", drawVerts
 		, " uiAutoUpdates.len = ", uiAutoUpdates.len

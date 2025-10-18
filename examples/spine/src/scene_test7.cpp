@@ -35,7 +35,7 @@ void SpineFrameBatch::Init(spine::SkeletonData* sd_, spine::Animation* a_, XY sc
 	anchor = aPos / size;
 
 	// spine frames -> tex
-	numFrames = gg.res.grass1.idle->getDuration() / gg.cDelta;
+	numFrames = a_->getDuration() / gg.cDelta;
 
 	// calculate tex max size
 	int32_t texSize{ 256 };
@@ -50,7 +50,7 @@ LabRetry:
 	stepY = texSize / numRows;
 	XY origin{ -texSize / 2 };
 
-	// fill tex
+	// fill tex & tfs
 	tex = xx::FrameBuffer{}.Init().Draw(texSize, true, {}, [&] {
 		int32_t i{};
 		for (int32_t y = 0; y < numRows; ++y) {
@@ -60,24 +60,22 @@ LabRetry:
 				sp.SetPosition(pos);
 				sp.Update(gg.cDelta);
 				sp.Draw();
+				auto& r = tfs.Emplace().uvRect;
+				r.x = stepX * x;
+				r.y = stepY * y;
+				r.w = size.x;
+				r.h = size.y;
 				++i;
 				if (i == numFrames) return;
 			}
 		}
 	});
 	tex->TryGenerateMipmap();
+
+	// fill tfs's tex
+	for (auto& o : tfs) o.tex = tex;
 }
 
-xx::UVRect SpineFrameBatch::GetUvRect(int32_t frameIndex_) const {
-	auto y = frameIndex_ / numCols;
-	auto x = frameIndex_ - numCols * y;
-	xx::UVRect r;
-	r.x = stepX * x;
-	r.y = stepY * y;
-	r.w = size.x;
-	r.h = size.y;
-	return r;
-}
 
 
 
@@ -88,26 +86,26 @@ void Grass1::FillScale() {
 	scale = gg.rnd.Next<float>(scene->cGrassScale.from, scene->cGrassScale.to);
 }
 
-void Grass1::Init(Scene_Test7* scene_, XY pos_) {
+void Grass1::Init(Scene_Test7* scene_, SpineFrameBatch* sfb_, XY pos_) {
 	scene = scene_;
+	sfb = sfb_;
 	pos = pos_;
 	FillColorplus();
 	FillScale();
-	frameIndex = gg.rnd.Next<int32_t>(scene->sfb.numFrames);
-	assert(frameIndex <= scene->sfb.numFrames);
+	frameIndex = gg.rnd.Next<int32_t>(sfb->numFrames);
+	assert(frameIndex <= sfb->numFrames);
 }
 
 void Grass1::Update() {
 	++frameIndex;
-	if (frameIndex == scene->sfb.numFrames) {
+	if (frameIndex == sfb->numFrames) {
 		frameIndex = 0;
 	}
 }
 
 void Grass1::Draw() {
-	// cam? scale? logic pos?
-	gg.Quad().Draw(*scene->sfb.tex, scene->sfb.GetUvRect(frameIndex)
-		, pos * scene->cam.scale, scene->sfb.anchor, scale * scene->cam.scale
+	auto& f = sfb->tfs[frameIndex];
+	gg.Quad().Draw(*f.tex, f.uvRect, pos * scene->cam.scale, sfb->anchor, scale * scene->cam.scale
 	, 0, colorPlus/*, xx::RGBA8_Red*/);
 }
 
@@ -132,12 +130,39 @@ void Scene_Test7::Init() {
 	cBGTiling = (cBGTilingRange.from + cBGTilingRange.to) / 10;
 
 	// spine prepare
-	sfb.Init(gg.res.grass1.skel, gg.res.grass1.idle, 0.1f);
+	for (auto& f : gg.res.flower_) {
+		sfbsFlower.Emplace().Init(f.skel, f.idle, 0.1f);
+	}
+	for (auto& f : gg.res.grass_) {
+		sfbsGrass.Emplace().Init(f.skel, f.idle, 0.1f);
+	}
+
+	// sfb batch combine
+	xx::RectPacker rp;
+	for (auto& o : sfbsFlower) {
+		for (auto& tf : o.tfs) {
+			rp.tfs.Add(&tf);
+		}
+	}
+	for (auto& o : sfbsGrass) {
+		for (auto& tf : o.tfs) {
+			rp.tfs.Add(&tf);
+		}
+	}
+	if (auto r = rp.Pack(4096, 8); r) {
+		xx::CoutN("pack failed");
+	}
+	else {
+		sfbsFlower[0].tfs[0].tex->TryGenerateMipmap();
+		for (auto& o : sfbsFlower) o.tex.Reset();
+		for (auto& o : sfbsGrass) o.tex.Reset();
+	}
+
 
 	// ui init
 	ui.Emplace()->InitRoot(gg.scale * 0.5f);
 
-	static constexpr float cSliderWidths[]{ 600, 1000, 200 };
+	static constexpr float cSliderWidths[]{ 600, 1000, 240 };
 	static constexpr float cMargin{ 5 };
 	static constexpr float cLineHeight{ 100 };
 	static constexpr XY cItemSize{ cSliderWidths[0] + cSliderWidths[1] + cSliderWidths[2], cLineHeight  - cMargin};
@@ -323,7 +348,14 @@ void Scene_Test7::GenGrass() {
 		for (size_t i = 0; i < cGrassCount; i++) {
 			XY pos{ gg.rnd.Next<float>(xRange.from, xRange.to)
 				, gg.rnd.Next<float>(yRange.from, yRange.to) };
-			grasses.Emplace().Init(this, pos);
+			SpineFrameBatch *sfb;
+			if (gg.rnd.Next<float>() > 0.1f) {
+				sfb = &sfbsGrass[gg.rnd.Next<int32_t>(sfbsGrass.len)];
+			}
+			else {
+				sfb = &sfbsFlower[gg.rnd.Next<int32_t>(sfbsFlower.len)];
+			}
+			grasses.Emplace().Init(this, sfb, pos);
 		}
 		std::sort(grasses.buf, grasses.buf + grasses.len, [](auto& a, auto& b)->bool {
 			return a.pos.y > b.pos.y;
@@ -334,7 +366,7 @@ void Scene_Test7::GenGrass() {
 void Scene_Test7::GenLeaf() {
 	texLeaf = xx::FrameBuffer{}.Init().Draw(gg.designSize, true, {}, [&] {
 		for (size_t i = 0; i < cLeafCount; i++) {
-			auto idx = gg.rnd.Next<int32_t>(gg.res.brush_.size() - 1);
+			auto idx = gg.rnd.Next<int32_t>(gg.res.brush_.size());
 			auto& tf = gg.res.brush_[idx];
 			XY pos{ gg.rnd.Next<float>(xRange.from, xRange.to)
 				, gg.rnd.Next<float>(yRange.from, yRange.to) };

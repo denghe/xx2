@@ -2,6 +2,12 @@
 #include "pch.h"
 using XY = xx::XY;
 
+struct SpineRes1 {
+	xx::Ref<xx::GLTexture> tex;
+	spine::SkeletonData* skel{};
+	spine::Animation* idle{};
+};
+
 struct Game : xx::Game<Game> {
 	static constexpr float cFps{ 120 };
 	static constexpr float cDelta{ 1.f / cFps };
@@ -19,7 +25,7 @@ struct Game : xx::Game<Game> {
 	}
 
 	struct {
-		std::array<xx::TinyFrame, 15> brush_;
+		std::array<xx::TinyFrame, 14> brush_;
 		struct {
 			xx::Ref<xx::GLTexture> tex;
 			spine::SkeletonData* skel{};
@@ -47,11 +53,8 @@ struct Game : xx::Game<Game> {
 			xx::Ref<xx::GLTexture> tex;
 			spine::SkeletonData* skel{};
 		} eye;
-		struct {
-			xx::Ref<xx::GLTexture> tex;
-			spine::SkeletonData* skel{};
-			spine::Animation* idle{};
-		} grass1;
+		xx::List<SpineRes1> flower_;
+		xx::List<SpineRes1> grass_;
 	} res;
 
 	// runtime vars

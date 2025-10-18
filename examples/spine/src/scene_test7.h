@@ -7,19 +7,20 @@ struct SpineFrameBatch {
 	int32_t numFrames{};
 	int32_t numCols{}, numRows{};
 	int32_t stepX{}, stepY{};
+	xx::List<xx::TinyFrame> tfs;	// frame results
 	void Init(spine::SkeletonData* sd_, spine::Animation* a_, XY scale_);
-	xx::UVRect GetUvRect(int32_t frameIndex_) const;
 };
 
 struct Scene_Test7;
 struct Grass1 {
 	Scene_Test7* scene{};
+	SpineFrameBatch* sfb{};
 	XY pos{}, scale{};
 	int32_t frameIndex{};
 	float colorPlus{};
 	void FillColorplus();
 	void FillScale();
-	void Init(Scene_Test7* scene_, XY pos_);
+	void Init(Scene_Test7* scene_, SpineFrameBatch* sfb_, XY pos_);
 	void Update();
 	void Draw();
 };
@@ -62,6 +63,9 @@ struct Scene_Test7 : xx::SceneBase {
 	xx::List<Grass1> grasses;
 	xx::Ref<xx::GLTexture> texBG, texLeaf;
 	xx::FromTo<float> xRange, yRange;
+
+	xx::List<SpineFrameBatch> sfbsFlower;
+	xx::List<SpineFrameBatch> sfbsGrass;
 
 	void GenGrass();
 	void GenLeaf();
