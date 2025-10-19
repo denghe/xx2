@@ -149,8 +149,11 @@ void Scene_Test7::Init() {
 			rp.tfs.Add(&tf);
 		}
 	}
-	if (auto r = rp.Pack(4096, 8); r) {
-		xx::CoutN("pack failed");
+	int32_t texSize{ 4096 };
+LabRetry:
+	if (auto r = rp.Pack(texSize, 8); r) {
+		texSize *= 2;
+		goto LabRetry;
 	}
 	else {
 		sfbsFlower[0].tfs[0].tex->TryGenerateMipmap();

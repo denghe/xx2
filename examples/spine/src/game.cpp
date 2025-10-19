@@ -68,7 +68,7 @@ void Game::GLInit() {
 		o.tex->TryGenerateMipmap();
 		o.idle = o.skel->findAnimation("idle");
 	}
-	for (size_t i = 1; i <= 3; i++) {
+	for (size_t i = 1; i <= 4; i++) {
 		auto& o = res.grass_.Emplace();
 		se.Load(xx::ToString("res/grass_", i), o.skel, o.tex);
 		o.tex->TryGenerateMipmap();
