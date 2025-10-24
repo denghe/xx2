@@ -9,7 +9,7 @@ namespace xx {
 		using Base::Base;
 		int32_t cellSize{};
 		float _1_cellSize{};
-		XYi pixelSize{};
+		XYi pixelSize{};	// world size
 
 		void Init(int32_t cellSize_, int32_t numRows_, int32_t numCols_, int32_t capacity_ = 0) {
 			assert(cellSize_ > 0);
@@ -22,12 +22,12 @@ namespace xx {
 		template<typename V>
 		void Add(int32_t& nodeIndex_, V&& e) {
 			assert(nodeIndex_ == -1);
-			auto cri = PosToCRIndex(e->pos);
-			nodeIndex_ = Base::Add(cri.y, cri.x, std::forward<V>(e));
-			auto& o = this->nodes[nodeIndex_];
+			auto cri = PosToCRIndex(e->pos);	// todo: auto switch?
+			nodeIndex_ = Base::Alloc(cri.y, cri.x);
 			if constexpr (!std::is_void_v<C>) {
-				o.cache = e;
+				this->nodes[nodeIndex_].cache = e;
 			}
+			Base::Add(nodeIndex_, std::forward<V>(e));
 		}
 
 		void Update(int32_t nodeIndex_, T const& e) {
@@ -40,7 +40,7 @@ namespace xx {
 			Base::Update(nodeIndex_, cri.y, cri.x);
 		}
 
-		void Remove(int32_t nodeIndex_, T const& e) {
+		void Remove(int32_t& nodeIndex_, T const& e) {
 			assert(Base::nodes[nodeIndex_].value == e);
 			Base::Remove(nodeIndex_);
 			nodeIndex_ = -1;

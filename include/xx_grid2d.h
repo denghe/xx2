@@ -89,8 +89,7 @@ namespace xx {
 			capacity = capacity_;
 		}
 
-		template<typename V>
-		XX_INLINE int32_t Add(int32_t rowNumber_, int32_t columnNumber_, V&& v_) {
+		XX_INLINE int32_t Alloc(int32_t rowNumber_, int32_t columnNumber_) {
 			assert(buckets);
 			assert(rowNumber_ >= 0 && rowNumber_ < numRows);
 			assert(columnNumber_ >= 0 && columnNumber_ < numCols);
@@ -123,10 +122,15 @@ namespace xx {
 			o.prev = -1;
 			o.bucketsIndex = bucketsIndex;
 
-			// assign
-			new (&o.value) T(std::forward<V>(v_));
 			return nodeIndex;
 		}
+
+		template<typename V>
+		XX_INLINE void Add(int32_t allocNodeIndex, V&& v_) {
+			auto& o = nodes[allocNodeIndex];
+			new (&o.value) T(std::forward<V>(v_));
+		}
+
 
 		XX_INLINE void Remove(int32_t nodeIndex_) {
 			assert(buckets);
@@ -258,7 +262,8 @@ namespace xx {
 					auto& tmp = rdd.idxs[offsets + j];
 					ForeachCore(rowNumber_ + tmp.y, columnNumber_ + tmp.x, range, func);
 				}
-				if (range > searchRange) break;
+				if (range > searchRange)
+					return;
 			}
 			assert(false);	// not enough rdd data?
 		}

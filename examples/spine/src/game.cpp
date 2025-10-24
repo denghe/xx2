@@ -14,6 +14,9 @@ void Game::Init() {
 }
 
 void Game::GLInit() {
+	// init basedata
+	sgrdd.Init(64, 64);
+
 	// init shader
 	shaderGrass.Init();
 

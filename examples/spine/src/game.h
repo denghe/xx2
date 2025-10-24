@@ -59,6 +59,7 @@ struct Game : xx::Game<Game> {
 
 	// runtime vars
 	xx::Rnd rnd;
+	xx::SpaceGridRingDiffuseData sgrdd;
 	// ...
 
 	void Init();

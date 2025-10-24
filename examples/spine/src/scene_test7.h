@@ -18,21 +18,33 @@ struct Grass1 {
 	XY pos{}, scale{};
 	int32_t frameIndex{};
 	float colorPlus{};
+	int32_t gridIndex{ -1 };
 	void FillColorplus();
 	void FillScale();
 	void Init(Scene_Test7* scene_, SpineFrameBatch* sfb_, XY pos_);
+	void InitGridIndex();
 	void Update();
 	void Draw();
+	Grass1() = default;
+	Grass1(Grass1 const&) = delete;
+	Grass1& operator=(Grass1 const&) = delete;
+	Grass1(Grass1&& o) noexcept;
+	Grass1& operator=(Grass1&& o) noexcept;
+	~Grass1();
 };
 
 struct Scene_Test7 : xx::SceneBase {
+	static constexpr int32_t cNumMaxGlass{ 100000 };
+	static constexpr int32_t cNumMaxLeaf{ 100000 };
+	static constexpr float cMouseRadius{ 120 };
+
 	xx::Shared<xx::Node> ui;
 
 	xx::FromTo<float> cGrassScale{}, cGrassColorPlus{};
 	xx::Shared<xx::Slider> uiGrassScaleFrom, uiGrassScaleTo, uiGrassColorPlusFrom, uiGrassColorPlusTo;
 
 	// todo: grass color?
-	static constexpr xx::FromTo<int32_t> cGrassCountRange{ 0, 100000 };
+	static constexpr xx::FromTo<int32_t> cGrassCountRange{ 0, cNumMaxGlass };
 	int32_t cGrassCount{};
 	xx::Shared<xx::Slider> uiGrassCount;
 
@@ -44,7 +56,7 @@ struct Scene_Test7 : xx::SceneBase {
 	float cLeafColorplus{};
 	xx::Shared<xx::Slider> uiLeafColorplus;
 
-	static constexpr xx::FromTo<int32_t> cLeafCountRange{ 0, 100000 };
+	static constexpr xx::FromTo<int32_t> cLeafCountRange{ 0, cNumMaxLeaf };
 	int32_t cLeafCount{};
 	xx::Shared<xx::Slider> uiLeafCount;
 
@@ -60,12 +72,13 @@ struct Scene_Test7 : xx::SceneBase {
 	xx::Camera cam;
 	float time{}, timePool{}, timeScale{ 1 };
 	SpineFrameBatch sfb;
+	xx::Grid2dCircle<Grass1*> grid;	// life cycle: must upon grasses
 	xx::List<Grass1> grasses;
 	xx::Ref<xx::GLTexture> texBG, texLeaf;
-	xx::FromTo<float> xRange, yRange;
 
 	xx::List<SpineFrameBatch> sfbsFlower;
 	xx::List<SpineFrameBatch> sfbsGrass;
+
 
 	void GenGrass();
 	void GenLeaf();

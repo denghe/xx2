@@ -96,6 +96,10 @@ void Grass1::Init(Scene_Test7* scene_, SpineFrameBatch* sfb_, XY pos_) {
 	assert(frameIndex <= sfb->numFrames);
 }
 
+void Grass1::InitGridIndex() {
+	scene->grid.Add(gridIndex, this);
+}
+
 void Grass1::Update() {
 	++frameIndex;
 	if (frameIndex == sfb->numFrames) {
@@ -105,19 +109,31 @@ void Grass1::Update() {
 
 void Grass1::Draw() {
 	auto& f = sfb->tfs[frameIndex];
-	gg.Quad().Draw(*f.tex, f.uvRect, pos * scene->cam.scale, sfb->anchor, scale * scene->cam.scale
+	gg.Quad().Draw(*f.tex, f.uvRect, scene->cam.ToGLPos(pos), sfb->anchor, scale * scene->cam.scale
 	, 0, colorPlus/*, xx::RGBA8_Red*/);
+}
+
+Grass1::Grass1(Grass1&& o) noexcept {
+	operator=(std::move(o));
+}
+
+Grass1& Grass1::operator=(Grass1&& o) noexcept {
+	memcpy(this, &o, sizeof(*this));
+	o.gridIndex = -1;
+	return *this;
+}
+
+
+Grass1::~Grass1() {
+	if (gridIndex >= 0) {
+		scene->grid.Remove(gridIndex, this);
+	}
 }
 
 
 
 
-
 void Scene_Test7::Init() {
-	cam.Init(gg.scale, 1.f);
-	xRange = { -gg.designSize.x / 2, gg.designSize.x / 2 };
-	yRange = { -gg.designSize.y / 2, gg.designSize.y / 2 };
-
 	// todo: load from disk ?
 	// data init
 	cGrassScale = { 0.3f, 1.f };
@@ -128,6 +144,8 @@ void Scene_Test7::Init() {
 	cLeafCount = (cLeafCountRange.from + cLeafCountRange.to) / 10;
 	cBGColorplus = 1.f;
 	cBGTiling = (cBGTilingRange.from + cBGTilingRange.to) / 10;
+
+	grasses.Reserve(cNumMaxGlass);
 
 	// spine prepare
 	for (auto& f : gg.res.flower_) {
@@ -161,6 +179,17 @@ LabRetry:
 		for (auto& o : sfbsGrass) o.tex.Reset();
 	}
 
+	// grid init
+	float maxWidth{};
+	for (auto& o : sfbsFlower) if (o.size.x > maxWidth) maxWidth = o.size.x;
+	for (auto& o : sfbsGrass) if (o.size.x > maxWidth) maxWidth = o.size.x;
+	assert(maxWidth > 0);
+	auto cellSize = (int32_t)std::roundf(maxWidth);
+	auto numCRs = (gg.designSize / cellSize + 1).As<int32_t>();
+	grid.Init(cellSize, numCRs.y, numCRs.x, 100000);
+	
+	// cam init
+	cam.Init(gg.scale, 1.f, gg.designSize / 2);
 
 	// ui init
 	ui.Emplace()->InitRoot(gg.scale * 0.5f);
@@ -346,27 +375,28 @@ LabRetry:
 
 void Scene_Test7::GenGrass() {
 	grasses.Clear();
-	if (cGrassCount) {
-		grasses.Reserve(cGrassCount);
-		for (size_t i = 0; i < cGrassCount; i++) {
-			XY pos{ gg.rnd.Next<float>(xRange.from, xRange.to)
-				, gg.rnd.Next<float>(yRange.from, yRange.to) };
-			SpineFrameBatch *sfb;
-			if (gg.rnd.Next<float>() > 0.1f) {
-				sfb = &sfbsGrass[gg.rnd.Next<int32_t>(sfbsGrass.len)];
-			}
-			else {
-				sfb = &sfbsFlower[gg.rnd.Next<int32_t>(sfbsFlower.len)];
-			}
-			grasses.Emplace().Init(this, sfb, pos);
+	if (!cGrassCount) return;
+	for (size_t i = 0; i < cGrassCount; i++) {
+		XY pos{ gg.rnd.Next<float>(0, gg.designSize.x)
+			, gg.rnd.Next<float>(0, gg.designSize.y) };
+		SpineFrameBatch *sfb;
+		if (gg.rnd.Next<float>() > 0.1f) {
+			sfb = &sfbsGrass[gg.rnd.Next<int32_t>(sfbsGrass.len)];
 		}
-		std::sort(grasses.buf, grasses.buf + grasses.len, [](auto& a, auto& b)->bool {
-			return a.pos.y > b.pos.y;
-		});
+		else {
+			sfb = &sfbsFlower[gg.rnd.Next<int32_t>(sfbsFlower.len)];
+		}
+		grasses.Emplace().Init(this, sfb, pos);
 	}
+	std::sort(grasses.buf, grasses.buf + grasses.len, [](auto& a, auto& b)->bool {
+		return a.pos.y < b.pos.y;
+	});
+	for (auto& o : grasses) o.InitGridIndex();
 }
 
 void Scene_Test7::GenLeaf() {
+	xx::FromTo<float> xRange { -gg.designSize.x / 2, gg.designSize.x / 2 };
+	xx::FromTo<float> yRange { -gg.designSize.y / 2, gg.designSize.y / 2 };
 	texLeaf = xx::FrameBuffer{}.Init().Draw(gg.designSize, true, {}, [&] {
 		for (size_t i = 0; i < cLeafCount; i++) {
 			auto idx = gg.rnd.Next<int32_t>(gg.res.brush_.size());
@@ -420,6 +450,24 @@ void Scene_Test7::Update() {
 void Scene_Test7::FixedUpdate() {
 	for (auto& o : grasses) {
 		o.Update();
+	}
+
+	// todo: check mouse pos & set range grass frame index
+	auto mp = cam.ToLogicPos(gg.mousePos);
+	if (mp.x >= 0 && mp.y >= 0 && mp.x < grid.pixelSize.x && mp.y < grid.pixelSize.y) {
+		auto cri = grid.PosToCRIndex(mp);
+		grid.ForeachByRange(cri.y, cri.x, cMouseRadius, gg.sgrdd, [&](xx::Grid2dCircle<Grass1*>::Node& node, float distance) {
+			auto& o = *node.value;
+			auto d = o.pos - mp;
+			if (d.x * d.x + d.y * d.y < cMouseRadius * cMouseRadius) {
+				if (o.pos.x > mp.x) {
+					o.frameIndex = o.sfb->numFrames / 2;
+				}
+				else {
+					o.frameIndex = 0;
+				}
+			}
+		});
 	}
 }
 
