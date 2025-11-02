@@ -54,7 +54,17 @@ namespace xx {
 				tf.uvRect.y = uint16_t(texSize_.y - o.y - tf.uvRect.h);
 			}
 
-			tfs.Clear();
+			return 0;
+		}
+
+		// try resize & auto generate mipmap
+		int32_t AutoPack(int32_t minPackSize_ = 1024, XY padding_ = 4) {
+		LabRetry:
+			if (auto r = Pack(minPackSize_); r) {
+				minPackSize_ *= 2;
+				goto LabRetry;
+			}
+			tfs[0]->tex->TryGenerateMipmap();
 			return 0;
 		}
 	};
