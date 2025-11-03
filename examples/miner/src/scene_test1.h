@@ -1,32 +1,32 @@
 ﻿#pragma once
 #include "game.h"
 
-// todo: priority queue sort by y
-// todo: list free pos
-
 struct Rock {
 	xx::TinyFrame tf;
 	XY pos{}, fixedPos{};
 };
 
-namespace std {
-	template<> struct greater<xx::Shared<Rock>> {
-		bool operator()(auto const& a, auto const& b) const {
-			return a->pos.y > b->pos.y;
-		}
-	};
-}
-
 struct Scene_Test1 : xx::SceneBase {
+	static constexpr float cUIScale{ 0.5f };
 	xx::Shared<xx::Node> ui;
 	xx::Camera cam;
 	float time{}, timePool{}, timeScale{ 1 };
 
-	xx::Grid2dCircle<Rock*> grid;		// life cycle: must upon rocks
-	xx::List<xx::Shared<Rock>> rocks;
-	xx::List<XY> fixedPosPool;
-	float rocksScale{ 0.25f };
+	static constexpr XYi cGridSize{ 40, 20 };
 
+	static constexpr xx::FromTo<float> cRocksScaleRange{ 0.01, 1 };
+	float cRocksScale{ 0.25f };
+	xx::Shared<xx::Slider> uiRocksScale;
+
+	static constexpr xx::FromTo<int32_t> cRocksCountRange{ 0, cGridSize.x * cGridSize.y };
+	int32_t cRocksCount{ 100 };
+	xx::Shared<xx::Slider> uiRocksCount;
+
+	xx::List<XY> rocksFixedPosPool;			// life cycle: must upon rocks
+	xx::Grid2dCircle<Rock*> rocksGrid;		// life cycle: must upon rocks
+	xx::List<xx::Shared<Rock>> rocks;
+
+	void GenRocks();
 	void Init();
 	void Update() override;
 	void FixedUpdate();
