@@ -4,6 +4,12 @@
 
 void Scene_Test1::Init() {
 	cam.Init(gg.scale, 1.f, gg.designSize / 2);
+	MakeUI();
+	GenRocksFixedPosPool();
+	GenRocks();
+}
+
+void Scene_Test1::MakeUI() {
 	ui.Emplace()->InitRoot(gg.scale * cUIScale);
 
 	static constexpr float cSliderWidths[]{ 600, 1000, 240 };
@@ -16,6 +22,34 @@ void Scene_Test1::Init() {
 
 	/*************************************************************************************************/
 	//offset.y -= cLineHeight;
+	uiGridSizeY = ui->Make<xx::Slider>();
+	uiGridSizeY->callbackWhenBlockMoving = true;
+	uiGridSizeY->valueToString = [](double v)->std::string {
+		return xx::ToString(cGridSizeRange.from.y + (uint32_t(v * (cGridSizeRange.to.y - cGridSizeRange.from.y))));
+	};
+	uiGridSizeY->Init(2, offset, anchor, cItemSize.y, cSliderWidths[0], cSliderWidths[1], cSliderWidths[2]
+		, (double)cGridSize.y / (cGridSizeRange.to.y - cGridSizeRange.from.y))("row count");
+	uiGridSizeY->onChanged = [this](double v) {
+		cGridSize.y = int32_t(v * (cGridSizeRange.to.y - cGridSizeRange.from.y));
+		GenAll();
+	};
+
+	/*************************************************************************************************/
+	offset.y -= cLineHeight;
+	uiGridSizeX = ui->Make<xx::Slider>();
+	uiGridSizeX->callbackWhenBlockMoving = true;
+	uiGridSizeX->valueToString = [](double v)->std::string {
+		return xx::ToString(cGridSizeRange.from.x + (uint32_t(v * (cGridSizeRange.to.x - cGridSizeRange.from.x))));
+	};
+	uiGridSizeX->Init(2, offset, anchor, cItemSize.y, cSliderWidths[0], cSliderWidths[1], cSliderWidths[2]
+		, (double)cGridSize.x / (cGridSizeRange.to.x - cGridSizeRange.from.x))("column count");
+	uiGridSizeX->onChanged = [this](double v) {
+		cGridSize.x = int32_t(v * (cGridSizeRange.to.x - cGridSizeRange.from.x));
+		GenAll();
+	};
+
+	/*************************************************************************************************/
+	offset.y -= cLineHeight;
 	uiRocksScale = ui->Make<xx::Slider>();
 	uiRocksScale->callbackWhenBlockMoving = true;
 	uiRocksScale->valueToString = [](double v)->std::string {
@@ -33,7 +67,7 @@ void Scene_Test1::Init() {
 	offset.y -= cLineHeight;
 	uiRocksCount = ui->Make<xx::Slider>();
 	uiRocksCount->callbackWhenBlockMoving = true;
-	uiRocksCount->valueToString = [](double v)->std::string {
+	uiRocksCount->valueToString = [this](double v)->std::string {
 		return xx::ToString(cRocksCountRange.from + (uint32_t(v * (cRocksCountRange.to - cRocksCountRange.from))));
 	};
 	uiRocksCount->Init(2, offset, anchor, cItemSize.y, cSliderWidths[0], cSliderWidths[1], cSliderWidths[2]
@@ -44,17 +78,28 @@ void Scene_Test1::Init() {
 	};
 
 	/*************************************************************************************************/
+	offset.y -= cLineHeight;
+	uiEnableRandomOffset = ui->Make<xx::CheckBox>();
+	uiEnableRandomOffset->Init(2, offset, anchor, cItemSize, cEnableRandomOffset)("enable random offset");
+	uiEnableRandomOffset->onValueChanged = [this](bool v)->void {
+		cEnableRandomOffset = v;
+		SetRandomOffset();
+	};
 
+	/*************************************************************************************************/
+
+	ui->SetAlphaRecursive(0.7f);
+}
+
+void Scene_Test1::GenRocksFixedPosPool() {
 	XY step{ gg.designSize / cGridSize };
-	XY basePoss[]{ {step.x / 2, step.y}, {step.x / 2, step.y + step.y / 2} };
+	XY basePoss[]{ { step.x / 2, step.y / 2 }, { step.x / 2, step.y } };
 	for (int y = 0; y < cGridSize.y; ++y) {
 		for (int x = 0; x < cGridSize.x; ++x) {
 			auto& basePos = basePoss[x & 1];
 			rocksFixedPosPool.Emplace(basePos.x + step.x * x, basePos.y + step.y * y);
 		}
 	}
-
-	GenRocks();
 }
 
 void Scene_Test1::GenRocks() {
@@ -76,7 +121,7 @@ void Scene_Test1::GenRocks() {
 				gg.rnd.Next<float>(-offsetRange.x, offsetRange.x),
 				gg.rnd.Next<float>(-offsetRange.y, offsetRange.y)
 			};
-			rock->pos = rock->fixedPos + posOffset;
+			rock->pos = rock->fixedPos;// +posOffset;
 		}
 	}
 	else {	// d is negative
@@ -89,6 +134,43 @@ void Scene_Test1::GenRocks() {
 	std::sort(rocks.buf, rocks.buf + rocks.len, [](auto& a, auto& b)->bool {
 		return a->pos.y < b->pos.y;
 	});
+}
+
+void Scene_Test1::SetRandomOffset() {
+	if (cEnableRandomOffset) {
+		XY step{ gg.designSize / cGridSize };
+		XY offsetRange{ step / 3 };
+		for (auto& rock : rocks) {
+			XY posOffset{
+				gg.rnd.Next<float>(-offsetRange.x, offsetRange.x),
+				gg.rnd.Next<float>(-offsetRange.y, offsetRange.y)
+			};
+			rock->pos = rock->fixedPos + posOffset;
+		}
+	}
+	else {
+		for (auto& rock : rocks) {
+			rock->pos = rock->fixedPos;
+		}
+	}
+}
+
+void Scene_Test1::GenAll() {
+	rocks.Clear();
+	rocksFixedPosPool.Clear();
+	cRocksCountRange.to = cGridSize.x * cGridSize.y;
+	cRocksCount = std::min(cRocksCount, cRocksCountRange.to);
+	if (cRocksCountRange.to > 0) {
+		uiRocksCount->SetValue((double)cRocksCount / (cRocksCountRange.to - cRocksCountRange.from));
+		uiRocksCount->ApplyValue();
+		GenRocksFixedPosPool();
+		GenRocks();
+	}
+	else {
+		uiRocksCount->SetValue(0);
+		uiRocksCount->ApplyValue();
+	}
+	SetRandomOffset();
 }
 
 void Scene_Test1::Update() {
