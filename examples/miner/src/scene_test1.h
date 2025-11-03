@@ -12,8 +12,8 @@ struct Scene_Test1 : xx::SceneBase {
 	xx::Camera cam;
 	float time{}, timePool{}, timeScale{ 1 };
 
-	static constexpr xx::FromTo<XYi> cGridSizeRange{ {0, 0}, { 160, 90 } };
-	XYi cGridSize{ 16, 9 };
+	static constexpr xx::FromTo<XYi> cGridSizeRange{ {0, 0}, { 160 * 5, 90 * 5 } };
+	XYi cGridSize{ 16 * 5, 9 * 5 };
 	xx::Shared<xx::Slider> uiGridSizeY;
 	xx::Shared<xx::Slider> uiGridSizeX;
 
