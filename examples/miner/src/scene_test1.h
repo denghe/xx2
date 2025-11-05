@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "game.h"
 
-struct Rock {
+struct Rock1 {
 	xx::TinyFrame tf;
 	XY pos{}, fixedPos{};
 };
@@ -30,8 +30,7 @@ struct Scene_Test1 : xx::SceneBase {
 	xx::Shared<xx::CheckBox> uiEnableRandomOffset;
 
 	xx::List<XY> rocksFixedPosPool;			// life cycle: must upon rocks
-	xx::Grid2dCircle<Rock*> rocksGrid;		// life cycle: must upon rocks
-	xx::List<xx::Shared<Rock>> rocks;
+	xx::List<xx::Shared<Rock1>> rocks;
 
 	void GenRocksFixedPosPool();
 	void GenRocks();

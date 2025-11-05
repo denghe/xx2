@@ -5,8 +5,7 @@
 void Scene_Test1::Init() {
 	cam.Init(gg.scale, 1.f, gg.designSize / 2);
 	MakeUI();
-	GenRocksFixedPosPool();
-	GenRocks();
+	GenAll();
 }
 
 void Scene_Test1::MakeUI() {
@@ -117,11 +116,7 @@ void Scene_Test1::GenRocks() {
 			auto fpIdx = gg.rnd.Next<int32_t>(rocksFixedPosPool.len);
 			rock->fixedPos = rocksFixedPosPool[fpIdx];
 			rocksFixedPosPool.SwapRemoveAt(fpIdx);
-			XY posOffset{
-				gg.rnd.Next<float>(-offsetRange.x, offsetRange.x),
-				gg.rnd.Next<float>(-offsetRange.y, offsetRange.y)
-			};
-			rock->pos = rock->fixedPos;// +posOffset;
+			rock->pos = rock->fixedPos;
 		}
 	}
 	else {	// d is negative

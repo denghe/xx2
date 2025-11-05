@@ -6,9 +6,9 @@
 namespace xx {
 
     /*  for copy
-struct XXXXXXXXXXX {
+struct XXXXXXXXXXX : ParentType {
     static constexpr uint16_t cTypeId{ 111111111 };
-	static constexpr uint16_t cParentTypeId{ xx::SerdeBase::cTypeId };
+	static constexpr uint16_t cParentTypeId{ ParentType::cTypeId };
     void WriteTo(xx::Data& d) const override;
     int32_t ReadFrom(xx::Data_r& dr) override;
 };
@@ -31,7 +31,7 @@ struct XXXXXXXXXXX {
     struct DataEx_r : Data_r {
         using Data_r::Data_r;
         SerdeInfo* si{};                            // need fill before use
-        List<Shared<SerdeBase>> ptrs;       // need clear after read finish
+        List<Shared<SerdeBase>> ptrs;               // need clear after read finish
     };
 
     struct UdPtr {
@@ -56,7 +56,7 @@ struct XXXXXXXXXXX {
     struct DataEx : Data {
         using Data::Data;
         SerdeInfo* si{};                            // need fill before use
-        List<UdPtr> ptrs;                    // need clear after write finish
+        List<UdPtr> ptrs;                           // need clear after write finish
     };
 
     struct SerdeInfo {

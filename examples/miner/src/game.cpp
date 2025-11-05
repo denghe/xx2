@@ -20,6 +20,7 @@ void Game::GLInit() {
 	// begin load res
 
 	// load pngs
+	res.circle256 = LoadTexture("res/circle256.png");
 	res.pickaxe_[0] = LoadTexture("res/pickaxe_0.png");
 	res.rock_[0] = LoadTexture("res/rock_a.png");
 	res.rock_[1] = LoadTexture("res/rock_b.png");

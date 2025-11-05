@@ -11,7 +11,7 @@ namespace xx {
 		float _1_cellSize{};
 		XYi pixelSize{};	// world size
 
-		void Init(int32_t cellSize_, int32_t numRows_, int32_t numCols_, int32_t capacity_ = 0) {
+		void Init(int32_t cellSize_, int32_t numRows_, int32_t numCols_, int32_t capacity_ = 100) {
 			assert(cellSize_ > 0);
 			Base::Init(numRows_, numCols_, capacity_);
 			cellSize = cellSize_;
