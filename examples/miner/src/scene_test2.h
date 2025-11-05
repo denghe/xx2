@@ -8,6 +8,9 @@ struct Rock2 {
 	XY pos{}, fixedPos{};
 	int32_t indexAtGrid{-1};
 	int32_t indexAtList{-1};	// fill by maker
+	static constexpr float cScaleStep{ 1.f / (gg.cFps * 0.25f) };
+	float scale{};
+	int32_t _1{};
 	// todo: rock id ?
 	void Init(Scene_Test2* scene_);
 	void Update();

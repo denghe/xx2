@@ -22,11 +22,17 @@ void Rock2::Init(Scene_Test2* scene_) {
 }
 
 void Rock2::Update() {
-	// todo: born logic? change scale?
+	// born logic: change scale
+	XX_BEGIN(_1);
+	for (scale = 0; scale < 1.f; scale += cScaleStep) {
+		XX_YIELD(_1);
+	}
+	scale = 1.f;
+	XX_END(_1);
 }
 
 void Rock2::Draw() {
-	gg.Quad().Draw(tf, tf, scene->cam.ToGLPos(pos), { 0.5f, 0 }, scene->cRocksScale * scene->cam.scale);
+	gg.Quad().Draw(tf, tf, scene->cam.ToGLPos(pos), { 0.5f, 0 }, scene->cRocksScale * scale * scene->cam.scale);
 }
 
 void Rock2::Dispose() {
@@ -70,7 +76,7 @@ void Scene_Test2::Init() {
 	}
 	assert(rocksFixedPosPool.len == cRocksMaxCount);
 
-	GenRocks(1000);
+	GenRocks(1300);
 	SortRocks();
 }
 
@@ -118,19 +124,28 @@ void Scene_Test2::Update() {
 void Scene_Test2::FixedUpdate() {
 	auto mp = cam.ToLogicPos(gg.mousePos);
 	if (mp.x >= 0 && mp.y >= 0 && mp.x < rocksGrid.pixelSize.x && mp.y < rocksGrid.pixelSize.y) {
-		bool dirty{};
+		auto total = rocks.len;
+		int32_t count{};
 		auto cri = rocksGrid.PosToCRIndex(mp);
-		rocksGrid.ForeachByRange(cri.y, cri.x, cMouseCircleRadius, gg.sgrdd, [&](xx::Grid2dCircle<Rock2*>::Node& node, float distance) {
+		float rockRadius{ 32 };
+		rocksGrid.ForeachByRange(cri.y, cri.x, cMouseCircleRadius + rockRadius, gg.sgrdd, [&](xx::Grid2dCircle<Rock2*>::Node& node, float distance) {
+			if (node.value->scale < 1) return;
 			auto& o = *node.value;
 			auto d = o.pos - mp;
-			if (d.x * d.x + d.y * d.y < cMouseCircleRadius * cMouseCircleRadius) {
+			auto r = cMouseCircleRadius + rockRadius;
+			if (d.x * d.x + d.y * d.y < r * r) {
 				node.value->Dispose();
-				dirty = true;
+				++count;
 			}
 		});
-		if (dirty) {
+		if (count) {
+			GenRocks(count);
 			SortRocks();
 		}
+	}
+
+	for (auto& rock : rocks) {
+		rock->Update();
 	}
 }
 
