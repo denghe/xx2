@@ -4,12 +4,12 @@
 
 namespace xx {
 
-    // 基础二进制数据跨度/引用容器( buf + len ) 类似 C++20 的 std::span
-    // 注意: 因 追加 & 扩容 导致的数据失效问题, 追加自身存储的数据时要小心，需要先 reserve
+    // binary data referrer( buf + len ) / reader( buf + len + offset ) / container( buf + len + cap + offset ) C++20 std::span likely
 
     template<typename T> concept Has_GetBuf = requires(T t) { t.GetBuf(); };
     template<typename T> concept Has_GetLen = requires(T t) { t.GetLen(); };
 
+    // referrer( buf + len )
     struct Span {
         uint8_t* buf;
         size_t len;
@@ -17,43 +17,34 @@ namespace xx {
         Span()
             : buf(nullptr), len(0) {
         }
-
         Span(Span const& o) = default;
-
         Span& operator=(Span const& o) = default;
 
-
-        // 引用一段数据
         [[maybe_unused]] Span(void const* buf, size_t len)
             : buf((uint8_t*)buf), len(len) {
         }
 
-        // 引用一个 含有 buf + len 成员的对象的数据
         template<typename T, typename = std::enable_if_t<std::is_class_v<T>>>
         [[maybe_unused]] explicit Span(T const& d)
             : buf((uint8_t*)d.buf), len(d.len) {
         }
 
-        // 引用一段数据
         [[maybe_unused]] XX_INLINE void Reset(void const* buf_, size_t len_) {
             buf = (uint8_t*)buf_;
             len = len_;
         }
 
-        // 引用一个 含有 buf + len 成员的对象的数据
         template<typename T, typename = std::enable_if_t<std::is_class_v<T>>>
         [[maybe_unused]] XX_INLINE void Reset(T const& d, size_t offset_ = 0) {
             Reset(d.buf, d.len, offset_);
         }
 
-        // 引用一个 含有 buf + len 成员的对象的数据
         template<typename T, typename = std::enable_if_t<std::is_class_v<T>>>
         Span& operator=(T const& o) {
             Reset(o.buf, o.len);
             return *this;
         }
 
-        // 判断数据是否一致
         XX_INLINE bool operator==(Span const& o) const {
             if (&o == this) return true;
             if (len != o.len) return false;
@@ -64,24 +55,16 @@ namespace xx {
             return !this->operator==(o);
         }
 
-        // 下标只读访问
-        XX_INLINE uint8_t const& operator[](size_t idx) const {
+        XX_INLINE uint8_t& operator[](size_t idx) const {
             assert(idx < len);
-            return buf[idx];
+            return (uint8_t&)buf[idx];
         }
 
-        // 下标可写访问
-        XX_INLINE uint8_t& operator[](size_t idx) {
-            assert(idx < len);
-            return buf[idx];
-        }
-
-        // 供 if 简单判断是否为空
         XX_INLINE operator bool() const {
             return len != 0;
         }
 
-        // 可轻松转为 std::string_view
+        // for easy use
         XX_INLINE operator std::string_view() const {
             return { (char*)buf, len };
         }
@@ -91,29 +74,24 @@ namespace xx {
     template<>
     struct IsPod<Span, void> : std::true_type {};
 
-    // Data 序列化 / 反序列化 基础适配模板
+    // SerDe base template
     template<typename T, typename ENABLED>
     struct DataFuncs;
 
-    // 基础二进制数据跨度/引用容器 附带基础 流式读 功能( offset )
+    // reader( buf + len + offset )
     struct Data_r : Span {
         size_t offset;
 
         Data_r()
                 : offset(0) {
         }
-
         Data_r(Data_r const& o) = default;
-
         Data_r& operator=(Data_r const& o) = default;
 
-
-        // 引用一段数据
         [[maybe_unused]] Data_r(void const* buf, size_t len, size_t offset = 0) {
             Reset(buf, len, offset);
         }
 
-        // 引用一个 含有 buf + len 成员的对象的数据
         template<typename T, typename = std::enable_if_t<std::is_class_v<T>>>
         [[maybe_unused]] Data_r(T const& d, size_t offset = 0) {
             if constexpr (std::is_same_v<std::string_view, std::decay_t<T>>) {
@@ -126,26 +104,22 @@ namespace xx {
             }
         }
 
-        // 引用一段数据
         [[maybe_unused]] XX_INLINE void Reset(void const* buf_, size_t len_, size_t offset_ = 0) {
             this->Span::Reset(buf_, len_);
             offset = offset_;
         }
 
-        // 引用一个 含有 buf + len 成员的对象的数据
         template<typename T, typename = std::enable_if_t<std::is_class_v<T>>>
         [[maybe_unused]] XX_INLINE void Reset(T const& d, size_t offset_ = 0) {
             Reset(d.buf, d.len, offset_);
         }
 
-        // 引用一个 含有 buf + len 成员的对象的数据
         template<typename T, typename = std::enable_if_t<std::is_class_v<T>>>
         Data_r& operator=(T const& o) {
             Reset(o.buf, o.len);
             return *this;
         }
 
-        // 判断数据是否一致
         XX_INLINE bool operator==(Data_r const &o) {
             return this->Span::operator==(o);
         }
@@ -179,13 +153,14 @@ namespace xx {
         }
 
         /***************************************************************************************************************************/
+        // return !0 mean read fail.
 
-        // 返回剩余 buf ( 不改变 offset )
+        // return left buf + len( do not change offset )
         [[maybe_unused]] [[nodiscard]] XX_INLINE std::pair<uint8_t*, size_t> GetLeftBuf() {
             return { buf + offset, len - offset };
         }
 
-        // fill 剩余 buf to dr
+        // dr.buf & len = left this.buf + len
         [[maybe_unused]] [[nodiscard]] XX_INLINE int ReadLeftBuf(Data_r& dr) {
             if (offset == len) return __LINE__;
             dr.Reset(buf + offset, len - offset);
@@ -193,7 +168,7 @@ namespace xx {
             return 0;
         }
 
-        // 跳过 siz 字节不读. 返回非 0 则失败( 长度不足 )
+        // skip siz bytes
         [[maybe_unused]] [[nodiscard]] XX_INLINE int ReadJump(size_t siz) {
             assert(siz);
             if (offset + siz > len) return __LINE__;
@@ -201,7 +176,7 @@ namespace xx {
             return 0;
         }
 
-        // 读 定长buf 到 tar. 返回非 0 则读取失败
+        // memcpy fixed siz data( from offset ) to tar
         [[maybe_unused]] [[nodiscard]] XX_INLINE int ReadBuf(void* tar, size_t siz) {
             assert(tar);
             if (offset + siz > len) return __LINE__;
@@ -210,7 +185,7 @@ namespace xx {
             return 0;
         }
 
-        // 从指定下标 读 定长buf. 不改变 offset. 返回非 0 则读取失败
+        // memcpy fixed siz data( from specific idx ) to tar
         [[maybe_unused]] [[nodiscard]] XX_INLINE int ReadBufAt(size_t idx, void* tar, size_t siz) const {
             assert(tar);
             if (idx + siz > len) return __LINE__;
@@ -218,7 +193,7 @@ namespace xx {
             return 0;
         }
 
-        // 读 定长buf 起始指针 方便外面 copy. 返回 nullptr 则读取失败
+        // return pointer( fixed len, from offset ) for memcpy
         [[maybe_unused]] [[nodiscard]] XX_INLINE void* ReadBuf(size_t siz) {
             if (offset + siz > len) return nullptr;
             auto bak = offset;
@@ -226,13 +201,13 @@ namespace xx {
             return buf + bak;
         }
 
-        // 从指定下标 读 定长buf 起始指针 方便外面 copy. 返回 nullptr 则读取失败
+        // return pointer( fixed len, from specific idx ) for read / memcpy
         [[maybe_unused]] [[nodiscard]] XX_INLINE void* ReadBufAt(size_t idx, size_t siz) const {
             if (idx + siz > len) return nullptr;
             return buf + idx;
         }
 
-        // 读 定长小尾数字. 返回非 0 则读取失败
+        // read fixed len little endian number
         template<typename T, typename = std::enable_if_t<std::is_arithmetic_v<T> || std::is_enum_v<T>>>
         [[maybe_unused]] [[nodiscard]] XX_INLINE int ReadFixed(T &v) {
             if (offset + sizeof(T) > len) return __LINE__;
@@ -244,7 +219,7 @@ namespace xx {
             return 0;
         }
 
-        // 从指定下标 读 定长小尾数字. 不改变 offset. 返回非 0 则读取失败
+        // read fixed len little endian number from specific idx ( do not change offset )
         template<typename T, typename = std::enable_if_t<std::is_arithmetic_v<T> || std::is_enum_v<T>>>
         [[maybe_unused]] [[nodiscard]] XX_INLINE int ReadFixedAt(size_t idx, T &v) {
             if (idx + sizeof(T) > len) return __LINE__;
@@ -255,7 +230,7 @@ namespace xx {
             return 0;
         }
 
-        // 读 定长大尾数字. 返回非 0 则读取失败
+        // read fixed len big endian number
         template<typename T, typename = std::enable_if_t<std::is_arithmetic_v<T> || std::is_enum_v<T>>>
         [[maybe_unused]] [[nodiscard]] XX_INLINE int ReadFixedBE(T& v) {
             if (offset + sizeof(T) > len) return __LINE__;
@@ -267,7 +242,7 @@ namespace xx {
             return 0;
         }
 
-        // 从指定下标 读 定长大尾数字. 不改变 offset. 返回非 0 则读取失败
+        // read fixed len big endian number from specific idx ( do not change offset )
         template<typename T, typename = std::enable_if_t<std::is_arithmetic_v<T> || std::is_enum_v<T>>>
         [[maybe_unused]] [[nodiscard]] XX_INLINE int ReadFixedBEAt(size_t idx, T& v) {
             if (idx + sizeof(T) >= len) return __LINE__;
@@ -278,7 +253,7 @@ namespace xx {
             return 0;
         }
 
-        // 读 定长小尾数字 数组. 返回非 0 则读取失败
+        // read fixed len little endian number array
         template<typename T, typename = std::enable_if_t<std::is_arithmetic_v<T> || std::is_enum_v<T>>>
         [[maybe_unused]] [[nodiscard]] XX_INLINE int ReadFixedArray(T* tar, size_t siz) {
             assert(tar);
@@ -298,7 +273,7 @@ namespace xx {
         }
 
 
-        // 读 变长整数. 返回非 0 则读取失败
+        // read variable length integer
         template<typename T>
         [[maybe_unused]] [[nodiscard]] XX_INLINE int ReadVarInteger(T &v) {
             using UT = std::make_unsigned_t<T>;
@@ -320,8 +295,7 @@ namespace xx {
             return __LINE__;
         }
 
-
-        // 从 buf[offset] 处填充一个指定长度的 string_view. 返回非 0 则读取失败
+        // read buf + len to sv
         [[maybe_unused]] [[nodiscard]] XX_INLINE int ReadSV(std::string_view& sv, size_t siz) {
             if (offset + siz >= len) return __LINE__;
             auto s = (char*)buf + offset;
@@ -330,7 +304,7 @@ namespace xx {
             return 0;
         }
 
-        // 从 buf[offset] 处填充一个 \0 string_view. 不会超过 buf 总长度. 返回非 0 则读取失败( 只会发生于进函数时 buf 已读光 )
+        // read "c string\0" to sv
         [[maybe_unused]] [[nodiscard]] XX_INLINE int ReadCStr(std::string_view& sv) {
             return ReadSV(sv, strlen((char*)buf + offset));
         }
@@ -341,8 +315,7 @@ namespace xx {
             return 0;
         }
 
-
-        // 读出并填充到变量. 可同时填充多个. 返回非 0 则读取失败
+        // multi read
         template<typename ...TS>
         int Read(TS&...vs) {
             return ReadCore(vs...);
@@ -364,28 +337,27 @@ namespace xx {
     /***************************************************************************************************************************/
 
 
-    // 基础二进制数据容器 附带基础 流式读写 功能，可配置预留长度方便有些操作在 buf 最头上放东西
+    // container( buf + len + cap + offset ). can reserve header len( for network package? )
     template<size_t bufHeaderReserveLen = 0>
     struct Data_rw : Data_r {
         size_t cap;
 
-        // buf = len = offset = cap = 0
         Data_rw()
             : cap(0) {
         }
 
-        // 便于读取模板参数 buf 前面的内存预留长度
+        // for easy use
         inline static size_t constexpr GetBufHeaderReserveLen() {
             return bufHeaderReserveLen;
         }
 
-        // unsafe: 直接设置成员数值, 常用于有把握的"借壳" 读写( 不会造成 Reserve 操作的 ), 最后记得 Reset 还原
+        // unsafe: override values
         [[maybe_unused]] XX_INLINE void Reset(void const* buf_ = nullptr, size_t len_ = 0, size_t offset_ = 0, size_t cap_ = 0) {
             this->Data_r::Reset(buf_, len_, offset_);
             cap = cap_;
         }
 
-        // 预分配空间
+        // cap: reserve len
         [[maybe_unused]] explicit Data_rw(size_t cap)
                 : cap(cap) {
             assert(cap);
@@ -394,31 +366,31 @@ namespace xx {
             this->cap = siz - bufHeaderReserveLen;
         }
 
-        // 复制( offset = 0 )
+        // memcpy( offset = 0 )
         [[maybe_unused]] Data_rw(Span const& s)
             : cap(0) {
             WriteBuf(s.buf, s.len);
         }
 
-        // 复制, 顺便设置 offset
+        // memcpy + set offset
         [[maybe_unused]] Data_rw(void const* ptr, size_t siz, size_t offset_ = 0)
             : cap(0) {
             WriteBuf(ptr, siz);
             offset = offset_;
         }
 
-        // 复制( offset = 0 )
+        // memcpy( offset = 0 )
         Data_rw(Data_rw const &o)
             : cap(0) {
             operator=(o);
         }
 
-        // 复制( offset = 0 )
+        // memcpy( offset = 0 )
         XX_INLINE Data_rw& operator=(Data_rw const& o) {
             return operator=<Data_rw>(o);
         }
 
-        // 复制含有 buf + len 成员的类实例的数据( offset = 0 )
+        // memcpy( offset = 0 )( o have field: buf + len )
         template<typename T, typename = std::enable_if_t<std::is_class_v<T>>>
         XX_INLINE Data_rw& operator=(T const& o) {
             if (this == &o) return *this;
@@ -427,13 +399,13 @@ namespace xx {
             return *this;
         }
 
-        // 将 o 的数据挪过来
+        // move o's memory to this
         Data_rw(Data_rw &&o) noexcept {
             memcpy((void*)this, &o, sizeof(Data_rw));
             memset((void*)&o, 0, sizeof(Data_rw));
         }
 
-        // 交换数据
+        // swap
         XX_INLINE Data_rw &operator=(Data_rw &&o) noexcept {
             std::swap(buf, o.buf);
             std::swap(len, o.len);
@@ -442,7 +414,7 @@ namespace xx {
             return *this;
         }
 
-        // 判断数据是否一致( 忽略 offset, cap )
+        // memcmp data( ignore offset, cap )
         XX_INLINE bool operator==(Data_rw const &o) const {
             return this->Span::operator==(o);
         }
@@ -451,7 +423,7 @@ namespace xx {
             return !this->operator==(o);
         }
 
-        // 确保空间足够( round2n == false 通常用于定长文件加载之类需求, cap == len )
+        // ensure free space is enough( round2n == false usually for big file data, cap == len )
         template<bool checkCap = true, bool round2n = true>
         XX_NOINLINE void Reserve(size_t newCap) {
             if constexpr (checkCap) {
@@ -470,7 +442,7 @@ namespace xx {
                 memcpy(newBuf, buf, len);
             }
 
-            // 这里判断 cap 不判断 buf, 是因为 gcc 优化会导致 if 失效, 无论如何都会执行 delete
+            // check cap for gcc issue
             if (cap) {
                 delete[](buf - bufHeaderReserveLen);
             }
@@ -502,7 +474,7 @@ namespace xx {
             return rtv;
         }
 
-        // 修改数据长度( 可能扩容 )。会返回旧长度
+        // resize & return old len
         XX_INLINE size_t Resize(size_t newLen) {
             if (newLen > cap) {
                 Reserve<false>(newLen);
@@ -512,7 +484,7 @@ namespace xx {
             return rtv;
         }
 
-        // 通过 初始化列表 填充内容. 填充前会先 Clear. 用法: d.Fill({ 1,2,3. ....})
+        // fill data by initializer list. will Clear. example: d.Fill({ 1,2,3. ....})
         template<typename T = int32_t, typename = std::enable_if_t<std::is_convertible_v<T, uint8_t>>>
         [[maybe_unused]] XX_INLINE void Fill(std::initializer_list<T> const &bytes) {
             Clear();
@@ -537,7 +509,7 @@ namespace xx {
             return d;
         }
 
-        // 从头部移除指定长度数据( 常见于拆包处理移除掉已经访问过的包数据, 将残留部分移动到头部 )
+        // erase data from head
         [[maybe_unused]] XX_INLINE void RemoveFront(size_t siz) {
             assert(siz <= len);
             if (!siz) return;
@@ -554,7 +526,7 @@ namespace xx {
 
         /***************************************************************************************************************************/
 
-        // 追加写入一段 buf( 不记录数据长度 )
+        // append data
         template<bool needReserve = true>
         XX_INLINE void WriteBuf(void const* ptr, size_t siz) {
             if constexpr (needReserve) {
@@ -566,7 +538,7 @@ namespace xx {
             len += siz;
         }
 
-        // WriteBuf 支持一下 literal string[_view] 以方便使用
+        // support literal string[_view] for easy use
         template<bool needReserve = true>
         XX_INLINE void WriteBuf(std::string const& sv) {
             WriteBuf<needReserve>(sv.data(), sv.size());
@@ -580,7 +552,7 @@ namespace xx {
             WriteBuf<needReserve>(s, n - 1);
         }
 
-        // 在指定 idx 写入一段 buf( 不记录数据长度 )
+        // write data to specific idx
         [[maybe_unused]] XX_INLINE void WriteBufAt(size_t idx, void const* ptr, size_t siz) {
             if (idx + siz > len) {
                 Resize(idx + siz);
@@ -588,8 +560,7 @@ namespace xx {
             memcpy(buf + idx, ptr, siz);
         }
 
-
-        // 追加写入 float / double / integer ( 定长 Little Endian )
+        // append write float / double / integer ( fixed size Little Endian )
         template<bool needReserve = true, typename T, typename = std::enable_if_t<std::is_arithmetic_v<T> || std::is_enum_v<T>>>
         [[maybe_unused]] XX_INLINE void WriteFixed(T v) {
             if constexpr (needReserve) {
@@ -604,7 +575,7 @@ namespace xx {
             len += sizeof(T);
         }
 
-        // 在指定 idx 写入 float / double / integer ( 定长 Little Endian )
+        // write float / double / integer ( fixed size Little Endian ) to specific index
         template<typename T, typename = std::enable_if_t<std::is_arithmetic_v<T> || std::is_enum_v<T>>>
         [[maybe_unused]] XX_INLINE void WriteFixedAt(size_t idx, T v) {
             if (idx + sizeof(T) > len) {
@@ -616,7 +587,7 @@ namespace xx {
             memcpy(buf + idx, &v, sizeof(T));
         }
 
-        // 追加写入 float / double / integer ( 定长 Big Endian )
+        // append write float / double / integer ( fixed size Big Endian )
         template<bool needReserve = true, typename T, typename = std::enable_if_t<std::is_arithmetic_v<T> || std::is_enum_v<T>>>
         [[maybe_unused]] XX_INLINE void WriteFixedBE(T v) {
             if constexpr (needReserve) {
@@ -631,7 +602,7 @@ namespace xx {
             len += sizeof(T);
         }
 
-        // 在指定 idx 写入 float / double / integer ( 定长 Big Endian )
+        // write float / double / integer ( fixed size Big Endian ) to specific index
         template<typename T, typename = std::enable_if_t<std::is_arithmetic_v<T> || std::is_enum_v<T>>>
         [[maybe_unused]] XX_INLINE void WriteFixedBEAt(size_t idx, T v) {
             if (idx + sizeof(T) > len) {
@@ -643,7 +614,7 @@ namespace xx {
             memcpy(buf + idx, &v, sizeof(T));
         }
 
-        // 追加写入 float / double / integer ( 定长 Little Endian ) 数组
+        // append write float / double / integer ( fixed size Little Endian ) array
         template<bool needReserve = true, typename T, typename = std::enable_if_t<std::is_arithmetic_v<T> || std::is_enum_v<T>>>
         [[maybe_unused]] XX_INLINE void WriteFixedArray(T const* ptr, size_t siz) {
             assert(ptr);
@@ -665,7 +636,7 @@ namespace xx {
             len += sizeof(T) * siz;
         }
 
-        // 追加写入整数( 7bit 变长格式 )
+        // append write variable length integer( 7bit format )
         template<bool needReserve = true, typename T, typename = std::enable_if_t<std::is_integral_v<T>>>
         [[maybe_unused]] XX_INLINE void WriteVarInteger(T const &v) {
             using UT = std::make_unsigned_t<T>;
@@ -686,8 +657,7 @@ namespace xx {
             buf[len++] = uint8_t(u);
         }
 
-
-        // 跳过指定长度字节数不写。返回起始 len
+        // skip specific size space. backup len and return
         template<bool needReserve = true>
         [[maybe_unused]] XX_INLINE size_t WriteJump(size_t siz) {
             auto bak = len;
@@ -700,13 +670,13 @@ namespace xx {
             return bak;
         }
 
-        // 跳过指定长度字节数不写。返回起始 指针
+        // skip specific size space. backup pointer and return
         template<bool needReserve = true>
         [[maybe_unused]] XX_INLINE uint8_t* WriteSpace(size_t siz) {
             return buf + WriteJump<needReserve>(siz);
         }
 
-        // 支持同时写入多个值
+        // multi write
         template<bool needReserve = true, typename ...TS>
         void Write(TS const& ...vs);
 
@@ -723,10 +693,9 @@ namespace xx {
             Clear(true);
         }
 
-        // len 清 0, 可彻底释放 buf
+        // set len & offset = 0, support free buf( cap = 0 )
         XX_INLINE void Clear(bool freeBuf = false) {
             if (freeBuf && cap) {
-                //delete[](buf - bufHeaderReserveLen);
                 delete[](buf - bufHeaderReserveLen);
                 buf = nullptr;
                 cap = 0;
@@ -749,22 +718,23 @@ namespace xx {
     using DataView = Data_r;
 
     /************************************************************************************/
-    // Data 序列化 / 反序列化 基础适配模板
+    // Data SerDe base template adapter
 
     template<typename T, typename ENABLED = void>
     struct DataFuncs {
-        // 整数变长写( 1字节除外 ), double 看情况, float 拷贝内存, 容器先变长写长度
         template<bool needReserve = true>
         static inline void Write(Data& dw, T const& in) {
             auto tn = typeid(T).name();
             assert(false);
         }
-        // 返回非 0 表示操作失败
+        // return !0 mean error
         static inline int Read(Data_r& dr, T& out) {
             assert(false);
             return 0;
         }
     };
+
+    /**********************************************************************************************************************/
 
     template<typename T, typename ...TS>
     int Data_r::ReadCore(T& v, TS&...vs) {
@@ -783,9 +753,8 @@ namespace xx {
     }
 
     /**********************************************************************************************************************/
-    // 为 Data.Read / Write 提供简单序列化功能( 1字节整数, float/double  memcpy,   别的整数 包括长度 变长. std::string/xx::Data 写 长度 + 内容
 
-    // 适配 Data
+    // adapt Data
     template<typename T>
     struct DataFuncs<T, std::enable_if_t<IsData_v<T>>> {
         template<bool needReserve = true>
@@ -804,7 +773,7 @@ namespace xx {
         }
     };
 
-    // 适配 Span / Data_r ( for buf combine, does not write len )
+    // adapt Span / Data_r ( for buf combine, does not write len )
     template<typename T>
     struct DataFuncs<T, std::enable_if_t<std::is_base_of_v<Span, T> && !IsData_v<T>>> {
         template<bool needReserve = true>
@@ -814,7 +783,7 @@ namespace xx {
     };
 
 
-    // 适配 1 字节长度的 数值( 含 double ) 或 float/double( 这些类型直接 memcpy )
+    // adapt some number format for memcpy( 1 size or floating )
     template<typename T>
     struct DataFuncs<T, std::enable_if_t< (std::is_arithmetic_v<T> && sizeof(T) == 1) || std::is_floating_point_v<T> >> {
         template<bool needReserve = true>
@@ -826,7 +795,7 @@ namespace xx {
         }
     };
 
-    // 适配 2+ 字节整数( 变长读写 )
+    // adapt 2 ~ 8 size integer( variable length )
     template<typename T>
     struct DataFuncs<T, std::enable_if_t<std::is_integral_v<T> && sizeof(T) >= 2>> {
         template<bool needReserve = true>
@@ -838,7 +807,7 @@ namespace xx {
         }
     };
 
-    // 适配 enum( 根据原始数据类型调上面的适配 )
+    // adapt enum( forward to 1 ~ 8 size integer )
     template<typename T>
     struct DataFuncs<T, std::enable_if_t<std::is_enum_v<T>>> {
         typedef std::underlying_type_t<T> U;
@@ -851,7 +820,7 @@ namespace xx {
         }
     };
 
-    // 适配 std::string_view ( 写入 变长长度 + 内容 )
+    // adapt std::string_view. write len + data
     template<typename T>
     struct DataFuncs<T, std::enable_if_t<std::is_same_v<std::string_view, std::decay_t<T>>>> {
         template<bool needReserve = true>
@@ -870,7 +839,7 @@ namespace xx {
         }
     };
 
-    // 适配 literal char[len] string  ( 写入 变长长度-1 + 内容. 不写入末尾 0 )
+    // adapt literal char[len]. write len(-1) + data( without end \0 )
     template<typename T>
     struct DataFuncs<T, std::enable_if_t<IsLiteral_v<T>>> {
         template<bool needReserve = true>
@@ -879,7 +848,7 @@ namespace xx {
         }
     };
 
-    // 适配 std::string ( 写入 变长长度 + 内容 )
+    // adapt std::string. write len + data
     template<typename T>
     struct DataFuncs<T, std::enable_if_t<std::is_same_v<std::string, std::decay_t<T>>>> {
         template<bool needReserve = true>
@@ -896,8 +865,7 @@ namespace xx {
         }
     };
 
-
-    // 适配 std::optional<T>
+    // adapt std::optional<T>
     template<typename T>
     struct DataFuncs<T, std::enable_if_t<IsStdOptional_v<T>>> {
         template<bool needReserve = true>
@@ -919,7 +887,7 @@ namespace xx {
         }
     };
 
-    // 适配 std::pair<K, V>
+    // adapt std::pair<K, V>
     template<typename T>
     struct DataFuncs<T, std::enable_if_t<IsStdPair_v<T>>> {
         template<bool needReserve = true>
@@ -931,7 +899,7 @@ namespace xx {
         }
     };
 
-    // 适配 std::tuple<......>
+    // adapt std::tuple<......>
     template<typename T>
     struct DataFuncs<T, std::enable_if_t<IsStdTuple_v<T>>> {
         template<bool needReserve = true>
@@ -958,7 +926,7 @@ namespace xx {
     };
 
 
-    // 适配 std::variant<......>
+    // adapt std::variant<......>
     template<typename T>
     struct DataFuncs<T, std::enable_if_t<IsStdVariant_v<T>>> {
         template<bool needReserve = true>
@@ -1000,7 +968,7 @@ namespace xx {
     };
 
 
-    // 适配 std::vector, std::array   // todo: queue / deque
+    // adapt std::vector, std::array   // todo: queue / deque
     template<typename T>
     struct DataFuncs<T, std::enable_if_t< (IsStdVector_v<T> || IsStdArray_v<T>)>> {
         using U = typename T::value_type;
@@ -1050,7 +1018,7 @@ namespace xx {
         }
     };
 
-    // 适配 std::set, unordered_set
+    // adapt std::set, unordered_set
     template<typename T>
     struct DataFuncs<T, std::enable_if_t< IsStdSetLike_v<T>>> {
         using U = typename T::value_type;
@@ -1087,9 +1055,9 @@ namespace xx {
         }
     };
 
-    // 适配 std::map unordered_map
+    // adapt std::map unordered_map
     template<typename T>
-    struct DataFuncs<T, std::enable_if_t< IsStdMapLike_v<T> /*&& IsBaseDataType_v<T>*/>> {
+    struct DataFuncs<T, std::enable_if_t< IsStdMapLike_v<T>>> {
         template<bool needReserve = true>
         static inline void Write(Data& d, T const& in) {
             d.WriteVarInteger<needReserve>(in.size());
@@ -1111,7 +1079,7 @@ namespace xx {
         }
     };
 
-    // 适配 std::unique_ptr
+    // adapt std::unique_ptr
     template<typename T>
     struct DataFuncs<T, std::enable_if_t< IsStdUniquePtr_v<T> >> {
         template<bool needReserve = true>
@@ -1137,7 +1105,7 @@ namespace xx {
         }
     };
 
-    // 适配 BufLenRef( 针对类似 std::array<char, ?> buf; int len;  这种组合 )
+    // for ref data( std::array<char, ?> buf; int len  likely )
     // example: xx::BufLenRef blr{ in.buf.data(), &in.len }; d.Read/Write( blr
     template<typename T, typename SizeType>
     struct BufLenRef {
@@ -1148,6 +1116,7 @@ namespace xx {
     };
     template<typename T> constexpr bool IsBufLenRef_v = TemplateIsSame_v<std::remove_cvref_t<T>, BufLenRef<AnyType, AnyType>>;
 
+    // adapt BufLenRef
     template<typename T>
     struct DataFuncs<T, std::enable_if_t< IsBufLenRef_v<T> >> {
         using U = std::make_unsigned_t<typename T::S>;
@@ -1166,12 +1135,13 @@ namespace xx {
         }
     };
 
-    // 适配 存有 uint16 范围值的 float
+    // float with uint16 value( for compress data )
     // example: d.Read( (xx::RWFloatUInt16&)x )
     struct RWFloatUInt16 {
         float v;
     };
 
+    // adapt float with uint16 value
     template<typename T>
     struct DataFuncs<T, std::enable_if_t< std::is_base_of_v<RWFloatUInt16, T> >> {
         template<bool needReserve = true>
@@ -1186,12 +1156,13 @@ namespace xx {
         }
     };
 
-    // 适配 存有 int16 范围值的 float
+    // float with int16 value( for compress data )
     // example: d.Read( (xx::RWFloatInt16&)x )
     struct RWFloatInt16 {
         float v;
     };
 
+    // adapt float with int16 value
     template<typename T>
     struct DataFuncs<T, std::enable_if_t< std::is_base_of_v<RWFloatInt16, T> >> {
         template<bool needReserve = true>

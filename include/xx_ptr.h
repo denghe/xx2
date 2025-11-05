@@ -516,7 +516,7 @@ namespace xx {
     template<typename T> struct IsPod<Shared<T>, void> : std::true_type {};
     template<typename T> struct IsPod<Weak<T>, void> : std::true_type {};
 
-    template<typename T> constexpr bool IsSharedv = TemplateIsSame_v<std::remove_cvref_t<T>, Shared<AnyType>>;
+    template<typename T> constexpr bool IsShared_v = TemplateIsSame_v<std::remove_cvref_t<T>, Shared<AnyType>>;
     template<typename T> constexpr bool IsWeak_v = TemplateIsSame_v<std::remove_cvref_t<T>, Weak<AnyType>>;
 
 
