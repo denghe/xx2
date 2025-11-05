@@ -148,7 +148,7 @@ namespace xx {
 			, RGBA8 color_ = RGBA8_White
 			, VAligns valign_ = VAligns::Center
 			, float newX_ = 0
-			, Ref<BMFont> bmf_ = GameBase_shader::GetInstance()->embed.font_sys
+			, Shared<BMFont> bmf_ = GameBase_shader::GetInstance()->embed.font_sys
 		) {
 			if (lineHeight_ == 0) lineHeight_ = fontSize_;
 			auto txt = StrPtr(txt_);

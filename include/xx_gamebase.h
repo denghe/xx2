@@ -318,34 +318,34 @@ namespace xx {
 		}
 
 		// load texture from file
-		Ref<GLTexture> LoadTexture(std::string_view fn) {
+		Shared<GLTexture> LoadTexture(std::string_view fn) {
 			auto [d, p] = LoadFileData(fn);
 			assert(d);
-			return MakeRef<GLTexture>(LoadGLTexture(d, p));
+			return MakeShared<GLTexture>(LoadGLTexture(d, p));
 		}
 
 		// load texture from data
-		Ref<GLTexture> LoadTextureFromData(uint8_t const* buf, size_t len, std::string_view fn = {}) {
+		Shared<GLTexture> LoadTextureFromData(uint8_t const* buf, size_t len, std::string_view fn = {}) {
 			if (IsCompressedData(buf, len)) {	// zstd
 				Data d;
 				ZstdDecompress({(char*)buf, len}, d);
-				return MakeRef<GLTexture>(LoadGLTexture(d, fn));
+				return MakeShared<GLTexture>(LoadGLTexture(d, fn));
 			}
-			return MakeRef<GLTexture>(LoadGLTexture({(char*)buf, len}, fn));
+			return MakeShared<GLTexture>(LoadGLTexture({(char*)buf, len}, fn));
 		}
 
 		// load texture from data
 		template<size_t len>
-		Ref<GLTexture> LoadTextureFromData(const uint8_t(&buf)[len], std::string_view fn = {}) {
+		Shared<GLTexture> LoadTextureFromData(const uint8_t(&buf)[len], std::string_view fn = {}) {
 			return LoadTextureFromData(buf, len, fn);
 		}
 
 
 
 		// d: ogg / wav
-		XX_INLINE Ref<SoundSource> LoadSoundSourceFromData(uint8_t* buf, size_t len, bool looping = false) {
+		XX_INLINE Shared<SoundSource> LoadSoundSourceFromData(uint8_t* buf, size_t len, bool looping = false) {
 			assert(!IsCompressedData(buf, len));
-			auto rtv = MakeRef<SoundSource>();
+			auto rtv = MakeShared<SoundSource>();
 			auto r = rtv->wav.loadMem(buf, len, false, false);
 			assert(!r);
 			if (looping) {
@@ -355,22 +355,22 @@ namespace xx {
 		}
 
 		template<size_t len>
-		XX_INLINE Ref<SoundSource> LoadSoundSourceFromData(const uint8_t(&buf)[len], bool looping = false) {
+		XX_INLINE Shared<SoundSource> LoadSoundSourceFromData(const uint8_t(&buf)[len], bool looping = false) {
 			return LoadSoundSourceFromData((uint8_t*)buf, len, looping);
 		}
 
-		XX_INLINE Ref<SoundSource> LoadSoundSource(std::string_view fn, bool looping = false) {
+		XX_INLINE Shared<SoundSource> LoadSoundSource(std::string_view fn, bool looping = false) {
 			auto [d, p] = LoadFileData(fn);
 			assert(d);
 			return LoadSoundSourceFromData(d.buf, d.len, looping);
 		}
 
-		XX_INLINE int PlayAudio(Ref<SoundSource> const& ss_, float volume_ = 1.f, float pan_ = 0.f, float speed_ = 1.f) {
+		XX_INLINE int PlayAudio(Shared<SoundSource> const& ss_, float volume_ = 1.f, float pan_ = 0.f, float speed_ = 1.f) {
 			if (mute || audioVolume == 0) return 0;
 			return sound.Play(ss_, volume_ * audioVolume, pan_, speed_);
 		}
 
-		XX_INLINE int PlayMusic(Ref<SoundSource> const& ss_, float volume_ = 1.f, float pan_ = 0.f, float speed_ = 1.f) {
+		XX_INLINE int PlayMusic(Shared<SoundSource> const& ss_, float volume_ = 1.f, float pan_ = 0.f, float speed_ = 1.f) {
 			if (mute || musicVolume == 0) return 0;
 			return sound.Play(ss_, volume_ * musicVolume, pan_, speed_);
 		}

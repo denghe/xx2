@@ -7,7 +7,7 @@ struct Monster {
 		xx::RGBA8_White, xx::RGBA8_Red, xx::RGBA8_Yellow, xx::RGBA8_Blue
 	};
 
-	xx::Ref<xx::GLTexture> tex;
+	xx::Shared<xx::GLTexture> tex;
 	XY scale{};
 	int32_t colorIndex{}, animIndex{};
 
@@ -21,7 +21,7 @@ struct Monster {
 	float _2x{};
 	void AnimBounce();
 
-	void Init(xx::Ref<xx::GLTexture> tex_);
+	void Init(xx::Shared<xx::GLTexture> tex_);
 	void Update();
 	void Draw();
 };

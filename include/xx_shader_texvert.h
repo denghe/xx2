@@ -142,7 +142,7 @@ void main() {
             count = 0;
         }
 
-        Shader_TexVertData* Alloc(Ref<GLTexture> tex_, Ref<GLVertTexture> const& vertTex_, int32_t num_) {
+        Shader_TexVertData* Alloc(Shared<GLTexture> tex_, Shared<GLVertTexture> const& vertTex_, int32_t num_) {
             assert(GameBase::instance->shader == this);
             assert(num_ <= maxNums);
             auto texId = tex_->id;

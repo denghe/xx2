@@ -4,7 +4,7 @@
 struct Scene_Test8 : xx::SceneBase {
 	xx::Shared<xx::Node> ui;
 	xx::Camera cam;
-	xx::Ref<xx::GLTexture> texBG;
+	xx::Shared<xx::GLTexture> texBG;
 
 	void Init();
 	void Update() override;

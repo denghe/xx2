@@ -49,12 +49,12 @@ namespace xx {
 
     /***********************************************************************************************/
 
-    template<typename T, bool weakSupport>
-    struct Shared_ {
+    template<typename T>
+    struct Shared {
         using HeaderType = PtrHeader_t<T>;
         using ElementType = T;
         template<typename U>
-        using S = Shared_<U, weakSupport>;
+        using S = Shared<U>;
         T* pointer{};
 
         operator bool() const {
@@ -103,10 +103,10 @@ namespace xx {
             return pointer->operator[](std::forward<IDX>(idx));
         }
 
-        Shared_() = default;
+        Shared() = default;
 
         template<typename U>
-        Shared_(U* ptr) : pointer(ptr) {
+        Shared(U* ptr) : pointer(ptr) {
             static_assert(std::is_base_of_v<T, U> || std::is_same_v<T, U>);
             static_assert(PtrAlignCheck_v<T, U>);
             if (ptr) {
@@ -114,69 +114,69 @@ namespace xx {
             }
         }
 
-        Shared_(T* ptr) : pointer(ptr) {
+        Shared(T* ptr) : pointer(ptr) {
             if (ptr) {
                 ++CalcPtrHeader<HeaderType>(ptr)->sharedCount;
             }
         }
 
         template<typename U>
-        Shared_(S<U> const& o) : Shared_(o.pointer) {
+        Shared(S<U> const& o) : Shared(o.pointer) {
             static_assert(std::is_base_of_v<T, U> || std::is_same_v<T, U>);
             static_assert(PtrAlignCheck_v<T, U>);
         }
 
-        Shared_(Shared_ const& o) : Shared_(o.pointer) {}
+        Shared(Shared const& o) : Shared(o.pointer) {}
 
         template<typename U>
-        Shared_(S<U>&& o) {
+        Shared(S<U>&& o) {
             static_assert(std::is_base_of_v<T, U> || std::is_same_v<T, U>);
             static_assert(PtrAlignCheck_v<T, U>);
             pointer = o.pointer;
             o.pointer = {};
         }
 
-        Shared_(Shared_&& o) {
+        Shared(Shared&& o) {
             pointer = o.pointer;
             o.pointer = {};
         }
 
         template<typename U>
-        Shared_ &operator=(U* ptr) {
+        Shared &operator=(U* ptr) {
             static_assert(std::is_base_of_v<T, U> || std::is_same_v<T, U>);
             static_assert(PtrAlignCheck_v<T, U>);
             Reset(ptr);
             return *this;
         }
 
-        Shared_ &operator=(T* ptr) {
+        Shared &operator=(T* ptr) {
             Reset(ptr);
             return *this;
         }
 
         template<typename U>
-        Shared_ &operator=(S<U> const& o) {
+        Shared &operator=(S<U> const& o) {
             static_assert(std::is_base_of_v<T, U> || std::is_same_v<T, U>);
             static_assert(PtrAlignCheck_v<T, U>);
             Reset(o.pointer);
             return *this;
         }
 
-        Shared_ &operator=(Shared_ const& o) {
+        Shared &operator=(Shared const& o) {
             Reset(o.pointer);
             return *this;
         }
 
         template<typename U>
-        Shared_ &operator=(S<U> &&o) {
+        Shared &operator=(S<U> &&o) {
             static_assert(std::is_base_of_v<T, U> || std::is_same_v<T, U>);
             static_assert(PtrAlignCheck_v<T, U>);
             Reset();
-            std::swap(pointer, (*(Shared_ *) &o).pointer);
+            std::swap(pointer, (*(Shared *) &o).pointer);
             return *this;
         }
 
-        Shared_ &operator=(Shared_ &&o) {
+        Shared &operator=(Shared &&o) {
             std::swap(pointer, o.pointer);
             return *this;
         }
@@ -240,14 +240,10 @@ namespace xx {
                         std::destroy_at(pointer);
                     }
                     pointer = {};
-                    if constexpr (weakSupport) {
-                        if (h->weakCount == 0) {
-                            delete (MyAlignedStorage<HeaderType>*)h;
-                        } else {
-                            h->sharedCount = 0;
-                        }
-                    } else {
+                    if (h->weakCount == 0) {
                         delete (MyAlignedStorage<HeaderType>*)h;
+                    } else {
+                        h->sharedCount = 0;
                     }
                 } else {
                     --h->sharedCount;
@@ -268,7 +264,7 @@ namespace xx {
             }
         }
 
-        ~Shared_() {
+        ~Shared() {
             Reset();
         }
 
@@ -293,14 +289,8 @@ namespace xx {
             return (S<U>&) * this;
         }
 
-        Weak<T> ToWeak() const requires(weakSupport);
+        Weak<T> ToWeak() const;
     };
-
-    template<typename T>
-    using Shared = Shared_<T, true>;
-
-    template<typename T>
-    using Ref = Shared_<T, false>;
 
     inline static void* Nil{};
 
@@ -511,8 +501,8 @@ namespace xx {
         }
     };
 
-    template<typename T, bool weakSupport>
-    Weak<T> Shared_<T, weakSupport>::ToWeak() const requires(weakSupport) {
+    template<typename T>
+    Weak<T> Shared<T>::ToWeak() const {
         if (pointer) {
             auto h = GetHeader();
             return (Weak<T>&)h;
@@ -523,14 +513,11 @@ namespace xx {
     /************************************************************************************/
 
     // memmove support flags
-    template<typename T, bool b> struct IsPod<Shared_<T, b>, void> : std::true_type {};
     template<typename T> struct IsPod<Shared<T>, void> : std::true_type {};
     template<typename T> struct IsPod<Weak<T>, void> : std::true_type {};
-    template<typename T> struct IsPod<Ref<T>, void> : std::true_type {};
 
-    template<typename T> constexpr bool IsShared_v = TemplateIsSame_v<std::remove_cvref_t<T>, Shared<AnyType>>;
+    template<typename T> constexpr bool IsSharedv = TemplateIsSame_v<std::remove_cvref_t<T>, Shared<AnyType>>;
     template<typename T> constexpr bool IsWeak_v = TemplateIsSame_v<std::remove_cvref_t<T>, Weak<AnyType>>;
-    template<typename T> constexpr bool IsRef_v = TemplateIsSame_v<std::remove_cvref_t<T>, Ref<AnyType>>;
 
 
     template<typename T, typename...Args>
@@ -593,20 +580,6 @@ namespace xx {
         return (*(Shared<T>*) & thiz).GetHeader();
     }
 
-    // unsafe
-    template<typename T>
-    Ref<T> RefFromThis(T* thiz) {
-        assert(thiz);
-        return *(Ref<T>*)&thiz;
-    }
-
-    template<typename T, typename...Args>
-    Ref<T> MakeRef(Args &&...args) {
-        Ref<T> rtv;
-        rtv.Emplace(std::forward<Args>(args)...);
-        return rtv;
-    }
-
     template<typename U, typename T = U>
     Weak<T> ToWeak(Shared<U> const& s) {
         static_assert(std::is_base_of_v<T, U>);
@@ -619,7 +592,7 @@ namespace xx {
     }
 }
 
-// let Shared Weak Ref support std hash container
+// let Shared Weak support std hash container
 namespace std {
     template<typename T>
     struct hash<xx::Shared<T>> {
@@ -632,13 +605,6 @@ namespace std {
     struct hash<xx::Weak<T>> {
         size_t operator()(xx::Weak<T> const &v) const {
             return (size_t) v.h;
-        }
-    };
-
-    template<typename T>
-    struct hash<xx::Ref<T>> {
-        size_t operator()(xx::Ref<T> const &v) const {
-            return (size_t) v.pointer;
         }
     };
 }

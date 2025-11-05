@@ -35,7 +35,7 @@ namespace xx {
 			auto r = stbrp_pack_rects(&c, rects.buf, rects.len);
 			if (r == 0) return __LINE__;
 
-			Ref<GLTexture> t;
+			Shared<GLTexture> t;
 			t.Emplace()->Make(texSize_);
 			FrameBuffer{}.Init().DrawTo(t, {}, [&] {
 				XY basePos{ -texSize_.x / 2, -texSize_.y / 2 };

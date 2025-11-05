@@ -9,14 +9,14 @@ namespace xx {
 
 		// reepeatable call
 		Scale9& Init(int32_t z_, XY position_, XY anchor_, XY size_
-			, Ref<Scale9Config> cfg_ = GameBase_ui::GetInstance()->embed.cfg_s9bg) {
+			, Shared<Scale9Config> cfg_ = GameBase_ui::GetInstance()->embed.cfg_s9bg) {
 			assert(typeId == cTypeId);
 			Node::InitDerived<Scale9>(z_, position_, anchor_, 1, size_);
 			cfg = *cfg_;
 			return *this;
 		}
 
-		Scale9& SetConfig(Ref<Scale9Config> cfg_ = GameBase_ui::GetInstance()->embed.cfg_s9bg) {
+		Scale9& SetConfig(Shared<Scale9Config> cfg_ = GameBase_ui::GetInstance()->embed.cfg_s9bg) {
 			cfg = *cfg_;
 			return *this;
 		}

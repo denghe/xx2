@@ -20,7 +20,7 @@ namespace xx {
 			soloud.setGlobalVolume(v);
 		}
 
-		XX_INLINE int Play(Ref<SoundSource> const& ss, float volume = 1.f, float pan = 0.f, float speed = 1.f) {
+		XX_INLINE int Play(Shared<SoundSource> const& ss, float volume = 1.f, float pan = 0.f, float speed = 1.f) {
 			int h = soloud.play(ss->wav, volume, pan);
 			if (speed != 1.f) {
 				soloud.setRelativePlaySpeed(h, speed);

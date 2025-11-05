@@ -102,14 +102,14 @@ struct EquipProp {
 // instance
 struct Equip {
 	static constexpr uint32_t cTypeId{};	// map to cfgs / makers[ index ]
-	xx::Ref<EquipConfig> cfg;
+	xx::Shared<EquipConfig> cfg;
 	Scene_Play* scene{};
 	Creature* owner{};
 	xx::List<EquipProp> props;	// cfg's props calc result
 	// todo: quantity?
 	// ...
 
-	void Init(Creature* owner_, xx::Ref<EquipConfig> cfg_);
+	void Init(Creature* owner_, xx::Shared<EquipConfig> cfg_);
 	void Combine(Equip& tar);	// attach tar's props to this
 
 	xx::Shared<xx::Node> GenInfoPanel(Equip* cmp = {});	// parent == Scene_Play::ui
@@ -122,7 +122,7 @@ struct Equip {
 	static int ReadFrom(xx::Data_r& dr_, Creature* owner_, xx::Shared<Equip>& tar_);
 
 	// cfgs & makers's index == Equip_xxxx::cTypeId
-	inline static xx::List<xx::Ref<EquipConfig>> cfgs;
+	inline static xx::List<xx::Shared<EquipConfig>> cfgs;
 	static void InitCfgs();
 
 	// cfgs & makers's index == Equip_xxxx::cTypeId
@@ -131,7 +131,7 @@ struct Equip {
 
 	// makers filler func
 	template<typename T> requires std::derived_from<T, Equip>
-	static xx::Ref<EquipConfig>& MakeMakerAndCfg() {
+	static xx::Shared<EquipConfig>& MakeMakerAndCfg() {
 		assert(cfgs.len == T::cTypeId);
 		assert(cfgs.len == makers.len);
 		makers.Emplace([] { return xx::MakeShared<T>(); });

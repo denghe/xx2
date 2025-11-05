@@ -9,7 +9,7 @@ namespace xx {
 		static constexpr int32_t cTypeId{ 13 };
 
 		bool callbackWhenBlockMoving{};	// user can set directly
-		Ref<Scale9Config> cfgBar, cfgBlock;
+		Shared<Scale9Config> cfgBar, cfgBlock;
 		float height{}, widthTxtLeft{}, widthBar{}, widthTxtRight{};
 		double value{}, valueBak{};	// 0 ~ 1
 		bool blockMoving{};
@@ -24,10 +24,10 @@ namespace xx {
 			, float height_
 			, float widthTxtLeft_, float widthBar_, float widthTxtRight_
 			, double value_
-			, Ref<Scale9Config> cfgNormal_ = GameBase_ui::GetInstance()->embed.cfg_s9bN
-			, Ref<Scale9Config> cfgHighlight_ = GameBase_ui::GetInstance()->embed.cfg_s9bH
-			, Ref<Scale9Config> cfgBar_ = GameBase_ui::GetInstance()->embed.cfg_sbar
-			, Ref<Scale9Config> cfgBlock_ = GameBase_ui::GetInstance()->embed.cfg_sblock
+			, Shared<Scale9Config> cfgNormal_ = GameBase_ui::GetInstance()->embed.cfg_s9bN
+			, Shared<Scale9Config> cfgHighlight_ = GameBase_ui::GetInstance()->embed.cfg_s9bH
+			, Shared<Scale9Config> cfgBar_ = GameBase_ui::GetInstance()->embed.cfg_sbar
+			, Shared<Scale9Config> cfgBlock_ = GameBase_ui::GetInstance()->embed.cfg_sblock
 		)
 		{
 			assert(children.Empty());

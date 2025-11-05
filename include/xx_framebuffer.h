@@ -17,22 +17,22 @@ namespace xx {
         }
 
         template<typename Func>
-        void DrawTo(Ref<GLTexture>& t, std::optional<RGBA8> const& c, Func&& func, Data* store = {}) {
+        void DrawTo(Shared<GLTexture>& t, std::optional<RGBA8> const& c, Func&& func, Data* store = {}) {
             Begin(t, c);
             func();
             End(store);
         }
 
         template<typename Func>
-        Ref<GLTexture> Draw(XYu const& wh, bool hasAlpha, std::optional<RGBA8> const& c, Func&& func, Data* store = {}) {
-            auto t = MakeRef<GLTexture>();
+        Shared<GLTexture> Draw(XYu const& wh, bool hasAlpha, std::optional<RGBA8> const& c, Func&& func, Data* store = {}) {
+            auto t = MakeShared<GLTexture>();
             t->Make({wh.x, wh.y}, hasAlpha);
             DrawTo(t, c, std::forward<Func>(func), store);
             return t;
         }
 
     protected:
-        void Begin(Ref<GLTexture>& t, std::optional<RGBA8> const& c = {}) {
+        void Begin(Shared<GLTexture>& t, std::optional<RGBA8> const& c = {}) {
             assert(t);
             auto& g = *GameBase::instance;
             g.ShaderEnd();

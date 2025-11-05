@@ -10,7 +10,7 @@ namespace xx {
 
     // sprite frame
     struct TinyFrame {
-        Ref<GLTexture> tex;
+        Shared<GLTexture> tex;
         UVRect uvRect{};
 
         TinyFrame() = default;
@@ -31,17 +31,17 @@ namespace xx {
             return { uvRect.w, uvRect.h };
         }
 
-        TinyFrame(Ref<GLTexture> t) {
+        TinyFrame(Shared<GLTexture> t) {
             tex = std::move(t);
             uvRect = tex->Rect();
         }
 
-        TinyFrame(Ref<GLTexture> t, int x, int y, int w, int h) {
+        TinyFrame(Shared<GLTexture> t, int x, int y, int w, int h) {
             tex = std::move(t);
             uvRect = { (uint16_t)x, (uint16_t)y, (uint16_t)w, (uint16_t)h };
         }
 
-        void operator=(Ref<GLTexture> t) {
+        void operator=(Shared<GLTexture> t) {
             tex = std::move(t);
             uvRect = tex->Rect();
         }
@@ -64,12 +64,12 @@ namespace xx {
         List<uint16_t> triangles;
         List<float> vertices;
         List<float> verticesUV;
-        Ref<GLTexture> tex;
+        Shared<GLTexture> tex;
         UVRect uvRect{};
     };
 
     //struct AnimFrame {
-    //    Ref<Frame> frame;
+    //    Shared<Frame> frame;
     //    float durationSeconds;
     //};
 

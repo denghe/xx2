@@ -40,7 +40,7 @@ void Monster::AnimBounce() {
 	XX_END(_2);
 }
 
-void Monster::Init(xx::Ref<xx::GLTexture> tex_) {
+void Monster::Init(xx::Shared<xx::GLTexture> tex_) {
 	tex = std::move(tex_);
 	scale = 1.f;
 }

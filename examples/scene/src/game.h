@@ -55,7 +55,7 @@ struct Game : xx::Game<Game>, Sav {
 			explosion_
 		;
 
-		xx::Ref<xx::SoundSource>
+		xx::Shared<xx::SoundSource>
 			explosion
 		;
 

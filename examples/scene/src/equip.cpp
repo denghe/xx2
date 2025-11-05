@@ -2,7 +2,7 @@
 #include "scene_play.h"
 #include "equip.h"
 
-void Equip::Init(Creature* owner_, xx::Ref<EquipConfig> cfg_) {
+void Equip::Init(Creature* owner_, xx::Shared<EquipConfig> cfg_) {
 	owner = owner_;
 	scene = owner_->scene;
 	cfg = std::move(cfg_);

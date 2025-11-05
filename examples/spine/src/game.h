@@ -3,7 +3,7 @@
 using XY = xx::XY;
 
 struct SpineRes1 {
-	xx::Ref<xx::GLTexture> tex;
+	xx::Shared<xx::GLTexture> tex;
 	spine::SkeletonData* skel{};
 	spine::Animation* idle{};
 };
@@ -27,7 +27,7 @@ struct Game : xx::Game<Game> {
 	struct {
 		std::array<xx::TinyFrame, 14> brush_;
 		struct {
-			xx::Ref<xx::GLTexture> tex;
+			xx::Shared<xx::GLTexture> tex;
 			spine::SkeletonData* skel{};
 			spine::Animation* idle{};
 			spine::Animation* blink{};
@@ -37,7 +37,7 @@ struct Game : xx::Game<Game> {
 			spine::Animation* left{};
 		} owl;
 		struct {
-			xx::Ref<xx::GLTexture> tex;
+			xx::Shared<xx::GLTexture> tex;
 			spine::SkeletonData* skel{};
 			spine::Animation* walk{};
 			spine::Animation* jump{};
@@ -45,12 +45,12 @@ struct Game : xx::Game<Game> {
 			spine::Animation* shoot{};
 		} spineBoy;
 		struct {
-			xx::Ref<xx::GLTexture> tex;
+			xx::Shared<xx::GLTexture> tex;
 			spine::SkeletonData* skel{};
 			spine::Animation* idle{};
 		} man1;
 		struct {
-			xx::Ref<xx::GLTexture> tex;
+			xx::Shared<xx::GLTexture> tex;
 			spine::SkeletonData* skel{};
 		} eye;
 		xx::List<SpineRes1> flower_;

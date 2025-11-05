@@ -28,7 +28,7 @@ namespace xx {
 
 		// embed res
 		struct {
-			Ref<Scale9Config>
+			Shared<Scale9Config>
 				cfg_s9,
 				cfg_s9bN,
 				cfg_s9bH,
@@ -57,11 +57,11 @@ namespace xx {
 
 			List<TinyFrame> icon_flags_;
 
-			Ref<SoundSource>
+			Shared<SoundSource>
 				ss_ui_focus;
 			// ...
 
-			Ref<BMFont> font_sys;
+			Shared<BMFont> font_sys;
 		} embed;
 
 		void BaseGLInit() {

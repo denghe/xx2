@@ -2,7 +2,7 @@
 #include "game.h"
 
 struct SpineFrameBatch {
-	xx::Ref<xx::GLTexture> tex;
+	xx::Shared<xx::GLTexture> tex;
 	XY size, anchor;	// , oPos, aPos
 	int32_t numFrames{};
 	int32_t numCols{}, numRows{};
@@ -74,7 +74,7 @@ struct Scene_Test7 : xx::SceneBase {
 	SpineFrameBatch sfb;
 	xx::Grid2dCircle<Grass1*> grid;	// life cycle: must upon grasses
 	xx::List<Grass1> grasses;
-	xx::Ref<xx::GLTexture> texBG, texLeaf;
+	xx::Shared<xx::GLTexture> texBG, texLeaf;
 
 	xx::List<SpineFrameBatch> sfbsFlower;
 	xx::List<SpineFrameBatch> sfbsGrass;

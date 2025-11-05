@@ -14,7 +14,7 @@ namespace xx {
 		static constexpr int32_t cTypeId{ 1 };
 
 		List<LabelChar> chars;
-		Ref<BMFont> bmf = GameBase_shader::GetInstance()->embed.font_sys;
+		Shared<BMFont> bmf = GameBase_shader::GetInstance()->embed.font_sys;
 		float fontSize{ 32 };
 		float baseScale{ fontSize / bmf->fontSize };
 		RGBA8 color{};
@@ -30,7 +30,7 @@ namespace xx {
 			return *this;
 		}
 
-		Label& SetFont(Ref<BMFont> bmf_) {
+		Label& SetFont(Shared<BMFont> bmf_) {
 			bmf = std::move(bmf_);
 			baseScale = fontSize / bmf->fontSize;
 			return *this;
@@ -81,7 +81,7 @@ namespace xx {
 		Label& operator()(S const& txt_) {
 			return SetText(txt_);
 		}
-		Label& operator()(Ref<BMFont> bmf_) {
+		Label& operator()(Shared<BMFont> bmf_) {
 			return SetFont(std::move(bmf_));
 		}
 
@@ -109,7 +109,7 @@ namespace xx {
 		// calc & return pixel width & used len & is line end
 		template<typename C>
 		inline static CalcResult Calc(float fontSize_, float maxWidth_
-			, Ref<BMFont> const& bmf_, C const* txt_, int32_t txtLen_) {
+			, Shared<BMFont> const& bmf_, C const* txt_, int32_t txtLen_) {
 			assert(txtLen_ > 0);
 			auto baseScale = fontSize_ / bmf_->fontSize;
 			float px{};
@@ -134,7 +134,7 @@ namespace xx {
 
 		template<typename S>
 		inline static CalcResult Calc(float fontSize_, float maxWidth_, S&& txt_
-			, Ref<BMFont> const& bmf_ = GameBase_shader::GetInstance()->embed.font_sys
+			, Shared<BMFont> const& bmf_ = GameBase_shader::GetInstance()->embed.font_sys
 		) {
 			return Calc(fontSize_, maxWidth_, bmf_, StrPtr(txt_), StrLen(txt_));
 		}

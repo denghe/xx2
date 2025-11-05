@@ -25,16 +25,16 @@ namespace xx {
 		Weak<Label> label;
 		TinyFrame icon, itemHead;
 		XY totalSize{};
-		Ref<Scale9Config> cfgBG;	// for popup
+		Shared<Scale9Config> cfgBG;	// for popup
 		List<std::u32string> items;
 		int32_t selectedIndex{};
 		std::function<void(int32_t)> onSelectedIndexChanged = [](int32_t idx) { CoutN("DropDownList selectedIndex = ", idx); };
 
 		// init step 1/2
 		DropDownList& InitBegin(int32_t z_, XY position_, XY anchor_, XY fixedSize_
-			, Ref<Scale9Config> cfgNormal_ = GameBase_ui::GetInstance()->embed.cfg_s9bN
-			, Ref<Scale9Config> cfgHighlight_ = GameBase_ui::GetInstance()->embed.cfg_s9bH
-			, Ref<Scale9Config> cfgBG_ = GameBase_ui::GetInstance()->embed.cfg_s9bg
+			, Shared<Scale9Config> cfgNormal_ = GameBase_ui::GetInstance()->embed.cfg_s9bN
+			, Shared<Scale9Config> cfgHighlight_ = GameBase_ui::GetInstance()->embed.cfg_s9bH
+			, Shared<Scale9Config> cfgBG_ = GameBase_ui::GetInstance()->embed.cfg_s9bg
 			, TinyFrame icon_ = GameBase_ui::GetInstance()->embed.ui_dropdownlist_icon
 			, TinyFrame itemHead_ = GameBase_ui::GetInstance()->embed.ui_dropdownlist_head) {
 			assert(typeId == cTypeId);

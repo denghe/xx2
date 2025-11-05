@@ -12,8 +12,8 @@ namespace xx {
 			, TinyFrame frame_
 			, XY fixedSize_ = 0
 			, bool keepAspect_ = true
-			, Ref<Scale9Config> cfgNormal_ = GameBase_ui::GetInstance()->embed.cfg_s9bN
-			, Ref<Scale9Config> cfgHighlight_ = GameBase_ui::GetInstance()->embed.cfg_s9bH
+			, Shared<Scale9Config> cfgNormal_ = GameBase_ui::GetInstance()->embed.cfg_s9bN
+			, Shared<Scale9Config> cfgHighlight_ = GameBase_ui::GetInstance()->embed.cfg_s9bH
 		) {
 			assert(typeId == cTypeId);
 			z = z_;

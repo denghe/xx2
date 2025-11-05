@@ -9,9 +9,9 @@ namespace xx {
 			g->PlayAudio(g->embed.ss_ui_focus);
 		};
 
-		Ref<Scale9Config> cfgNormal, cfgHighlight;
+		Shared<Scale9Config> cfgNormal, cfgHighlight;
 
-		Ref<Scale9Config> const& GetCfg() const {
+		Shared<Scale9Config> const& GetCfg() const {
 			if (selected || focused) {
 				return cfgHighlight;
 			}
@@ -49,8 +49,8 @@ namespace xx {
 		std::function<void()> onClicked2 = [] { CoutN("Button2 clicked."); };
 
 		Button& Init(int32_t z_, XY position_, XY anchor_, XY size_
-			, Ref<Scale9Config> cfgNormal_ = GameBase_shader::GetInstance()->embed.cfg_s9bN
-			, Ref<Scale9Config> cfgHighlight_ = GameBase_shader::GetInstance()->embed.cfg_s9bH) {
+			, Shared<Scale9Config> cfgNormal_ = GameBase_shader::GetInstance()->embed.cfg_s9bN
+			, Shared<Scale9Config> cfgHighlight_ = GameBase_shader::GetInstance()->embed.cfg_s9bH) {
 			//assert(typeId == cTypeId);
 			z = z_;
 			position = position_;

@@ -20,7 +20,7 @@ namespace xx {
 		std::array<BMFontChar, 256> charArray; // charMap ascii cache
 		std::unordered_map<uint32_t, BMFontChar> charMap; // key: char id
 		std::unordered_map<uint64_t, int> kernings;	// key: char id pair
-		List<Ref<GLTexture>> texs;
+		List<Shared<GLTexture>> texs;
 		uint8_t paddingLeft{}, paddingTop{}, paddingRight{}, paddingBottom{};
 		int16_t fontSize{};
 		uint16_t lineHeight{};

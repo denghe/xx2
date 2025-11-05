@@ -13,8 +13,8 @@ namespace xx {
 		// step 1
 		ImageLabelButton& Init(int32_t z_, XY position_, XY anchor_
 			, float fontSize_ = 0, float marginLeft_ = 0, XY fixedSize_ = {}
-			, Ref<Scale9Config> cfgNormal_ = GameBase_ui::GetInstance()->embed.cfg_s9bN
-			, Ref<Scale9Config> cfgHighlight_ = GameBase_ui::GetInstance()->embed.cfg_s9bH
+			, Shared<Scale9Config> cfgNormal_ = GameBase_ui::GetInstance()->embed.cfg_s9bN
+			, Shared<Scale9Config> cfgHighlight_ = GameBase_ui::GetInstance()->embed.cfg_s9bH
 		) {
 			assert(children.Empty());
 			assert(typeId == cTypeId);

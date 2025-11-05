@@ -8,7 +8,7 @@ struct Game : xx::Game<Game> {
 	static constexpr float cDelta{ 1.f / cFps };
 
 	struct {
-		xx::Ref<xx::GLTexture> heart;
+		xx::Shared<xx::GLTexture> heart;
 	} res;
 
 	xx::Shared<xx::Node> ui;
