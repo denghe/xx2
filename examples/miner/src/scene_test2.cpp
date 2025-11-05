@@ -18,6 +18,7 @@ void Rock2::Init(Scene_Test2* scene_) {
 		gg.rnd.Next<float>(-scene->cRockMarginOffsetRange.y, scene->cRockMarginOffsetRange.y)
 	};
 	pos = fixedPos + posOffset;
+	centerPos = pos + scene->cRocksPivotOffset;
 	scene->rocksGrid.Add(indexAtGrid, this);
 }
 
@@ -51,16 +52,17 @@ Rock2::~Rock2() {
 
 /********************************************************************************************************/
 
-void Scene_Test2::Init() {
+void Scene_Test2::Init(float totalScale_) {
 	cam.Init(gg.scale, 1.f, gg.designSize / 2);
 	MakeUI();
 
-	XYi cGridSize{ 50, 30 };
+	XYi cGridSize{ 50 * totalScale_, 30 * totalScale_ };
 	auto cRockMargin = gg.designSize / cGridSize;
 	cRockMarginOffsetRange = { cRockMargin / 3 };
-	cRocksScale = 0.37f;
+	cRocksScale = 0.37f / totalScale_;
 	cRocksMaxCount = cGridSize.x * cGridSize.y;
 	cMouseCircleRadius = 128.f;
+	cRocksPivotOffset = { 0, -100 * cRocksScale };
 
 	auto cellSize = (int32_t)std::ceilf(std::max(cRockMargin.x, cRockMargin.y));
 	auto numCRs = gg.designSize.As<int32_t>() / cellSize + 1;
@@ -76,7 +78,7 @@ void Scene_Test2::Init() {
 	}
 	assert(rocksFixedPosPool.len == cRocksMaxCount);
 
-	GenRocks(1300);
+	GenRocks(cRocksMaxCount * 0.9);
 	SortRocks();
 }
 
@@ -127,11 +129,11 @@ void Scene_Test2::FixedUpdate() {
 		auto total = rocks.len;
 		int32_t count{};
 		auto cri = rocksGrid.PosToCRIndex(mp);
-		float rockRadius{ 32 };
-		rocksGrid.ForeachByRange(cri.y, cri.x, cMouseCircleRadius + rockRadius, gg.sgrdd, [&](xx::Grid2dCircle<Rock2*>::Node& node, float distance) {
+		auto rockRadius = 32 * cRocksScale;
+		rocksGrid.ForeachByRange(cri.y, cri.x, cMouseCircleRadius + rockRadius * 2, gg.sgrdd, [&](xx::Grid2dCircle<Rock2*>::Node& node, float distance) {
 			if (node.value->scale < 1) return;
 			auto& o = *node.value;
-			auto d = o.pos - mp;
+			auto d = o.centerPos - mp;
 			auto r = cMouseCircleRadius + rockRadius;
 			if (d.x * d.x + d.y * d.y < r * r) {
 				node.value->Dispose();
@@ -156,7 +158,7 @@ void Scene_Test2::Draw() {
 	}
 
 	// draw mouse circle
-	gg.Quad().Draw(gg.res.circle256, gg.res.circle256, gg.mousePos);
+	gg.Quad().Draw(gg.res.circle256, gg.res.circle256, gg.mousePos, 0.5f, cMouseCircleRadius * 0.0078125f * cam.scale);
 
 	gg.GLBlendFunc(gg.blendDefault);
 	gg.DrawNode(ui);

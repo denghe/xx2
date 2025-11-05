@@ -28,8 +28,14 @@ void Scene_MainMenu::MakeUI() {
 		gg.MakeScene<Scene_Test1>()->Init();
 	};
 
-	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test2")).onClicked = [this] {
-		gg.MakeScene<Scene_Test2>()->Init();
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test2(1)")).onClicked = [this] {
+		gg.MakeScene<Scene_Test2>()->Init(1);
+	};
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test2(5)")).onClicked = [this] {
+		gg.MakeScene<Scene_Test2>()->Init(5);
+	};
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test2(10)")).onClicked = [this] {
+		gg.MakeScene<Scene_Test2>()->Init(10);
 	};
 
 	L.InitEnd();

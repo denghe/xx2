@@ -5,7 +5,7 @@ struct Scene_Test2;
 struct Rock2 {
 	Scene_Test2* scene{};
 	xx::TinyFrame tf;
-	XY pos{}, fixedPos{};
+	XY pos{}, fixedPos{}, centerPos{};
 	int32_t indexAtGrid{-1};
 	int32_t indexAtList{-1};	// fill by maker
 	static constexpr float cScaleStep{ 1.f / (gg.cFps * 0.25f) };
@@ -29,6 +29,7 @@ struct Scene_Test2 : xx::SceneBase {
 	int32_t cRocksMaxCount{};
 	float cRocksScale{};
 	float cMouseCircleRadius{};
+	XY cRocksPivotOffset{};
 
 	xx::List<XY> rocksFixedPosPool;			// life cycle: must upon rocks
 	xx::Grid2dCircle<Rock2*> rocksGrid;		// life cycle: must upon rocks
@@ -38,7 +39,7 @@ struct Scene_Test2 : xx::SceneBase {
 	void SortRocks();
 
 	void MakeUI();
-	void Init();
+	void Init(float totalScale_ = 1);
 	void Update() override;
 	void FixedUpdate();
 	void Draw() override;
