@@ -76,7 +76,7 @@ void Rock2::Bounce() {
 		scale.y = 2.f - scale.x;
 		XX_YIELD(_2);
 	}
-	for (; scale.x > 0.9f; scale.x -= cScaleStep) {
+	for (; scale.x > 0.95f; scale.x -= cScaleStep) {
 		scale.y = 2.f - scale.x;
 		XX_YIELD(_2);
 	}
