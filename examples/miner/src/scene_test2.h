@@ -18,20 +18,25 @@ struct Rock2 {
 	Scene_Test2* scene{};
 	xx::TinyFrame tf;
 	XY pos{}, centerPos{}, fixedPos{};
-	int32_t indexAtGrid{-1};
-	int32_t indexAtList{-1};	// fill by maker
-	float scale{};
-	// todo: rock id? value? hp?
+	int32_t indexAtGrid{ -1 };
+	int32_t indexAtList{ -1 };	// fill by maker
+	XY scale{};
+	int32_t typeId{ -1 }, qualityId{ -1 };
+	static constexpr float cHPMax{ 100 };
 	int32_t hp{};
-	int32_t _1{};
-	bool ready{};	// after born: true
-	// todo: more state bool
+	int32_t _1{}, _2{};
+	float breakFrameIndex{};
+	bool flip{};
+	bool ready{};	// true: can dig
 	bool digging{};
-	Pickaxe pickaxe;	// Update + Draw for digging
-	// todo: shake, crash
-	void Dig();
+	bool bouncing{};
+	bool breaking{};
+	Pickaxe pickaxe;	// digging coroutine
+	void BeginDig();
+	void BeginBounce();
+	void Bounce();	// coroutine _2
 	void Init(Scene_Test2* scene_);
-	void Update();
+	void Update();	// coroutine _1
 	void Draw();
 	void Dispose();
 	~Rock2();

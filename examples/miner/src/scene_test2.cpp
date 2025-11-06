@@ -11,7 +11,7 @@ void Pickaxe::Init(Rock2* target_) {
 bool Pickaxe::Update() {
 	static constexpr float cStep1Radians{ 30.f / 180.f * M_PI };
 	static constexpr float cStep1RadiansStep{ cStep1Radians / (gg.cFps * 0.1f) };
-	static constexpr float cStep2Radians{ -90.f / 180.f * M_PI };
+	static constexpr float cStep2Radians{ -50.f / 180.f * M_PI };
 	static constexpr float cStep2RadiansStep{ (cStep2Radians - cStep1Radians) / (gg.cFps * 0.2f) };
 
 	XX_BEGIN(_1);
@@ -34,20 +34,19 @@ void Pickaxe::Draw(Scene_Test2* scene_) {
 
 /********************************************************************************************************/
 
-void Rock2::Dig() {
-	// if(digging) todo
+void Rock2::BeginDig() {
+	assert(!digging);
 	digging = true;
 	pickaxe.Init(this);
 }
 
 void Rock2::Init(Scene_Test2* scene_) {
+	gg.sound.SetGlobalVolume(0.1);
 	scene = scene_;
-	// todo: rock id? value? hp?
-	hp = 100;
-	auto i1 = gg.rnd.Next<int32_t>(0, gg.res.rocks_.size());
-	static constexpr int32_t cIdxs[] { 1,3,4 };
-	auto i2 = cIdxs[gg.rnd.Next<int32_t>(3)];
-	tf = gg.res.rocks_[i1][i2];
+	hp = cHPMax;
+	typeId = gg.rnd.Next<int32_t>(0, gg.res.rocks_.size());
+	qualityId = gg.rnd.Next<int32_t>(2);
+	tf = gg.res.rocks_[typeId][qualityId * 2 + 1];
 
 	auto fpIdx = gg.rnd.Next<int32_t>(scene->rocksFixedPosPool.len);
 	fixedPos = scene->rocksFixedPosPool[fpIdx];
@@ -58,44 +57,93 @@ void Rock2::Init(Scene_Test2* scene_) {
 	};
 	pos = fixedPos + posOffset;
 	centerPos = pos + scene->cRocksPivotOffset;
+	flip = gg.rnd.Next<bool>();
 	scene->rocksGrid.Add(indexAtGrid, this);
 }
 
-void Rock2::Update() {
-	static constexpr float cScaleStep{ 1.f / (gg.cFps * 0.25f) };
-	XX_BEGIN(_1);
-	for (scale = 0; scale < 1.f; scale += cScaleStep) {
-		XX_YIELD(_1);	// born logic: change scale
+void Rock2::BeginBounce() {
+	bouncing = true;
+	_2 = 0;
+	scale = 1.f;
+}
+
+void Rock2::Bounce() {
+	// todo: stone scale anim
+	// stone scale 23 frame
+	static constexpr float cScaleStep{ 0.1f / (gg.cFps * 0.133333f) };
+	XX_BEGIN(_2);
+	for (scale.x = 1.f; scale.x < 1.1f; scale.x += cScaleStep) {
+		scale.y = 2.f - scale.x;
+		XX_YIELD(_2);
+	}
+	for (; scale.x > 0.9f; scale.x -= cScaleStep) {
+		scale.y = 2.f - scale.x;
+		XX_YIELD(_2);
+	}
+	for (; scale.x < 1.f; scale.x += cScaleStep) {
+		scale.y = 2.f - scale.x;
+		XX_YIELD(_2);
 	}
 	scale = 1.f;
-	ready = true;		// ready. can dig
+	bouncing = false;
+	XX_END(_2);
+}
+
+void Rock2::Update() {
+	static constexpr auto esiz = gg.res.explosion_1_.size();
+	static constexpr float cScaleStep{ 1.f / (gg.cFps * 0.25f) };
+
+	XX_BEGIN(_1);
+	for (scale.x = 0; scale.x < 1.f; scale.x += cScaleStep) {
+		scale.y = scale.x;
+		XX_YIELD(_1);
+	}
+	scale = 1.f;
+	ready = true;
 	while (true) {
+		if (bouncing) {
+			Bounce();
+		}
 		XX_YIELD(_1);
 		if (digging) {
 			if (pickaxe.Update()) {
 				hp -= 25;
-				if (hp <= 0) {
-					++scene->rocksDisposedCountPerFrame;
-					// todo: play crash effect
-					gg.PlayAudio(gg.snds.rockbreak);
-					Dispose();
-					return;
+				if (hp <= cHPMax / 2) {
+					tf = gg.res.rocks_[typeId][qualityId * 2];
 				}
+				if (hp <= 0) goto LabBreak;
 				else {
 					digging = false;
-					// todo: stone scale anim
-					// stone scale 23 frame
+					BeginBounce();
 				}
 			}
 		}
 	}
+LabBreak:
+	ready = false;
+	breaking = true;
+	gg.PlayAudio(gg.snds.rockbreak);
+	for (breakFrameIndex = 0.f; breakFrameIndex < esiz; breakFrameIndex += (gg.cDelta * esiz / 0.5f)) {
+		XX_YIELD(_1);
+	}
+	++scene->rocksDisposedCountPerFrame;
+	Dispose();
+	return;
 	XX_END(_1);
 }
 
 void Rock2::Draw() {
-	gg.Quad().Draw(tf, tf, scene->cam.ToGLPos(pos), { 0.5f, 0 }, scene->cRocksScale * scale * scene->cam.scale);
-	if (digging) {
-		pickaxe.Draw(scene);
+	XY s{ scene->cRocksScale * scale * scene->cam.scale };
+	if (breaking) {
+		auto& f = gg.res.explosion_1_[breakFrameIndex];
+		gg.Quad().Draw(f, f, scene->cam.ToGLPos(centerPos), 0.5f, s * 3.f);
+	}
+	else {
+		if (flip) s.x = -s.x;
+		gg.Quad().Draw(tf, tf, scene->cam.ToGLPos(pos), { 0.5f, 0 }, s);
+		if (digging) {
+			pickaxe.Draw(scene);
+		}
 	}
 }
 
@@ -200,7 +248,7 @@ void Scene_Test2::FixedUpdate() {
 			auto d = o.centerPos - mp;
 			auto r = cMouseCircleRadius + rockRadius;
 			if (d.x * d.x + d.y * d.y < r * r) {
-				node.value->Dig();
+				node.value->BeginDig();
 			}
 		});
 	}

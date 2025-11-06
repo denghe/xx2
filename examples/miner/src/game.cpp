@@ -27,6 +27,9 @@ void Game::GLInit() {
 	res.pickaxe_[0] = LoadTexture("res/pickaxe_0.png");
 	res.rock_[0] = LoadTexture("res/rock_a.png");
 	res.rock_[1] = LoadTexture("res/rock_b.png");
+	for (size_t i = 0; i < res.explosion_1_.size(); i++) {
+		res.explosion_1_[i] = LoadTexture(xx::ToStringFormat("res/explosion_1_{0}.png", i + 1));
+	}
 	for (size_t i = 0; i < res.rocks_.size(); i++) {
 		auto& sub = res.rocks_[i];
 		for (size_t j = 0; j < sub.size(); j++) {
@@ -39,6 +42,9 @@ void Game::GLInit() {
 		rp.tfs.Add(&res.pickaxe_[0]);
 		rp.tfs.Add(&res.rock_[0]);
 		rp.tfs.Add(&res.rock_[1]);
+		for (size_t i = 0; i < res.explosion_1_.size(); i++) {
+			rp.tfs.Add(&res.explosion_1_[i]);
+		}
 		for (auto& sub : res.rocks_) {
 			for (auto& tf : sub) {
 				rp.tfs.Add(&tf);

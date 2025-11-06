@@ -18,6 +18,7 @@ struct Game : xx::Game<Game> {
 
 	struct {
 		xx::TinyFrame circle256;
+		std::array<xx::TinyFrame, 8> explosion_1_;
 		std::array<xx::TinyFrame, 1> pickaxe_;
 		std::array<xx::TinyFrame, 2> rock_;	// base rock: a, b
 		std::array<std::array<xx::TinyFrame, 6>, 8> rocks_;	// rock_?_?
