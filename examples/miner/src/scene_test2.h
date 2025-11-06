@@ -48,6 +48,7 @@ struct Scene_Test2 : xx::SceneBase {
 	float cRocksScale{};
 	float cMouseCircleRadius{};
 	XY cRocksPivotOffset{};
+	int32_t rocksDisposedCountPerFrame{};
 
 	xx::List<XY> rocksFixedPosPool;			// life cycle: must upon rocks
 	xx::Grid2dCircle<Rock2*> rocksGrid;		// life cycle: must upon rocks

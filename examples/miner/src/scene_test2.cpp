@@ -3,7 +3,7 @@
 #include "scene_mainmenu.h"
 
 void Pickaxe::Init(Rock2* target_) {
-	pos = target_->centerPos + XY{ Scene_Test2::cRockRadius, 0 };
+	pos = target_->centerPos + XY{ Scene_Test2::cRockRadius * target_->scene->cRocksScale, 0 };
 }
 
 bool Pickaxe::Update() {
@@ -13,12 +13,26 @@ bool Pickaxe::Update() {
 // stone scale 23 frame
 // pickaxe offset: center pos + { 64, 0 }
 // pickaxe anchor: { 0.5, 0.25 }
+	static constexpr float cStep1Radians{ 30.f / 180.f * M_PI };
+	static constexpr float cStep1RadiansStep{ cStep1Radians / (gg.cFps * 0.1f) };
+	static constexpr float cStep2Radians{ -90.f / 180.f * M_PI };
+	static constexpr float cStep2RadiansStep{ (cStep2Radians - cStep1Radians) / (gg.cFps * 0.2f) };
+
+	XX_BEGIN(_1);
+	for (radians = 0; radians < cStep1Radians; radians += cStep1RadiansStep) {
+		XX_YIELD_F(_1);
+	}
+	for (; radians > cStep2Radians; radians += cStep2RadiansStep) {
+		XX_YIELD_F(_1);
+	}
+	return true;
+	XX_END(_1);
 	return false;
 }
 
 void Pickaxe::Draw(Scene_Test2* scene_) {
 	gg.Quad().Draw(gg.res.pickaxe_[0], gg.res.pickaxe_[0], scene_->cam.ToGLPos(pos)
-		, { 0.5f, 0.25f }, scene_->cRocksScale * scene_->cam.scale);
+		, { 0.5f, 0.25f }, scene_->cRocksScale * scene_->cam.scale, radians);
 }
 
 /********************************************************************************************************/
@@ -61,6 +75,7 @@ void Rock2::Update() {
 		XX_YIELD(_1);
 		if (digging) {
 			if (pickaxe.Update()) {
+				++scene->rocksDisposedCountPerFrame;
 				Dispose();
 				return;
 			}
@@ -164,10 +179,11 @@ void Scene_Test2::Update() {
 }
 
 void Scene_Test2::FixedUpdate() {
+	rocksDisposedCountPerFrame = 0;
+
 	auto mp = cam.ToLogicPos(gg.mousePos);
 	if (mp.x >= 0 && mp.y >= 0 && mp.x < rocksGrid.pixelSize.x && mp.y < rocksGrid.pixelSize.y) {
 		auto total = rocks.len;
-		int32_t count{};
 		auto cri = rocksGrid.PosToCRIndex(mp);
 		auto rockRadius = 32 * cRocksScale;
 		rocksGrid.ForeachByRange(cri.y, cri.x, cMouseCircleRadius + rockRadius * 3, gg.sgrdd, [&](xx::Grid2dCircle<Rock2*>::Node& node, float distance) {
@@ -177,17 +193,17 @@ void Scene_Test2::FixedUpdate() {
 			auto r = cMouseCircleRadius + rockRadius;
 			if (d.x * d.x + d.y * d.y < r * r) {
 				node.value->Dig();
-				++count;
 			}
 		});
-		if (count) {
-			GenRocks(count);
-			SortRocks();
-		}
 	}
 
 	for (auto& rock : rocks) {
 		rock->Update();
+	}
+
+	if (rocksDisposedCountPerFrame > 0) {
+		GenRocks(rocksDisposedCountPerFrame);
+		SortRocks();
 	}
 }
 
