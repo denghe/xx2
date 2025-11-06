@@ -9,12 +9,6 @@ void Pickaxe::Init(Rock2* target_) {
 }
 
 bool Pickaxe::Update() {
-	// todo: 
-// pickaxe anim step 1: 12 frame & -0.16 radians
-// step 2: 22
-// stone scale 23 frame
-// pickaxe offset: center pos + { 64, 0 }
-// pickaxe anchor: { 0.5, 0.25 }
 	static constexpr float cStep1Radians{ 30.f / 180.f * M_PI };
 	static constexpr float cStep1RadiansStep{ cStep1Radians / (gg.cFps * 0.1f) };
 	static constexpr float cStep2Radians{ -90.f / 180.f * M_PI };
@@ -24,6 +18,7 @@ bool Pickaxe::Update() {
 	for (radians = 0; radians < cStep1Radians; radians += cStep1RadiansStep) {
 		XX_YIELD_F(_1);
 	}
+	gg.PlayAudio(gg.snds.pickaxe);
 	for (; radians > cStep2Radians; radians += cStep2RadiansStep) {
 		XX_YIELD_F(_1);
 	}
@@ -68,13 +63,12 @@ void Rock2::Init(Scene_Test2* scene_) {
 
 void Rock2::Update() {
 	static constexpr float cScaleStep{ 1.f / (gg.cFps * 0.25f) };
-	// born logic: change scale
 	XX_BEGIN(_1);
 	for (scale = 0; scale < 1.f; scale += cScaleStep) {
-		XX_YIELD(_1);
+		XX_YIELD(_1);	// born logic: change scale
 	}
 	scale = 1.f;
-	ready = true;
+	ready = true;		// ready. can dig
 	while (true) {
 		XX_YIELD(_1);
 		if (digging) {
@@ -82,11 +76,15 @@ void Rock2::Update() {
 				hp -= 25;
 				if (hp <= 0) {
 					++scene->rocksDisposedCountPerFrame;
+					// todo: play crash effect
+					gg.PlayAudio(gg.snds.rockbreak);
 					Dispose();
 					return;
 				}
 				else {
 					digging = false;
+					// todo: stone scale anim
+					// stone scale 23 frame
 				}
 			}
 		}

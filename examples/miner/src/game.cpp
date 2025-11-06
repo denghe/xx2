@@ -18,6 +18,9 @@ void Game::GLInit() {
 	sgrdd.Init(64, 64);
 
 	// begin load res
+	// load wav ogg
+	snds.pickaxe = LoadSoundSource("res/pickaxe.wav");
+	snds.rockbreak = LoadSoundSource("res/rockbreak.ogg");
 
 	// load pngs
 	res.circle256 = LoadTexture("res/circle256.png");
