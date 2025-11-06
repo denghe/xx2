@@ -2,16 +2,33 @@
 #include "game.h"
 
 struct Scene_Test2;
+struct Rock2;
+
+// effect
+struct Pickaxe {
+	XY pos{};
+	float radians{};
+	int32_t _1{};
+	void Init(Rock2* target_);
+	bool Update();	// return true mean finished
+	void Draw(Scene_Test2* scene_);
+};
+
 struct Rock2 {
 	Scene_Test2* scene{};
 	xx::TinyFrame tf;
-	XY pos{}, fixedPos{}, centerPos{};
+	XY pos{}, centerPos{}, fixedPos{};
 	int32_t indexAtGrid{-1};
 	int32_t indexAtList{-1};	// fill by maker
-	static constexpr float cScaleStep{ 1.f / (gg.cFps * 0.25f) };
 	float scale{};
+	// todo: rock id? value? hp?
 	int32_t _1{};
-	// todo: rock id ?
+	bool ready{};	// after born: true
+	// todo: more state bool
+	bool digging{};
+	Pickaxe pickaxe;	// Update + Draw for digging
+	// todo: shake, crash
+	void Dig();
 	void Init(Scene_Test2* scene_);
 	void Update();
 	void Draw();
@@ -25,6 +42,7 @@ struct Scene_Test2 : xx::SceneBase {
 	xx::Camera cam;
 	float time{}, timePool{}, timeScale{ 1 };
 
+	static constexpr float cRockRadius{ 64 };
 	XY cRockMarginOffsetRange{};
 	int32_t cRocksMaxCount{};
 	float cRocksScale{};

@@ -12,17 +12,17 @@ struct Scene_Test1 : xx::SceneBase {
 	xx::Camera cam;
 	float time{}, timePool{}, timeScale{ 1 };
 
-	static constexpr xx::FromTo<XYi> cGridSizeRange{ {0, 0}, { 160 * 5, 90 * 5 } };
-	XYi cGridSize{ 16 * 5, 9 * 5 };
+	static constexpr xx::FromTo<XYi> cGridSizeRange{ {0, 0}, { 160 * 5, 30 * 5 } };
+	XYi cGridSize{ 16 * 5, 3 * 5 };
 	xx::Shared<xx::Slider> uiGridSizeY;
 	xx::Shared<xx::Slider> uiGridSizeX;
 
-	static constexpr xx::FromTo<float> cRocksScaleRange{ 0.01, 1 };
-	float cRocksScale{ 0.25f };
+	static constexpr xx::FromTo<float> cRocksScaleRange{ 0, 1 };
+	float cRocksScale{ 0.4f };
 	xx::Shared<xx::Slider> uiRocksScale;
 
 	xx::FromTo<int32_t> cRocksCountRange{ 0, cGridSize.x * cGridSize.y };
-	int32_t cRocksCount{};
+	int32_t cRocksCount{ 1200 };
 	xx::Shared<xx::Slider> uiRocksCount;
 
 	// todo: random offset range set

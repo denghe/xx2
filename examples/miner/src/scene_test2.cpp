@@ -2,12 +2,38 @@
 #include "scene_test2.h"
 #include "scene_mainmenu.h"
 
+void Pickaxe::Init(Rock2* target_) {
+	pos = target_->centerPos + XY{ Scene_Test2::cRockRadius, 0 };
+}
 
+bool Pickaxe::Update() {
+	// todo: 
+// pickaxe anim step 1: 12 frame & -0.16 radians
+// step 2: 22
+// stone scale 23 frame
+// pickaxe offset: center pos + { 64, 0 }
+// pickaxe anchor: { 0.5, 0.25 }
+	return false;
+}
+
+void Pickaxe::Draw(Scene_Test2* scene_) {
+	gg.Quad().Draw(gg.res.pickaxe_[0], gg.res.pickaxe_[0], scene_->cam.ToGLPos(pos)
+		, { 0.5f, 0.25f }, scene_->cRocksScale * scene_->cam.scale);
+}
+
+/********************************************************************************************************/
+
+void Rock2::Dig() {
+	// if(digging) todo
+	digging = true;
+	pickaxe.Init(this);
+}
 
 void Rock2::Init(Scene_Test2* scene_) {
 	scene = scene_;
 	auto i1 = gg.rnd.Next<int32_t>(0, gg.res.rocks_.size());
-	auto i2 = gg.rnd.Next<int32_t>(2) * 2 + 1;
+	static constexpr int32_t cIdxs[] { 1,3,4 };
+	auto i2 = cIdxs[gg.rnd.Next<int32_t>(3)];
 	tf = gg.res.rocks_[i1][i2];
 
 	auto fpIdx = gg.rnd.Next<int32_t>(scene->rocksFixedPosPool.len);
@@ -23,17 +49,31 @@ void Rock2::Init(Scene_Test2* scene_) {
 }
 
 void Rock2::Update() {
+	static constexpr float cScaleStep{ 1.f / (gg.cFps * 0.25f) };
 	// born logic: change scale
 	XX_BEGIN(_1);
 	for (scale = 0; scale < 1.f; scale += cScaleStep) {
 		XX_YIELD(_1);
 	}
 	scale = 1.f;
+	ready = true;
+	while (true) {
+		XX_YIELD(_1);
+		if (digging) {
+			if (pickaxe.Update()) {
+				Dispose();
+				return;
+			}
+		}
+	}
 	XX_END(_1);
 }
 
 void Rock2::Draw() {
 	gg.Quad().Draw(tf, tf, scene->cam.ToGLPos(pos), { 0.5f, 0 }, scene->cRocksScale * scale * scene->cam.scale);
+	if (digging) {
+		pickaxe.Draw(scene);
+	}
 }
 
 void Rock2::Dispose() {
@@ -56,13 +96,13 @@ void Scene_Test2::Init(float totalScale_) {
 	cam.Init(gg.scale, 1.f, gg.designSize / 2);
 	MakeUI();
 
-	XYi cGridSize{ 50 * totalScale_, 30 * totalScale_ };
+	XYi cGridSize{ 80 * totalScale_, 15 * totalScale_ };
 	auto cRockMargin = gg.designSize / cGridSize;
 	cRockMarginOffsetRange = { cRockMargin / 3 };
-	cRocksScale = 0.37f / totalScale_;
+	cRocksScale = 0.4f / totalScale_;
 	cRocksMaxCount = cGridSize.x * cGridSize.y;
 	cMouseCircleRadius = 128.f;
-	cRocksPivotOffset = { 0, -100 * cRocksScale };
+	cRocksPivotOffset = { 0, -cRockRadius * cRocksScale };
 
 	auto cellSize = (int32_t)std::ceilf(std::max(cRockMargin.x, cRockMargin.y));
 	auto numCRs = gg.designSize.As<int32_t>() / cellSize + 1;
@@ -130,13 +170,13 @@ void Scene_Test2::FixedUpdate() {
 		int32_t count{};
 		auto cri = rocksGrid.PosToCRIndex(mp);
 		auto rockRadius = 32 * cRocksScale;
-		rocksGrid.ForeachByRange(cri.y, cri.x, cMouseCircleRadius + rockRadius * 2, gg.sgrdd, [&](xx::Grid2dCircle<Rock2*>::Node& node, float distance) {
-			if (node.value->scale < 1) return;
+		rocksGrid.ForeachByRange(cri.y, cri.x, cMouseCircleRadius + rockRadius * 3, gg.sgrdd, [&](xx::Grid2dCircle<Rock2*>::Node& node, float distance) {
+			if (!node.value->ready) return;
 			auto& o = *node.value;
 			auto d = o.centerPos - mp;
 			auto r = cMouseCircleRadius + rockRadius;
 			if (d.x * d.x + d.y * d.y < r * r) {
-				node.value->Dispose();
+				node.value->Dig();
 				++count;
 			}
 		});

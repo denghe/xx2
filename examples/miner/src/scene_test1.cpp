@@ -110,7 +110,8 @@ void Scene_Test1::GenRocks() {
 		for (int i = 0; i < d; ++i) {
 			auto& rock = rocks.Emplace().Emplace();
 			auto i1 = gg.rnd.Next<int32_t>(0, gg.res.rocks_.size());
-			auto i2 = gg.rnd.Next<int32_t>(2) * 2 + 1;
+			static constexpr int32_t cIdxs[]{ 1,3,4 };
+			auto i2 = cIdxs[gg.rnd.Next<int32_t>(3)];
 			rock->tf = gg.res.rocks_[i1][i2];
 
 			auto fpIdx = gg.rnd.Next<int32_t>(rocksFixedPosPool.len);
