@@ -22,6 +22,7 @@ struct Rock2 {
 	int32_t indexAtList{-1};	// fill by maker
 	float scale{};
 	// todo: rock id? value? hp?
+	int32_t hp{};
 	int32_t _1{};
 	bool ready{};	// after born: true
 	// todo: more state bool

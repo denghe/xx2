@@ -4,6 +4,8 @@
 
 void Pickaxe::Init(Rock2* target_) {
 	pos = target_->centerPos + XY{ Scene_Test2::cRockRadius * target_->scene->cRocksScale, 0 };
+	radians = {};
+	_1 = {};
 }
 
 bool Pickaxe::Update() {
@@ -45,6 +47,8 @@ void Rock2::Dig() {
 
 void Rock2::Init(Scene_Test2* scene_) {
 	scene = scene_;
+	// todo: rock id? value? hp?
+	hp = 100;
 	auto i1 = gg.rnd.Next<int32_t>(0, gg.res.rocks_.size());
 	static constexpr int32_t cIdxs[] { 1,3,4 };
 	auto i2 = cIdxs[gg.rnd.Next<int32_t>(3)];
@@ -75,9 +79,15 @@ void Rock2::Update() {
 		XX_YIELD(_1);
 		if (digging) {
 			if (pickaxe.Update()) {
-				++scene->rocksDisposedCountPerFrame;
-				Dispose();
-				return;
+				hp -= 25;
+				if (hp <= 0) {
+					++scene->rocksDisposedCountPerFrame;
+					Dispose();
+					return;
+				}
+				else {
+					digging = false;
+				}
 			}
 		}
 	}
@@ -187,7 +197,7 @@ void Scene_Test2::FixedUpdate() {
 		auto cri = rocksGrid.PosToCRIndex(mp);
 		auto rockRadius = 32 * cRocksScale;
 		rocksGrid.ForeachByRange(cri.y, cri.x, cMouseCircleRadius + rockRadius * 3, gg.sgrdd, [&](xx::Grid2dCircle<Rock2*>::Node& node, float distance) {
-			if (!node.value->ready) return;
+			if (!node.value->ready || node.value->digging) return;
 			auto& o = *node.value;
 			auto d = o.centerPos - mp;
 			auto r = cMouseCircleRadius + rockRadius;
