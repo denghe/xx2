@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "pch.h"
 using XY = xx::XY;
+using XYi = xx::XYi;
 
 struct SpineRes1 {
 	xx::Shared<xx::GLTexture> tex;

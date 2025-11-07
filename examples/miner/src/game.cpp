@@ -19,8 +19,8 @@ void Game::GLInit() {
 
 	// begin load res
 	// load wav ogg
-	snds.pickaxe = LoadSoundSource("res/pickaxe.wav");
-	snds.rockbreak = LoadSoundSource("res/rockbreak.ogg");
+	ss.pickaxe = LoadSoundSource("res/pickaxe.wav");
+	ss.rockbreak = LoadSoundSource("res/rockbreak.ogg");
 
 	// load pngs
 	res.circle256 = LoadTexture("res/circle256.png");
@@ -39,16 +39,8 @@ void Game::GLInit() {
 	// combine pngs into single texture
 	{
 		xx::RectPacker rp;
-		rp.tfs.Add(&res.pickaxe_[0]);
-		rp.tfs.Add(&res.rock_[0]);
-		rp.tfs.Add(&res.rock_[1]);
-		for (size_t i = 0; i < res.explosion_1_.size(); i++) {
-			rp.tfs.Add(&res.explosion_1_[i]);
-		}
-		for (auto& sub : res.rocks_) {
-			for (auto& tf : sub) {
-				rp.tfs.Add(&tf);
-			}
+		for (int32_t i = 0; i < sizeof(res) / sizeof(xx::TinyFrame); ++i) {
+			rp.tfs.Add((xx::TinyFrame*)&res + i);
 		}
 		rp.AutoPack();
 	}

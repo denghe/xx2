@@ -23,9 +23,10 @@ struct Game : xx::Game<Game> {
 		std::array<xx::TinyFrame, 2> rock_;	// base rock: a, b
 		std::array<std::array<xx::TinyFrame, 6>, 8> rocks_;	// rock_?_?
 	} res;
+
 	struct {
 		xx::Shared<xx::SoundSource> pickaxe, rockbreak;
-	} snds;
+	} ss;
 
 	// runtime vars
 	xx::Rnd rnd;

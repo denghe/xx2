@@ -1,46 +1,16 @@
 ﻿#pragma once
 #include "game.h"
+#include "spine_frame_batch.h"
+#include "scene_grass.h"
 
-struct SpineFrameBatch {
-	xx::Shared<xx::GLTexture> tex;
-	XY size, anchor;	// , oPos, aPos
-	int32_t numFrames{};
-	int32_t numCols{}, numRows{};
-	int32_t stepX{}, stepY{};
-	xx::List<xx::TinyFrame> tfs;	// frame results
-	void Init(spine::SkeletonData* sd_, spine::Animation* a_, XY scale_);
-};
-
-struct Scene_Test7;
-struct Grass1 {
-	Scene_Test7* scene{};
-	SpineFrameBatch* sfb{};
-	XY pos{}, scale{};
-	int32_t frameIndex{};
-	float colorPlus{};
-	int32_t gridIndex{ -1 };
-	void FillColorplus();
-	void FillScale();
-	void Init(Scene_Test7* scene_, SpineFrameBatch* sfb_, XY pos_);
-	void InitGridIndex();
-	void Update();
-	void Draw();
-	Grass1() = default;
-	Grass1(Grass1 const&) = delete;
-	Grass1& operator=(Grass1 const&) = delete;
-	Grass1(Grass1&& o) noexcept;
-	Grass1& operator=(Grass1&& o) noexcept;
-	~Grass1();
-};
-
-struct Scene_Test7 : xx::SceneBase {
+struct Scene_Test7 : Scene_Grass {
 	static constexpr int32_t cNumMaxGlass{ 100000 };
 	static constexpr int32_t cNumMaxLeaf{ 100000 };
 	static constexpr float cMouseRadius{ 120 };
 
 	xx::Shared<xx::Node> ui;
 
-	xx::FromTo<float> cGrassScale{}, cGrassColorPlus{};
+	//xx::FromTo<float> cGrassScale{}, cGrassColorPlus{};
 	xx::Shared<xx::Slider> uiGrassScaleFrom, uiGrassScaleTo, uiGrassColorPlusFrom, uiGrassColorPlusTo;
 
 	// todo: grass color?
@@ -69,11 +39,11 @@ struct Scene_Test7 : xx::SceneBase {
 	float cBGTiling{};
 	xx::Shared<xx::Slider> uiBGTiling;
 
-	xx::Camera cam;
+	//xx::Camera cam;
 	float time{}, timePool{}, timeScale{ 1 };
 	SpineFrameBatch sfb;
-	xx::Grid2dCircle<Grass1*> grid;	// life cycle: must upon grasses
-	xx::List<Grass1> grasses;
+	//xx::Grid2dCircle<Grass*> grid;	// life cycle: must upon grasses
+	xx::List<Grass> grasses;
 	xx::Shared<xx::GLTexture> texBG, texLeaf;
 
 	xx::List<SpineFrameBatch> sfbsFlower;

@@ -18,7 +18,7 @@ bool Pickaxe::Update() {
 	for (radians = 0; radians < cStep1Radians; radians += cStep1RadiansStep) {
 		XX_YIELD_F(_1);
 	}
-	gg.PlayAudio(gg.snds.pickaxe);
+	gg.PlayAudio(gg.ss.pickaxe);
 	for (; radians > cStep2Radians; radians += cStep2RadiansStep) {
 		XX_YIELD_F(_1);
 	}
@@ -122,7 +122,7 @@ void Rock2::Update() {
 LabBreak:
 	ready = false;
 	breaking = true;
-	gg.PlayAudio(gg.snds.rockbreak);
+	gg.PlayAudio(gg.ss.rockbreak);
 	for (breakFrameIndex = 0.f; breakFrameIndex < esiz; breakFrameIndex += (gg.cDelta * esiz / 0.5f)) {
 		XX_YIELD(_1);
 	}
@@ -180,7 +180,7 @@ void Scene_Test2::Init(float totalScale_) {
 	rocksGrid.Init(cellSize, numCRs.y, numCRs.x);
 	rocks.Reserve(cRocksMaxCount);
 
-	XY basePoss[]{ { cRockMargin.x / 2, cRockMargin.y / 2 }, { cRockMargin.x / 2, cRockMargin.y } };
+	XY basePoss[]{ { cRockMargin.x * 0.5f, cRockMargin.y * 0.25f }, { cRockMargin.x * 0.5f, cRockMargin.y * 0.75f } };
 	for (int y = 0; y < cGridSize.y; ++y) {
 		for (int x = 0; x < cGridSize.x; ++x) {
 			auto& basePos = basePoss[x & 1];
@@ -264,6 +264,9 @@ void Scene_Test2::FixedUpdate() {
 }
 
 void Scene_Test2::Draw() {
+	// todo: draw bg
+	gg.Quad().Draw(gg.embed.shape_dot, gg.embed.shape_dot, 0, 0.5f, gg.designSize, 0, 1, { 15, 67, 11, 255 });
+
 	// draw rocks
 	for (auto& rock : rocks) {
 		rock->Draw();

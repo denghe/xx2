@@ -2,137 +2,6 @@
 #include "scene_test7.h"
 #include "scene_mainmenu.h"
 
-void SpineFrameBatch::Init(spine::SkeletonData* sd_, spine::Animation* a_, XY scale_) {
-	xx::SpinePlayer sp(sd_);
-	sp.SetScale(scale_);
-	sp.SetAnimation(0, a_, true);
-	sp.skeleton.setToSetupPose();
-
-	/*        h
-	+---------+
-	|         |
-	|         |
-	|         |
-	|    O    |
-	|         |
-	|         |
-	|         |
-  00+------A--+w
-
-	given O's pos & size( w&h ), find A( root/anchor )
-	anchor.x = (w/2 - A.x) / w
-	anchor.y = (A.y - h/2) / h;
-	*/
-
-	// calculate anchor
-	// todo: args set size when no slot: size
-	auto a = (spine::RegionAttachment*)sp.FindSlot("size")->getAttachment();
-	size = { a->getScaleX() * a->getWidth(), a->getScaleY() * a->getHeight() };
-	size *= scale_;
-	XY oPos { a->getX(), a->getY() };
-	oPos *= scale_;
-	XY aPos { size.x / 2 - oPos.x, size.y / 2 - oPos.y };
-	anchor = aPos / size;
-
-	// spine frames -> tex
-	numFrames = a_->getDuration() / gg.cDelta;
-
-	// calculate tex max size
-	int32_t texSize{ 256 };
-LabRetry:
-	numCols = texSize / (int32_t)size.x;
-	numRows = texSize / (int32_t)size.y;
-	if (numCols * numRows < numFrames) {
-		texSize *= 2;
-		goto LabRetry;
-	}
-	stepX = texSize / numCols;
-	stepY = texSize / numRows;
-	XY origin{ -texSize / 2 };
-
-	// fill tex & tfs
-	tex = xx::FrameBuffer{}.Init().Draw(texSize, true, {}, [&] {
-		int32_t i{};
-		for (int32_t y = 0; y < numRows; ++y) {
-			for (int32_t x = 0; x < numCols; ++x) {
-				XY pos{ origin.x + stepX * x, origin.y + texSize - stepY * (y + 1) };
-				pos += aPos;
-				sp.SetPosition(pos);
-				sp.Update(gg.cDelta);
-				sp.Draw();
-				auto& r = tfs.Emplace().uvRect;
-				r.x = stepX * x;
-				r.y = stepY * y;
-				r.w = size.x;
-				r.h = size.y;
-				++i;
-				if (i == numFrames) return;
-			}
-		}
-	});
-	tex->TryGenerateMipmap();
-
-	// fill tfs's tex
-	for (auto& o : tfs) o.tex = tex;
-}
-
-
-
-
-void Grass1::FillColorplus() {
-	colorPlus = gg.rnd.Next<float>(scene->cGrassColorPlus.from, scene->cGrassColorPlus.to);
-}
-void Grass1::FillScale() {
-	scale = gg.rnd.Next<float>(scene->cGrassScale.from, scene->cGrassScale.to);
-}
-
-void Grass1::Init(Scene_Test7* scene_, SpineFrameBatch* sfb_, XY pos_) {
-	scene = scene_;
-	sfb = sfb_;
-	pos = pos_;
-	FillColorplus();
-	FillScale();
-	frameIndex = gg.rnd.Next<int32_t>(sfb->numFrames);
-	assert(frameIndex <= sfb->numFrames);
-}
-
-void Grass1::InitGridIndex() {
-	scene->grid.Add(gridIndex, this);
-}
-
-void Grass1::Update() {
-	++frameIndex;
-	if (frameIndex == sfb->numFrames) {
-		frameIndex = 0;
-	}
-}
-
-void Grass1::Draw() {
-	auto& f = sfb->tfs[frameIndex];
-	gg.Quad().Draw(*f.tex, f.uvRect, scene->cam.ToGLPos(pos), sfb->anchor, scale * scene->cam.scale
-	, 0, colorPlus/*, xx::RGBA8_Red*/);
-}
-
-Grass1::Grass1(Grass1&& o) noexcept {
-	operator=(std::move(o));
-}
-
-Grass1& Grass1::operator=(Grass1&& o) noexcept {
-	memcpy(this, &o, sizeof(*this));
-	o.gridIndex = -1;
-	return *this;
-}
-
-
-Grass1::~Grass1() {
-	if (gridIndex >= 0) {
-		scene->grid.Remove(gridIndex, this);
-	}
-}
-
-
-
-
 void Scene_Test7::Init() {
 	// todo: load from disk ?
 	// data init
@@ -167,17 +36,9 @@ void Scene_Test7::Init() {
 			rp.tfs.Add(&tf);
 		}
 	}
-	int32_t texSize{ 4096 };
-LabRetry:
-	if (auto r = rp.Pack(texSize, 8); r) {
-		texSize *= 2;
-		goto LabRetry;
-	}
-	else {
-		sfbsFlower[0].tfs[0].tex->TryGenerateMipmap();
-		for (auto& o : sfbsFlower) o.tex.Reset();
-		for (auto& o : sfbsGrass) o.tex.Reset();
-	}
+	rp.AutoPack(4096, 8);
+	for (auto& o : sfbsFlower) o.tex.Reset();
+	for (auto& o : sfbsGrass) o.tex.Reset();
 
 	// grid init
 	float maxWidth{};
@@ -456,7 +317,7 @@ void Scene_Test7::FixedUpdate() {
 	auto mp = cam.ToLogicPos(gg.mousePos);
 	if (mp.x >= 0 && mp.y >= 0 && mp.x < grid.pixelSize.x && mp.y < grid.pixelSize.y) {
 		auto cri = grid.PosToCRIndex(mp);
-		grid.ForeachByRange(cri.y, cri.x, cMouseRadius, gg.sgrdd, [&](xx::Grid2dCircle<Grass1*>::Node& node, float distance) {
+		grid.ForeachByRange(cri.y, cri.x, cMouseRadius, gg.sgrdd, [&](xx::Grid2dCircle<Grass*>::Node& node, float distance) {
 			auto& o = *node.value;
 			auto d = o.pos - mp;
 			if (d.x * d.x + d.y * d.y < cMouseRadius * cMouseRadius) {
