@@ -49,6 +49,7 @@ struct Scene_Test2 : xx::SceneBase {
 	float time{}, timePool{}, timeScale{ 1 };
 
 	static constexpr float cRockRadius{ 64 };
+	XY cRockMargin{};
 	XY cRockMarginOffsetRange{};
 	int32_t cRocksMaxCount{};
 	float cRocksScale{};

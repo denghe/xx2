@@ -29,7 +29,7 @@ bool Pickaxe::Update() {
 
 void Pickaxe::Draw(Scene_Test2* scene_) {
 	gg.Quad().Draw(gg.res.pickaxe_[0], gg.res.pickaxe_[0], scene_->cam.ToGLPos(pos)
-		, { 0.5f, 0.25f }, scene_->cRocksScale * scene_->cam.scale, radians);
+		, { 0.5f, 0.25f }, scene_->cRocksScale * scene_->cam.scale, radians, 1.f, {255,255,255,127});
 }
 
 /********************************************************************************************************/
@@ -164,12 +164,12 @@ Rock2::~Rock2() {
 /********************************************************************************************************/
 
 void Scene_Test2::Init(float totalScale_) {
-	cam.Init(gg.scale, 1.f, gg.designSize / 2);
+	cam.Init(gg.scale, 0.8f, gg.designSize / 2);
 	MakeUI();
 
 	XYi cGridSize{ 80 * totalScale_, 15 * totalScale_ };
-	auto cRockMargin = gg.designSize / cGridSize;
-	cRockMarginOffsetRange = { cRockMargin / 3 };
+	cRockMargin = gg.designSize / cGridSize;
+	cRockMarginOffsetRange = { cRockMargin / 4 };
 	cRocksScale = 0.4f / totalScale_;
 	cRocksMaxCount = cGridSize.x * cGridSize.y;
 	cMouseCircleRadius = 128.f;
@@ -199,8 +199,9 @@ void Scene_Test2::Init(float totalScale_) {
 	//cBGColor = { 155, 0, 0, 255 };
 	//cBGColor = { 111, 111, 111, 255 };
 	cBGTiling = 0.7f * totalScale_;
-	texBG = xx::FrameBuffer{}.Init().Draw(gg.designSize, true, {}, [&] {
-		gg.Grass().Draw({ 0, 0, uint16_t(gg.designSize.x * cBGTiling), uint16_t(gg.designSize.y * cBGTiling) }
+	auto texBGSize = gg.designSize + XY{ cRockMargin.x, cRockMargin.y * 0.5f };
+	texBG = xx::FrameBuffer{}.Init().Draw(texBGSize, true, {}, [&] {
+		gg.Grass().Draw({ 0, 0, uint16_t(texBGSize.x * cBGTiling), uint16_t(texBGSize.y * cBGTiling) }
 		, 0, 0.5f, 1.f / cBGTiling);
 	});
 	texBG->TryGenerateMipmap();
@@ -278,11 +279,8 @@ void Scene_Test2::FixedUpdate() {
 
 void Scene_Test2::Draw() {
 	// draw bg
-#if 0
-	gg.Quad().Draw(gg.embed.shape_dot, gg.embed.shape_dot, 0, 0.5f, gg.designSize, 0, 1, { 15, 67, 11, 255 });
-#else
-	gg.Quad().Draw(*texBG, texBG->Rect(), 0, 0.5f, cam.scale, 0, cBGColorplus, cBGColor);
-#endif
+	gg.Quad().Draw(gg.embed.shape_dot, gg.embed.shape_dot, 0, 0.5f, gg.designSize * cam.baseScale, 0, 1, { 15, 67, 11, 255 });
+	gg.Quad().Draw(*texBG, texBG->Rect(), cam.ToGLPos(-cRockMargin * 0.5f), { 0, 1.f }, cam.scale, 0, cBGColorplus, cBGColor);
 
 	// draw rocks
 	for (auto& rock : rocks) {
@@ -290,8 +288,10 @@ void Scene_Test2::Draw() {
 	}
 
 	// draw mouse circle
-	gg.Quad().Draw(gg.res.circle256, gg.res.circle256, gg.mousePos, 0.5f, cMouseCircleRadius * 0.0078125f * cam.scale);
+	gg.Quad().Draw(gg.res.circle256, gg.res.circle256, gg.mousePos, 0.5f
+		, cMouseCircleRadius * 0.0078125f * cam.scale, 0, 1.f, {255,255,255,127});
 
+	// draw ui
 	gg.GLBlendFunc(gg.blendDefault);
 	gg.DrawNode(ui);
 }
