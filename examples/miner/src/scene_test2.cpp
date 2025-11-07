@@ -191,6 +191,19 @@ void Scene_Test2::Init(float totalScale_) {
 
 	GenRocks(cRocksMaxCount * 0.9);
 	SortRocks();
+
+	cBGColorplus = 1.f;
+	//cBGColor = xx::RGBA8_White;
+	cBGColor = { 139, 120, 80, 255 };
+	//cBGColor = { 0, 111, 0, 255 };
+	//cBGColor = { 155, 0, 0, 255 };
+	//cBGColor = { 111, 111, 111, 255 };
+	cBGTiling = 0.7f * totalScale_;
+	texBG = xx::FrameBuffer{}.Init().Draw(gg.designSize, true, {}, [&] {
+		gg.Grass().Draw({ 0, 0, uint16_t(gg.designSize.x * cBGTiling), uint16_t(gg.designSize.y * cBGTiling) }
+		, 0, 0.5f, 1.f / cBGTiling);
+	});
+	texBG->TryGenerateMipmap();
 }
 
 void Scene_Test2::MakeUI() {
@@ -264,8 +277,12 @@ void Scene_Test2::FixedUpdate() {
 }
 
 void Scene_Test2::Draw() {
-	// todo: draw bg
+	// draw bg
+#if 0
 	gg.Quad().Draw(gg.embed.shape_dot, gg.embed.shape_dot, 0, 0.5f, gg.designSize, 0, 1, { 15, 67, 11, 255 });
+#else
+	gg.Quad().Draw(*texBG, texBG->Rect(), 0, 0.5f, cam.scale, 0, cBGColorplus, cBGColor);
+#endif
 
 	// draw rocks
 	for (auto& rock : rocks) {

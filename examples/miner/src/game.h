@@ -16,6 +16,10 @@ struct Game : xx::Game<Game> {
 		return (xx::Shared<T>&)scene;
 	}
 
+	// for bg
+	xx::Shader_Grass shaderGrass;
+	XX_INLINE xx::Shader_Grass& Grass() { return ShaderBegin(shaderGrass); }
+
 	struct {
 		xx::TinyFrame circle256;
 		std::array<xx::TinyFrame, 8> explosion_1_;

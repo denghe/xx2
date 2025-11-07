@@ -56,9 +56,14 @@ struct Scene_Test2 : xx::SceneBase {
 	XY cRocksPivotOffset{};
 	int32_t rocksDisposedCountPerFrame{};
 
+	xx::RGBA8 cBGColor{};
+	float cBGColorplus{};
+	float cBGTiling{};
+
 	xx::List<XY> rocksFixedPosPool;			// life cycle: must upon rocks
 	xx::Grid2dCircle<Rock2*> rocksGrid;		// life cycle: must upon rocks
 	xx::List<xx::Shared<Rock2>> rocks;
+	xx::Shared<xx::GLTexture> texBG;
 
 	void GenRocks(int32_t count_);
 	void SortRocks();

@@ -53,9 +53,9 @@ void Scene_Test8::Init() {
 
 	// data init
 	cGrassScale = { 1.f, 1.f };
-	cGrassColorPlus = { 0.1f, 1.f };
+	cGrassColorPlus = { 0.3f, 1.f };
 	cGrassRandomFrameIndex = true;
-	cGrassCount = cGrassMaxCount;
+	cGrassCount = cGrassMaxCount * 0.5;
 	cLeafScale = 0.1f;
 	cLeafColorplus = 0.f;
 	cLeafCount = 1000;
@@ -176,7 +176,7 @@ void Scene_Test8::FixedUpdate() {
 					o.frameIndex = 0;
 				}
 			}
-			});
+		});
 	}
 }
 

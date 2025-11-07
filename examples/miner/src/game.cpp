@@ -17,6 +17,9 @@ void Game::GLInit() {
 	// init basedata
 	sgrdd.Init(64, 64);
 
+	// init shader
+	shaderGrass.Init();
+
 	// begin load res
 	// load wav ogg
 	ss.pickaxe = LoadSoundSource("res/pickaxe.wav");
