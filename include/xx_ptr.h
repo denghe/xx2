@@ -353,7 +353,7 @@ namespace xx {
         }
 
         // unsafe
-        template<typename U>
+        template<typename U = T>
         U& CastRef() const {
             static_assert(std::is_base_of_v<T, U> || std::is_same_v<T, U>);
             static_assert(PtrAlignCheck_v<T, U>);

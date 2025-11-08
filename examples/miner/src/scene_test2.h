@@ -42,6 +42,18 @@ struct Rock2 {
 	~Rock2();
 };
 
+struct FlyingRock {
+	static constexpr float cFlySpeed{ 800 / gg.cFps };
+	static constexpr float cScaleStep{ 1.f / (gg.cFps * 0.3f) };
+	XY pos{}, inc{};
+	float scale{}, moveCount{}, moveIndex{};
+	int32_t typeId{};
+	int32_t _1{};
+	void Init(Rock2* rock_);
+	bool Update();	// coroutine _1
+	void Draw(Scene_Test2* scene_);
+};
+
 struct Scene_Test2 : xx::SceneBase {
 	xx::Shared<xx::Node> ui;
 	xx::Camera cam;
@@ -64,7 +76,10 @@ struct Scene_Test2 : xx::SceneBase {
 	xx::Grid2dCircle<Rock2*> rocksGrid;		// life cycle: must upon rocks
 	xx::List<xx::Shared<Rock2>> rocks;
 	xx::Shared<xx::GLTexture> texBG;
-	std::array<XY, 8> flyTargets{};
+	std::array<XY, 9> flyTargets{};
+	std::array<int32_t, 9> counts{};
+	std::array<xx::Weak<xx::ImageLabelButton>, 9> countUIs;
+	xx::List<FlyingRock> flyingRocks;
 
 	void GenRocks(int32_t count_);
 	void SortRocks();
