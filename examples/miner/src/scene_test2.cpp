@@ -167,7 +167,7 @@ Rock2::~Rock2() {
 void FlyingRock::Init(Rock2* rock_) {
 	pos = rock_->scene->cam.ToGLPos(rock_->centerPos);
 	typeId = rock_->typeId;
-	auto target = rock_->scene->flyTargets[typeId];
+	auto target = rock_->scene->flyTargets[typeId] * rock_->scene->cam.baseScale;
 	auto d = target - pos;
 	auto mag2 = d.x * d.x + d.y * d.y;
 	assert(mag2 > 0);
