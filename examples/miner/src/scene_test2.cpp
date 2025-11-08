@@ -28,7 +28,7 @@ bool Pickaxe::Update() {
 }
 
 void Pickaxe::Draw(Scene_Test2* scene_) {
-	gg.Quad().Draw(gg.res.pickaxe_[0], gg.res.pickaxe_[0], scene_->cam.ToGLPos(pos)
+	gg.Quad().Draw(gg.res.pickaxe, gg.res.pickaxe, scene_->cam.ToGLPos(pos)
 		, { 0.5f, 0.25f }, scene_->cRocksScale * scene_->cam.scale, radians, 1.f, {255,255,255,127});
 }
 
@@ -208,8 +208,20 @@ void Scene_Test2::Init(float totalScale_) {
 }
 
 void Scene_Test2::MakeUI() {
-	ui.Emplace()->InitRoot(gg.scale * cUIScale);
+	static constexpr float cLineHeight{ 70 };
+	static constexpr float cMargin{ 10 };
+	auto fontSize = cLineHeight - gg.embed.cfg_s9bN->paddings.TopBottom();
+	auto basePos = gg.p7 + XY{ cMargin, -cMargin };
+	auto anchor = gg.a7;
+
+	ui.Emplace()->InitRoot(gg.scale);
 	// todo
+	for (int i = 1; i <= 8; ++i) {
+		auto pos = basePos + XY{ (i-1) * gg.designSize.x / 8, 0 };
+		ui->Make<xx::ImageLabelButton>()->Init(2, pos, anchor, fontSize)
+			(gg.res.rocks_[i][5], cLineHeight, cLineHeight * 0.5f, false)("123123");
+		flyTargets[i - 1] = pos;
+	}
 }
 
 void Scene_Test2::GenRocks(int32_t count_) {
@@ -294,9 +306,14 @@ void Scene_Test2::Draw() {
 	// draw ui
 	gg.GLBlendFunc(gg.blendDefault);
 	gg.DrawNode(ui);
+
+	// gizmos
+	for (auto& p : flyTargets) {
+		gg.Quad().Draw(gg.embed.shape_gear, gg.embed.shape_gear, 0, 0.5f, cam.baseScale);
+	}
 }
 
 void Scene_Test2::OnResize(bool modeChanged_) {
-	ui->Resize(gg.scale * cUIScale);
+	ui->Resize(gg.scale);
 	cam.SetBaseScale(gg.scale);
 }

@@ -43,7 +43,6 @@ struct Rock2 {
 };
 
 struct Scene_Test2 : xx::SceneBase {
-	static constexpr float cUIScale{ 0.5f };
 	xx::Shared<xx::Node> ui;
 	xx::Camera cam;
 	float time{}, timePool{}, timeScale{ 1 };
@@ -65,6 +64,7 @@ struct Scene_Test2 : xx::SceneBase {
 	xx::Grid2dCircle<Rock2*> rocksGrid;		// life cycle: must upon rocks
 	xx::List<xx::Shared<Rock2>> rocks;
 	xx::Shared<xx::GLTexture> texBG;
+	std::array<XY, 8> flyTargets{};
 
 	void GenRocks(int32_t count_);
 	void SortRocks();

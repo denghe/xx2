@@ -24,12 +24,11 @@ void Game::GLInit() {
 	// load wav ogg
 	ss.pickaxe = LoadSoundSource("res/pickaxe.wav");
 	ss.rockbreak = LoadSoundSource("res/rockbreak.ogg");
+	ss.pop = LoadSoundSource("res/pop.wav");
 
 	// load pngs
 	res.circle256 = LoadTexture("res/circle256.png");
-	res.pickaxe_[0] = LoadTexture("res/pickaxe_0.png");
-	res.rock_[0] = LoadTexture("res/rock_a.png");
-	res.rock_[1] = LoadTexture("res/rock_b.png");
+	res.pickaxe = LoadTexture("res/pickaxe.png");
 	for (size_t i = 0; i < res.explosion_1_.size(); i++) {
 		res.explosion_1_[i] = LoadTexture(xx::ToStringFormat("res/explosion_1_{0}.png", i + 1));
 	}
