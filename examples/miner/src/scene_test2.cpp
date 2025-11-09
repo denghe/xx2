@@ -122,6 +122,7 @@ void Rock2::Update() {
 LabBreak:
 	ready = false;
 	breaking = true;
+	scene->flyingRocks.Emplace().Init(this);
 	gg.PlayAudio(gg.ss.rockbreak);
 	for (breakFrameIndex = 0.f; breakFrameIndex < esiz; breakFrameIndex += (gg.cDelta * esiz / 0.5f)) {
 		XX_YIELD(_1);
@@ -150,7 +151,6 @@ void Rock2::Draw() {
 void Rock2::Dispose() {
 	assert(indexAtList > -1);
 	assert(scene->rocks[indexAtList].pointer == this);
-	scene->flyingRocks.Emplace().Init(this);
 	auto ial = indexAtList;
 	scene->rocks.Back()->indexAtList = ial;
 	scene->rocks.SwapRemoveAt(ial);
@@ -165,28 +165,32 @@ Rock2::~Rock2() {
 /********************************************************************************************************/
 
 void FlyingRock::Init(Rock2* rock_) {
-	pos = rock_->scene->cam.ToGLPos(rock_->centerPos);
+	scene = rock_->scene;
+	pos = rock_->centerPos;
 	typeId = rock_->typeId;
-	auto target = rock_->scene->flyTargets[typeId] * rock_->scene->cam.baseScale;
+	auto target = rock_->scene->flyTargets[typeId];
 	auto d = target - pos;
 	auto mag2 = d.x * d.x + d.y * d.y;
 	assert(mag2 > 0);
 	auto mag = std::sqrtf(mag2);
 	auto norm = d / mag;
 	inc = norm * cFlySpeed;
-	scale = 0;
 	moveCount = mag / cFlySpeed;
+	assert(moveCount > 0);
 	moveIndex = 0;
+	scale = 0;
+	scaleStep = (50 * 1.5f / 128.f - scene->cRocksScale) / moveCount;
 }
 
 bool FlyingRock::Update() {
 	XX_BEGIN(_1);
-	for (; scale < 1.f; scale += cScaleStep) {
+	for (; scale < scene->cRocksScale; scale += cScaleStep * scene->cRocksScale) {
 		XX_YIELD_F(_1);
 	}
-	scale = 1.f;
+	scale = scene->cRocksScale;
 	for (; moveIndex < moveCount; ++moveIndex) {
 		pos += inc;
+		scale += scaleStep;
 		XX_YIELD_F(_1);
 	}
 	return true;
@@ -196,7 +200,7 @@ bool FlyingRock::Update() {
 
 void FlyingRock::Draw(Scene_Test2* scene_) {
 	auto& f = gg.res.rocks_[typeId][4];
-	gg.Quad().Draw(f, f, pos, 0.5f, scale * scene_->cam.scale * scene_->cRocksScale);
+	gg.Quad().Draw(f, f, scene_->cam.ToGLPos(pos), 0.5f, scale * scene_->cam.scale);
 }
 
 /********************************************************************************************************/
@@ -246,20 +250,23 @@ void Scene_Test2::Init(float totalScale_) {
 }
 
 void Scene_Test2::MakeUI() {
-	static constexpr float cLineHeight{ 70 };
+	static constexpr float cLineHeight{ 50 };
 	static constexpr float cMargin{ 10 };
-	auto fontSize = cLineHeight - gg.embed.cfg_s9bN->paddings.TopBottom();
+	auto cfg = xx::MakeShared<xx::Scale9Config>();
+	*cfg = *gg.embed.cfg_s9bN;
+	cfg->paddings = { 10, 20, 10, 20 };
+	auto fontSize = cLineHeight - cfg->paddings.TopBottom();
 	auto basePos = gg.p7 + XY{ cMargin, -cMargin };
 	auto anchor = gg.a7;
 
 	ui.Emplace()->InitRoot(gg.scale);
 	for (int i = 0; i < counts.size(); ++i) {
 		auto pos = basePos + XY{ i * gg.designSize.x / counts.size(), 0 };
-		auto& o = ui->Make<xx::ImageLabelButton>()->Init(2, pos, anchor, fontSize)
-			(gg.res.rocks_[i][4], cLineHeight, cLineHeight * 0.5f, false)(xx::ToString(counts[i]));
+		auto& o = ui->Make<xx::ImageLabelButton>()->Init(2, pos, anchor, fontSize, 0, 0, cfg, cfg)
+			(gg.res.rocks_[i][4], cLineHeight * 1.5, cLineHeight * 0.5f, false)(xx::ToString(counts[i]));
 		o.At<xx::Scale9>(2).SetAlphaRecursive(0.5f);
 		countUIs[i] = xx::WeakFromThis(&o);
-		flyTargets[i] = pos + XY{cLineHeight * 0.5f, -cLineHeight * 0.5f};
+		flyTargets[i] = cam.ToLogicPos((pos + XY{cLineHeight * 0.5f, -cLineHeight * 0.5f}) * ui->scale);
 	}
 }
 
@@ -362,10 +369,10 @@ void Scene_Test2::Draw() {
 	gg.GLBlendFunc(gg.blendDefault);
 	gg.DrawNode(ui);
 
-	// gizmos
-	for (auto& p : flyTargets) {
-		gg.Quad().Draw(gg.embed.shape_gear, gg.embed.shape_gear, p * cam.baseScale, 0.5f, cam.baseScale);
-	}
+	//// gizmos
+	//for (auto& p : flyTargets) {
+	//	gg.Quad().Draw(gg.embed.shape_gear, gg.embed.shape_gear, cam.ToGLPos(p), 0.5f, cam.scale);
+	//}
 }
 
 void Scene_Test2::OnResize(bool modeChanged_) {

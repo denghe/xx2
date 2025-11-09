@@ -43,10 +43,11 @@ struct Rock2 {
 };
 
 struct FlyingRock {
-	static constexpr float cFlySpeed{ 800 / gg.cFps };
-	static constexpr float cScaleStep{ 1.f / (gg.cFps * 0.3f) };
+	static constexpr float cFlySpeed{ 1200 / gg.cFps };
+	static constexpr float cScaleStep{ 1.f / (gg.cFps * 0.6f) };
+	Scene_Test2* scene{};
 	XY pos{}, inc{};
-	float scale{}, moveCount{}, moveIndex{};
+	float scale{}, scaleStep{}, moveCount{}, moveIndex{};
 	int32_t typeId{};
 	int32_t _1{};
 	void Init(Rock2* rock_);
