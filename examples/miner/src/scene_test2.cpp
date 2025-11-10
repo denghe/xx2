@@ -68,8 +68,6 @@ void Rock2::BeginBounce() {
 }
 
 void Rock2::Bounce() {
-	// todo: stone scale anim
-	// stone scale 23 frame
 	static constexpr float cScaleStep{ 0.1f / (gg.cFps * 0.133333f) };
 	XX_BEGIN(_2);
 	for (scale.x = 1.f; scale.x < 1.1f; scale.x += cScaleStep) {
