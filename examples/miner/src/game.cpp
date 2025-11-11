@@ -27,13 +27,16 @@ void Game::GLInit() {
 	ss.pop = LoadSoundSource("res/pop.wav");
 
 	// load pngs
-	res.circle256 = LoadTexture("res/circle256.png");
-	res.pickaxe = LoadTexture("res/pickaxe.png");
-	for (size_t i = 0; i < res.explosion_1_.size(); i++) {
-		res.explosion_1_[i] = LoadTexture(xx::ToStringFormat("res/explosion_1_{0}.png", i + 1));
+	tf.circle256 = LoadTexture("res/circle256.png");
+	tf.pickaxe = LoadTexture("res/pickaxe.png");
+	for (size_t i = 0; i < tf.explosion_1_.size(); i++) {
+		tf.explosion_1_[i] = LoadTexture(xx::ToStringFormat("res/explosion_1_{0}.png", i + 1));
 	}
-	for (size_t i = 0; i < res.rocks_.size(); i++) {
-		auto& sub = res.rocks_[i];
+	for (size_t i = 0; i < tf.airplane_.size(); i++) {
+		tf.airplane_[i] = LoadTexture(xx::ToStringFormat("res/airplane_{0}.png", i + 1));
+	}
+	for (size_t i = 0; i < tf.rocks_.size(); i++) {
+		auto& sub = tf.rocks_[i];
 		for (size_t j = 0; j < sub.size(); j++) {
 			sub[j] = LoadTexture(xx::ToStringFormat("res/rock_{0}_{1}.png", i, j));
 		}
@@ -41,8 +44,8 @@ void Game::GLInit() {
 	// combine pngs into single texture
 	{
 		xx::RectPacker rp;
-		for (int32_t i = 0; i < sizeof(res) / sizeof(xx::TinyFrame); ++i) {
-			rp.tfs.Add((xx::TinyFrame*)&res + i);
+		for (int32_t i = 0; i < sizeof(tf) / sizeof(xx::TinyFrame); ++i) {
+			rp.tfs.Add((xx::TinyFrame*)&tf + i);
 		}
 		rp.AutoPack();
 	}

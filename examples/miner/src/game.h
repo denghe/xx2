@@ -24,8 +24,9 @@ struct Game : xx::Game<Game> {
 		xx::TinyFrame circle256;
 		xx::TinyFrame pickaxe;
 		std::array<xx::TinyFrame, 8> explosion_1_;
+		std::array<xx::TinyFrame, 7> airplane_;
 		std::array<std::array<xx::TinyFrame, 6>, 9> rocks_;	// rock_?_?
-	} res;
+	} tf;
 
 	struct {
 		xx::Shared<xx::SoundSource> pickaxe, rockbreak, pop;
