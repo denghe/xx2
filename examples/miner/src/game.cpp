@@ -59,6 +59,20 @@ void Game::GLInit() {
 		rp.AutoPack();
 	}
 
+	// fill anchor point data
+	for (size_t i = 0; i < tf.monster1_idle_.size(); i++) {
+		ap.monster1_idle_[i] = { 0.5f, 0.f };
+	}
+	for (size_t i = 0; i < tf.monster1_move_.size(); i++) {
+		ap.monster1_move_[i] = { 0.5f, 0.f };
+	}
+	for (size_t i = 0; i < tf.monster1_atk_.size(); i++) {
+		ap.monster1_atk_[i] = { 0.5f, 0.f };
+	}
+	// fill collision detect data( left-top:0,0 )
+	cd.monster1_atk_[3] = { {80, 24}, {96, 39} };
+
+
 	// init first scene
 	scene.Emplace<Scene_MainMenu>()->Init();
 }

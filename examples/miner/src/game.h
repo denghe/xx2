@@ -33,6 +33,16 @@ struct Game : xx::Game<Game> {
 	} tf;
 
 	struct {
+		std::array<XY, 8> monster1_idle_{};
+		std::array<XY, 11> monster1_move_{};
+		std::array<XY, 6> monster1_atk_{};
+	} ap;	// anchor point
+
+	struct {
+		std::array<xx::FromTo<XY>, 6> monster1_atk_{};
+	} cd;	// collision detect( attack )
+
+	struct {
 		xx::Shared<xx::SoundSource> pickaxe, rockbreak, pop;
 	} ss;
 

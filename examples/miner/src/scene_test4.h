@@ -9,10 +9,12 @@ struct Scene_Test4;
 struct Monster1 {
 	Scene_Test4* scene{};
 	xx::TinyFrame* tfs{};
-	XY pos{};
+	XY* aps{};
+	xx::FromTo<XY>* cds{};
 	int32_t tfsLen{};
 	float tfIndex{};
 	float speedScale{};
+	XY pos{};
 	Monster1& Init(Scene_Test4* scene_, XY pos_ = 0, float speedScale_ = 1);	// need set anim
 	void SetAnim(AnimTypes t);
 	bool Update();

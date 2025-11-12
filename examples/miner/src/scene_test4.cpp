@@ -15,21 +15,27 @@ void Monster1::SetAnim(AnimTypes t) {
 	case AnimTypes::Idle:
 		tfs = gg.tf.monster1_idle_.data();
 		tfsLen = gg.tf.monster1_idle_.size();
+		aps = gg.ap.monster1_idle_.data();
+		cds = {};
 		break;
 	case AnimTypes::Move:
 		tfs = gg.tf.monster1_move_.data();
 		tfsLen = gg.tf.monster1_move_.size();
+		aps = gg.ap.monster1_move_.data();
+		cds = {};
 		break;
 	case AnimTypes::Atk:
 		tfs = gg.tf.monster1_atk_.data();
 		tfsLen = gg.tf.monster1_atk_.size();
+		aps = gg.ap.monster1_atk_.data();
+		cds = gg.cd.monster1_atk_.data();
 		break;
 	}
 	tfIndex = 0;
 }
 
 bool Monster1::Update() {
-	tfIndex += (15.f / gg.cFps) * speedScale;
+	tfIndex += (12.f / gg.cFps) * speedScale;
 	// todo: hit check event
 	while (tfIndex >= tfsLen) {
 		tfIndex -= tfsLen;
@@ -41,15 +47,24 @@ bool Monster1::Update() {
 }
 
 void Monster1::Draw() {
-	auto& f = tfs[(int32_t)tfIndex];
 	auto& c = scene->cam;
-	gg.Quad().Draw(f, f, c.ToGLPos(pos), { 0.5f, 0 }, 1.f * c.scale);
+	auto i = (int32_t)tfIndex;
+	auto& f = tfs[i];
+	auto ap = aps[i];
+	gg.Quad().Draw(f, f, c.ToGLPos(pos), ap, c.scale);
+	if (cds && cds[i].to.x > 0) {
+		auto leftTopPos = pos - XY{ f.uvRect.w * ap.x, f.uvRect.h * (1.f - ap.y)};
+		auto p = leftTopPos + cds[i].from;
+		auto siz = cds[i].to - cds[i].from;
+		auto& o = gg.embed.shape_dot;
+		gg.Quad().Draw(o, o, c.ToGLPos(p), { 0,1 }, siz * c.scale, 0, 1, {255,255,255,127});
+	}
 }
 
 /***************************************************************************************/
 
 void Scene_Test4::Init() {
-	cam.Init(gg.scale, 2.f);
+	cam.Init(gg.scale, 3.f);
 	ui.Emplace()->InitRoot(gg.scale * cUIScale);
 
 	monsters.Emplace().Emplace<Monster1>()->Init(this, {-100, -100}).SetAnim(AnimTypes::Idle);
