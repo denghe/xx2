@@ -26,6 +26,10 @@ struct Game : xx::Game<Game> {
 		std::array<xx::TinyFrame, 8> explosion_1_;
 		std::array<xx::TinyFrame, 7> airplane_;
 		std::array<std::array<xx::TinyFrame, 6>, 9> rocks_;	// rock_?_?
+
+		std::array<xx::TinyFrame, 8> monster1_idle_;
+		std::array<xx::TinyFrame, 11> monster1_move_;
+		std::array<xx::TinyFrame, 6> monster1_atk_;
 	} tf;
 
 	struct {

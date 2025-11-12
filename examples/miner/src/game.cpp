@@ -41,6 +41,15 @@ void Game::GLInit() {
 			sub[j] = LoadTexture(xx::ToStringFormat("res/rock_{0}_{1}.png", i, j));
 		}
 	}
+	for (size_t i = 0; i < tf.monster1_idle_.size(); i++) {
+		tf.monster1_idle_[i] = LoadTexture(xx::ToStringFormat("res/monster1_idle_{0}.png", i + 1));
+	}
+	for (size_t i = 0; i < tf.monster1_move_.size(); i++) {
+		tf.monster1_move_[i] = LoadTexture(xx::ToStringFormat("res/monster1_move_{0}.png", i + 1));
+	}
+	for (size_t i = 0; i < tf.monster1_atk_.size(); i++) {
+		tf.monster1_atk_[i] = LoadTexture(xx::ToStringFormat("res/monster1_atk_{0}.png", i + 1));
+	}
 	// combine pngs into single texture
 	{
 		xx::RectPacker rp;
