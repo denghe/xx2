@@ -45,13 +45,12 @@ namespace xx {
     }
 
 
-    XX_INLINE static XY GetRndPosDoughnut(Rnd& rnd_, float maxRadius_, float safeRadius_) {
+    XX_INLINE static XY GetRndPosDoughnut(Rnd& rnd_, float maxRadius_, float safeRadius_, float radiansFrom_ = -M_PI, float radiansTo_ = M_PI) {
         auto len = maxRadius_ - safeRadius_;
         auto len_radius = len / maxRadius_;
         auto safeRadius_radius = safeRadius_ / maxRadius_;
         auto radius = std::sqrtf(rnd_.Next<float>(0, len_radius) + safeRadius_radius) * maxRadius_;
-        auto radians = rnd_.Next<float>(-M_PI, M_PI);
+        auto radians = rnd_.Next<float>(radiansFrom_, radiansTo_);
         return { std::cosf(radians) * radius, std::sinf(radians) * radius };
     }
-
 }

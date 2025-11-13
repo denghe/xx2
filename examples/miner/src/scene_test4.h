@@ -6,18 +6,24 @@ enum class AnimTypes {
 };
 
 struct Scene_Test4;
-struct Rock {
+struct OrderByYItem {
 	Scene_Test4* scene{};
+	float y{};
+	virtual void Update() {}
+	virtual void Draw() {}
+	~OrderByYItem() {}
+};
+
+struct Rock : OrderByYItem {
 	XY pos{};
 	float radius{};
 	int32_t hp{};
 	Rock& Init(Scene_Test4* scene_, XY pos_, float radius_);
-	void Update();
-	void Draw();
+	void Update() override;
+	void Draw() override;
 };
 
-struct Monster1 {
-	Scene_Test4* scene{};
+struct Monster1 : OrderByYItem {
 	xx::TinyFrame* tfs{};
 	XY* aps{};
 	xx::FromTo<XY>* cds{};
@@ -25,20 +31,23 @@ struct Monster1 {
 	float tfIndex{};
 	float speedScale{};
 	float radius{};
+	bool flipX{};
 	XY pos{};
 	Monster1& Monster1Init(Scene_Test4* scene_, XY pos_, float radius_, float speedScale_);	// need set anim
 	void SetAnim(AnimTypes t);
 	bool StepAnimOnce();
 	void StepAnimLoop();
 	bool IsHitFrame() const;
-	virtual void Update();
-	virtual void Draw();
+	void Update() override;
+	void Draw() override;
 };
 
 struct Monster2 : Monster1 {
 	xx::Weak<Rock> target;
+	XY targetPos{};
 	float stepTime{};
 	float attackRange{}, moveSpeed{};
+	bool hited{};
 	int32_t _1{};
 	Monster2& Monster2Init(Scene_Test4* scene_, XY pos_, float radius_);
 	bool SearchTarget();
@@ -51,9 +60,11 @@ struct Scene_Test4 : xx::SceneBase {
 	xx::Shared<xx::Node> ui;
 	xx::Camera cam;
 	float time{}, timePool{}, timeScale{ 1 };
+	float timer{};
 
 	xx::List<xx::Shared<Monster1>> monsters;
 	xx::List<xx::Shared<Rock>> rocks;
+	xx::List<std::pair<float, OrderByYItem*>> obyis;	// for draw order
 
 	void Init();
 	void Update() override;
