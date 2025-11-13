@@ -6,6 +6,16 @@ enum class AnimTypes {
 };
 
 struct Scene_Test4;
+struct Rock {
+	Scene_Test4* scene{};
+	XY pos{};
+	float radius{};
+	int32_t hp{};
+	Rock& Init(Scene_Test4* scene_, XY pos_, float radius_);
+	void Update();
+	void Draw();
+};
+
 struct Monster1 {
 	Scene_Test4* scene{};
 	xx::TinyFrame* tfs{};
@@ -14,11 +24,26 @@ struct Monster1 {
 	int32_t tfsLen{};
 	float tfIndex{};
 	float speedScale{};
+	float radius{};
 	XY pos{};
-	Monster1& Init(Scene_Test4* scene_, XY pos_ = 0, float speedScale_ = 1);	// need set anim
+	Monster1& Monster1Init(Scene_Test4* scene_, XY pos_, float radius_, float speedScale_);	// need set anim
 	void SetAnim(AnimTypes t);
-	bool Update();
-	void Draw();
+	bool StepAnimOnce();
+	void StepAnimLoop();
+	bool IsHitFrame() const;
+	virtual void Update();
+	virtual void Draw();
+};
+
+struct Monster2 : Monster1 {
+	xx::Weak<Rock> target;
+	float stepTime{};
+	float attackRange{}, moveSpeed{};
+	int32_t _1{};
+	Monster2& Monster2Init(Scene_Test4* scene_, XY pos_, float radius_);
+	bool SearchTarget();
+	void Update() override;
+	void Draw() override;
 };
 
 struct Scene_Test4 : xx::SceneBase {
@@ -28,6 +53,7 @@ struct Scene_Test4 : xx::SceneBase {
 	float time{}, timePool{}, timeScale{ 1 };
 
 	xx::List<xx::Shared<Monster1>> monsters;
+	xx::List<xx::Shared<Rock>> rocks;
 
 	void Init();
 	void Update() override;
