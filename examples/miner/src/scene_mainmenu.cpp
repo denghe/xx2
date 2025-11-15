@@ -4,6 +4,7 @@
 #include "scene_test2.h"
 #include "scene_test3.h"
 #include "scene_test4.h"
+#include "scene_test5.h"
 
 void Scene_MainMenu::Init() {
 	MakeUI();
@@ -42,8 +43,11 @@ void Scene_MainMenu::MakeUI() {
 	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test3(airplanes)")).onClicked = [this] {
 		gg.MakeScene<Scene_Test3>()->Init();
 	};
-	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test4(monster anim)")).onClicked = [this] {
-		gg.MakeScene<Scene_Test4>()->Init();
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test4(monster1 anim)")).onClicked = [this] {
+		gg.MakeScene<Test4::Scene>()->Init();
+	};
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test5(monster2 anim)")).onClicked = [this] {
+		gg.MakeScene<Test5::Scene>()->Init();
 	};
 
 	L.InitEnd();

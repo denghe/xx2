@@ -30,16 +30,26 @@ struct Game : xx::Game<Game> {
 		std::array<xx::TinyFrame, 8> monster1_idle_;
 		std::array<xx::TinyFrame, 11> monster1_move_;
 		std::array<xx::TinyFrame, 6> monster1_atk_;
+
+		std::array<xx::TinyFrame, 63> monster2_idle_;
+		std::array<xx::TinyFrame, 90> monster2_move_;
+		std::array<xx::TinyFrame, 56> monster2_atk_;
 	} tf;
 
-	struct {
-		std::array<XY, 8> monster1_idle_{};
-		std::array<XY, 11> monster1_move_{};
-		std::array<XY, 6> monster1_atk_{};
-	} ap;	// anchor point
+	//struct {
+	//	std::array<XY, 8> monster1_idle_{};
+	//	std::array<XY, 11> monster1_move_{};
+	//	std::array<XY, 6> monster1_atk_{};
+
+	//	std::array<XY, 63> monster2_idle_{};
+	//	std::array<XY, 90> monster2_move_{};
+	//	std::array<XY, 56> monster2_atk_{};
+	//} ap;	// anchor point
 
 	struct {
 		std::array<xx::FromTo<XY>, 6> monster1_atk_{};
+
+		std::array<xx::FromTo<XY>, 56> monster2_atk_{};
 	} cd;	// collision detect( attack )
 
 	struct {

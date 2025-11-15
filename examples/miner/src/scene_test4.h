@@ -1,74 +1,78 @@
 ﻿#pragma once
 #include "game.h"
 
-enum class AnimTypes {
-	Idle,Move,Atk
-};
+namespace Test4 {
 
-struct Scene_Test4;
-struct OrderByYItem {
-	Scene_Test4* scene{};
-	float y{};
-	virtual void Update() {}
-	virtual void Draw() {}
-	~OrderByYItem() {}
-};
+	enum class AnimTypes {
+		Idle, Move, Atk
+	};
 
-struct Rock : OrderByYItem {
-	XY pos{};
-	float radius{};
-	int32_t hp{};
-	Rock& Init(Scene_Test4* scene_, XY pos_, float radius_);
-	void Update() override;
-	void Draw() override;
-};
+	struct Scene;
+	struct OrderByYItem {
+		Scene* scene{};
+		float y{};
+		virtual void Update() {}
+		virtual void Draw() {}
+		~OrderByYItem() {}
+	};
 
-struct Monster1 : OrderByYItem {
-	xx::TinyFrame* tfs{};
-	XY* aps{};
-	xx::FromTo<XY>* cds{};
-	int32_t tfsLen{};
-	float tfIndex{};
-	float speedScale{};
-	float radius{};
-	bool flipX{};
-	XY pos{};
-	Monster1& Monster1Init(Scene_Test4* scene_, XY pos_, float radius_, float speedScale_);	// need set anim
-	void SetAnim(AnimTypes t);
-	bool StepAnimOnce();
-	void StepAnimLoop();
-	bool IsHitFrame() const;
-	void Update() override;
-	void Draw() override;
-};
+	struct Rock : OrderByYItem {
+		XY pos{};
+		float radius{};
+		int32_t hp{};
+		Rock& Init(Scene* scene_, XY pos_, float radius_);
+		void Update() override;
+		void Draw() override;
+	};
 
-struct Monster2 : Monster1 {
-	xx::Weak<Rock> target;
-	XY targetPos{};
-	float stepTime{};
-	float attackRange{}, moveSpeed{};
-	bool hited{};
-	int32_t _1{};
-	Monster2& Monster2Init(Scene_Test4* scene_, XY pos_, float radius_);
-	bool SearchTarget();
-	void Update() override;
-	void Draw() override;
-};
+	struct Monster0 : OrderByYItem {
+		xx::TinyFrame* tfs{};
+		//XY* aps{};
+		xx::FromTo<XY>* cds{};
+		int32_t tfsLen{};
+		float tfIndex{};
+		float speedScale{};
+		float radius{};
+		bool flipX{};
+		XY pos{};
+		Monster0& Monster1Init(Scene* scene_, XY pos_, float radius_, float speedScale_);	// need set anim
+		void SetAnim(AnimTypes t);
+		bool StepAnimOnce();
+		void StepAnimLoop();
+		bool IsHitFrame() const;
+		void Update() override;
+		void Draw() override;
+	};
 
-struct Scene_Test4 : xx::SceneBase {
-	static constexpr float cUIScale{ 0.5f };
-	xx::Shared<xx::Node> ui;
-	xx::Camera cam;
-	float time{}, timePool{}, timeScale{ 1 };
-	float timer{};
+	struct Monster1 : Monster0 {
+		xx::Weak<Rock> target;
+		XY targetPos{};
+		float stepTime{};
+		float attackRange{}, moveSpeed{};
+		bool hited{};
+		int32_t _1{};
+		Monster1& Monster2Init(Scene* scene_, XY pos_, float radius_);
+		bool SearchTarget();
+		void Update() override;
+		void Draw() override;
+	};
 
-	xx::List<xx::Shared<Monster1>> monsters;
-	xx::List<xx::Shared<Rock>> rocks;
-	xx::List<std::pair<float, OrderByYItem*>> obyis;	// for draw order
+	struct Scene : xx::SceneBase {
+		static constexpr float cUIScale{ 0.5f };
+		xx::Shared<xx::Node> ui;
+		xx::Camera cam;
+		float time{}, timePool{}, timeScale{ 1 };
+		float timer{};
 
-	void Init();
-	void Update() override;
-	void FixedUpdate();
-	void Draw() override;
-	void OnResize(bool modeChanged_) override;
-};
+		xx::List<xx::Shared<Monster0>> monsters;
+		xx::List<xx::Shared<Rock>> rocks;
+		xx::List<std::pair<float, OrderByYItem*>> obyis;	// for draw order
+
+		void Init();
+		void Update() override;
+		void FixedUpdate();
+		void Draw() override;
+		void OnResize(bool modeChanged_) override;
+	};
+
+}

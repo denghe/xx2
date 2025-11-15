@@ -41,6 +41,7 @@ void Game::GLInit() {
 			sub[j] = LoadTexture(xx::ToStringFormat("res/rock_{0}_{1}.png", i, j));
 		}
 	}
+	//// monster1
 	for (size_t i = 0; i < tf.monster1_idle_.size(); i++) {
 		tf.monster1_idle_[i] = LoadTexture(xx::ToStringFormat("res/monster1_idle_{0}.png", i + 1));
 	}
@@ -50,6 +51,17 @@ void Game::GLInit() {
 	for (size_t i = 0; i < tf.monster1_atk_.size(); i++) {
 		tf.monster1_atk_[i] = LoadTexture(xx::ToStringFormat("res/monster1_atk_{0}.png", i + 1));
 	}
+	//// monster2
+	for (size_t i = 0; i < tf.monster2_idle_.size(); i++) {
+		tf.monster2_idle_[i] = LoadTexture(xx::ToStringFormat("res/monster2_idle_{0}.png", i + 1));
+	}
+	for (size_t i = 0; i < tf.monster2_move_.size(); i++) {
+		tf.monster2_move_[i] = LoadTexture(xx::ToStringFormat("res/monster2_move_{0}.png", i + 1));
+	}
+	for (size_t i = 0; i < tf.monster2_atk_.size(); i++) {
+		tf.monster2_atk_[i] = LoadTexture(xx::ToStringFormat("res/monster2_atk_{0}.png", i + 1));
+	}
+
 	// combine pngs into single texture
 	{
 		xx::RectPacker rp;
@@ -59,18 +71,21 @@ void Game::GLInit() {
 		rp.AutoPack();
 	}
 
-	// fill anchor point data
-	for (size_t i = 0; i < tf.monster1_idle_.size(); i++) {
-		ap.monster1_idle_[i] = { 0.5f, 0.f };
-	}
-	for (size_t i = 0; i < tf.monster1_move_.size(); i++) {
-		ap.monster1_move_[i] = { 0.5f, 0.f };
-	}
-	for (size_t i = 0; i < tf.monster1_atk_.size(); i++) {
-		ap.monster1_atk_[i] = { 0.5f, 0.f };
-	}
+	//// fill anchor point data
+	//for (size_t i = 0; i < tf.monster1_idle_.size(); i++) {
+	//	ap.monster1_idle_[i] = { 0.5f, 0.f };
+	//}
+	//for (size_t i = 0; i < tf.monster1_move_.size(); i++) {
+	//	ap.monster1_move_[i] = { 0.5f, 0.f };
+	//}
+	//for (size_t i = 0; i < tf.monster1_atk_.size(); i++) {
+	//	ap.monster1_atk_[i] = { 0.5f, 0.f };
+	//}
+
 	// fill collision detect data( left-top:0,0 )
 	cd.monster1_atk_[3] = { {80, 24}, {96, 39} };
+
+	cd.monster2_atk_[13] = { {50, 57}, {67, 73} };
 
 
 	// init first scene

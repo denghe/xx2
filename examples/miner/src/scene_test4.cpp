@@ -2,8 +2,9 @@
 #include "scene_test4.h"
 #include "scene_mainmenu.h"
 
+namespace Test4 {
 
-Monster1& Monster1::Monster1Init(Scene_Test4* scene_, XY pos_, float radius_, float speedScale_) {
+Monster0& Monster0::Monster1Init(Scene* scene_, XY pos_, float radius_, float speedScale_) {
 	scene = scene_;
 	pos = pos_;
 	y = pos.y;
@@ -12,55 +13,56 @@ Monster1& Monster1::Monster1Init(Scene_Test4* scene_, XY pos_, float radius_, fl
 	return *this;
 }
 
-void Monster1::SetAnim(AnimTypes t) {
+void Monster0::SetAnim(AnimTypes t) {
 	switch (t) {
 	case AnimTypes::Idle:
 		tfs = gg.tf.monster1_idle_.data();
 		tfsLen = gg.tf.monster1_idle_.size();
-		aps = gg.ap.monster1_idle_.data();
+		//aps = gg.ap.monster1_idle_.data();
 		cds = {};
 		break;
 	case AnimTypes::Move:
 		tfs = gg.tf.monster1_move_.data();
 		tfsLen = gg.tf.monster1_move_.size();
-		aps = gg.ap.monster1_move_.data();
+		//aps = gg.ap.monster1_move_.data();
 		cds = {};
 		break;
 	case AnimTypes::Atk:
 		tfs = gg.tf.monster1_atk_.data();
 		tfsLen = gg.tf.monster1_atk_.size();
-		aps = gg.ap.monster1_atk_.data();
+		//aps = gg.ap.monster1_atk_.data();
 		cds = gg.cd.monster1_atk_.data();
 		break;
 	}
 	tfIndex = 0;
 }
 
-bool Monster1::StepAnimOnce() {
+bool Monster0::StepAnimOnce() {
 	tfIndex += (12.f / gg.cFps) * speedScale;
 	return tfIndex >= tfsLen;
 }
 
-void Monster1::StepAnimLoop() {
+void Monster0::StepAnimLoop() {
 	tfIndex += (12.f / gg.cFps) * speedScale;
 	while (tfIndex >= tfsLen) {
 		tfIndex -= tfsLen;
 	}
 }
 
-bool Monster1::IsHitFrame() const {
+bool Monster0::IsHitFrame() const {
 	return cds[(int32_t)tfIndex].to.x > 0;
 }
 
-void Monster1::Update() {
+void Monster0::Update() {
 	StepAnimLoop();
 }
 
-void Monster1::Draw() {
+void Monster0::Draw() {
 	auto& c = scene->cam;
 	auto i = (int32_t)tfIndex;
 	auto& f = tfs[i];
-	auto ap = aps[i];
+	//auto ap = aps[i];
+	XY ap{ 0.5f, 0.f };
 	auto s = radius / 23.f;
 	gg.Quad().Draw(f, f, c.ToGLPos(pos), ap, s * c.scale);
 	if (cds && cds[i].to.x > 0) {
@@ -74,14 +76,14 @@ void Monster1::Draw() {
 
 /***************************************************************************************/
 
-Monster2& Monster2::Monster2Init(Scene_Test4* scene_, XY pos_, float radius_) {
+Monster1& Monster1::Monster2Init(Scene* scene_, XY pos_, float radius_) {
 	Monster1Init(scene_, pos_, radius_, 1);
 	attackRange = 56.f;
 	moveSpeed = 100.f / gg.cFps;
 	return *this;
 }
 
-void Monster2::Update() {
+void Monster1::Update() {
 	XX_BEGIN(_1);
 LabSearch:
 	SetAnim(AnimTypes::Idle);
@@ -131,7 +133,7 @@ LabAttack:
 	XX_END(_1);
 }
 
-bool Monster2::SearchTarget() {
+bool Monster1::SearchTarget() {
 	target.Reset();
 	float minMag2 = std::numeric_limits<float>::max();
 	for (auto& o : scene->rocks) {	// todo: optimize by Grid
@@ -154,11 +156,12 @@ bool Monster2::SearchTarget() {
 	return true;
 }
 
-void Monster2::Draw() {
+void Monster1::Draw() {
 	auto& c = scene->cam;
 	auto i = (int32_t)tfIndex;
 	auto& f = tfs[i];
-	auto ap = aps[i];
+	//auto ap = aps[i];
+	XY ap{ 0.5f, 0.f };
 	XY s{ radius / 23.f * c.scale };
 	if (flipX) s.x = -s.x;
 	gg.Quad().Draw(f, f, c.ToGLPos(pos), ap, s);
@@ -166,7 +169,7 @@ void Monster2::Draw() {
 
 /***************************************************************************************/
 
-Rock& Rock::Init(Scene_Test4 * scene_, XY pos_, float radius_) {
+Rock& Rock::Init(Scene * scene_, XY pos_, float radius_) {
 	scene = scene_;
 	pos = pos_;
 	y = pos.y;
@@ -188,36 +191,36 @@ void Rock::Draw() {
 
 /***************************************************************************************/
 
-void Scene_Test4::Init() {
+void Scene::Init() {
 	cam.Init(gg.scale, 1.f);
 	ui.Emplace()->InitRoot(gg.scale * cUIScale);
 
-	monsters.Emplace().Emplace<Monster1>()->Monster1Init(this, {-100, -400}, 46, 1).SetAnim(AnimTypes::Idle);
-	monsters.Emplace().Emplace<Monster1>()->Monster1Init(this, { 0, -400 }, 46, 1).SetAnim(AnimTypes::Move);
-	monsters.Emplace().Emplace<Monster1>()->Monster1Init(this, {100, -400}, 46, 1).SetAnim(AnimTypes::Atk);
+	monsters.Emplace().Emplace<Monster0>()->Monster1Init(this, {-100, -400}, 46, 1).SetAnim(AnimTypes::Idle);
+	monsters.Emplace().Emplace<Monster0>()->Monster1Init(this, { 0, -400 }, 46, 1).SetAnim(AnimTypes::Move);
+	monsters.Emplace().Emplace<Monster0>()->Monster1Init(this, {100, -400}, 46, 1).SetAnim(AnimTypes::Atk);
 
-	monsters.Emplace().Emplace<Monster1>()->Monster1Init(this, {-100, -300}, 46, 2).SetAnim(AnimTypes::Idle);
-	monsters.Emplace().Emplace<Monster1>()->Monster1Init(this, { 0, -300 }, 46, 2).SetAnim(AnimTypes::Move);
-	monsters.Emplace().Emplace<Monster1>()->Monster1Init(this, {100, -300 }, 46, 2).SetAnim(AnimTypes::Atk);
+	monsters.Emplace().Emplace<Monster0>()->Monster1Init(this, {-100, -300}, 46, 2).SetAnim(AnimTypes::Idle);
+	monsters.Emplace().Emplace<Monster0>()->Monster1Init(this, { 0, -300 }, 46, 2).SetAnim(AnimTypes::Move);
+	monsters.Emplace().Emplace<Monster0>()->Monster1Init(this, {100, -300 }, 46, 2).SetAnim(AnimTypes::Atk);
 
-	monsters.Emplace().Emplace<Monster1>()->Monster1Init(this, {-100, -200}, 46, 3).SetAnim(AnimTypes::Idle);
-	monsters.Emplace().Emplace<Monster1>()->Monster1Init(this, { 0, -200 }, 46, 3).SetAnim(AnimTypes::Move);
-	monsters.Emplace().Emplace<Monster1>()->Monster1Init(this, {100, -200}, 46, 3).SetAnim(AnimTypes::Atk);
+	monsters.Emplace().Emplace<Monster0>()->Monster1Init(this, {-100, -200}, 46, 3).SetAnim(AnimTypes::Idle);
+	monsters.Emplace().Emplace<Monster0>()->Monster1Init(this, { 0, -200 }, 46, 3).SetAnim(AnimTypes::Move);
+	monsters.Emplace().Emplace<Monster0>()->Monster1Init(this, {100, -200}, 46, 3).SetAnim(AnimTypes::Atk);
 
 #if 0
 	rocks.Emplace().Emplace<Rock>()->Init(this, { 0, 0 }, 23);
-	monsters.Emplace().Emplace<Monster2>()->Monster2Init(this, { -200, 0 }, 23).SetAnim(AnimTypes::Idle);
-	monsters.Emplace().Emplace<Monster2>()->Monster2Init(this, { -200, -50 }, 23).SetAnim(AnimTypes::Idle);
-	monsters.Emplace().Emplace<Monster2>()->Monster2Init(this, { -200, 50 }, 23).SetAnim(AnimTypes::Idle);
-	monsters.Emplace().Emplace<Monster2>()->Monster2Init(this, { -200, 100 }, 23).SetAnim(AnimTypes::Idle);
-	monsters.Emplace().Emplace<Monster2>()->Monster2Init(this, { -200, 150 }, 23).SetAnim(AnimTypes::Idle);
-	monsters.Emplace().Emplace<Monster2>()->Monster2Init(this, { 200, 0 }, 23).SetAnim(AnimTypes::Idle);
-	monsters.Emplace().Emplace<Monster2>()->Monster2Init(this, { 200, -50 }, 23).SetAnim(AnimTypes::Idle);
-	monsters.Emplace().Emplace<Monster2>()->Monster2Init(this, { 200, 50 }, 23).SetAnim(AnimTypes::Idle);
-	monsters.Emplace().Emplace<Monster2>()->Monster2Init(this, { 200, 100 }, 23).SetAnim(AnimTypes::Idle);
-	monsters.Emplace().Emplace<Monster2>()->Monster2Init(this, { 200, 150 }, 23).SetAnim(AnimTypes::Idle);
-	monsters.Emplace().Emplace<Monster2>()->Monster2Init(this, { 0, -100 }, 23).SetAnim(AnimTypes::Idle);
-	monsters.Emplace().Emplace<Monster2>()->Monster2Init(this, { 0, 100 }, 23).SetAnim(AnimTypes::Idle);
+	monsters.Emplace().Emplace<Monster1>()->Monster2Init(this, { -200, 0 }, 23).SetAnim(AnimTypes::Idle);
+	monsters.Emplace().Emplace<Monster1>()->Monster2Init(this, { -200, -50 }, 23).SetAnim(AnimTypes::Idle);
+	monsters.Emplace().Emplace<Monster1>()->Monster2Init(this, { -200, 50 }, 23).SetAnim(AnimTypes::Idle);
+	monsters.Emplace().Emplace<Monster1>()->Monster2Init(this, { -200, 100 }, 23).SetAnim(AnimTypes::Idle);
+	monsters.Emplace().Emplace<Monster1>()->Monster2Init(this, { -200, 150 }, 23).SetAnim(AnimTypes::Idle);
+	monsters.Emplace().Emplace<Monster1>()->Monster2Init(this, { 200, 0 }, 23).SetAnim(AnimTypes::Idle);
+	monsters.Emplace().Emplace<Monster1>()->Monster2Init(this, { 200, -50 }, 23).SetAnim(AnimTypes::Idle);
+	monsters.Emplace().Emplace<Monster1>()->Monster2Init(this, { 200, 50 }, 23).SetAnim(AnimTypes::Idle);
+	monsters.Emplace().Emplace<Monster1>()->Monster2Init(this, { 200, 100 }, 23).SetAnim(AnimTypes::Idle);
+	monsters.Emplace().Emplace<Monster1>()->Monster2Init(this, { 200, 150 }, 23).SetAnim(AnimTypes::Idle);
+	monsters.Emplace().Emplace<Monster1>()->Monster2Init(this, { 0, -100 }, 23).SetAnim(AnimTypes::Idle);
+	monsters.Emplace().Emplace<Monster1>()->Monster2Init(this, { 0, 100 }, 23).SetAnim(AnimTypes::Idle);
 #else
 	xx::FromTo<XY> posRange{ -gg.designSize / 2 * 0.8, gg.designSize / 2 * 0.8 };
 	for (size_t i = 0; i < 1000; i++) {
@@ -226,12 +229,12 @@ void Scene_Test4::Init() {
 	}
 	for (size_t i = 0; i < 10000; i++) {
 		XY pos{ gg.rnd.Next(posRange.from.x, posRange.to.x), gg.rnd.Next(posRange.from.y, posRange.to.y) };
-		monsters.Emplace().Emplace<Monster2>()->Monster2Init(this, pos, 23).SetAnim(AnimTypes::Idle);
+		monsters.Emplace().Emplace<Monster1>()->Monster2Init(this, pos, 23).SetAnim(AnimTypes::Idle);
 	}
 #endif
 }
 
-void Scene_Test4::Update() {
+void Scene::Update() {
 	// handle inputs
 	if (gg.keyboard[GLFW_KEY_ESCAPE](0.2f)) {
 		gg.MakeScene<Scene_MainMenu>()->Init();
@@ -248,7 +251,7 @@ void Scene_Test4::Update() {
 	}
 }
 
-void Scene_Test4::FixedUpdate() {
+void Scene::FixedUpdate() {
 	if (timer <= time) {
 		timer += 2.f;
 		std::sort((OrderByYItem**)rocks.buf, (OrderByYItem**)rocks.buf + rocks.len, [](auto& a, auto& b) { return a->y < b->y; });
@@ -259,7 +262,7 @@ void Scene_Test4::FixedUpdate() {
 	for (auto& o : rocks) o->Update();
 }
 
-void Scene_Test4::Draw() {
+void Scene::Draw() {
 	// sort order by y
 	assert(obyis.Empty());
 	for (auto& o : monsters) obyis.Emplace(o->y, o.pointer);
@@ -274,7 +277,9 @@ void Scene_Test4::Draw() {
 	gg.DrawNode(ui);
 }
 
-void Scene_Test4::OnResize(bool modeChanged_) {
+void Scene::OnResize(bool modeChanged_) {
 	ui->Resize(gg.scale * cUIScale);
 	cam.SetBaseScale(gg.scale);
+}
+
 }
