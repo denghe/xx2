@@ -93,7 +93,7 @@ void Game::GLInit() {
 		auto& mc = mcs[0];
 		mc.animFPS = 12;
 		mc.resRadius = 23;
-		mc.moveSpeed = 100 / gg.cFps;
+		mc.moveSpeed = 20 / gg.cFps;
 		mc.attackRange = 50;
 		mc.aps[0] = { 0.5f, 0 };
 		mc.aps[1] = { 0.5f, 0 };
@@ -109,8 +109,8 @@ void Game::GLInit() {
 	{
 		auto& mc = mcs[1];
 		mc.animFPS = 30;
-		mc.resRadius = 50;
-		mc.moveSpeed = 100 / gg.cFps;
+		mc.resRadius = 40;
+		mc.moveSpeed = 10 / gg.cFps;
 		mc.attackRange = 26;
 		mc.aps[0] = { 0.5f, 0 };
 		mc.aps[1] = { 0.5f, 0 };
@@ -126,8 +126,8 @@ void Game::GLInit() {
 	{
 		auto& mc = mcs[2];
 		mc.animFPS = 30;
-		mc.resRadius = 33;
-		mc.moveSpeed = 100 / gg.cFps;
+		mc.resRadius = 50;
+		mc.moveSpeed = 30 / gg.cFps;
 		mc.attackRange = 44;
 		mc.aps[0] = { 0.5f, 1.f - 86.f / 95 };
 		mc.aps[1] = { 0.5f, 1.f - 86.f / 95 };

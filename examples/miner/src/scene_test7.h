@@ -67,7 +67,7 @@ namespace Test7 {
 		xx::List<xx::Shared<Rock>> rocks;
 		xx::List<std::pair<float, OrderByYItem*>> obyis;	// for draw order
 
-		void Init();
+		void Init(int32_t monsterTypeId_);
 		void Update() override;
 		void FixedUpdate();
 		void Draw() override;

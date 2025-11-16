@@ -156,23 +156,23 @@ void Rock::Draw() {
 
 /***************************************************************************************/
 
-void Scene::Init() {
-	cam.Init(gg.scale, 1.f);
+void Scene::Init(int32_t monsterTypeId_) {
+	cam.Init(gg.scale, 2.5f);
 	ui.Emplace()->InitRoot(gg.scale * cUIScale);
 
 	rocks.Emplace().Emplace<Rock>()->Init(this, { 0, 0 }, 23);
-	monsters.Emplace().Emplace<Monster>()->Init(this, 2, { -200, 0 }, 23);
-	monsters.Emplace().Emplace<Monster>()->Init(this, 2, { -200, -50 }, 23);
-	monsters.Emplace().Emplace<Monster>()->Init(this, 2, { -200, 50 }, 23);
-	monsters.Emplace().Emplace<Monster>()->Init(this, 2, { -200, 100 }, 23);
-	monsters.Emplace().Emplace<Monster>()->Init(this, 2, { -200, 150 }, 23);
-	monsters.Emplace().Emplace<Monster>()->Init(this, 2, { 200, 0 }, 23);
-	monsters.Emplace().Emplace<Monster>()->Init(this, 2, { 200, -50 }, 23);
-	monsters.Emplace().Emplace<Monster>()->Init(this, 2, { 200, 50 }, 23);
-	monsters.Emplace().Emplace<Monster>()->Init(this, 2, { 200, 100 }, 23);
-	monsters.Emplace().Emplace<Monster>()->Init(this, 2, { 200, 150 }, 23);
-	monsters.Emplace().Emplace<Monster>()->Init(this, 2, { 0, -100 }, 23);
-	monsters.Emplace().Emplace<Monster>()->Init(this, 2, { 0, 100 }, 23);
+	monsters.Emplace().Emplace<Monster>()->Init(this, monsterTypeId_, { -200, 0 }, 23);
+	monsters.Emplace().Emplace<Monster>()->Init(this, monsterTypeId_, { -200, -50 }, 23);
+	monsters.Emplace().Emplace<Monster>()->Init(this, monsterTypeId_, { -200, 50 }, 23);
+	monsters.Emplace().Emplace<Monster>()->Init(this, monsterTypeId_, { -200, 100 }, 23);
+	monsters.Emplace().Emplace<Monster>()->Init(this, monsterTypeId_, { -200, 150 }, 23);
+	monsters.Emplace().Emplace<Monster>()->Init(this, monsterTypeId_, { 200, 0 }, 23);
+	monsters.Emplace().Emplace<Monster>()->Init(this, monsterTypeId_, { 200, -50 }, 23);
+	monsters.Emplace().Emplace<Monster>()->Init(this, monsterTypeId_, { 200, 50 }, 23);
+	monsters.Emplace().Emplace<Monster>()->Init(this, monsterTypeId_, { 200, 100 }, 23);
+	monsters.Emplace().Emplace<Monster>()->Init(this, monsterTypeId_, { 200, 150 }, 23);
+	monsters.Emplace().Emplace<Monster>()->Init(this, monsterTypeId_, { 10, -100 }, 23);
+	monsters.Emplace().Emplace<Monster>()->Init(this, monsterTypeId_, { -10, 100 }, 23);
 }
 
 void Scene::Update() {
