@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "game.h"
 
-namespace Test5 {
+namespace Test7 {
 
 	enum class AnimTypes {
 		Idle, Move, Atk
@@ -25,34 +25,33 @@ namespace Test5 {
 		void Draw() override;
 	};
 
-	struct Monster0 : OrderByYItem {
+	struct Monster : OrderByYItem {
 		xx::TinyFrame* tfs{};
-		//XY* aps{};
 		xx::FromTo<XY>* cds{};
+		int32_t monsterTypeId{};
 		int32_t tfsLen{};
+		XY ap{};
 		float tfIndex{};
+		float resRadius{};
+		float frameDelay{};
 		float speedScale{};
-		float radius{}, resRadius{}, frameDelay{};
+		float radius{};
 		bool flipX{};
 		XY pos{};
-		Monster0& Monster0Init(Scene* scene_, XY pos_, float resRadius_, float radius_, float frameDelay_, float speedScale_);	// need set anim
-		void SetAnim(AnimTypes t);
-		bool StepAnimOnce();
-		void StepAnimLoop();
-		bool IsHitFrame() const;
-		void Update() override;
-		void Draw() override;
-	};
 
-	struct Monster2 : Monster0 {
 		xx::Weak<Rock> target;
 		XY targetPos{};
 		float stepTime{};
 		float attackRange{}, moveSpeed{};
 		bool hited{};
 		int32_t _1{};
-		Monster2& Monster2Init(Scene* scene_, XY pos_, float radius_);
+
+		Monster& Init(Scene* scene_, int32_t monsterTypeId_, XY pos_, float radius_);
+		void SetAnim(AnimTypes t);
+		bool StepAnimOnce();
+		void StepAnimLoop();
 		bool SearchTarget();
+		bool IsHitFrame() const;
 		void Update() override;
 		void Draw() override;
 	};
@@ -64,7 +63,7 @@ namespace Test5 {
 		float time{}, timePool{}, timeScale{ 1 };
 		float timer{};
 
-		xx::List<xx::Shared<Monster0>> monsters;
+		xx::List<xx::Shared<Monster>> monsters;
 		xx::List<xx::Shared<Rock>> rocks;
 		xx::List<std::pair<float, OrderByYItem*>> obyis;	// for draw order
 

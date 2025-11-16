@@ -4,11 +4,13 @@
 
 namespace Test4 {
 
-Monster0& Monster0::Monster1Init(Scene* scene_, XY pos_, float radius_, float speedScale_) {
+Monster0& Monster0::Monster0Init(Scene* scene_, XY pos_, float resRadius_, float radius_, float frameDelay_, float speedScale_) {
 	scene = scene_;
 	pos = pos_;
 	y = pos.y;
+	resRadius = resRadius_;
 	radius = radius_;
+	frameDelay = frameDelay_;
 	speedScale = speedScale_;
 	return *this;
 }
@@ -38,12 +40,12 @@ void Monster0::SetAnim(AnimTypes t) {
 }
 
 bool Monster0::StepAnimOnce() {
-	tfIndex += (12.f / gg.cFps) * speedScale;
+	tfIndex += frameDelay * speedScale;
 	return tfIndex >= tfsLen;
 }
 
 void Monster0::StepAnimLoop() {
-	tfIndex += (12.f / gg.cFps) * speedScale;
+	tfIndex += frameDelay * speedScale;
 	while (tfIndex >= tfsLen) {
 		tfIndex -= tfsLen;
 	}
@@ -76,9 +78,9 @@ void Monster0::Draw() {
 
 /***************************************************************************************/
 
-Monster1& Monster1::Monster2Init(Scene* scene_, XY pos_, float radius_) {
-	Monster1Init(scene_, pos_, radius_, 1);
-	attackRange = 56.f;
+Monster1& Monster1::Monster1Init(Scene* scene_, XY pos_, float radius_) {
+	Monster0Init(scene_, pos_, 23, radius_, 12.f / gg.cFps, 1);
+	attackRange = 50.f;
 	moveSpeed = 100.f / gg.cFps;
 	return *this;
 }
@@ -147,11 +149,11 @@ bool Monster1::SearchTarget() {
 	if (!target) return false;
 	if (target->pos.x > pos.x) {
 		targetPos = target->pos + xx::GetRndPosDoughnut(gg.rnd, attackRange, attackRange * 0.7f
-			, 175 / 360.f * M_PI * 2, 200 / 360.f * M_PI * 2);
+			, 155 / 360.f * M_PI * 2, 200 / 360.f * M_PI * 2);
 	}
 	else {
 		targetPos = target->pos + xx::GetRndPosDoughnut(gg.rnd, attackRange, attackRange * 0.7f
-			, -20 / 360.f * M_PI * 2, 5 / 360.f * M_PI * 2);
+			, -40 / 360.f * M_PI * 2, 5 / 360.f * M_PI * 2);
 	}
 	return true;
 }
@@ -185,7 +187,7 @@ void Rock::Update() {
 void Rock::Draw() {
 	auto& c = scene->cam;
 	auto& f = gg.tf.rocks_[0][0];
-	gg.Quad().Draw(f, f, c.ToGLPos(pos), { 0.5f, 0.f }, radius / 64.f * c.scale);
+	gg.Quad().Draw(f, f, c.ToGLPos(pos), { 0.5f, 0.1f }, radius / 64.f * c.scale);
 }
 
 
@@ -195,32 +197,32 @@ void Scene::Init() {
 	cam.Init(gg.scale, 1.f);
 	ui.Emplace()->InitRoot(gg.scale * cUIScale);
 
-	monsters.Emplace().Emplace<Monster0>()->Monster1Init(this, {-100, -400}, 46, 1).SetAnim(AnimTypes::Idle);
-	monsters.Emplace().Emplace<Monster0>()->Monster1Init(this, { 0, -400 }, 46, 1).SetAnim(AnimTypes::Move);
-	monsters.Emplace().Emplace<Monster0>()->Monster1Init(this, {100, -400}, 46, 1).SetAnim(AnimTypes::Atk);
+	monsters.Emplace().Emplace<Monster0>()->Monster0Init(this, {-100, -400}, 23, 46, 12.f / gg.cFps, 1).SetAnim(AnimTypes::Idle);
+	monsters.Emplace().Emplace<Monster0>()->Monster0Init(this, { 0, -400 }, 23, 46, 12.f / gg.cFps, 1).SetAnim(AnimTypes::Move);
+	monsters.Emplace().Emplace<Monster0>()->Monster0Init(this, {100, -400}, 23, 46, 12.f / gg.cFps, 1).SetAnim(AnimTypes::Atk);
 
-	monsters.Emplace().Emplace<Monster0>()->Monster1Init(this, {-100, -300}, 46, 2).SetAnim(AnimTypes::Idle);
-	monsters.Emplace().Emplace<Monster0>()->Monster1Init(this, { 0, -300 }, 46, 2).SetAnim(AnimTypes::Move);
-	monsters.Emplace().Emplace<Monster0>()->Monster1Init(this, {100, -300 }, 46, 2).SetAnim(AnimTypes::Atk);
+	monsters.Emplace().Emplace<Monster0>()->Monster0Init(this, {-100, -300}, 23, 46, 12.f / gg.cFps, 2).SetAnim(AnimTypes::Idle);
+	monsters.Emplace().Emplace<Monster0>()->Monster0Init(this, { 0, -300 }, 23, 46, 12.f / gg.cFps, 2).SetAnim(AnimTypes::Move);
+	monsters.Emplace().Emplace<Monster0>()->Monster0Init(this, {100, -300 }, 23, 46, 12.f / gg.cFps, 2).SetAnim(AnimTypes::Atk);
 
-	monsters.Emplace().Emplace<Monster0>()->Monster1Init(this, {-100, -200}, 46, 3).SetAnim(AnimTypes::Idle);
-	monsters.Emplace().Emplace<Monster0>()->Monster1Init(this, { 0, -200 }, 46, 3).SetAnim(AnimTypes::Move);
-	monsters.Emplace().Emplace<Monster0>()->Monster1Init(this, {100, -200}, 46, 3).SetAnim(AnimTypes::Atk);
+	monsters.Emplace().Emplace<Monster0>()->Monster0Init(this, {-100, -200}, 23, 46, 12.f / gg.cFps, 3).SetAnim(AnimTypes::Idle);
+	monsters.Emplace().Emplace<Monster0>()->Monster0Init(this, { 0, -200 }, 23, 46, 12.f / gg.cFps, 3).SetAnim(AnimTypes::Move);
+	monsters.Emplace().Emplace<Monster0>()->Monster0Init(this, {100, -200}, 23, 46, 12.f / gg.cFps, 3).SetAnim(AnimTypes::Atk);
 
-#if 0
+#if 1
 	rocks.Emplace().Emplace<Rock>()->Init(this, { 0, 0 }, 23);
-	monsters.Emplace().Emplace<Monster1>()->Monster2Init(this, { -200, 0 }, 23).SetAnim(AnimTypes::Idle);
-	monsters.Emplace().Emplace<Monster1>()->Monster2Init(this, { -200, -50 }, 23).SetAnim(AnimTypes::Idle);
-	monsters.Emplace().Emplace<Monster1>()->Monster2Init(this, { -200, 50 }, 23).SetAnim(AnimTypes::Idle);
-	monsters.Emplace().Emplace<Monster1>()->Monster2Init(this, { -200, 100 }, 23).SetAnim(AnimTypes::Idle);
-	monsters.Emplace().Emplace<Monster1>()->Monster2Init(this, { -200, 150 }, 23).SetAnim(AnimTypes::Idle);
-	monsters.Emplace().Emplace<Monster1>()->Monster2Init(this, { 200, 0 }, 23).SetAnim(AnimTypes::Idle);
-	monsters.Emplace().Emplace<Monster1>()->Monster2Init(this, { 200, -50 }, 23).SetAnim(AnimTypes::Idle);
-	monsters.Emplace().Emplace<Monster1>()->Monster2Init(this, { 200, 50 }, 23).SetAnim(AnimTypes::Idle);
-	monsters.Emplace().Emplace<Monster1>()->Monster2Init(this, { 200, 100 }, 23).SetAnim(AnimTypes::Idle);
-	monsters.Emplace().Emplace<Monster1>()->Monster2Init(this, { 200, 150 }, 23).SetAnim(AnimTypes::Idle);
-	monsters.Emplace().Emplace<Monster1>()->Monster2Init(this, { 0, -100 }, 23).SetAnim(AnimTypes::Idle);
-	monsters.Emplace().Emplace<Monster1>()->Monster2Init(this, { 0, 100 }, 23).SetAnim(AnimTypes::Idle);
+	monsters.Emplace().Emplace<Monster1>()->Monster1Init(this, { -200, 0 }, 23).SetAnim(AnimTypes::Idle);
+	monsters.Emplace().Emplace<Monster1>()->Monster1Init(this, { -200, -50 }, 23).SetAnim(AnimTypes::Idle);
+	monsters.Emplace().Emplace<Monster1>()->Monster1Init(this, { -200, 50 }, 23).SetAnim(AnimTypes::Idle);
+	monsters.Emplace().Emplace<Monster1>()->Monster1Init(this, { -200, 100 }, 23).SetAnim(AnimTypes::Idle);
+	monsters.Emplace().Emplace<Monster1>()->Monster1Init(this, { -200, 150 }, 23).SetAnim(AnimTypes::Idle);
+	monsters.Emplace().Emplace<Monster1>()->Monster1Init(this, { 200, 0 }, 23).SetAnim(AnimTypes::Idle);
+	monsters.Emplace().Emplace<Monster1>()->Monster1Init(this, { 200, -50 }, 23).SetAnim(AnimTypes::Idle);
+	monsters.Emplace().Emplace<Monster1>()->Monster1Init(this, { 200, 50 }, 23).SetAnim(AnimTypes::Idle);
+	monsters.Emplace().Emplace<Monster1>()->Monster1Init(this, { 200, 100 }, 23).SetAnim(AnimTypes::Idle);
+	monsters.Emplace().Emplace<Monster1>()->Monster1Init(this, { 200, 150 }, 23).SetAnim(AnimTypes::Idle);
+	monsters.Emplace().Emplace<Monster1>()->Monster1Init(this, { 0, -100 }, 23).SetAnim(AnimTypes::Idle);
+	monsters.Emplace().Emplace<Monster1>()->Monster1Init(this, { 0, 100 }, 23).SetAnim(AnimTypes::Idle);
 #else
 	xx::FromTo<XY> posRange{ -gg.designSize / 2 * 0.8, gg.designSize / 2 * 0.8 };
 	for (size_t i = 0; i < 1000; i++) {
@@ -229,7 +231,7 @@ void Scene::Init() {
 	}
 	for (size_t i = 0; i < 10000; i++) {
 		XY pos{ gg.rnd.Next(posRange.from.x, posRange.to.x), gg.rnd.Next(posRange.from.y, posRange.to.y) };
-		monsters.Emplace().Emplace<Monster1>()->Monster2Init(this, pos, 23).SetAnim(AnimTypes::Idle);
+		monsters.Emplace().Emplace<Monster1>()->Monster1Init(this, pos, 23).SetAnim(AnimTypes::Idle);
 	}
 #endif
 }

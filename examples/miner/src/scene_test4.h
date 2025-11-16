@@ -32,10 +32,10 @@ namespace Test4 {
 		int32_t tfsLen{};
 		float tfIndex{};
 		float speedScale{};
-		float radius{};
+		float radius{}, resRadius{}, frameDelay{};
 		bool flipX{};
 		XY pos{};
-		Monster0& Monster1Init(Scene* scene_, XY pos_, float radius_, float speedScale_);	// need set anim
+		Monster0& Monster0Init(Scene* scene_, XY pos_, float resRadius_, float radius_, float frameDelay_, float speedScale_);	// need set anim
 		void SetAnim(AnimTypes t);
 		bool StepAnimOnce();
 		void StepAnimLoop();
@@ -51,7 +51,7 @@ namespace Test4 {
 		float attackRange{}, moveSpeed{};
 		bool hited{};
 		int32_t _1{};
-		Monster1& Monster2Init(Scene* scene_, XY pos_, float radius_);
+		Monster1& Monster1Init(Scene* scene_, XY pos_, float radius_);
 		bool SearchTarget();
 		void Update() override;
 		void Draw() override;

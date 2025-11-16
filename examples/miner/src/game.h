@@ -3,6 +3,14 @@
 using XY = xx::XY;
 using XYi = xx::XYi;
 
+struct MonsterConfig {
+	float animFPS, resRadius, moveSpeed, attackRange;
+	XY aps[3];	// anchor points for idle, move, atk
+	int32_t tfsLens[3]; // aIdleLen, aMoveLen, aAtkLen;
+	xx::TinyFrame* tfss[3];	// aIdle, * aMove, * aAtk;
+	xx::FromTo<XY>* cd;	// for atk. share aAtkLen
+};
+
 struct Game : xx::Game<Game> {
 	static constexpr float cFps{ 120 };
 	static constexpr float cDelta{ 1.f / cFps };
@@ -34,23 +42,21 @@ struct Game : xx::Game<Game> {
 		std::array<xx::TinyFrame, 63> monster2_idle_;
 		std::array<xx::TinyFrame, 90> monster2_move_;
 		std::array<xx::TinyFrame, 56> monster2_atk_;
+
+		std::array<xx::TinyFrame, 30> monster3_idle_;
+		std::array<xx::TinyFrame, 4> monster3_move_;
+		std::array<xx::TinyFrame, 10> monster3_atk_;
 	} tf;
-
-	//struct {
-	//	std::array<XY, 8> monster1_idle_{};
-	//	std::array<XY, 11> monster1_move_{};
-	//	std::array<XY, 6> monster1_atk_{};
-
-	//	std::array<XY, 63> monster2_idle_{};
-	//	std::array<XY, 90> monster2_move_{};
-	//	std::array<XY, 56> monster2_atk_{};
-	//} ap;	// anchor point
 
 	struct {
 		std::array<xx::FromTo<XY>, 6> monster1_atk_{};
 
 		std::array<xx::FromTo<XY>, 56> monster2_atk_{};
+
+		std::array<xx::FromTo<XY>, 10> monster3_atk_{};
 	} cd;	// collision detect( attack )
+
+	std::array<MonsterConfig, 3> mcs;
 
 	struct {
 		xx::Shared<xx::SoundSource> pickaxe, rockbreak, pop;

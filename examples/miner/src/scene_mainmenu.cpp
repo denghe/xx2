@@ -5,6 +5,8 @@
 #include "scene_test3.h"
 #include "scene_test4.h"
 #include "scene_test5.h"
+#include "scene_test6.h"
+#include "scene_test7.h"
 
 void Scene_MainMenu::Init() {
 	MakeUI();
@@ -48,6 +50,12 @@ void Scene_MainMenu::MakeUI() {
 	};
 	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test5(monster2 anim)")).onClicked = [this] {
 		gg.MakeScene<Test5::Scene>()->Init();
+	};
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test7(monster3 anim)")).onClicked = [this] {
+		gg.MakeScene<Test7::Scene>()->Init();
+	};
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test6(monster1/2 anim)")).onClicked = [this] {
+		gg.MakeScene<Test6::Scene>()->Init();
 	};
 
 	L.InitEnd();
