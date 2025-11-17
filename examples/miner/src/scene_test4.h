@@ -28,7 +28,7 @@ namespace Test4 {
 	struct Monster0 : OrderByYItem {
 		xx::TinyFrame* tfs{};
 		//XY* aps{};
-		xx::FromTo<XY>* cds{};
+		char* cds{};
 		int32_t tfsLen{};
 		float tfIndex{};
 		float speedScale{};

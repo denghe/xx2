@@ -41,36 +41,30 @@ void Game::GLInit() {
 			sub[j] = LoadTexture(xx::ToStringFormat("res/rock_{0}_{1}.png", i, j));
 		}
 	}
-	//// monster1
-	for (size_t i = 0; i < tf.monster1_idle_.size(); i++) {
-		tf.monster1_idle_[i] = LoadTexture(xx::ToStringFormat("res/monster1_idle_{0}.png", i + 1));
-	}
-	for (size_t i = 0; i < tf.monster1_move_.size(); i++) {
-		tf.monster1_move_[i] = LoadTexture(xx::ToStringFormat("res/monster1_move_{0}.png", i + 1));
-	}
-	for (size_t i = 0; i < tf.monster1_atk_.size(); i++) {
-		tf.monster1_atk_[i] = LoadTexture(xx::ToStringFormat("res/monster1_atk_{0}.png", i + 1));
-	}
-	//// monster2
-	for (size_t i = 0; i < tf.monster2_idle_.size(); i++) {
-		tf.monster2_idle_[i] = LoadTexture(xx::ToStringFormat("res/monster2_idle_{0}.png", i + 1));
-	}
-	for (size_t i = 0; i < tf.monster2_move_.size(); i++) {
-		tf.monster2_move_[i] = LoadTexture(xx::ToStringFormat("res/monster2_move_{0}.png", i + 1));
-	}
-	for (size_t i = 0; i < tf.monster2_atk_.size(); i++) {
-		tf.monster2_atk_[i] = LoadTexture(xx::ToStringFormat("res/monster2_atk_{0}.png", i + 1));
-	}
-	//// monster3
-	for (size_t i = 0; i < tf.monster3_idle_.size(); i++) {
-		tf.monster3_idle_[i] = LoadTexture(xx::ToStringFormat("res/monster3_idle_{0}.png", i + 1));
-	}
-	for (size_t i = 0; i < tf.monster3_move_.size(); i++) {
-		tf.monster3_move_[i] = LoadTexture(xx::ToStringFormat("res/monster3_move_{0}.png", i + 1));
-	}
-	for (size_t i = 0; i < tf.monster3_atk_.size(); i++) {
-		tf.monster3_atk_[i] = LoadTexture(xx::ToStringFormat("res/monster3_atk_{0}.png", i + 1));
-	}
+
+	// load monster pngs & some config
+	auto LoadMonsterTFs = [this](auto& tfIdle, auto& tfMove, auto& tfAtk, auto const& pathPrefix, int32_t configIndex) {
+		for (size_t i = 0; i < tfIdle.size(); i++) {
+			tfIdle[i] = LoadTexture(xx::ToStringFormat("{0}_idle_{1}.png", pathPrefix, i + 1));
+		}
+		for (size_t i = 0; i < tfMove.size(); i++) {
+			tfMove[i] = LoadTexture(xx::ToStringFormat("{0}_move_{1}.png", pathPrefix, i + 1));
+		}
+		for (size_t i = 0; i < tfAtk.size(); i++) {
+			tfAtk[i] = LoadTexture(xx::ToStringFormat("{0}_atk_{1}.png", pathPrefix, i + 1));
+		}
+		auto& mc = mcs[configIndex];
+		mc.tfss[0] = tfIdle.data();
+		mc.tfsLens[0] = tfIdle.size();
+		mc.tfss[1] = tfMove.data();
+		mc.tfsLens[1] = tfMove.size();
+		mc.tfss[2] = tfAtk.data();
+		mc.tfsLens[2] = tfAtk.size();
+	};
+	LoadMonsterTFs(tf.monster1_idle_, tf.monster1_move_, tf.monster1_atk_, "res/monster1", 0);
+	LoadMonsterTFs(tf.monster2_idle_, tf.monster2_move_, tf.monster2_atk_, "res/monster2", 1);
+	LoadMonsterTFs(tf.monster3_idle_, tf.monster3_move_, tf.monster3_atk_, "res/monster3", 2);
+	LoadMonsterTFs(tf.monster4_idle_, tf.monster4_move_, tf.monster4_atk_, "res/monster4", 3);
 
 	// combine pngs into single texture
 	{
@@ -82,45 +76,32 @@ void Game::GLInit() {
 	}
 
 	// fill collision detect data( left-top:0,0 )
-	cd.monster1_atk_[3] = { {80, 24}, {96, 39} };
-
-	cd.monster2_atk_[13] = { {50, 57}, {67, 73} };
-
-	cd.monster3_atk_[4] = { {157, 49}, {212, 77} };
+	cd.monster1_atk_[3] = 1;
+	cd.monster2_atk_[7] = 1;
+	cd.monster3_atk_[4] = 1;
+	cd.monster4_atk_[3] = 1;
 
 	// fill monster configs
 	{
 		auto& mc = mcs[0];
 		mc.animFPS = 12;
 		mc.resRadius = 23;
-		mc.moveSpeed = 20 / gg.cFps;
+		mc.moveSpeed = 30 / gg.cFps;
 		mc.attackRange = 50;
 		mc.aps[0] = { 0.5f, 0 };
 		mc.aps[1] = { 0.5f, 0 };
 		mc.aps[2] = { 0.5f, 0 };
-		mc.tfss[0] = tf.monster1_idle_.data();
-		mc.tfsLens[0] = tf.monster1_idle_.size();
-		mc.tfss[1] = tf.monster1_move_.data();
-		mc.tfsLens[1] = tf.monster1_move_.size();
-		mc.tfss[2] = tf.monster1_atk_.data();
-		mc.tfsLens[2] = tf.monster1_atk_.size();
 		mc.cd = cd.monster1_atk_.data();
 	}
 	{
 		auto& mc = mcs[1];
 		mc.animFPS = 30;
 		mc.resRadius = 40;
-		mc.moveSpeed = 10 / gg.cFps;
+		mc.moveSpeed = 20 / gg.cFps;
 		mc.attackRange = 26;
 		mc.aps[0] = { 0.5f, 0 };
 		mc.aps[1] = { 0.5f, 0 };
 		mc.aps[2] = { 0.5f, 0 };
-		mc.tfss[0] = tf.monster2_idle_.data();
-		mc.tfsLens[0] = tf.monster2_idle_.size();
-		mc.tfss[1] = tf.monster2_move_.data();
-		mc.tfsLens[1] = tf.monster2_move_.size();
-		mc.tfss[2] = tf.monster2_atk_.data();
-		mc.tfsLens[2] = tf.monster2_atk_.size();
 		mc.cd = cd.monster2_atk_.data();
 	}
 	{
@@ -132,13 +113,18 @@ void Game::GLInit() {
 		mc.aps[0] = { 0.5f, 1.f - 86.f / 95 };
 		mc.aps[1] = { 0.5f, 1.f - 86.f / 95 };
 		mc.aps[2] = { 74.f / 217, 1.f - 90.f / 108 };
-		mc.tfss[0] = tf.monster3_idle_.data();
-		mc.tfsLens[0] = tf.monster3_idle_.size();
-		mc.tfss[1] = tf.monster3_move_.data();
-		mc.tfsLens[1] = tf.monster3_move_.size();
-		mc.tfss[2] = tf.monster3_atk_.data();
-		mc.tfsLens[2] = tf.monster3_atk_.size();
 		mc.cd = cd.monster3_atk_.data();
+	}
+	{
+		auto& mc = mcs[3];
+		mc.animFPS = 8;
+		mc.resRadius = 40;
+		mc.moveSpeed = 50 / gg.cFps;
+		mc.attackRange = 32;
+		mc.aps[0] = { 0.5f, 0.f };
+		mc.aps[1] = { 0.5f, 0.f };
+		mc.aps[2] = { 0.5f, 0.f };
+		mc.cd = cd.monster4_atk_.data();
 	}
 
 	// init first scene

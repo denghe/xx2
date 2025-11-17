@@ -27,7 +27,7 @@ namespace Test6 {
 
 	struct Monster : OrderByYItem {
 		xx::TinyFrame* tfs{};
-		xx::FromTo<XY>* cds{};
+		char* cds{};
 		int32_t monsterTypeId{};
 		int32_t tfsLen{};
 		XY ap{};
@@ -43,7 +43,7 @@ namespace Test6 {
 		XY targetPos{};
 		float stepTime{};
 		float attackRange{}, moveSpeed{};
-		bool hited{};
+		char hited{};
 		int32_t _1{};
 
 		Monster& Init(Scene* scene_, int32_t monsterTypeId_, XY pos_, float radius_);
@@ -51,7 +51,7 @@ namespace Test6 {
 		bool StepAnimOnce();
 		void StepAnimLoop();
 		bool SearchTarget();
-		bool IsHitFrame() const;
+		char GetHitData() const;
 		void Update() override;
 		void Draw() override;
 	};

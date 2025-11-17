@@ -8,7 +8,7 @@ struct MonsterConfig {
 	XY aps[3];	// anchor points for idle, move, atk
 	int32_t tfsLens[3]; // aIdleLen, aMoveLen, aAtkLen;
 	xx::TinyFrame* tfss[3];	// aIdle, * aMove, * aAtk;
-	xx::FromTo<XY>* cd;	// for atk. share aAtkLen
+	char* cd;	// for atk. share aAtkLen
 };
 
 struct Game : xx::Game<Game> {
@@ -39,24 +39,30 @@ struct Game : xx::Game<Game> {
 		std::array<xx::TinyFrame, 11> monster1_move_;
 		std::array<xx::TinyFrame, 6> monster1_atk_;
 
-		std::array<xx::TinyFrame, 63> monster2_idle_;
-		std::array<xx::TinyFrame, 90> monster2_move_;
-		std::array<xx::TinyFrame, 56> monster2_atk_;
+		std::array<xx::TinyFrame, 32> monster2_idle_;
+		std::array<xx::TinyFrame, 45> monster2_move_;
+		std::array<xx::TinyFrame, 28> monster2_atk_;
 
 		std::array<xx::TinyFrame, 30> monster3_idle_;
 		std::array<xx::TinyFrame, 4> monster3_move_;
 		std::array<xx::TinyFrame, 10> monster3_atk_;
+
+		std::array<xx::TinyFrame, 6> monster4_idle_;
+		std::array<xx::TinyFrame, 5> monster4_move_;
+		std::array<xx::TinyFrame, 7> monster4_atk_;
 	} tf;
 
 	struct {
-		std::array<xx::FromTo<XY>, 6> monster1_atk_{};
+		std::array<char, 6> monster1_atk_{};
 
-		std::array<xx::FromTo<XY>, 56> monster2_atk_{};
+		std::array<char, 28> monster2_atk_{};
 
-		std::array<xx::FromTo<XY>, 10> monster3_atk_{};
-	} cd;	// collision detect( attack )
+		std::array<char, 10> monster3_atk_{};
 
-	std::array<MonsterConfig, 3> mcs;
+		std::array<char, 6> monster4_atk_{};
+	} cd;	// collision detect
+
+	std::array<MonsterConfig, 4> mcs;
 
 	struct {
 		xx::Shared<xx::SoundSource> pickaxe, rockbreak, pop;

@@ -47,8 +47,8 @@ void Monster::StepAnimLoop() {
 	}
 }
 
-bool Monster::IsHitFrame() const {
-	return cds[(int32_t)tfIndex].to.x > 0;
+char Monster::GetHitData() const {
+	return cds[(int32_t)tfIndex];
 }
 
 void Monster::Draw() {
@@ -96,14 +96,14 @@ LabMoveLoop:
 	goto LabMoveLoop;
 LabAttack:
 	SetAnim(AnimTypes::Atk);
-	hited = false;
+	hited = 0;
 	while (!StepAnimOnce()) {
 		XX_YIELD(_1);
 		if (!target) goto LabSearch;
-		if (IsHitFrame()) {
+		if (auto r = GetHitData(); r > hited) {
 			// todo: sound? effect?
 			// todo: hit logic
-			hited = true;
+			hited = r;
 		}
 	}
 	goto LabAttack;

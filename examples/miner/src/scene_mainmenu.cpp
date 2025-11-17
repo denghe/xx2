@@ -54,6 +54,9 @@ void Scene_MainMenu::MakeUI() {
 	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test7(monster3)")).onClicked = [this] {
 		gg.MakeScene<Test7::Scene>()->Init(2);
 	};
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test7(monster4)")).onClicked = [this] {
+		gg.MakeScene<Test7::Scene>()->Init(3);
+	};
 	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test6(monster all)")).onClicked = [this] {
 		gg.MakeScene<Test6::Scene>()->Init();
 	};

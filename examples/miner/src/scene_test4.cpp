@@ -52,7 +52,7 @@ void Monster0::StepAnimLoop() {
 }
 
 bool Monster0::IsHitFrame() const {
-	return cds[(int32_t)tfIndex].to.x > 0;
+	return cds[(int32_t)tfIndex] > 0;
 }
 
 void Monster0::Update() {
@@ -67,13 +67,6 @@ void Monster0::Draw() {
 	XY ap{ 0.5f, 0.f };
 	auto s = radius / 23.f;
 	gg.Quad().Draw(f, f, c.ToGLPos(pos), ap, s * c.scale);
-	if (cds && cds[i].to.x > 0) {
-		auto leftTopPos = pos - XY{ f.uvRect.w * s * ap.x, f.uvRect.h * s * (1.f - ap.y)};
-		auto p = leftTopPos + cds[i].from * s;
-		auto siz = cds[i].to - cds[i].from;
-		auto& o = gg.embed.shape_dot;
-		gg.Quad().Draw(o, o, c.ToGLPos(p), { 0,1 }, siz * s * c.scale, 0, 1, {255,255,255,127});
-	}
 }
 
 /***************************************************************************************/
