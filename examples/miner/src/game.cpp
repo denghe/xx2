@@ -33,6 +33,7 @@ void Game::GLInit() {
 	// load pngs
 	tf.circle256 = LoadTexture("res/circle256.png");
 	tf.pickaxe = LoadTexture("res/pickaxe.png");
+	tf.bg1 = LoadTexture("res/bg1.png");
 	for (size_t i = 0; i < tf.explosion_1_.size(); i++) {
 		tf.explosion_1_[i] = LoadTexture(xx::ToStringFormat("res/explosion_1_{0}.png", i + 1));
 	}
@@ -134,6 +135,9 @@ void Game::GLInit() {
 		mc.cd = cd.monster4_atk_.data();
 		mc.ss = ss.monster4_atk;
 	}
+
+	// load file data
+	stbi.bg1a.Fill(LoadFileData("res/bg1a.png"));
 
 	// init first scene
 	scene.Emplace<Scene_MainMenu>()->Init();

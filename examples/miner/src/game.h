@@ -32,6 +32,7 @@ struct Game : xx::Game<Game> {
 	struct {
 		xx::TinyFrame circle256;
 		xx::TinyFrame pickaxe;
+		xx::TinyFrame bg1;
 		std::array<xx::TinyFrame, 8> explosion_1_;
 		std::array<xx::TinyFrame, 7> airplane_;
 		std::array<std::array<xx::TinyFrame, 6>, 9> rocks_;	// rock_?_?
@@ -73,6 +74,10 @@ struct Game : xx::Game<Game> {
 			, monster3_atk
 			, monster4_atk;
 	} ss;
+
+	struct {
+		xx::STBImage bg1a;
+	} stbi;
 
 	// runtime vars
 	xx::Rnd rnd;

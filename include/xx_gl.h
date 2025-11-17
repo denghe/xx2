@@ -108,6 +108,58 @@ namespace xx {
 		}
 	};
 
+	struct STBImage {
+		uint8_t* buf{};
+		int32_t len{};
+		int32_t w{}, h{}, comp{};
+
+		void Fill(uint8_t const* buf_, size_t len_) {
+			if (buf) Clear();
+			buf = (uint8_t*)stbi_load_from_memory((stbi_uc*)buf_, (int)len_, &w, &h, &comp, 0);
+			len = comp * w * h;
+		}
+		void Fill(std::pair<Data, std::string> const& fd) {
+			Fill(fd.first.buf, fd.first.len);
+		}
+		void Clear() {
+			if (buf) {
+				stbi_image_free((stbi_uc*)buf);
+				buf = {};
+			}
+		}
+		XY Size() const {
+			return { w, h };
+		}
+
+		uint8_t& operator[](int32_t idx) const {
+			assert(buf);
+			assert(idx >= 0);
+			assert(len > idx);
+			return ((uint8_t*)buf)[idx];
+		}
+
+		STBImage(uint8_t const* buf, size_t len) {
+			Fill(buf, len);
+		}
+		STBImage() = default;
+		STBImage(STBImage const&) = delete;
+		STBImage& operator=(STBImage const&) = delete;
+		STBImage(STBImage&& o) {
+			operator=(std::move(o));
+		}
+		STBImage& operator=(STBImage&& o) {
+			std::swap(buf, o.buf);
+			std::swap(len, o.len);
+			std::swap(w, o.w);
+			std::swap(h, o.h);
+			std::swap(comp, o.comp);
+			return *this;
+		}
+		~STBImage() {
+			Clear();
+		}
+	};
+
 	/**********************************************************************************************************************************/
 	/**********************************************************************************************************************************/
 
