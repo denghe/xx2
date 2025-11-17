@@ -96,7 +96,7 @@ LabMoveLoop:
 	goto LabMoveLoop;
 LabAttack:
 	SetAnim(AnimTypes::Atk);
-	if (gg.GetActiveVoiceCount() < 32) {
+	if (gg.GetActiveVoiceCount() < 8) {
 		gg.PlayAudio(gg.mcs[monsterTypeId].ss.Lock(), 0.3f);
 	}
 	hited = 0;
