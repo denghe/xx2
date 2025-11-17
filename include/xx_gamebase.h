@@ -365,6 +365,10 @@ namespace xx {
 			return LoadSoundSourceFromData(d.buf, d.len, looping);
 		}
 
+		XX_INLINE unsigned int GetActiveVoiceCount() {
+			return sound.GetActiveVoiceCount();
+		}
+
 		XX_INLINE int PlayAudio(Shared<SoundSource> const& ss_, float volume_ = 1.f, float pan_ = 0.f, float speed_ = 1.f) {
 			if (mute || audioVolume == 0) return 0;
 			return sound.Play(ss_, volume_ * audioVolume, pan_, speed_);

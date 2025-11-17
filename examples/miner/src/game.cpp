@@ -25,6 +25,10 @@ void Game::GLInit() {
 	ss.pickaxe = LoadSoundSource("res/pickaxe.wav");
 	ss.rockbreak = LoadSoundSource("res/rockbreak.ogg");
 	ss.pop = LoadSoundSource("res/pop.wav");
+	ss.monster1_atk = LoadSoundSource("res/monster1_atk.ogg");
+	ss.monster2_atk = LoadSoundSource("res/monster2_atk.ogg");
+	ss.monster3_atk = LoadSoundSource("res/monster3_atk.ogg");
+	ss.monster4_atk = LoadSoundSource("res/monster4_atk.ogg");
 
 	// load pngs
 	tf.circle256 = LoadTexture("res/circle256.png");
@@ -92,6 +96,7 @@ void Game::GLInit() {
 		mc.aps[1] = { 0.5f, 0 };
 		mc.aps[2] = { 0.5f, 0 };
 		mc.cd = cd.monster1_atk_.data();
+		mc.ss = ss.monster1_atk;
 	}
 	{
 		auto& mc = mcs[1];
@@ -103,6 +108,7 @@ void Game::GLInit() {
 		mc.aps[1] = { 0.5f, 0 };
 		mc.aps[2] = { 0.5f, 0 };
 		mc.cd = cd.monster2_atk_.data();
+		mc.ss = ss.monster2_atk;
 	}
 	{
 		auto& mc = mcs[2];
@@ -114,10 +120,11 @@ void Game::GLInit() {
 		mc.aps[1] = { 0.5f, 1.f - 86.f / 95 };
 		mc.aps[2] = { 74.f / 217, 1.f - 90.f / 108 };
 		mc.cd = cd.monster3_atk_.data();
+		mc.ss = ss.monster3_atk;
 	}
 	{
 		auto& mc = mcs[3];
-		mc.animFPS = 8;
+		mc.animFPS = 5;
 		mc.resRadius = 40;
 		mc.moveSpeed = 50 / gg.cFps;
 		mc.attackRange = 32;
@@ -125,6 +132,7 @@ void Game::GLInit() {
 		mc.aps[1] = { 0.5f, 0.f };
 		mc.aps[2] = { 0.5f, 0.f };
 		mc.cd = cd.monster4_atk_.data();
+		mc.ss = ss.monster4_atk;
 	}
 
 	// init first scene

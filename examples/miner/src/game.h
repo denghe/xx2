@@ -9,6 +9,7 @@ struct MonsterConfig {
 	int32_t tfsLens[3]; // aIdleLen, aMoveLen, aAtkLen;
 	xx::TinyFrame* tfss[3];	// aIdle, * aMove, * aAtk;
 	char* cd;	// for atk. share aAtkLen
+	xx::Weak<xx::SoundSource> ss;
 };
 
 struct Game : xx::Game<Game> {
@@ -65,7 +66,12 @@ struct Game : xx::Game<Game> {
 	std::array<MonsterConfig, 4> mcs;
 
 	struct {
-		xx::Shared<xx::SoundSource> pickaxe, rockbreak, pop;
+		xx::Shared<xx::SoundSource>
+			pickaxe, rockbreak, pop
+			, monster1_atk
+			, monster2_atk
+			, monster3_atk
+			, monster4_atk;
 	} ss;
 
 	// runtime vars

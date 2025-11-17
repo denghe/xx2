@@ -20,39 +20,47 @@ namespace Test4 {
 		XY pos{};
 		float radius{};
 		int32_t hp{};
+		float colorplus{};
+		float whiteEndTime{};
+		XY scale{};
+		bool bouncing{};
+		int32_t _2{};
+		void Hit();
+		void BeginWhite();
+		void BeginBounce();
+		void Bounce();	// _2
 		Rock& Init(Scene* scene_, XY pos_, float radius_);
 		void Update() override;
 		void Draw() override;
 	};
 
-	struct Monster0 : OrderByYItem {
+	struct Monster : OrderByYItem {
 		xx::TinyFrame* tfs{};
-		//XY* aps{};
 		char* cds{};
+		int32_t monsterTypeId{};
 		int32_t tfsLen{};
+		XY ap{};
 		float tfIndex{};
+		float resRadius{};
+		float frameDelay{};
 		float speedScale{};
-		float radius{}, resRadius{}, frameDelay{};
+		float radius{};
 		bool flipX{};
 		XY pos{};
-		Monster0& Monster0Init(Scene* scene_, XY pos_, float resRadius_, float radius_, float frameDelay_, float speedScale_);	// need set anim
-		void SetAnim(AnimTypes t);
-		bool StepAnimOnce();
-		void StepAnimLoop();
-		bool IsHitFrame() const;
-		void Update() override;
-		void Draw() override;
-	};
 
-	struct Monster1 : Monster0 {
 		xx::Weak<Rock> target;
 		XY targetPos{};
 		float stepTime{};
 		float attackRange{}, moveSpeed{};
-		bool hited{};
+		char hited{};
 		int32_t _1{};
-		Monster1& Monster1Init(Scene* scene_, XY pos_, float radius_);
+
+		Monster& Init(Scene* scene_, int32_t monsterTypeId_, XY pos_, float radius_);
+		void SetAnim(AnimTypes t);
+		bool StepAnimOnce();
+		void StepAnimLoop();
 		bool SearchTarget();
+		char GetHitData() const;
 		void Update() override;
 		void Draw() override;
 	};
@@ -64,11 +72,11 @@ namespace Test4 {
 		float time{}, timePool{}, timeScale{ 1 };
 		float timer{};
 
-		xx::List<xx::Shared<Monster0>> monsters;
+		xx::List<xx::Shared<Monster>> monsters;
 		xx::List<xx::Shared<Rock>> rocks;
 		xx::List<std::pair<float, OrderByYItem*>> obyis;	// for draw order
 
-		void Init();
+		void Init(int32_t monsterTypeId_);
 		void Update() override;
 		void FixedUpdate();
 		void Draw() override;

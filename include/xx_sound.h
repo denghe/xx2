@@ -13,11 +13,16 @@ namespace xx {
 
 		XX_INLINE void Init() {
 			// small buffer for low latency. default is 0 ( auto: 4096 )
-			soloud.init(SoLoud::Soloud::CLIP_ROUNDOFF, 0, 0, 1024);
+			//soloud.init(SoLoud::Soloud::CLIP_ROUNDOFF, 0, 0, 1024);
+			soloud.init(0, 0, 0, 1024);
 		}
 
 		XX_INLINE void SetGlobalVolume(float v) {
 			soloud.setGlobalVolume(v);
+		}
+
+		XX_INLINE unsigned int GetActiveVoiceCount() {
+			return soloud.getActiveVoiceCount();
 		}
 
 		XX_INLINE int Play(Shared<SoundSource> const& ss, float volume = 1.f, float pan = 0.f, float speed = 1.f) {
