@@ -138,6 +138,14 @@ namespace xx {
 			return ((uint8_t*)buf)[idx];
 		}
 
+		RGBA8& At(int32_t idx) const {
+			assert(comp == 4);
+			assert(buf);
+			assert(idx >= 0);
+			assert(len > idx * comp);
+			return ((RGBA8*)buf)[idx];
+		}
+
 		STBImage(uint8_t const* buf, size_t len) {
 			Fill(buf, len);
 		}

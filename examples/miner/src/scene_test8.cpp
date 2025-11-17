@@ -27,7 +27,7 @@ void Rock::Draw() {
 /***************************************************************************************/
 
 void Scene::Init() {
-	cam.Init(gg.scale, 1.f, gg.designSize/2);
+	cam.Init(gg.scale, 1.f, gg.designSize / 2);
 	ui.Emplace()->InitRoot(gg.scale * cUIScale);
 
 	// todo: gen rock pos from image
@@ -35,13 +35,12 @@ void Scene::Init() {
 	assert(img.comp == 4);
 	auto siz = img.Size();
 	auto s = 1.f / (gg.designSize / siz);
-	auto cs = (xx::RGBA8*)img.buf;
 
-	float totalScale_{ 1.f };
-	XYi cGridSize{ 80 * totalScale_, 15 * totalScale_ };
+	float density{ 1.2f };
+	XYi cGridSize{ 80 * density, 15 * density };
 	cRockMargin = gg.designSize / cGridSize;
 	cRockMarginOffsetRange = { cRockMargin / 4 };
-	cRocksScale = 0.4f / totalScale_;
+	cRocksScale = 0.4f / density;
 	cRocksMaxCount = cGridSize.x * cGridSize.y;
 	cMouseCircleRadius = 128.f;
 	cRocksPivotOffset = { 0, -cRockRadius * cRocksScale };
@@ -56,11 +55,10 @@ void Scene::Init() {
 		for (int x = 0; x < cGridSize.x; ++x) {
 			auto& basePos = basePoss[x & 1];
 			XY pos{ basePos.x + cRockMargin.x * x, basePos.y + cRockMargin.y * y };
-
-			// todo: check img color
-			auto cidx = int32_t(pos.y * s.y * img.w + pos.x * s.x);
-			auto c = cs[cidx];
-			if (c.a) {
+			auto ipos = (pos * s).As<int32_t>();
+			// filte by img
+			auto cidx = ipos.y * img.w + ipos.x;
+			if (img.At(cidx).a) {
 				rocksFixedPosPool.Emplace(pos);
 			}
 		}
@@ -68,7 +66,12 @@ void Scene::Init() {
 	assert(rocksFixedPosPool.len <= cRocksMaxCount);
 
 	for (auto& o : rocksFixedPosPool) {
-		rocks.Emplace().Emplace()->Init(this, o, 32.f);
+		XY posOffset{
+			gg.rnd.Next<float>(-cRockMarginOffsetRange.x, cRockMarginOffsetRange.x),
+			gg.rnd.Next<float>(-cRockMarginOffsetRange.y, cRockMarginOffsetRange.y)
+		};
+		auto p = o + posOffset;
+		rocks.Emplace().Emplace()->Init(this, p, cRockRadius * cRocksScale);
 	}
 
 }
