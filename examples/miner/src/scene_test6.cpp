@@ -186,9 +186,9 @@ void Scene::Update() {
 
 	// fixed update
 	auto d = float(std::min((float)gg.delta, gg.cMaxDelta) * timeScale);
-	time += d;
 	timePool += d;
 	while (timePool >= gg.cDelta) {
+		time += gg.cDelta;
 		timePool -= gg.cDelta;
 		FixedUpdate();
 	}

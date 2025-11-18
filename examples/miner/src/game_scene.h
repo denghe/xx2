@@ -2,7 +2,6 @@
 #include "game.h"
 #include "game_sceneitem.h"
 #include "game_rock.h"
-#include "game_flyingrock.h"
 #include "game_monster.h"
 
 struct Scene : xx::SceneBase {

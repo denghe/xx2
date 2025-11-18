@@ -113,13 +113,34 @@ LabAttack:
 bool Monster::SearchTarget() {
 	target.Reset();
 	float minMag2 = std::numeric_limits<float>::max();
-	for (auto& o : scene->rocks) {	// todo: optimize by Grid
-		auto d = o->pos - pos;
-		auto dd = d.x * d.x + d.y * d.y;
-		if (dd < minMag2) {
-			minMag2 = dd;
-			target = o;
+	if (scene->rocks.len < 30) {
+		for (auto& o : scene->rocks) {
+			auto d = o->pos - pos;
+			auto mag2 = d.x * d.x + d.y * d.y;
+			if (mag2 < minMag2) {
+				minMag2 = mag2;
+				target = o;
+			}
 		}
+	}
+	else {
+		static constexpr float cSearchRange{ 200.f };
+		auto& g = scene->rocksGrid;
+		auto cri = g.PosToCRIndex(pos);
+		auto rockRadius = scene->cRockRadius * scene->cRocksScale;
+		g.ForeachByRange(cri.y, cri.x, cSearchRange + rockRadius * 3, gg.sgrdd, [&](xx::Grid2dCircle<Rock*>::Node& node, float distance) {
+			auto o = node.value;
+			if (o->digging) return;
+			auto d = o->pos - pos;
+			auto r = cSearchRange + rockRadius;
+			auto mag2 = d.x * d.x + d.y * d.y;
+			if (mag2 < r * r) {
+				if (mag2 < minMag2) {
+					minMag2 = mag2;
+					target = xx::WeakFromThis(o);
+				}
+			}
+		});
 	}
 	if (!target) return false;
 	if (target->pos.x > pos.x) {

@@ -1,7 +1,6 @@
 ﻿#include "pch.h"
 #include "game_scene.h"
 #include "game_rock.h"
-#include "game_flyingrock.h"
 #include "scene_mainmenu.h"
 
 void Scene::Init(float totalScale_) {
@@ -40,7 +39,7 @@ void Scene::Init(float totalScale_) {
 	}
 	assert(rocksFixedPosPool.len <= cRocksMaxCount);
 
-	GenRocks(rocksFixedPosPool.len * 0.9);
+	GenRocks(rocksFixedPosPool.len * 0.5);
 	SortRocks();
 
 	for (int32_t i = 0; i < 10; ++i) {
@@ -70,6 +69,28 @@ void Scene::MakeUI() {
 		countUIs[i] = xx::WeakFromThis(&o);
 		flyTargets[i] = cam.ToLogicPos((pos + XY{ cLineHeight * 0.5f, -cLineHeight * 0.5f }) * ui->scale);
 	}
+
+	basePos = gg.p1 + cMargin;
+	anchor = gg.a1;
+	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, cLineHeight)("game speed:1x").onClicked = [this]() {
+		timeScale = 1.f;
+	};
+	basePos.x += ui->children.Back()->size.x + cMargin;
+	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, cLineHeight)("10x").onClicked = [this]() {
+		timeScale = 10.f;
+	};
+	basePos.x += ui->children.Back()->size.x + cMargin;
+	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, cLineHeight)("100x").onClicked = [this]() {
+		timeScale = 100.f;
+	};
+	basePos.x += ui->children.Back()->size.x + cMargin;
+	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, cLineHeight)("1000x").onClicked = [this]() {
+		timeScale = 1000.f;
+	};
+	basePos.x += ui->children.Back()->size.x + cMargin;
+	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, cLineHeight)("5000x").onClicked = [this]() {
+		timeScale = 5000.f;
+	};
 }
 
 void Scene::GenRocks(int32_t count_) {
@@ -101,9 +122,9 @@ void Scene::Update() {
 
 	// fixed update
 	auto d = float(std::min((float)gg.delta, gg.cMaxDelta) * timeScale);
-	time += d;
 	timePool += d;
 	while (timePool >= gg.cDelta) {
+		time += gg.cDelta;
 		timePool -= gg.cDelta;
 		FixedUpdate();
 	}
@@ -115,7 +136,6 @@ void Scene::FixedUpdate() {
 	// mouse dig logic
 	auto mp = cam.ToLogicPos(gg.mousePos);
 	if (mp.x >= 0 && mp.y >= 0 && mp.x < rocksGrid.pixelSize.x && mp.y < rocksGrid.pixelSize.y) {
-		auto total = rocks.len;
 		auto cri = rocksGrid.PosToCRIndex(mp);
 		auto rockRadius = 32 * cRocksScale;
 		rocksGrid.ForeachByRange(cri.y, cri.x, cMouseCircleRadius + rockRadius * 3, gg.sgrdd, [&](xx::Grid2dCircle<Rock*>::Node& node, float distance) {
