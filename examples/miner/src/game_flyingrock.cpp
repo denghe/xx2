@@ -7,6 +7,7 @@ void FlyingRock::Init(Rock* rock_) {
 	scene = rock_->scene;
 	pos = rock_->centerPos;
 	typeId = rock_->typeId;
+	qualityId = rock_->qualityId;
 	auto target = rock_->scene->flyTargets[typeId];
 	auto d = target - pos;
 	auto mag2 = d.x * d.x + d.y * d.y;

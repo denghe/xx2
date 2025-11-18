@@ -20,7 +20,6 @@ namespace Test4 {
 		XY pos{};
 		float radius{};
 		int32_t hp{};
-		float colorplus{};
 		float whiteEndTime{};
 		XY scale{};
 		bool bouncing{};

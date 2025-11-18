@@ -42,6 +42,8 @@ void Scene::Init(float totalScale_) {
 
 	GenRocks(rocksFixedPosPool.len * 0.9);
 	SortRocks();
+
+	monsters.Emplace().Emplace<Monster>()->Init(this, 0, cam.original, 23);
 }
 
 void Scene::MakeUI() {
@@ -66,12 +68,13 @@ void Scene::MakeUI() {
 }
 
 void Scene::GenRocks(int32_t count_) {
-	if (rocks.len + count_ > cRocksMaxCount) {
-		count_ = cRocksMaxCount - rocks.len;
+	auto n = borningRocks.len + rocks.len;
+	if (n + count_ > cRocksMaxCount) {
+		count_ = cRocksMaxCount - n;
 	}
 	if (!count_) return;
 	for (int i = 0; i < count_; ++i) {
-		rocks.Emplace().Emplace()->Init(this);
+		borningRocks.Emplace().Emplace()->Init(this);
 	}
 }
 
@@ -104,24 +107,42 @@ void Scene::Update() {
 void Scene::FixedUpdate() {
 	rocksDisposedCountPerFrame = 0;
 
+	// mouse dig logic
 	auto mp = cam.ToLogicPos(gg.mousePos);
 	if (mp.x >= 0 && mp.y >= 0 && mp.x < rocksGrid.pixelSize.x && mp.y < rocksGrid.pixelSize.y) {
 		auto total = rocks.len;
 		auto cri = rocksGrid.PosToCRIndex(mp);
 		auto rockRadius = 32 * cRocksScale;
 		rocksGrid.ForeachByRange(cri.y, cri.x, cMouseCircleRadius + rockRadius * 3, gg.sgrdd, [&](xx::Grid2dCircle<Rock*>::Node& node, float distance) {
-			if (!node.value->ready || node.value->mining) return;
 			auto& o = *node.value;
+			if (o.digging) return;
 			auto d = o.centerPos - mp;
 			auto r = cMouseCircleRadius + rockRadius;
 			if (d.x * d.x + d.y * d.y < r * r) {
 				node.value->BeginDig();
 			}
-			});
+		});
 	}
 
-	for (auto& rock : rocks) {
-		rock->Update();
+	for (auto i = monsters.len - 1; i >= 0; --i) {
+		if (monsters[i]->Update()) {
+			monsters.SwapRemoveAt(i);
+		}
+	}
+	for (auto i = rocks.len - 1; i >= 0; --i) {
+		if (rocks[i]->Update()) {
+			rocks[i]->Dispose();
+		}
+	}
+	for (auto i = borningRocks.len - 1; i >= 0; --i) {
+		if (borningRocks[i]->Update()) {
+			borningRocks.SwapRemoveAt(i);
+		}
+	}
+	for (auto i = breakingRocks.len - 1; i >= 0; --i) {
+		if (breakingRocks[i].Update()) {
+			breakingRocks.SwapRemoveAt(i);
+		}
 	}
 
 	if (rocksDisposedCountPerFrame > 0) {
@@ -136,16 +157,30 @@ void Scene::FixedUpdate() {
 			flyingRocks.SwapRemoveAt(i);
 		}
 	}
+
+	//if (timer <= time) {
+	//	timer += 2.f;
+	//	std::sort((OrderByYItem**)rocks.buf, (OrderByYItem**)rocks.buf + rocks.len, [](auto& a, auto& b) { return a->y < b->y; });
+	//	std::sort((OrderByYItem**)monsters.buf, (OrderByYItem**)monsters.buf + monsters.len, [](auto& a, auto& b) { return a->y < b->y; });
+	//}
 }
 
 void Scene::Draw() {
 	// draw bg
 	gg.Quad().Draw(gg.tf.bg1, gg.tf.bg1, 0, 0.5f, gg.designSize.y / gg.tf.bg1.Size().y * cam.scale, 0, 0.5f);
 
-	// draw rocks
-	for (auto& rock : rocks) {
-		rock->Draw();
-	}
+	// sort order by y
+	assert(sitems.Empty());
+	for (auto& o : borningRocks) sitems.Emplace(o->y, o.pointer);
+	for (auto& o : breakingRocks)
+		sitems.Emplace(o.y, &o);
+	for (auto& o : monsters) sitems.Emplace(o->y, o.pointer);
+	for (auto& o : rocks) sitems.Emplace(o->y, o.pointer);
+	std::sort(sitems.buf, sitems.buf + sitems.len, [](auto& a, auto& b) { return a.first < b.first; });
+
+	// draw by y
+	for (auto& o : sitems) o.second->Draw();
+	sitems.Clear();
 
 	// draw fly rocks
 	for (auto& o : flyingRocks) o.Draw(this);
@@ -173,4 +208,3 @@ void Scene::OnResize(bool modeChanged_) {
 	ui->Resize(gg.scale);
 	cam.SetBaseScale(gg.scale);
 }
-

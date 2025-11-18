@@ -3,6 +3,76 @@
 #include "game_flyingrock.h"
 #include "game_scene.h"
 
+/********************************************************************************************************/
+
+void BorningRock::Init(Scene* scene_) {
+	scene = scene_;
+	typeId = gg.rnd.Next<int32_t>(0, gg.tf.rocks_.size());
+	qualityId = gg.rnd.Next<int32_t>(2);
+	tf = gg.tf.rocks_[typeId][qualityId * 2 + 1];
+
+	auto fpIdx = gg.rnd.Next<int32_t>(scene->rocksFixedPosPool.len);
+	fixedPos = scene->rocksFixedPosPool[fpIdx];
+	scene->rocksFixedPosPool.SwapRemoveAt(fpIdx);
+	XY posOffset{
+		gg.rnd.Next<float>(-scene->cRockMarginOffsetRange.x, scene->cRockMarginOffsetRange.x),
+		gg.rnd.Next<float>(-scene->cRockMarginOffsetRange.y, scene->cRockMarginOffsetRange.y)
+	};
+	pos = fixedPos + posOffset;
+	y = pos.y;
+	centerPos = pos + scene->cRocksPivotOffset;
+	flip = gg.rnd.Next<bool>();
+	scale = 0;
+}
+
+bool BorningRock::Update() {
+	static constexpr float cScaleStep{ 1.f / (gg.cFps * 0.25f) };
+	if (scale.x < 1.f) {
+		scale.x += cScaleStep;
+		scale.y = scale.x;
+		return false;
+	}
+	scale = 1.f;
+	scene->rocks.Emplace().Emplace<Rock>()->Init(this);
+	return true;
+}
+
+void BorningRock::Draw() {
+	XY s{ scene->cRocksScale * scale * scene->cam.scale };
+	if (flip) s.x = -s.x;
+	gg.Quad().Draw(tf, tf, scene->cam.ToGLPos(pos), { 0.5f, 0 }, s);
+}
+
+BorningRock::~BorningRock() {
+	if (fixedPos.IsZeroSimple()) return;
+	scene->rocksFixedPosPool.Emplace(fixedPos);
+}
+
+/********************************************************************************************************/
+
+void BreakingRock::Init(Rock* rock_) {
+	scene = rock_->scene;
+	pos = rock_->centerPos;
+	y = pos.y;
+	scale = scene->cRocksScale * 3.f;
+	breakFrameIndex = 0.f;
+}
+
+bool BreakingRock::Update() {
+	static constexpr auto n = gg.tf.explosion_1_.size();
+	if (breakFrameIndex < n) {
+		breakFrameIndex += (gg.cDelta * n / 0.5f);
+	}
+	return breakFrameIndex >= n;
+}
+
+void BreakingRock::Draw() {
+	auto& f = gg.tf.explosion_1_[breakFrameIndex];
+	gg.Quad().Draw(f, f, scene->cam.ToGLPos(pos), 0.5f, scale * scene->cam.scale);
+}
+
+/********************************************************************************************************/
+
 void Pickaxe::Init(Rock* target_) {
 	pos = target_->centerPos + XY{ Scene::cRockRadius * target_->scene->cRocksScale, 0 };
 	radians = {};
@@ -35,37 +105,36 @@ void Pickaxe::Draw(Scene* scene_) {
 
 /********************************************************************************************************/
 
-void Rock::BeginDig() {
-	assert(!mining);
-	mining = true;
-	pickaxe.Init(this);
+bool Rock::Hit(int32_t dmg_) {
+	hp -= dmg_;
+	if (hp <= cHPMax / 2) {
+		tf = gg.tf.rocks_[typeId][qualityId * 2];
+	}
+	if (hp <= 0) {
+		Break();
+		return true;
+	}
+	else {
+		BeginWhite();
+		BeginBounce();
+		return false;
+	}
 }
 
-void Rock::Init(Scene* scene_) {
-	gg.sound.SetGlobalVolume(0.1);
-	scene = scene_;
-	hp = cHPMax;
-	typeId = gg.rnd.Next<int32_t>(0, gg.tf.rocks_.size());
-	qualityId = gg.rnd.Next<int32_t>(2);
-	tf = gg.tf.rocks_[typeId][qualityId * 2 + 1];
-
-	auto fpIdx = gg.rnd.Next<int32_t>(scene->rocksFixedPosPool.len);
-	fixedPos = scene->rocksFixedPosPool[fpIdx];
-	scene->rocksFixedPosPool.SwapRemoveAt(fpIdx);
-	XY posOffset{
-		gg.rnd.Next<float>(-scene->cRockMarginOffsetRange.x, scene->cRockMarginOffsetRange.x),
-		gg.rnd.Next<float>(-scene->cRockMarginOffsetRange.y, scene->cRockMarginOffsetRange.y)
-	};
-	pos = fixedPos + posOffset;
-	centerPos = pos + scene->cRocksPivotOffset;
-	flip = gg.rnd.Next<bool>();
-	scene->rocksGrid.Add(indexAtGrid, this);
+void Rock::BeginDig() {
+	assert(!digging);
+	digging = true;
+	pickaxe.Init(this);
 }
 
 void Rock::BeginBounce() {
 	bouncing = true;
 	_2 = 0;
 	scale = 1.f;
+}
+
+void Rock::BeginWhite() {
+	whiteEndTime = scene->time + 0.05f;
 }
 
 void Rock::Bounce() {
@@ -88,63 +157,11 @@ void Rock::Bounce() {
 	XX_END(_2);
 }
 
-void Rock::Update() {
-	static constexpr auto esiz = gg.tf.explosion_1_.size();
-	static constexpr float cScaleStep{ 1.f / (gg.cFps * 0.25f) };
-
-	XX_BEGIN(_1);
-	for (scale.x = 0; scale.x < 1.f; scale.x += cScaleStep) {
-		scale.y = scale.x;
-		XX_YIELD(_1);
-	}
-	scale = 1.f;
-	ready = true;
-	while (true) {
-		if (bouncing) {
-			Bounce();
-		}
-		XX_YIELD(_1);
-		if (mining) {
-			if (pickaxe.Update()) {
-				hp -= 25;
-				if (hp <= cHPMax / 2) {
-					tf = gg.tf.rocks_[typeId][qualityId * 2];
-				}
-				if (hp <= 0) goto LabBreak;
-				else {
-					mining = false;
-					BeginBounce();
-				}
-			}
-		}
-	}
-LabBreak:
-	ready = false;
-	breaking = true;
+void Rock::Break() {
 	scene->flyingRocks.Emplace().Init(this);
+	scene->breakingRocks.Emplace().Init(this);
 	gg.PlayAudio(gg.ss.rockbreak);
-	for (breakFrameIndex = 0.f; breakFrameIndex < esiz; breakFrameIndex += (gg.cDelta * esiz / 0.5f)) {
-		XX_YIELD(_1);
-	}
 	++scene->rocksDisposedCountPerFrame;
-	Dispose();
-	return;
-	XX_END(_1);
-}
-
-void Rock::Draw() {
-	XY s{ scene->cRocksScale * scale * scene->cam.scale };
-	if (breaking) {
-		auto& f = gg.tf.explosion_1_[breakFrameIndex];
-		gg.Quad().Draw(f, f, scene->cam.ToGLPos(centerPos), 0.5f, s * 3.f);
-	}
-	else {
-		if (flip) s.x = -s.x;
-		gg.Quad().Draw(tf, tf, scene->cam.ToGLPos(pos), { 0.5f, 0 }, s);
-		if (mining) {
-			pickaxe.Draw(scene);
-		}
-	}
 }
 
 void Rock::Dispose() {
@@ -155,9 +172,48 @@ void Rock::Dispose() {
 	scene->rocks.SwapRemoveAt(ial);
 }
 
+void Rock::Init(BorningRock* src_) {
+	// move data
+	*(BorningRock*)this = *src_;
+	src_->fixedPos = {};
+	hp = 100;
+	scene->rocksGrid.Add(indexAtGrid, this);
+	indexAtList = scene->rocks.len - 1;
+}
+
+bool Rock::Update() {
+	XX_BEGIN(_1);
+	while (true) {
+		if (bouncing) {
+			Bounce();
+		}
+		XX_YIELD_F(_1);
+		if (digging) {
+			if (pickaxe.Update()) {
+				if (Hit(25)) return true;
+				digging = false;
+				BeginWhite();
+				BeginBounce();
+			}
+		}
+	}
+	XX_END(_1);
+	return false;
+}
+
+void Rock::Draw() {
+	XY s{ scene->cRocksScale * scale * scene->cam.scale };
+	float cp;
+	if (whiteEndTime > scene->time) cp = 100000.f;
+	else cp = 1.f;
+	if (flip) s.x = -s.x;
+	gg.Quad().Draw(tf, tf, scene->cam.ToGLPos(pos), { 0.5f, 0 }, s, 0, cp);
+	if (digging) {
+		pickaxe.Draw(scene);
+	}
+}
+
 Rock::~Rock() {
 	assert(indexAtGrid > -1);
 	scene->rocksGrid.Remove(indexAtGrid, this);
-	scene->rocksFixedPosPool.Emplace(fixedPos);
 }
-

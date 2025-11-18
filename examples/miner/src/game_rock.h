@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "game.h"
+#include "game_sceneitem.h"
 
 struct Scene;
 struct Rock;
@@ -13,30 +14,45 @@ struct Pickaxe {
 	void Draw(Scene* scene_);
 };
 
-struct Rock {
-	Scene* scene{};
+struct BorningRock : SceneItem {
 	xx::TinyFrame tf;
 	XY pos{}, centerPos{}, fixedPos{};
 	int32_t indexAtGrid{ -1 };
-	int32_t indexAtList{ -1 };	// fill by maker
 	XY scale{};
 	int32_t typeId{ -1 }, qualityId{ -1 };
+	bool flip{};
+	void Init(Scene* scene_);
+	bool Update() override;
+	void Draw() override;
+	~BorningRock();
+};
+
+struct Rock : BorningRock {
 	static constexpr float cHPMax{ 100 };
+	int32_t indexAtList{ -1 };
 	int32_t hp{};
 	int32_t _1{}, _2{};
-	float breakFrameIndex{};
-	bool flip{};
-	bool ready{};	// true: can dig
-	bool mining{};
+	float whiteEndTime{};
+	bool digging{};
 	bool bouncing{};
-	bool breaking{};
-	Pickaxe pickaxe;	// mining coroutine
+	Pickaxe pickaxe;	// digging coroutine
+	bool Hit(int32_t dmg_);	// return true: no hp
+	void BeginWhite();
 	void BeginDig();
 	void BeginBounce();
 	void Bounce();	// coroutine _2
-	void Init(Scene* scene_);
-	void Update();	// coroutine _1
-	void Draw();
-	void Dispose();
+	void Break();
+	void Dispose();	// unsafe: Release this
+	void Init(BorningRock* src_);
+	bool Update() override;	// coroutine _1
+	void Draw() override;
 	~Rock();
+};
+
+struct BreakingRock : SceneItem {
+	XY pos{};
+	float breakFrameIndex{}, scale{};
+	void Init(Rock* rock_);
+	bool Update() override;
+	void Draw() override;
 };

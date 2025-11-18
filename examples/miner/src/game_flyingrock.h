@@ -10,7 +10,7 @@ struct FlyingRock {
 	Scene* scene{};
 	XY pos{}, inc{};
 	float scale{}, scaleStep{}, moveCount{}, moveIndex{};
-	int32_t typeId{};
+	int32_t typeId{ -1 }, qualityId{ -1 };
 	int32_t _1{};
 	void Init(Rock* rock_);
 	bool Update();	// coroutine _1

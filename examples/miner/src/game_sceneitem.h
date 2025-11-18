@@ -5,7 +5,7 @@ struct Scene;
 struct SceneItem {
 	Scene* scene{};
 	float y{};
-	virtual void Update() {}
+	virtual bool Update() { return false; }	// return true mean release
 	virtual void Draw() {}
 	~SceneItem() {}
 };

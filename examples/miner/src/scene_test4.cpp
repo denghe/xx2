@@ -96,7 +96,7 @@ namespace Test4 {
 	LabAttack:
 		SetAnim(AnimTypes::Atk);
 		if (gg.GetActiveVoiceCount() < 32) {
-			gg.PlayAudio(gg.mcs[monsterTypeId].ss.Lock(), 0.3f);
+			gg.PlayAudio(gg.mcs[monsterTypeId].ss.Lock());
 		}
 		hited = 0;
 		while (!StepAnimOnce()) {
@@ -179,18 +179,10 @@ namespace Test4 {
 		y = pos.y;
 		radius = radius_;
 		scale = 1.f;
-		colorplus = 1.f;
 		return *this;
 	}
 
 	void Rock::Update() {
-		// color white effect
-		if (whiteEndTime > scene->time) {
-			colorplus = 100000.f;
-		}
-		else {
-			colorplus = 1.f;
-		}
 		// hit bounce effect
 		if (bouncing) {
 			Bounce();
@@ -200,7 +192,10 @@ namespace Test4 {
 	void Rock::Draw() {
 		auto& c = scene->cam;
 		auto& f = gg.tf.rocks_[0][0];
-		gg.Quad().Draw(f, f, c.ToGLPos(pos), { 0.5f, 0.1f }, radius / 64.f * scale * c.scale, 0, colorplus);
+		float cp;
+		if (whiteEndTime > scene->time) cp = 100000.f;
+		else cp = 1.f;
+		gg.Quad().Draw(f, f, c.ToGLPos(pos), { 0.5f, 0.1f }, radius / 64.f * scale * c.scale, 0, cp);
 	}
 
 

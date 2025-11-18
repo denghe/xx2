@@ -3,6 +3,7 @@
 #include "game_sceneitem.h"
 #include "game_rock.h"
 #include "game_flyingrock.h"
+#include "game_monster.h"
 
 struct Scene : xx::SceneBase {
 	xx::Shared<xx::Node> ui;
@@ -29,6 +30,9 @@ struct Scene : xx::SceneBase {
 	std::array<int32_t, 9> counts{};
 	std::array<xx::Weak<xx::ImageLabelButton>, 9> countUIs;
 	xx::List<FlyingRock> flyingRocks;
+	xx::List<xx::Shared<Monster>> monsters;
+	xx::List<xx::Shared<BorningRock>> borningRocks;	// life cycle: must below rocks
+	xx::List<BreakingRock> breakingRocks;	// effect
 	xx::List<std::pair<float, SceneItem*>> sitems;	// for draw order
 
 	void GenRocks(int32_t count_);

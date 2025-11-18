@@ -43,7 +43,6 @@ namespace Test2 {
 	}
 
 	void Rock::Init(Scene* scene_) {
-		gg.sound.SetGlobalVolume(0.1);
 		scene = scene_;
 		hp = cHPMax;
 		typeId = gg.rnd.Next<int32_t>(0, gg.tf.rocks_.size());
