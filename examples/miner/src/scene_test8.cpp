@@ -30,11 +30,10 @@ void Scene::Init() {
 	cam.Init(gg.scale, 1.f, gg.designSize / 2);
 	ui.Emplace()->InitRoot(gg.scale * cUIScale);
 
-	// todo: gen rock pos from image
+	// gen rock pos using image filter
 	auto& img = gg.stbi.bg1a;
 	assert(img.comp == 4);
-	auto siz = img.Size();
-	auto s = 1.f / (gg.designSize / siz);
+	auto s = 1.f / (gg.designSize / img.Size());
 
 	float density{ 1.2f };
 	XYi cGridSize{ 80 * density, 15 * density };

@@ -37,7 +37,6 @@ namespace Test8 {
 		XY cRocksPivotOffset{};
 		int32_t rocksDisposedCountPerFrame{};
 
-
 		xx::List<XY> rocksFixedPosPool;			// life cycle: must upon rocks
 		xx::List<xx::Shared<Rock>> rocks;
 		xx::List<std::pair<float, OrderByYItem*>> obyis;	// for draw order

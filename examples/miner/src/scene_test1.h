@@ -1,46 +1,50 @@
 ﻿#pragma once
 #include "game.h"
 
-struct Rock1 {
-	xx::TinyFrame tf;
-	XY pos{}, fixedPos{};
-};
+namespace Test1 {
 
-struct Scene_Test1 : xx::SceneBase {
-	static constexpr float cUIScale{ 0.5f };
-	xx::Shared<xx::Node> ui;
-	xx::Camera cam;
-	float time{}, timePool{}, timeScale{ 1 };
+	struct Rock {
+		xx::TinyFrame tf;
+		XY pos{}, fixedPos{};
+	};
 
-	static constexpr xx::FromTo<XYi> cGridSizeRange{ {0, 0}, { 160 * 5, 30 * 5 } };
-	XYi cGridSize{ 16 * 5, 3 * 5 };
-	xx::Shared<xx::Slider> uiGridSizeY;
-	xx::Shared<xx::Slider> uiGridSizeX;
+	struct Scene : xx::SceneBase {
+		static constexpr float cUIScale{ 0.5f };
+		xx::Shared<xx::Node> ui;
+		xx::Camera cam;
+		float time{}, timePool{}, timeScale{ 1 };
 
-	static constexpr xx::FromTo<float> cRocksScaleRange{ 0, 1 };
-	float cRocksScale{ 0.4f };
-	xx::Shared<xx::Slider> uiRocksScale;
+		static constexpr xx::FromTo<XYi> cGridSizeRange{ {0, 0}, { 160 * 5, 30 * 5 } };
+		XYi cGridSize{ 16 * 5, 3 * 5 };
+		xx::Shared<xx::Slider> uiGridSizeY;
+		xx::Shared<xx::Slider> uiGridSizeX;
 
-	xx::FromTo<int32_t> cRocksCountRange{ 0, cGridSize.x * cGridSize.y };
-	int32_t cRocksCount{ 1200 };
-	xx::Shared<xx::Slider> uiRocksCount;
+		static constexpr xx::FromTo<float> cRocksScaleRange{ 0, 1 };
+		float cRocksScale{ 0.4f };
+		xx::Shared<xx::Slider> uiRocksScale;
 
-	// todo: random offset range set
-	bool cEnableRandomOffset{};
-	xx::Shared<xx::CheckBox> uiEnableRandomOffset;
+		xx::FromTo<int32_t> cRocksCountRange{ 0, cGridSize.x * cGridSize.y };
+		int32_t cRocksCount{ 1200 };
+		xx::Shared<xx::Slider> uiRocksCount;
 
-	xx::List<XY> rocksFixedPosPool;			// life cycle: must upon rocks
-	xx::List<xx::Shared<Rock1>> rocks;
+		// todo: random offset range set
+		bool cEnableRandomOffset{};
+		xx::Shared<xx::CheckBox> uiEnableRandomOffset;
 
-	void GenRocksFixedPosPool();
-	void GenRocks();
-	void SetRandomOffset();
-	void GenAll();
+		xx::List<XY> rocksFixedPosPool;			// life cycle: must upon rocks
+		xx::List<xx::Shared<Rock>> rocks;
 
-	void MakeUI();
-	void Init();
-	void Update() override;
-	void FixedUpdate();
-	void Draw() override;
-	void OnResize(bool modeChanged_) override;
-};
+		void GenRocksFixedPosPool();
+		void GenRocks();
+		void SetRandomOffset();
+		void GenAll();
+
+		void MakeUI();
+		void Init();
+		void Update() override;
+		void FixedUpdate();
+		void Draw() override;
+		void OnResize(bool modeChanged_) override;
+	};
+
+}
