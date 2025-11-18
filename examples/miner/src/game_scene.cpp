@@ -43,7 +43,12 @@ void Scene::Init(float totalScale_) {
 	GenRocks(rocksFixedPosPool.len * 0.9);
 	SortRocks();
 
-	monsters.Emplace().Emplace<Monster>()->Init(this, 0, cam.original, 23);
+	for (int32_t i = 0; i < 10; ++i) {
+		for (int32_t j = 0; j < gg.mcs.size(); ++j) {
+			auto posOffset = xx::GetRndPosDoughnut(gg.rnd, cRockRadius * 5, 0);
+			monsters.Emplace().Emplace<Monster>()->Init(this, j, cam.original + posOffset, 23);
+		}
+	}
 }
 
 void Scene::MakeUI() {

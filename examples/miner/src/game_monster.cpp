@@ -95,15 +95,17 @@ LabAttack:
 	hited = 0;
 	while (!StepAnimOnce()) {
 		XX_YIELD_F(_1);
-		if (!target) goto LabSearch;
-		if (auto r = GetHitData(); r > hited) {
-			if (target->Hit(25)) {
-				target->Dispose();
+		if (target) {
+			if (auto r = GetHitData(); r > hited) {
+				if (target->Hit(25)) {
+					target->Dispose();
+				}
+				hited = r;
 			}
-			hited = r;
 		}
 	}
-	goto LabAttack;
+	if (target) goto LabAttack;
+	else goto LabSearch;
 	XX_END(_1);
 	return false;
 }
