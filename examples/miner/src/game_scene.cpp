@@ -41,13 +41,7 @@ void Scene::Init(float totalScale_) {
 
 	GenRocks(rocksFixedPosPool.len * 0.5);
 	SortRocks();
-
-	for (int32_t i = 0; i < 10; ++i) {
-		for (int32_t j = 0; j < gg.mcs.size(); ++j) {
-			auto posOffset = xx::GetRndPosDoughnut(gg.rnd, cRockRadius * 5, 0);
-			monsters.Emplace().Emplace<Monster>()->Init(this, j, cam.original + posOffset, 23);
-		}
-	}
+	GenMonsters(10);
 }
 
 void Scene::MakeUI() {
@@ -84,13 +78,35 @@ void Scene::MakeUI() {
 		timeScale = 100.f;
 	};
 	basePos.x += ui->children.Back()->size.x + cMargin;
-	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, cLineHeight)("1000x").onClicked = [this]() {
+	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, cLineHeight)("1K").onClicked = [this]() {
 		timeScale = 1000.f;
 	};
 	basePos.x += ui->children.Back()->size.x + cMargin;
-	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, cLineHeight)("5000x").onClicked = [this]() {
-		timeScale = 5000.f;
+	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, cLineHeight)("monster count:40").onClicked = [this]() {
+		GenMonsters(10);
 	};
+	basePos.x += ui->children.Back()->size.x + cMargin;
+	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, cLineHeight)("400").onClicked = [this]() {
+		GenMonsters(100);
+	};
+	basePos.x += ui->children.Back()->size.x + cMargin;
+	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, cLineHeight)("4K").onClicked = [this]() {
+		GenMonsters(1000);
+	};
+	basePos.x += ui->children.Back()->size.x + cMargin;
+	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, cLineHeight)("40K").onClicked = [this]() {
+		GenMonsters(10000);
+	};
+}
+
+void Scene::GenMonsters(int32_t count_) {
+	monsters.Clear();
+	for (int32_t i = 0; i < count_; ++i) {
+		for (int32_t j = 0; j < gg.mcs.size(); ++j) {
+			auto posOffset = xx::GetRndPosDoughnut(gg.rnd, cRockRadius * 5, 0);
+			monsters.Emplace().Emplace<Monster>()->Init(this, j, cam.original + posOffset, 23);
+		}
+	}
 }
 
 void Scene::GenRocks(int32_t count_) {

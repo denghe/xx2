@@ -36,6 +36,7 @@ struct Scene : xx::SceneBase {
 
 	void GenRocks(int32_t count_);
 	void SortRocks();
+	void GenMonsters(int32_t count_);
 
 	virtual void MakeUI();
 	void Init(float totalScale_ = 1);
