@@ -7,7 +7,7 @@
 struct Scene : xx::SceneBase {
 	xx::Shared<xx::Node> ui;
 	xx::Camera cam;
-	float time{}, timePool{}, timeScale{ 1 };
+	float time{}, timePool{}, timeScale{ 1 }, timer{};
 
 	xx::RGBA8 cBGColor{};
 	float cBGColorplus{};
@@ -35,7 +35,6 @@ struct Scene : xx::SceneBase {
 	xx::List<std::pair<float, SceneItem*>> sitems;	// for draw order
 
 	void GenRocks(int32_t count_);
-	void SortRocks();
 	void GenMonsters(int32_t count_);
 
 	virtual void MakeUI();

@@ -10,6 +10,7 @@ namespace xx {
 
 	struct Sound {
 		SoLoud::Soloud soloud;
+		float globalVolume{ 1 };
 
 		XX_INLINE void Init() {
 			// small buffer for low latency. default is 0 ( auto: 4096 )
@@ -17,14 +18,17 @@ namespace xx {
 		}
 
 		XX_INLINE void SetGlobalVolume(float v) {
+			globalVolume = v;
 			soloud.setGlobalVolume(v);
 		}
 
 		XX_INLINE unsigned int GetActiveVoiceCount() {
+			if (globalVolume == 0.f) return 0;
 			return soloud.getActiveVoiceCount();
 		}
 
 		XX_INLINE int Play(Shared<SoundSource> const& ss, float volume = 1.f, float pan = 0.f, float speed = 1.f) {
+			if (globalVolume == 0.f) return -1;
 			int h = soloud.play(ss->wav, volume, pan);
 			if (speed != 1.f) {
 				soloud.setRelativePlaySpeed(h, speed);

@@ -218,10 +218,17 @@ namespace xx {
 
 		// call by other ForeachXxxxxxxx func
 		// .Foreach??????????([](decltype(grid)::Node& o, float range)->void {  all  });
-		// .Foreach??????????([](decltype(grid)::Node& o, float range)->bool {  return false == break  });
+		// .Foreach??????????([](decltype(grid)::Node& o, float range)->bool {  return true mean break  });
 		template <typename F, typename R = std::invoke_result_t<F, Node&, float>>
-		XX_INLINE void ForeachCore(int32_t rowNumber_, int32_t columnNumber_, float range_, F& func) {
-			if (rowNumber_ < 0 || rowNumber_ >= numRows || columnNumber_ < 0 || columnNumber_ >= numCols) return;
+		XX_INLINE decltype(auto) ForeachCore(int32_t rowNumber_, int32_t columnNumber_, float range_, F& func) {
+			if (rowNumber_ < 0 || rowNumber_ >= numRows || columnNumber_ < 0 || columnNumber_ >= numCols) {
+				if constexpr (std::is_void_v<R>) {
+					return;
+				}
+				else {
+					return false;
+				}
+			}
 			auto ni = buckets[rowNumber_ * numCols + columnNumber_];
 			while (ni != -1) {
 				auto& n = nodes[ni];
@@ -230,9 +237,12 @@ namespace xx {
 					func(n, range_);
 				}
 				else {
-					if (func(n, range_)) return;
+					if (func(n, range_)) return true;
 				}
 				ni = nex;
+			}
+			if constexpr (!std::is_void_v<R>) {
+				return false;
 			}
 		}
 
@@ -260,7 +270,12 @@ namespace xx {
 				auto range = rdd.lens[i].radius * scale;
 				for (int32_t j = 0; j < size; ++j) {
 					auto& tmp = rdd.idxs[offsets + j];
-					ForeachCore(rowNumber_ + tmp.y, columnNumber_ + tmp.x, range, func);
+					if constexpr (std::is_void_v<R>) {
+						ForeachCore(rowNumber_ + tmp.y, columnNumber_ + tmp.x, range, func);
+					}
+					else {
+						if (ForeachCore(rowNumber_ + tmp.y, columnNumber_ + tmp.x, range, func)) return;
+					}
 				}
 				if (range > searchRange)
 					return;

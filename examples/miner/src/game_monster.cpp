@@ -124,22 +124,26 @@ bool Monster::SearchTarget() {
 		}
 	}
 	else {
-		static constexpr float cSearchRange{ 200.f };
 		auto& g = scene->rocksGrid;
 		auto cri = g.PosToCRIndex(pos);
+		auto searchRange = scene->cRockRadius * 2;
 		auto rockRadius = scene->cRockRadius * scene->cRocksScale;
-		g.ForeachByRange(cri.y, cri.x, cSearchRange + rockRadius * 3, gg.sgrdd, [&](xx::Grid2dCircle<Rock*>::Node& node, float distance) {
+		auto r = searchRange + rockRadius;
+		auto rr = r * r;
+		int32_t limit{ 5 };
+		g.ForeachByRange(cri.y, cri.x, searchRange + rockRadius * 3, gg.sgrdd, [&](xx::Grid2dCircle<Rock*>::Node& node, float distance)->bool {
 			auto o = node.value;
-			if (o->digging) return;
+			if (o->digging) return false;
 			auto d = o->pos - pos;
-			auto r = cSearchRange + rockRadius;
 			auto mag2 = d.x * d.x + d.y * d.y;
-			if (mag2 < r * r) {
+			if (mag2 < rr) {
 				if (mag2 < minMag2) {
 					minMag2 = mag2;
 					target = xx::WeakFromThis(o);
 				}
+				if (--limit <= 0) return true;
 			}
+			return false;
 		});
 	}
 	if (!target) return false;

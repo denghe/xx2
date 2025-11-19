@@ -146,7 +146,9 @@ void Game::GLInit() {
 // game loop
 void Game::Update() {
 	scene->Update();
-	scene->Draw();
+	if (!minimized) {
+		scene->Draw();
+	}
 	if (oldScene) oldScene.Reset();
 }
 

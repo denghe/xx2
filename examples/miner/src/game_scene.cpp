@@ -4,6 +4,8 @@
 #include "scene_mainmenu.h"
 
 void Scene::Init(float totalScale_) {
+	gg.sound.SetGlobalVolume(0);
+
 	cam.Init(gg.scale, 0.8f, gg.designSize / 2);
 	MakeUI();
 
@@ -40,7 +42,6 @@ void Scene::Init(float totalScale_) {
 	assert(rocksFixedPosPool.len <= cRocksMaxCount);
 
 	GenRocks(rocksFixedPosPool.len * 0.5);
-	SortRocks();
 	GenMonsters(10);
 }
 
@@ -120,15 +121,6 @@ void Scene::GenRocks(int32_t count_) {
 	}
 }
 
-void Scene::SortRocks() {
-	std::sort(rocks.buf, rocks.buf + rocks.len, [](auto& a, auto& b)->bool {
-		return a->pos.y < b->pos.y;
-		});
-	for (int i = 0; i < rocks.len; ++i) {
-		rocks[i]->indexAtList = i;
-	}
-}
-
 void Scene::Update() {
 	// handle inputs
 	if (gg.keyboard[GLFW_KEY_ESCAPE](0.2f)) {
@@ -188,7 +180,6 @@ void Scene::FixedUpdate() {
 
 	if (rocksDisposedCountPerFrame > 0) {
 		GenRocks(rocksDisposedCountPerFrame);
-		SortRocks();
 	}
 
 	for (auto i = flyingRocks.len - 1; i >= 0; --i) {
@@ -200,9 +191,8 @@ void Scene::FixedUpdate() {
 	}
 
 	//if (timer <= time) {
-	//	timer += 2.f;
-	//	std::sort((OrderByYItem**)rocks.buf, (OrderByYItem**)rocks.buf + rocks.len, [](auto& a, auto& b) { return a->y < b->y; });
-	//	std::sort((OrderByYItem**)monsters.buf, (OrderByYItem**)monsters.buf + monsters.len, [](auto& a, auto& b) { return a->y < b->y; });
+	//	timer += 0.1f;
+	//	std::sort((SceneItem**)monsters.buf, (SceneItem**)monsters.buf + monsters.len, [](auto& a, auto& b) { return a->y < b->y; });
 	//}
 }
 
