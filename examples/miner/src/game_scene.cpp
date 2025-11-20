@@ -4,9 +4,9 @@
 #include "scene_mainmenu.h"
 
 void Scene::Init(float totalScale_) {
-	gg.sound.SetGlobalVolume(0);
+	//gg.sound.SetGlobalVolume(0);
 
-	cam.Init(gg.scale, 0.8f, gg.designSize / 2);
+	cam.Init(gg.scale, 1.f, gg.designSize / 2);
 	MakeUI();
 
 	XYi cGridSize{ 80 * totalScale_, 15 * totalScale_ };
@@ -56,14 +56,23 @@ void Scene::MakeUI() {
 	auto anchor = gg.a7;
 
 	ui.Emplace()->InitRoot(gg.scale);
-	for (int i = 0; i < counts.size(); ++i) {
-		auto pos = basePos + XY{ i * gg.designSize.x / counts.size(), 0 };
+	auto MakeCountUI = [&](int32_t i, XY pos) {
 		auto& o = ui->Make<xx::ImageLabelButton>()->Init(2, pos, anchor, fontSize, 0, 0, cfg, cfg)
 			(gg.tf.rocks_[i][4], cLineHeight * 1.5, cLineHeight * 0.5f, false)(xx::ToString(counts[i]));
 		o.At<xx::Scale9>(2).SetAlphaRecursive(0.5f);
 		countUIs[i] = xx::WeakFromThis(&o);
 		flyTargets[i] = cam.ToLogicPos((pos + XY{ cLineHeight * 0.5f, -cLineHeight * 0.5f }) * ui->scale);
-	}
+	};
+	assert(counts.size() == 9);
+	MakeCountUI(0, basePos + XY{ 0 * gg.designSize.x / counts.size(), 0 });
+	MakeCountUI(1, basePos + XY{ 1 * gg.designSize.x / counts.size(), 0 });
+	MakeCountUI(2, basePos + XY{ 2 * gg.designSize.x / counts.size(), 0 });
+	MakeCountUI(3, basePos + XY{ 0 * gg.designSize.x / counts.size(), -cLineHeight - cMargin * 3 });
+	MakeCountUI(4, basePos + XY{ 1 * gg.designSize.x / counts.size(), -cLineHeight - cMargin * 3 });
+	MakeCountUI(5, basePos + XY{ 2 * gg.designSize.x / counts.size(), -cLineHeight - cMargin * 3 });
+	MakeCountUI(6, basePos + XY{ 0 * gg.designSize.x / counts.size(), (-cLineHeight - cMargin * 3) * 2 });
+	MakeCountUI(7, basePos + XY{ 1 * gg.designSize.x / counts.size(), (-cLineHeight - cMargin * 3) * 2 });
+	MakeCountUI(8, basePos + XY{ 2 * gg.designSize.x / counts.size(), (-cLineHeight - cMargin * 3) * 2 });
 
 	basePos = gg.p1 + cMargin;
 	anchor = gg.a1;
