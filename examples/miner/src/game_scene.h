@@ -22,6 +22,7 @@ struct Scene : xx::SceneBase {
 	XY cRocksPivotOffset{};
 	int32_t rocksDisposedCountPerFrame{};
 
+	xx::List<XY> rocksFixedPosPoolBak;		// backup for random monster pos
 	xx::List<XY> rocksFixedPosPool;			// life cycle: must upon rocks
 	xx::Grid2dCircle<Rock*> rocksGrid;		// life cycle: must upon rocks
 	xx::List<xx::Shared<Rock>> rocks;

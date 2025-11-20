@@ -40,6 +40,7 @@ void Scene::Init(float totalScale_) {
 		}
 	}
 	assert(rocksFixedPosPool.len <= cRocksMaxCount);
+	rocksFixedPosPoolBak.AddRange(rocksFixedPosPool);
 
 	GenRocks(rocksFixedPosPool.len * 0.5);
 	GenMonsters(10);
@@ -52,7 +53,7 @@ void Scene::MakeUI() {
 	*cfg = *gg.embed.cfg_s9bN;
 	cfg->paddings = { 10, 20, 10, 20 };
 	auto fontSize = cLineHeight - cfg->paddings.TopBottom();
-	auto basePos = gg.p7 + XY{ cMargin, -cMargin };
+	auto basePos = gg.p7 + XY{ cMargin * 2, -cMargin * 2 };
 	auto anchor = gg.a7;
 
 	ui.Emplace()->InitRoot(gg.scale);
@@ -74,37 +75,40 @@ void Scene::MakeUI() {
 	MakeCountUI(7, basePos + XY{ 1 * gg.designSize.x / counts.size(), (-cLineHeight - cMargin * 3) * 2 });
 	MakeCountUI(8, basePos + XY{ 2 * gg.designSize.x / counts.size(), (-cLineHeight - cMargin * 3) * 2 });
 
-	basePos = gg.p1 + cMargin;
-	anchor = gg.a1;
-	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, cLineHeight)("game speed:1x").onClicked = [this]() {
+	auto cfgH = xx::MakeShared<xx::Scale9Config>();
+	*cfgH = *gg.embed.cfg_s9bH;
+	cfgH->paddings = { 10, 20, 10, 20 };
+	basePos.y = ui->children.Back()->position.y - cLineHeight * 2;
+	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, fontSize, {}, cfg, cfgH)("game speed:1x").onClicked = [this]() {
 		timeScale = 1.f;
 	};
 	basePos.x += ui->children.Back()->size.x + cMargin;
-	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, cLineHeight)("10x").onClicked = [this]() {
+	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, fontSize, {}, cfg, cfgH)("10x").onClicked = [this]() {
 		timeScale = 10.f;
 	};
 	basePos.x += ui->children.Back()->size.x + cMargin;
-	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, cLineHeight)("100x").onClicked = [this]() {
+	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, fontSize, {}, cfg, cfgH)("100x").onClicked = [this]() {
 		timeScale = 100.f;
 	};
 	basePos.x += ui->children.Back()->size.x + cMargin;
-	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, cLineHeight)("1K").onClicked = [this]() {
+	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, fontSize, {}, cfg, cfgH)("1K").onClicked = [this]() {
 		timeScale = 1000.f;
 	};
-	basePos.x += ui->children.Back()->size.x + cMargin;
-	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, cLineHeight)("monster count:40").onClicked = [this]() {
+	basePos.x = gg.p7.x + cMargin * 2;
+	basePos.y -= ui->children.Back()->size.y + cMargin;
+	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, fontSize, {}, cfg, cfgH)("monster count:40").onClicked = [this]() {
 		GenMonsters(10);
 	};
 	basePos.x += ui->children.Back()->size.x + cMargin;
-	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, cLineHeight)("400").onClicked = [this]() {
+	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, fontSize, {}, cfg, cfgH)("400").onClicked = [this]() {
 		GenMonsters(100);
 	};
 	basePos.x += ui->children.Back()->size.x + cMargin;
-	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, cLineHeight)("4K").onClicked = [this]() {
+	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, fontSize, {}, cfg, cfgH)("4K").onClicked = [this]() {
 		GenMonsters(1000);
 	};
 	basePos.x += ui->children.Back()->size.x + cMargin;
-	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, cLineHeight)("40K").onClicked = [this]() {
+	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, fontSize, {}, cfg, cfgH)("40K").onClicked = [this]() {
 		GenMonsters(10000);
 	};
 }
@@ -113,8 +117,10 @@ void Scene::GenMonsters(int32_t count_) {
 	monsters.Clear();
 	for (int32_t i = 0; i < count_; ++i) {
 		for (int32_t j = 0; j < gg.mcs.size(); ++j) {
-			auto posOffset = xx::GetRndPosDoughnut(gg.rnd, cRockRadius * 5, 0);
-			monsters.Emplace().Emplace<Monster>()->Init(this, j, cam.original + posOffset, 23);
+			//auto posOffset = xx::GetRndPosDoughnut(gg.rnd, cRockRadius * 5, 0);
+			//monsters.Emplace().Emplace<Monster>()->Init(this, j, cam.original + posOffset, 23);
+			auto pos = rocksFixedPosPoolBak[gg.rnd.Next(rocksFixedPosPoolBak.len)];
+			monsters.Emplace().Emplace<Monster>()->Init(this, j, pos, 23);
 		}
 	}
 }
