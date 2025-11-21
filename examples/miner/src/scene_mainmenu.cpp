@@ -8,6 +8,7 @@
 #include "scene_test6.h"
 #include "scene_test7.h"
 #include "scene_test8.h"
+#include "scene_test9.h"
 #include "game_scene.h"
 
 void Scene_MainMenu::Init() {
@@ -76,6 +77,9 @@ void Scene_MainMenu::MakeUI() {
 	};
 	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test8(map)")).onClicked = [this] {
 		gg.MakeScene<Test8::Scene>()->Init();
+	};
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test9(minecart)")).onClicked = [this] {
+		gg.MakeScene<Test9::Scene>()->Init();
 	};
 	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("game scene")).onClicked = [this] {
 		gg.MakeScene<Scene>()->Init();

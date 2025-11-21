@@ -40,6 +40,9 @@ void Game::GLInit() {
 	for (size_t i = 0; i < tf.airplane_.size(); i++) {
 		tf.airplane_[i] = LoadTexture(xx::ToStringFormat("res/airplane_{0}.png", i + 1));
 	}
+	for (size_t i = 0; i < tf.minecart_.size(); i++) {
+		tf.minecart_[i] = LoadTexture(xx::ToStringFormat("res/minecart_{0}.png", i + 1));
+	}
 	for (size_t i = 0; i < tf.rocks_.size(); i++) {
 		auto& sub = tf.rocks_[i];
 		for (size_t j = 0; j < sub.size(); j++) {
@@ -138,6 +141,7 @@ void Game::GLInit() {
 
 	// load file data
 	stbi.bg1a.Fill(LoadFileData("res/bg1a.png"));
+	stbi.minecart_3.Fill(LoadFileData("res/minecart_3.png"));
 
 	// init first scene
 	scene.Emplace<Scene_MainMenu>()->Init();
