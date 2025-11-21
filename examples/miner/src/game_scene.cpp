@@ -1,50 +1,20 @@
 ﻿#include "pch.h"
 #include "game_scene.h"
 #include "game_rock.h"
+#include "game_map.h"
 #include "scene_mainmenu.h"
 
 void Scene::Init(float totalScale_) {
 	cam.Init(gg.scale, 1.f, gg.designSize / 2);
 	MakeUI();
-
-	XYi cGridSize{ 80 * totalScale_, 15 * totalScale_ };
-	cRockMargin = gg.designSize / cGridSize;
-	cRockMarginOffsetRange = { cRockMargin / 4 };
-	cRocksScale = 0.4f / totalScale_;
-	cRocksMaxCount = cGridSize.x * cGridSize.y;
-	cMouseCircleRadius = 128.f;
-	cRocksPivotOffset = { 0, -cRockRadius * cRocksScale };
-
-	auto cellSize = (int32_t)std::ceilf(std::max(cRockMargin.x, cRockMargin.y));
-	auto numCRs = gg.designSize.As<int32_t>() / cellSize + 1;
-	rocksGrid.Init(cellSize, numCRs.y, numCRs.x);
-	rocks.Reserve(cRocksMaxCount);
-
-	// pos filter
-	auto& img = gg.stbi.bg1a;
-	assert(img.comp == 4);
-	auto s = 1.f / (gg.designSize / img.Size());
-
-	XY basePoss[]{ { cRockMargin.x * 0.5f, cRockMargin.y * 0.25f }, { cRockMargin.x * 0.5f, cRockMargin.y * 0.75f } };
-	for (int y = 0; y < cGridSize.y; ++y) {
-		for (int x = 0; x < cGridSize.x; ++x) {
-			auto& basePos = basePoss[x & 1];
-			XY pos{ basePos.x + cRockMargin.x * x, basePos.y + cRockMargin.y * y };
-			auto ipos = (pos * s).As<int32_t>();
-			auto cidx = ipos.y * img.w + ipos.x;
-			if (img.At(cidx).a) {
-				rocksFixedPosPool.Emplace(pos);
-			}
-		}
-	}
-	assert(rocksFixedPosPool.len <= cRocksMaxCount);
-	rocksFixedPosPoolBak.AddRange(rocksFixedPosPool);
-
+	map.Emplace<Map>()->Init(this);
 	GenRocks(rocksFixedPosPool.len * 0.5);
 	GenMonsters(10);
 }
 
 void Scene::MakeUI() {
+	// todo: change counts display style
+
 	static constexpr float cLineHeight{ 50 };
 	static constexpr float cMargin{ 10 };
 	auto cfg = xx::MakeShared<xx::Scale9Config>();
@@ -117,7 +87,7 @@ void Scene::GenMonsters(int32_t count_) {
 		for (int32_t j = 0; j < gg.mcs.size(); ++j) {
 			//auto posOffset = xx::GetRndPosDoughnut(gg.rnd, cRockRadius * 5, 0);
 			//monsters.Emplace().Emplace<Monster>()->Init(this, j, cam.original + posOffset, 23);
-			auto pos = rocksFixedPosPoolBak[gg.rnd.Next(rocksFixedPosPoolBak.len)];
+			auto pos = rocksFixedPoss[gg.rnd.Next(rocksFixedPoss.len)];
 			monsters.Emplace().Emplace<Monster>()->Init(this, j, pos, 23);
 		}
 	}
@@ -203,6 +173,8 @@ void Scene::FixedUpdate() {
 		}
 	}
 
+	map->Update();
+
 	//if (timer <= time) {
 	//	timer += 0.1f;
 	//	std::sort((SceneItem**)monsters.buf, (SceneItem**)monsters.buf + monsters.len, [](auto& a, auto& b) { return a->y < b->y; });
@@ -211,7 +183,8 @@ void Scene::FixedUpdate() {
 
 void Scene::Draw() {
 	// draw bg
-	gg.Quad().Draw(gg.tf.bg1, gg.tf.bg1, 0, 0.5f, gg.designSize.y / gg.tf.bg1.Size().y * cam.scale, 0, 0.5f);
+	map->Draw();
+	// todo: grass ?
 
 	// sort order by y
 	assert(sitems.Empty());

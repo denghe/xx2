@@ -3,15 +3,12 @@
 #include "game_sceneitem.h"
 #include "game_rock.h"
 #include "game_monster.h"
+#include "game_map.h"
 
 struct Scene : xx::SceneBase {
 	xx::Shared<xx::Node> ui;
 	xx::Camera cam;
 	float time{}, timePool{}, timeScale{ 1 }, timer{};
-
-	xx::RGBA8 cBGColor{};
-	float cBGColorplus{};
-	float cBGTiling{};
 
 	static constexpr float cRockRadius{ 64 };
 	XY cRockMargin{};
@@ -22,7 +19,7 @@ struct Scene : xx::SceneBase {
 	XY cRocksPivotOffset{};
 	int32_t rocksDisposedCountPerFrame{};
 
-	xx::List<XY> rocksFixedPosPoolBak;		// backup for random monster pos
+	xx::List<XY> rocksFixedPoss;			// for random monster pos
 	xx::List<XY> rocksFixedPosPool;			// life cycle: must upon rocks
 	xx::Grid2dCircle<Rock*> rocksGrid;		// life cycle: must upon rocks
 	xx::List<xx::Shared<Rock>> rocks;
@@ -34,6 +31,7 @@ struct Scene : xx::SceneBase {
 	xx::List<xx::Shared<BorningRock>> borningRocks;	// life cycle: must below rocks
 	xx::List<BreakingRock> breakingRocks;	// effect
 	xx::List<std::pair<float, SceneItem*>> sitems;	// for draw order
+	xx::Shared<Map> map;
 
 	void GenRocks(int32_t count_);
 	void GenMonsters(int32_t count_);
