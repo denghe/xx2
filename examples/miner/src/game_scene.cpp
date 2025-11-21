@@ -4,8 +4,6 @@
 #include "scene_mainmenu.h"
 
 void Scene::Init(float totalScale_) {
-	//gg.sound.SetGlobalVolume(0);
-
 	cam.Init(gg.scale, 1.f, gg.designSize / 2);
 	MakeUI();
 
@@ -253,4 +251,13 @@ void Scene::Draw() {
 void Scene::OnResize(bool modeChanged_) {
 	ui->Resize(gg.scale);
 	cam.SetBaseScale(gg.scale);
+}
+
+void Scene::OnFocus(bool focused_) {
+	if (focused_) {
+		gg.sound.SetGlobalVolume(1);
+	}
+	else {
+		gg.sound.SetGlobalVolume(0);
+	}
 }

@@ -44,4 +44,5 @@ struct Scene : xx::SceneBase {
 	virtual void FixedUpdate();
 	void Draw() override;
 	void OnResize(bool modeChanged_) override;
+	void OnFocus(bool focused_) override;
 };

@@ -90,5 +90,6 @@ struct Game : xx::Game<Game> {
 	void Delay();
 	void Stat();
 	void OnResize(bool modeChanged_);
+	void OnFocus(bool focused_);
 };
 extern Game gg;

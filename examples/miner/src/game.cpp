@@ -165,6 +165,12 @@ void Game::OnResize(bool modeChanged_) {
 	}
 }
 
+void Game::OnFocus(bool focused_) {
+	if (scene) {
+		scene->OnFocus(focused_);
+	}
+}
+
 void Game::Stat() {
 #if 1
 	xx::CoutN("drawFPS = ", drawFPS, " drawCall = "

@@ -94,8 +94,8 @@ namespace xx {
 			embed.shape_dot = { ft, 752, 992, 1, 1 };
 			embed.shape_gear = { ft, 768, 992, 32, 32 };
 			embed.shape_heart = { ft, 802, 997, 29, 24 };
-			embed.icon_flags_.Emplace(ft, 751, 1008, 16, 16);
 			embed.icon_flags_.Emplace(ft, 734, 1008, 16, 16);
+			embed.icon_flags_.Emplace(ft, 751, 1008, 16, 16);
 
 			// init cfgs
 			embed.cfg_s9.Emplace();

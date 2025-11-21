@@ -14,6 +14,7 @@ namespace xx {
 	template<typename T> concept Has_Delay = requires(T t) { { t.Delay() } -> std::same_as<void>; };
 	template<typename T> concept Has_Stat = requires(T t) { { t.Stat() } -> std::same_as<void>; };
 	template<typename T> concept Has_OnResize = requires(T t) { { t.OnResize(bool{}) } -> std::same_as<void>; };
+	template<typename T> concept Has_OnFocus = requires(T t) { { t.OnFocus(bool{}) } -> std::same_as<void>; };
 
 
 	// for game scene logic
@@ -22,6 +23,7 @@ namespace xx {
 		virtual void Update() {};
 		virtual void Draw() {};
 		virtual void OnResize(bool modeChanged_) {};
+		virtual void OnFocus(bool focused_) {};
 	};
 
 
@@ -149,20 +151,24 @@ namespace xx {
 			glfwSetWindowFocusCallback(this->wnd, [](GLFWwindow* wnd, int focused) {
 				auto g = (Game*)glfwGetWindowUserPointer(wnd);
 				g->focused = focused != 0;
+				if constexpr (Has_OnFocus<Derived>) {
+					((Derived*)g)->OnFocus(g->focused);
+				}
 			});
 
-			// window resize
+			// frame buffer resize
 			glfwSetFramebufferSizeCallback(this->wnd, [](GLFWwindow* wnd, int w, int h) {
 				auto g = (Game*)glfwGetWindowUserPointer(wnd);
 				if (w == 0 || h == 0) {
 					g->minimized = true;
-					return;
 				}
-				g->minimized = false;
-				g->windowSize.x = (float)w;
-				g->windowSize.y = (float)h;
-				g->ResizeCalc();
-				g->GLViewport();
+				else {
+					g->minimized = false;
+					g->windowSize.x = (float)w;
+					g->windowSize.y = (float)h;
+					g->ResizeCalc();
+					g->GLViewport();
+				}
 				if constexpr (Has_OnResize<Derived>) {
 					((Derived*)g)->OnResize(false);
 				}
