@@ -2,12 +2,14 @@
 #include "game_scene.h"
 #include "game_rock.h"
 #include "game_map.h"
+#include "game_minecart.h"
 #include "scene_mainmenu.h"
 
 void Scene::Init(float totalScale_) {
 	cam.Init(gg.scale, 1.f, gg.designSize / 2);
 	MakeUI();
 	map.Emplace<Map>()->Init(this);
+	minecart.Emplace()->Init(this, { 50.f, cam.original.y - 100.f });
 	GenRocks(rocksFixedPosPool.len * 0.5);
 	GenMonsters(10);
 }
@@ -169,6 +171,7 @@ void Scene::FixedUpdate() {
 		auto& o = flyingRocks[i];
 		if (o.Update()) {
 			++counts[o.typeId];
+			minecart->Add(o.typeId);
 			flyingRocks.SwapRemoveAt(i);
 		}
 	}
@@ -184,15 +187,15 @@ void Scene::FixedUpdate() {
 void Scene::Draw() {
 	// draw bg
 	map->Draw();
-	// todo: grass ?
 
 	// sort order by y
 	assert(sitems.Empty());
+	// todo: grass ?
 	for (auto& o : borningRocks) sitems.Emplace(o->y, o.pointer);
-	for (auto& o : breakingRocks)
-		sitems.Emplace(o.y, &o);
+	for (auto& o : breakingRocks) sitems.Emplace(o.y, &o);
 	for (auto& o : monsters) sitems.Emplace(o->y, o.pointer);
 	for (auto& o : rocks) sitems.Emplace(o->y, o.pointer);
+	sitems.Emplace(minecart->y, minecart.pointer);
 	std::sort(sitems.buf, sitems.buf + sitems.len, [](auto& a, auto& b) { return a.first < b.first; });
 
 	// draw by y

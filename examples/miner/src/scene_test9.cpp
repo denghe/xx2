@@ -30,11 +30,11 @@ void Scene::Init() {
 	assert(img.comp == 4);
 	auto s = 1.f;// / (gg.designSize / img.Size());
 
-	float density{ 7 };
+	float density{ 8 };
 	XYi cGridSize{ 5 * density, 3 * density };
 	cRocksScale = 0.6f / density;
 	cRockMargin = img.Size() / cGridSize;
-	cRockMarginOffsetRange = { cRockMargin / 3 };
+	cRockMarginOffsetRange = { cRockMargin.x / 6, cRockMargin.y / 10 };
 	cRocksMaxCount = cGridSize.x * cGridSize.y;
 
 	auto cellSize = (int32_t)std::ceilf(std::max(cRockMargin.x, cRockMargin.y));
@@ -102,7 +102,7 @@ void Scene::Draw() {
 
 	gg.Quad().Draw(gg.tf.minecart_[0], gg.tf.minecart_[0], 0, { 0.f, 1.f }, cam.scale, 0, 0.5f);
 	for (auto& o : cartrocks) o->Draw();
-	gg.Quad().Draw(gg.tf.minecart_[0], gg.tf.minecart_[1], 0, { 0.f, 1.f }, cam.scale, 0, 0.5f);
+	gg.Quad().Draw(gg.tf.minecart_[1], gg.tf.minecart_[1], 0, { 0.f, 1.f }, cam.scale, 0, 0.5f, {255,255,255,127});
 
 
 	gg.GLBlendFunc(gg.blendDefault);

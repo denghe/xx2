@@ -51,6 +51,7 @@ void Monster::Draw() {
 	XY s{ radius / resRadius * c.scale };
 	if (flipX) s.x = -s.x;
 	gg.Quad().Draw(f, f, c.ToGLPos(pos), ap, s);
+	// todo: shadow ?
 }
 
 bool Monster::Update() {

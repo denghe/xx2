@@ -4,6 +4,7 @@
 #include "game_rock.h"
 #include "game_monster.h"
 #include "game_map.h"
+#include "game_minecart.h"
 
 struct Scene : xx::SceneBase {
 	xx::Shared<xx::Node> ui;
@@ -32,6 +33,7 @@ struct Scene : xx::SceneBase {
 	xx::List<BreakingRock> breakingRocks;	// effect
 	xx::List<std::pair<float, SceneItem*>> sitems;	// for draw order
 	xx::Shared<Map> map;
+	xx::Shared<MineCart> minecart;
 
 	void GenRocks(int32_t count_);
 	void GenMonsters(int32_t count_);

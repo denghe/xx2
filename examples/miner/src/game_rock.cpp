@@ -224,7 +224,8 @@ void FlyingRock::Init(Rock* rock_) {
 	pos = rock_->centerPos;
 	typeId = rock_->typeId;
 	qualityId = rock_->qualityId;
-	auto target = rock_->scene->flyTargets[typeId];
+	//auto target = rock_->scene->flyTargets[typeId];
+	auto target = scene->minecart->flyTargetPos;
 	auto d = target - pos;
 	auto mag2 = d.x * d.x + d.y * d.y;
 	assert(mag2 > 0);
@@ -235,7 +236,8 @@ void FlyingRock::Init(Rock* rock_) {
 	assert(moveCount > 0);
 	moveIndex = 0;
 	scale = 0;
-	scaleStep = (50 * 1.5f / 128.f - scene->cRocksScale) / moveCount;
+	//scaleStep = (50 * 1.5f / 128.f - scene->cRocksScale) / moveCount;
+	scaleStep = (scene->minecart->cRocksScale - scene->cRocksScale) / moveCount;
 }
 
 bool FlyingRock::Update() {
