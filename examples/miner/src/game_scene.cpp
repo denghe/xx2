@@ -48,7 +48,8 @@ void Scene::MakeUI() {
 	auto cfgH = xx::MakeShared<xx::Scale9Config>();
 	*cfgH = *gg.embed.cfg_s9bH;
 	cfgH->paddings = { 10, 20, 10, 20 };
-	basePos.y = ui->children.Back()->position.y - cLineHeight * 2;
+	basePos = gg.p1 + cMargin;
+	anchor = gg.a1;
 	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, fontSize, {}, cfg, cfgH)("game speed:1x").onClicked = [this]() {
 		timeScale = 1.f;
 	};
@@ -64,8 +65,7 @@ void Scene::MakeUI() {
 	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, fontSize, {}, cfg, cfgH)("1K").onClicked = [this]() {
 		timeScale = 1000.f;
 	};
-	basePos.x = gg.p7.x + cMargin * 2;
-	basePos.y -= ui->children.Back()->size.y + cMargin;
+	basePos.x += ui->children.Back()->size.x + cMargin * 2;
 	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, fontSize, {}, cfg, cfgH)("monster count:40").onClicked = [this]() {
 		GenMonsters(10);
 	};
