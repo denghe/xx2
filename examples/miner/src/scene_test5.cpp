@@ -4,284 +4,240 @@
 
 namespace Test5 {
 
-Monster0& Monster0::Monster0Init(Scene* scene_, XY pos_, float resRadius_, float radius_, float frameDelay_, float speedScale_) {
-	scene = scene_;
-	pos = pos_;
-	y = pos.y;
-	resRadius = resRadius_;
-	radius = radius_;
-	frameDelay = frameDelay_;
-	speedScale = speedScale_;
-	return *this;
-}
-
-void Monster0::SetAnim(AnimTypes t) {
-	switch (t) {
-	case AnimTypes::Idle:
-		tfs = gg.tf.monster2_idle_.data();
-		tfsLen = gg.tf.monster2_idle_.size();
-		//aps = gg.ap.monster2_idle_.data();
-		cds = {};
-		break;
-	case AnimTypes::Move:
-		tfs = gg.tf.monster2_move_.data();
-		tfsLen = gg.tf.monster2_move_.size();
-		//aps = gg.ap.monster2_move_.data();
-		cds = {};
-		break;
-	case AnimTypes::Atk:
-		tfs = gg.tf.monster2_atk_.data();
-		tfsLen = gg.tf.monster2_atk_.size();
-		//aps = gg.ap.monster2_atk_.data();
-		cds = gg.cd.monster2_atk_.data();
-		break;
-	}
-	tfIndex = 0;
-}
-
-bool Monster0::StepAnimOnce() {
-	tfIndex += frameDelay * speedScale;
-	return tfIndex >= tfsLen;
-}
-
-void Monster0::StepAnimLoop() {
-	tfIndex += frameDelay * speedScale;
-	while (tfIndex >= tfsLen) {
-		tfIndex -= tfsLen;
-	}
-}
-
-bool Monster0::IsHitFrame() const {
-	return cds[(int32_t)tfIndex] > 0;
-}
-
-void Monster0::Update() {
-	StepAnimLoop();
-}
-
-void Monster0::Draw() {
-	auto& c = scene->cam;
-	auto i = (int32_t)tfIndex;
-	auto& f = tfs[i];
-	//auto ap = aps[i];
-	XY ap{ 0.5f, 0.f };
-	auto s = radius / resRadius;
-	gg.Quad().Draw(f, f, c.ToGLPos(pos), ap, s * c.scale);
-	//if (cds && cds[i].to.x > 0) {
-	//	auto leftTopPos = pos - XY{ f.uvRect.w * s * ap.x, f.uvRect.h * s * (1.f - ap.y)};
-	//	auto p = leftTopPos + cds[i].from * s;
-	//	auto siz = cds[i].to - cds[i].from;
-	//	auto& o = gg.embed.shape_dot;
-	//	gg.Quad().Draw(o, o, c.ToGLPos(p), { 0,1 }, siz * s * c.scale, 0, 1, {255,255,255,222});
-	//}
-}
-
-/***************************************************************************************/
-
-Monster2& Monster2::Monster2Init(Scene* scene_, XY pos_, float radius_) {
-	Monster0Init(scene_, pos_, 50, radius_, 30.f / gg.cFps, 1);
-	attackRange = 26.f;
-	moveSpeed = 100.f / gg.cFps;
-	return *this;
-}
-
-void Monster2::Update() {
-	XX_BEGIN(_1);
-LabSearch:
-	SetAnim(AnimTypes::Idle);
-LabSearchLoop:
-	// simulate spending time thinking
-	stepTime = (0.2f + gg.rnd.Next<float>(0.3f)) / speedScale + scene->time;
-	while (stepTime > scene->time) {
-		StepAnimLoop();
-		XX_YIELD(_1);
-	}
-	// search
-	if (!SearchTarget()) goto LabSearchLoop;
-LabMove:
-	// move to target pos. step cost 0.5s
-	SetAnim(AnimTypes::Move);
-LabMoveLoop:
-	stepTime = 0.5f / speedScale + scene->time;
-	while (stepTime > scene->time) {
-		flipX = targetPos.x < pos.x;
-		StepAnimLoop();
-		XX_YIELD(_1);
-		if (!target) goto LabSearch;
-		auto d = targetPos - pos;
-		auto mag2 = d.x * d.x + d.y * d.y;
-		auto moveStep = moveSpeed * speedScale;
-		if (mag2 < moveStep) {
-			flipX = target->pos.x < pos.x;
-			goto LabAttack;	// reached
+	void TalentBase::Draw() {
+		if (!visible) return;
+		auto p = scene->cam.ToGLPos(scene->talentBasePos + pos);
+		auto& fg = gg.tf.talent_[(int32_t)type];
+		gg.Quad().Draw(fg, fg, p, 0.5f, scene->talentScale * scene->cam.scale);
+		xx::RGBA8 c;
+		if (level == maxLevel) {
+			c = xx::RGBA8_Blue;
 		}
-		pos += d / std::sqrtf(mag2) * moveStep;	// move
-		y = pos.y;
-	}
-	goto LabMoveLoop;
-LabAttack:
-	SetAnim(AnimTypes::Atk);
-	hited = false;
-	while (!StepAnimOnce()) {
-		XX_YIELD(_1);
-		if (!target) goto LabSearch;
-		if (IsHitFrame()) {
-			// todo: sound? effect?
-			// todo: hit logic
-			hited = true;
+		else if (canLevelUp) {
+			c = xx::RGBA8_Green;
+		}
+		else {
+			c = xx::RGBA8_Red;
+		}
+		auto& bg = gg.tf.circle256;
+		gg.Quad().Draw(bg, bg, p, 0.5f, scene->talentScale * scene->cam.scale, 0.f, 1.f, c);
+		// draw line
+		if (parent) {
+			auto pos2 = parent->pos;
+			auto d = pos2 - pos;
+			auto dist = std::sqrtf(d.x * d.x + d.y * d.y);
+			auto norm = d / dist;
+			auto pos1 = pos + norm * 128.f;
+			pos2 -= norm * 128.f;
+			dist -= 128.f * 2.f;
+			static constexpr int32_t numSteps{ 32 };
+			auto step = norm * dist * (1.f / numSteps);
+			for (int32_t i = 0; i < numSteps; ++i) {
+				auto pp = scene->cam.ToGLPos(scene->talentBasePos + pos1 + step * i);
+				gg.Quad().Draw(bg, bg, pp, 0.5f, scene->talentScale * scene->cam.scale * 0.1f, 0.f, 1.f, c);
+			}
 		}
 	}
-	goto LabAttack;
-	XX_END(_1);
-}
 
-bool Monster2::SearchTarget() {
-	target.Reset();
-	float minMag2 = std::numeric_limits<float>::max();
-	for (auto& o : scene->rocks) {	// todo: optimize by Grid
-		auto d = o->pos - pos;
-		auto dd = d.x * d.x + d.y * d.y;
-		if (dd < minMag2) {
-			minMag2 = dd;
-			target = o;
+	/***************************************************************************************/
+
+	void TalentA::LevelUp() {
+		assert(canLevelUp);
+		assert(level < maxLevel);
+		++level;
+		assert(scene->currencyA >= 1);
+		scene->currencyA -= 1;
+	}
+
+	xx::Shared<xx::Node> TalentA::GetInfo() { 
+		return {}; 
+	}
+
+	void TalentA::Update() {
+		visible = true;
+		if (level == maxLevel) {
+			canLevelUp = false;
+			return;
+		}
+		assert(level < maxLevel);
+		canLevelUp = scene->currencyA >= 1;
+	}
+
+	/***************************************************************************************/
+
+	void TalentB::LevelUp() {
+		assert(canLevelUp);
+		assert(level < maxLevel);
+		++level;
+		assert(scene->currencyB >= 1);
+		scene->currencyB -= 1;
+	}
+
+	xx::Shared<xx::Node> TalentB::GetInfo() { 
+		return {};
+	}
+
+	void TalentB::Update() {
+		if (!parent->level) {
+			visible = false;
+			canLevelUp = false;
+			return;
+		}
+		else {
+			visible = true;
+		}
+		if (level == maxLevel) {
+			canLevelUp = false;
+			return;
+		}
+		assert(level < maxLevel);
+		canLevelUp = scene->currencyB >= 1;
+	}
+
+	/***************************************************************************************/
+
+	void TalentC::LevelUp() {
+		assert(canLevelUp);
+		assert(level < maxLevel);
+		++level;
+		assert(scene->currencyC >= 1);
+		scene->currencyC -= 1;
+	}
+
+	xx::Shared<xx::Node> TalentC::GetInfo() {
+		return {};
+	}
+
+	void TalentC::Update() {
+		if (!parent->level) {
+			visible = false;
+			canLevelUp = false;
+			return;
+		}
+		else {
+			visible = true;
+		}
+		if (level == maxLevel) {
+			canLevelUp = false;
+			return;
+		}
+		assert(level < maxLevel);
+		canLevelUp = scene->currencyC >= 1;
+	}
+
+	/***************************************************************************************/
+
+	void Scene::SetTalentLevel(int32_t id_, int32_t level_) {
+		for (auto& o : talents) {
+			if (o->id == id_) {
+				assert(o->maxLevel >= level_);
+				o->level = level_;
+				return;
+			}
+		}
+		assert(false);
+	}
+
+	void Scene::Init() {
+		cam.Init(gg.scale, 1.f, gg.designSize / 2);
+		ui.Emplace()->InitRoot(gg.scale);
+
+		currencyA = 1;
+		currencyB = 2;
+		currencyC = 2;
+
+		talentScale = 1.f;
+		talentBasePos = gg.designSize / 2;
+		static constexpr float d{ 300 };
+
+		// fill talents
+		{
+			auto& t = talents.Emplace().Emplace<TalentA>();
+			t->type = TalentA::cType;
+			t->id = 0;
+			t->parentId = 0;
+			t->maxLevel = 1;
+			t->pos = 0;
+		}
+		{
+			auto& t = talents.Emplace().Emplace<TalentB>();
+			t->type = TalentB::cType;
+			t->id = 1;
+			t->parentId = 0;
+			t->maxLevel = 2;
+			t->pos = -d;
+		}
+		{
+			auto& t = talents.Emplace().Emplace<TalentC>();
+			t->type = TalentC::cType;
+			t->id = 2;
+			t->parentId = 0;
+			t->maxLevel = 3;
+			t->pos = { d, -d };
+		}
+
+		// fill talent's parent, scene
+		for (auto& t : talents) {
+			t->scene = this;
+			for (auto& o : talents) {
+				if (t.pointer == o.pointer) continue;
+				if (o->parentId == t->id) {
+					o->parent = t.pointer;
+					//t->children.Add(o.pointer);
+				}
+			}
+		}
+
+		// restore player settings
+		//SetTalentLevel(0, 1);
+
+		// fill talent's visible
+		// todo
+	}
+
+	void Scene::Update() {
+		// handle inputs
+		if (gg.keyboard[GLFW_KEY_ESCAPE](0.2f)) {
+			gg.MakeScene<Scene_MainMenu>()->Init();
+			return;
+		}
+		// todo: mouse scroll zoom talentScale. drag, click
+		if (gg.mouse[GLFW_MOUSE_BUTTON_1](0.2f)) {
+			auto mp = (cam.ToLogicPos(gg.mousePos) - talentBasePos) / talentScale;
+			xx::CoutN(mp);
+			for (auto& o : talents) {
+				if (o->canLevelUp) {
+					auto d = o->pos - mp;
+					if (d.x * d.x + d.y * d.y < 128.f * 128.f) {
+						o->LevelUp();
+					}
+				}
+			}
+		}
+
+		// fixed update
+		auto d = float(std::min((float)gg.delta, gg.cMaxDelta) * timeScale);
+		timePool += d;
+		while (timePool >= gg.cDelta) {
+			time += gg.cDelta;
+			timePool -= gg.cDelta;
+			FixedUpdate();
 		}
 	}
-	if (!target) return false;
-	if (target->pos.x > pos.x) {
-		targetPos = target->pos + xx::GetRndPosDoughnut(gg.rnd, attackRange, attackRange * 0.7f
-			, 155 / 360.f * M_PI * 2, 200 / 360.f * M_PI * 2);
-	}
-	else {
-		targetPos = target->pos + xx::GetRndPosDoughnut(gg.rnd, attackRange, attackRange * 0.7f
-			, -40 / 360.f * M_PI * 2, 5 / 360.f * M_PI * 2);
-	}
-	return true;
-}
 
-void Monster2::Draw() {
-	auto& c = scene->cam;
-	auto i = (int32_t)tfIndex;
-	auto& f = tfs[i];
-	//auto ap = aps[i];
-	XY ap{ 0.5f, 0.f };
-	XY s{ radius / resRadius * c.scale };
-	if (flipX) s.x = -s.x;
-	gg.Quad().Draw(f, f, c.ToGLPos(pos), ap, s);
-}
-
-/***************************************************************************************/
-
-Rock& Rock::Init(Scene * scene_, XY pos_, float radius_) {
-	scene = scene_;
-	pos = pos_;
-	y = pos.y;
-	radius = radius_;
-	return *this;
-}
-
-void Rock::Update() {
-	// todo: color white effect
-	// todo: hit bounce effect
-}
-
-void Rock::Draw() {
-	auto& c = scene->cam;
-	auto& f = gg.tf.rocks_[0][0];
-	gg.Quad().Draw(f, f, c.ToGLPos(pos), { 0.5f, 0.1f }, radius / 64.f * c.scale);
-}
-
-
-/***************************************************************************************/
-
-void Scene::Init() {
-	cam.Init(gg.scale, 1.f);
-	ui.Emplace()->InitRoot(gg.scale * cUIScale);
-
-	monsters.Emplace().Emplace<Monster0>()->Monster0Init(this, {-100, -400}, 50, 46, 30.f / gg.cFps, 1).SetAnim(AnimTypes::Idle);
-	monsters.Emplace().Emplace<Monster0>()->Monster0Init(this, { 0, -400 }, 50, 46, 30.f / gg.cFps, 1).SetAnim(AnimTypes::Move);
-	monsters.Emplace().Emplace<Monster0>()->Monster0Init(this, {100, -400}, 50, 46, 30.f / gg.cFps, 1).SetAnim(AnimTypes::Atk);
-
-	monsters.Emplace().Emplace<Monster0>()->Monster0Init(this, {-100, -300}, 50, 46, 30.f / gg.cFps, 2).SetAnim(AnimTypes::Idle);
-	monsters.Emplace().Emplace<Monster0>()->Monster0Init(this, { 0, -300 }, 50, 46, 30.f / gg.cFps, 2).SetAnim(AnimTypes::Move);
-	monsters.Emplace().Emplace<Monster0>()->Monster0Init(this, {100, -300 }, 50, 46, 30.f / gg.cFps, 2).SetAnim(AnimTypes::Atk);
-
-	monsters.Emplace().Emplace<Monster0>()->Monster0Init(this, {-100, -200}, 50, 46, 30.f / gg.cFps, 3).SetAnim(AnimTypes::Idle);
-	monsters.Emplace().Emplace<Monster0>()->Monster0Init(this, { 0, -200 }, 50, 46, 30.f / gg.cFps, 3).SetAnim(AnimTypes::Move);
-	monsters.Emplace().Emplace<Monster0>()->Monster0Init(this, {100, -200}, 50, 46, 30.f / gg.cFps, 3).SetAnim(AnimTypes::Atk);
-
-#if 0
-	rocks.Emplace().Emplace<Rock>()->Init(this, { 0, 0 }, 23);
-	monsters.Emplace().Emplace<Monster2>()->Monster2Init(this, { -200, 0 }, 23).SetAnim(AnimTypes::Idle);
-	monsters.Emplace().Emplace<Monster2>()->Monster2Init(this, { -200, -50 }, 23).SetAnim(AnimTypes::Idle);
-	monsters.Emplace().Emplace<Monster2>()->Monster2Init(this, { -200, 50 }, 23).SetAnim(AnimTypes::Idle);
-	monsters.Emplace().Emplace<Monster2>()->Monster2Init(this, { -200, 100 }, 23).SetAnim(AnimTypes::Idle);
-	monsters.Emplace().Emplace<Monster2>()->Monster2Init(this, { -200, 150 }, 23).SetAnim(AnimTypes::Idle);
-	monsters.Emplace().Emplace<Monster2>()->Monster2Init(this, { 200, 0 }, 23).SetAnim(AnimTypes::Idle);
-	monsters.Emplace().Emplace<Monster2>()->Monster2Init(this, { 200, -50 }, 23).SetAnim(AnimTypes::Idle);
-	monsters.Emplace().Emplace<Monster2>()->Monster2Init(this, { 200, 50 }, 23).SetAnim(AnimTypes::Idle);
-	monsters.Emplace().Emplace<Monster2>()->Monster2Init(this, { 200, 100 }, 23).SetAnim(AnimTypes::Idle);
-	monsters.Emplace().Emplace<Monster2>()->Monster2Init(this, { 200, 150 }, 23).SetAnim(AnimTypes::Idle);
-	monsters.Emplace().Emplace<Monster2>()->Monster2Init(this, { 0, -100 }, 23).SetAnim(AnimTypes::Idle);
-	monsters.Emplace().Emplace<Monster2>()->Monster2Init(this, { 0, 100 }, 23).SetAnim(AnimTypes::Idle);
-#else
-	xx::FromTo<XY> posRange{ -gg.designSize / 2 * 0.8, gg.designSize / 2 * 0.8 };
-	for (size_t i = 0; i < 100; i++) {
-		XY pos{ gg.rnd.Next(posRange.from.x, posRange.to.x), gg.rnd.Next(posRange.from.y, posRange.to.y) };
-		rocks.Emplace().Emplace<Rock>()->Init(this, pos, 23);
-	}
-	for (size_t i = 0; i < 1000; i++) {
-		XY pos{ gg.rnd.Next(posRange.from.x, posRange.to.x), gg.rnd.Next(posRange.from.y, posRange.to.y) };
-		monsters.Emplace().Emplace<Monster2>()->Monster2Init(this, pos, 23).SetAnim(AnimTypes::Idle);
-	}
-#endif
-}
-
-void Scene::Update() {
-	// handle inputs
-	if (gg.keyboard[GLFW_KEY_ESCAPE](0.2f)) {
-		gg.MakeScene<Scene_MainMenu>()->Init();
-		return;
+	void Scene::FixedUpdate() {
+		for (auto& o : talents) o->Update();
 	}
 
-	// fixed update
-	auto d = float(std::min((float)gg.delta, gg.cMaxDelta) * timeScale);
-	timePool += d;
-	while (timePool >= gg.cDelta) {
-		time += gg.cDelta;
-		timePool -= gg.cDelta;
-		FixedUpdate();
-	}
-}
-
-void Scene::FixedUpdate() {
-	if (timer <= time) {
-		timer += 2.f;
-		std::sort((OrderByYItem**)rocks.buf, (OrderByYItem**)rocks.buf + rocks.len, [](auto& a, auto& b) { return a->y < b->y; });
-		std::sort((OrderByYItem**)monsters.buf, (OrderByYItem**)monsters.buf + monsters.len, [](auto& a, auto& b) { return a->y < b->y; });
+	void Scene::Draw() {
+		for (auto& o : talents) o->Draw();
+		gg.GLBlendFunc(gg.blendDefault);
+		gg.DrawNode(ui);
 	}
 
-	for (auto& o : monsters) o->Update();
-	for (auto& o : rocks) o->Update();
-}
-
-void Scene::Draw() {
-	// sort order by y
-	assert(obyis.Empty());
-	for (auto& o : monsters) obyis.Emplace(o->y, o.pointer);
-	for (auto& o : rocks) obyis.Emplace(o->y, o.pointer);
-	std::sort(obyis.buf, obyis.buf + obyis.len, [](auto& a, auto& b) { return a.first < b.first; });
-
-	// draw by y
-	for (auto& o : obyis) o.second->Draw();
-	obyis.Clear();
-
-	gg.GLBlendFunc(gg.blendDefault);
-	gg.DrawNode(ui);
-}
-
-void Scene::OnResize(bool modeChanged_) {
-	ui->Resize(gg.scale * cUIScale);
-	cam.SetBaseScale(gg.scale);
-}
+	void Scene::OnResize(bool modeChanged_) {
+		ui->Resize(gg.scale);
+		cam.SetBaseScale(gg.scale);
+	}
 
 }

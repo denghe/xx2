@@ -40,6 +40,9 @@ void Game::GLInit() {
 	for (size_t i = 0; i < tf.airplane_.size(); i++) {
 		tf.airplane_[i] = LoadTexture(xx::ToStringFormat("res/airplane_{0}.png", i + 1));
 	}
+	for (size_t i = 0; i < tf.talent_.size(); i++) {
+		tf.talent_[i] = LoadTexture(xx::ToStringFormat("res/talent_{0}.png", i + 1));
+	}
 	for (size_t i = 0; i < tf.minecart_.size(); i++) {
 		tf.minecart_[i] = LoadTexture(xx::ToStringFormat("res/minecart_{0}.png", i + 1));
 	}

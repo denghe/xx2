@@ -3,70 +3,71 @@
 
 namespace Test5 {
 
-	enum class AnimTypes {
-		Idle, Move, Atk
-	};
+	// talent: config + data
+	// config: node ( id/index, parentId, [children], type, level, levelup condition, pos, info panel )
+	// data: [id+level]...
+	// colors: 
+	// can't levelup: red
+	// can levelup: green
+	// levelup max: blue
 
 	struct Scene;
-	struct OrderByYItem {
-		Scene* scene{};
-		float y{};
-		virtual void Update() {}
-		virtual void Draw() {}
-		~OrderByYItem() {}
+
+	enum class TalentTypes {
+		A, B, C
 	};
 
-	struct Rock : OrderByYItem {
+	struct TalentBase {
+		TalentTypes type{};
+		int32_t id{}, parentId{};
+		int32_t maxLevel{};
 		XY pos{};
-		float radius{};
-		int32_t hp{};
-		Rock& Init(Scene* scene_, XY pos_, float radius_);
-		void Update() override;
-		void Draw() override;
+		// todo: grid for mouse pos check? joystick focus?
+		int32_t level{};				// runtime / player settings?
+		bool canLevelUp{};				// runtime
+		bool visible{};					// runtime
+		TalentBase* parent{};			// runtime
+		Scene* scene{};					// runtime
+		//xx::List<TalentBase*> children;	// runtime
+		virtual void LevelUp() {};					// ++level && deducte resources ?
+		virtual xx::Shared<xx::Node> GetInfo() { return {}; };	// gen ui panel by info + levelup condition
+		virtual void Update() {};								// set canLevelUp?
+		virtual void Draw();						// draw icon by type. draw line
+		virtual ~TalentBase() {}
 	};
 
-	struct Monster0 : OrderByYItem {
-		xx::TinyFrame* tfs{};
-		//XY* aps{};
-		char* cds{};
-		int32_t tfsLen{};
-		float tfIndex{};
-		float speedScale{};
-		float radius{}, resRadius{}, frameDelay{};
-		bool flipX{};
-		XY pos{};
-		Monster0& Monster0Init(Scene* scene_, XY pos_, float resRadius_, float radius_, float frameDelay_, float speedScale_);	// need set anim
-		void SetAnim(AnimTypes t);
-		bool StepAnimOnce();
-		void StepAnimLoop();
-		bool IsHitFrame() const;
+	struct TalentA : TalentBase {
+		static constexpr TalentTypes cType{ TalentTypes::A };
+		void LevelUp() override;
+		xx::Shared<xx::Node> GetInfo() override;
 		void Update() override;
-		void Draw() override;
 	};
 
-	struct Monster2 : Monster0 {
-		xx::Weak<Rock> target;
-		XY targetPos{};
-		float stepTime{};
-		float attackRange{}, moveSpeed{};
-		bool hited{};
-		int32_t _1{};
-		Monster2& Monster2Init(Scene* scene_, XY pos_, float radius_);
-		bool SearchTarget();
+	struct TalentB : TalentBase {
+		static constexpr TalentTypes cType{ TalentTypes::B };
+		void LevelUp() override;
+		xx::Shared<xx::Node> GetInfo() override;
 		void Update() override;
-		void Draw() override;
+	};
+
+	struct TalentC : TalentBase {
+		static constexpr TalentTypes cType{ TalentTypes::C };
+		void LevelUp() override;
+		xx::Shared<xx::Node> GetInfo() override;
+		void Update() override;
 	};
 
 	struct Scene : xx::SceneBase {
-		static constexpr float cUIScale{ 0.5f };
 		xx::Shared<xx::Node> ui;
 		xx::Camera cam;
 		float time{}, timePool{}, timeScale{ 1 };
 		float timer{};
 
-		xx::List<xx::Shared<Monster0>> monsters;
-		xx::List<xx::Shared<Rock>> rocks;
-		xx::List<std::pair<float, OrderByYItem*>> obyis;	// for draw order
+		int32_t currencyA{}, currencyB{}, currencyC{};
+		float talentScale{};
+		XY talentBasePos{};
+		xx::List<xx::Shared<TalentBase>> talents;
+		void SetTalentLevel(int32_t id_, int32_t level_);
 
 		void Init();
 		void Update() override;

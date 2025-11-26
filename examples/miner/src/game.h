@@ -35,6 +35,7 @@ struct Game : xx::Game<Game> {
 		xx::TinyFrame bg1;
 		std::array<xx::TinyFrame, 8> explosion_1_;
 		std::array<xx::TinyFrame, 7> airplane_;
+		std::array<xx::TinyFrame, 3> talent_;
 		std::array<xx::TinyFrame, 2> minecart_;
 		std::array<std::array<xx::TinyFrame, 6>, 9> rocks_;	// rock_?_?
 
