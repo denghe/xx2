@@ -6,7 +6,9 @@ namespace Test5 {
 
 	void TalentBase::Draw() {
 		if (!visible) return;
-		auto p = scene->cam.ToGLPos(scene->talentBasePos + pos);
+		auto ts = scene->talentScale;
+		auto pos1 = pos * ts;
+		auto p = scene->cam.ToGLPos(scene->talentBasePos + pos1);
 		auto& fg = gg.tf.talent_[(int32_t)type];
 		gg.Quad().Draw(fg, fg, p, 0.5f, scene->talentScale * scene->cam.scale);
 		xx::RGBA8 c;
@@ -20,21 +22,21 @@ namespace Test5 {
 			c = xx::RGBA8_Red;
 		}
 		auto& bg = gg.tf.circle256;
-		gg.Quad().Draw(bg, bg, p, 0.5f, scene->talentScale * scene->cam.scale, 0.f, 1.f, c);
+		gg.Quad().Draw(bg, bg, p, 0.5f, ts * scene->cam.scale, 0.f, 1.f, c);
 		// draw line
 		if (parent) {
-			auto pos2 = parent->pos;
-			auto d = pos2 - pos;
+			auto pos2 = parent->pos * ts;
+			auto d = pos2 - pos1;
 			auto dist = std::sqrtf(d.x * d.x + d.y * d.y);
 			auto norm = d / dist;
-			auto pos1 = pos + norm * 128.f;
-			pos2 -= norm * 128.f;
-			dist -= 128.f * 2.f;
+			pos1 += norm * 128.f * ts;
+			pos2 -= norm * 128.f * ts;
+			dist -= 128.f * ts * 2.f;
 			static constexpr int32_t numSteps{ 32 };
 			auto step = norm * dist * (1.f / numSteps);
 			for (int32_t i = 0; i < numSteps; ++i) {
 				auto pp = scene->cam.ToGLPos(scene->talentBasePos + pos1 + step * i);
-				gg.Quad().Draw(bg, bg, pp, 0.5f, scene->talentScale * scene->cam.scale * 0.1f, 0.f, 1.f, c);
+				gg.Quad().Draw(bg, bg, pp, 0.5f, ts * scene->cam.scale * 0.1f, 0.f, 1.f, c);
 			}
 		}
 	}
@@ -142,6 +144,8 @@ namespace Test5 {
 		cam.Init(gg.scale, 1.f, gg.designSize / 2);
 		ui.Emplace()->InitRoot(gg.scale);
 
+		// todo: ui for currencyABC
+
 		currencyA = 1;
 		currencyB = 2;
 		currencyC = 2;
@@ -226,6 +230,17 @@ namespace Test5 {
 	}
 
 	void Scene::FixedUpdate() {
+		if (gg.mouse[GLFW_MOUSE_BUTTON_LAST + 1]) {	// mouse wheel up
+			if (talentScale < 1.f) {
+				talentScale += 0.02f;
+			}
+		}
+		if (gg.mouse[GLFW_MOUSE_BUTTON_LAST + 2]) { // mouse wheel down
+			if (talentScale > 0.1f) {
+				talentScale -= 0.02f;
+			}
+		}
+
 		for (auto& o : talents) o->Update();
 	}
 
