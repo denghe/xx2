@@ -21,8 +21,11 @@ namespace Test5 {
 		else {
 			c = xx::RGBA8_Red;
 		}
+		float cp;
+		if (scene->currTalent == this) cp = 1.f;
+		else cp = 0.5f;
 		auto& bg = gg.tf.circle256;
-		gg.Quad().Draw(bg, bg, p, 0.5f, ts * scene->cam.scale, 0.f, 1.f, c);
+		gg.Quad().Draw(bg, bg, p, 0.5f, ts * scene->cam.scale, 0.f, cp, c);
 		// draw line
 		if (parent) {
 			auto pos2 = parent->pos * ts;
@@ -36,7 +39,7 @@ namespace Test5 {
 			auto step = norm * dist * (1.f / numSteps);
 			for (int32_t i = 0; i < numSteps; ++i) {
 				auto pp = scene->cam.ToGLPos(scene->talentBasePos + pos1 + step * i);
-				gg.Quad().Draw(bg, bg, pp, 0.5f, ts * scene->cam.scale * 0.1f, 0.f, 1.f, c);
+				gg.Quad().Draw(bg, bg, pp, 0.5f, ts * scene->cam.scale * 0.1f, 0.f, cp, c);
 			}
 		}
 	}
@@ -58,7 +61,8 @@ namespace Test5 {
 				if (scene->currency[(int32_t)p.currencyType] < p.value) c = xx::RGBA8_Red;
 				else c = xx::RGBA8_White;
 				// todo: change $ to currency icon
-				L.Text("$", 32, 48).Text(xx::ToString(p.value, " "), 32, 48, c);
+				auto& tf = gg.tf.rocks_[std::to_underlying(p.currencyType)][4];
+				L.Image(tf, 48.f).Text(xx::ToString(p.value, " "), 32, 48, c);
 			}
 		}
 		L.EndLine(false).HAlign(xx::HAligns::Right);
@@ -154,8 +158,19 @@ namespace Test5 {
 	void Scene::Init() {
 		cam.Init(gg.scale, 1.f, gg.designSize / 2);
 		ui.Emplace()->InitRoot(gg.scale);
-
-		// todo: ui for currencyABC
+		{
+			XY uiPos = gg.p7 + XY{ 20, -20 - 32.f };
+			XY a{ 0.f, 0.5f };
+			for (int32_t i = 0; i < cNumCurrencyTypes; ++i) {
+				auto p = uiPos;
+				p.x += i * 250.f;
+				ui->Make<xx::Image>()->Init(1, p, a, gg.tf.rocks_[i][4], 64.f);
+				p.x += 64.f + 5.f;
+				auto lbl = ui->Make<xx::Label>();
+				currencyUI[i] = lbl;
+				lbl->Init(1, p, a, 48)("0");
+			}
+		}
 
 		currency[(int32_t)CurrencyTypes::A] = 100;
 		currency[(int32_t)CurrencyTypes::B] = 100;
@@ -227,7 +242,7 @@ namespace Test5 {
 
 		// handle mouse drag, click
 		auto mp = (cam.ToLogicPos(gg.mousePos) - talentBasePos) / talentScale;
-		auto t = FindTalent(mp);
+		currTalent = FindTalent(mp);
 		if (gg.mouse[GLFW_MOUSE_BUTTON_1]) {
 			if (clicking) {
 				if (lastMousePos != gg.mousePos) {
@@ -241,16 +256,16 @@ namespace Test5 {
 			}
 			else if (!lastMBPressed) {	// first time
 				lastMBPressed = true;
-				if (t) clicking = true;
+				if (currTalent) clicking = true;
 				else talentDragging = true;
 				lastMousePos = gg.mousePos;
 			}
 		}
 		else {
 			if (clicking && lastMousePos == gg.mousePos) {
-				assert(t);
-				if (t->canLevelUp) {
-					t->LevelUp();
+				assert(currTalent);
+				if (currTalent->canLevelUp) {
+					currTalent->LevelUp();
 					gg.PlayAudio(gg.embed.ss_ui_focus);
 				}
 			}
@@ -263,12 +278,12 @@ namespace Test5 {
 			uiInfo->SwapRemove();
 			uiInfoExists = true;
 		}
-		if (t) {
+		if (currTalent) {
 			if (!uiInfoExists) {
 				gg.PlayAudio(gg.embed.ss_ui_focus);
 			}
-			auto n = t->GetInfo();
-			n->position = cam.ToGLPos(talentBasePos + t->pos * talentScale) + XY{ 0, 128.f * talentScale };
+			auto n = currTalent->GetInfo();
+			n->position = cam.ToGLPos(talentBasePos + currTalent->pos * talentScale) + XY{ 0, 128.f * talentScale };
 			n->FillTransRecursive();
 			ui->Add(n);
 			uiInfo = n;
@@ -300,11 +315,13 @@ namespace Test5 {
 	}
 
 	void Scene::Draw() {
-		// todo: scissor
+		// todo: scissor?
 		for (auto& o : talents) o->Draw();
 
-		// todo: sync some ui text
-
+		// sync currency ui text
+		for (int32_t i = 0; i < cNumCurrencyTypes; ++i) {
+			currencyUI[i]->SetText(xx::ToString(currency[i]));
+		}
 
 		gg.GLBlendFunc(gg.blendDefault);
 		gg.DrawNode(ui);

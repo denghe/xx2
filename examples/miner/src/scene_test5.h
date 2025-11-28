@@ -22,6 +22,8 @@ namespace Test5 {
 		, __MAX_VALUE__
 	};
 
+	static constexpr auto cNumCurrencyTypes{ std::to_underlying(CurrencyTypes::__MAX_VALUE__) };
+
 	struct TalentPrice {
 		CurrencyTypes currencyType{};
 		int32_t value{};
@@ -69,7 +71,10 @@ namespace Test5 {
 		float timer{};
 
 		xx::Weak<xx::Node> uiInfo;
-		std::array<int32_t, (size_t)CurrencyTypes::__MAX_VALUE__> currency;
+		std::array<int32_t, cNumCurrencyTypes> currency;
+		std::array<xx::Weak<xx::Label>, cNumCurrencyTypes> currencyUI;
+
+		TalentBase* currTalent{};
 		float talentScale{};
 		XY talentBasePos{};
 		XY lastMousePos{};
