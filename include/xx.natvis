@@ -38,7 +38,7 @@
 		</Expand>
 	</Type>
 
-	<Type Name="xx::Shared_&lt;*,*&gt;">
+	<Type Name="xx::Shared&lt;*&gt;">
 		<SmartPointer Usage="Minimal">pointer</SmartPointer>
 		<DisplayString Condition="pointer == 0">null</DisplayString>
 		<DisplayString Condition="pointer != 0">{pointer}</DisplayString>

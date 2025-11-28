@@ -51,8 +51,15 @@ namespace Test5 {
 		scene->currencyA -= 1;
 	}
 
-	xx::Shared<xx::Node> TalentA::GetInfo() { 
-		return {}; 
+	xx::Shared<xx::Node> TalentA::GetInfo() {
+		auto node = xx::MakeShared<xx::Node>();
+		xx::Layouter L;
+		L.InitBegin(node, 2, {}, {0.5f, 0}, 500);
+		L.Text("talent info", 32, 48).EndLine();
+		L.Text("Price: 123 Level: 123", 32, 48);
+		L.InitEnd();
+		node->Make<xx::Scale9>()->Init(1, 0, 0, node->size);
+		return node; 
 	}
 
 	void TalentA::Update() {
@@ -76,7 +83,14 @@ namespace Test5 {
 	}
 
 	xx::Shared<xx::Node> TalentB::GetInfo() { 
-		return {};
+		auto node = xx::MakeShared<xx::Node>();
+		xx::Layouter L;
+		L.InitBegin(node, 2, {}, { 0.5f, 0 }, 500);
+		L.Text("talent info", 32, 48).EndLine();
+		L.Text("Price: 123 Level: 123", 32, 48);
+		L.InitEnd();
+		node->Make<xx::Scale9>()->Init(1, 0, 0, node->size);
+		return node;
 	}
 
 	void TalentB::Update() {
@@ -107,7 +121,14 @@ namespace Test5 {
 	}
 
 	xx::Shared<xx::Node> TalentC::GetInfo() {
-		return {};
+		auto node = xx::MakeShared<xx::Node>();
+		xx::Layouter L;
+		L.InitBegin(node, 2, {}, { 0.5f, 0 }, 500);
+		L.Text("talent info", 32, 48).EndLine();
+		L.Text("Price: 123 Level: 123", 32, 48);
+		L.InitEnd();
+		node->Make<xx::Scale9>()->Init(1, 0, 0, node->size);
+		return node;
 	}
 
 	void TalentC::Update() {
@@ -138,6 +159,17 @@ namespace Test5 {
 			}
 		}
 		assert(false);
+	}
+
+	TalentBase* Scene::FindTalent(XY pos_) {
+		for (auto& o : talents) {
+			if (!o->visible) continue;
+			auto d = o->pos - pos_;
+			if (d.x * d.x + d.y * d.y < 128.f * 128.f) {
+				return o.pointer;
+			}
+		}
+		return {};
 	}
 
 	void Scene::Init() {
@@ -194,9 +226,6 @@ namespace Test5 {
 
 		// restore player settings
 		//SetTalentLevel(0, 1);
-
-		// fill talent's visible
-		// todo
 	}
 
 	void Scene::Update() {
@@ -205,18 +234,48 @@ namespace Test5 {
 			gg.MakeScene<Scene_MainMenu>()->Init();
 			return;
 		}
-		// todo: mouse scroll zoom talentScale. drag, click
-		if (gg.mouse[GLFW_MOUSE_BUTTON_1](0.2f)) {
-			auto mp = (cam.ToLogicPos(gg.mousePos) - talentBasePos) / talentScale;
-			xx::CoutN(mp);
-			for (auto& o : talents) {
-				if (o->canLevelUp) {
-					auto d = o->pos - mp;
-					if (d.x * d.x + d.y * d.y < 128.f * 128.f) {
-						o->LevelUp();
-					}
+
+		// handle mouse drag, click
+		auto mp = (cam.ToLogicPos(gg.mousePos) - talentBasePos) / talentScale;
+		auto t = FindTalent(mp);
+		if (gg.mouse[GLFW_MOUSE_BUTTON_1]) {
+			if (clicking) {
+				if (lastMousePos != gg.mousePos) {
+					clicking = false;
+					talentDragging = true;
 				}
 			}
+			if (talentDragging) {
+				talentBasePos += (gg.mousePos - lastMousePos).FlipY();
+				lastMousePos = gg.mousePos;
+			}
+			else if (!lastMBPressed) {	// first time
+				lastMBPressed = true;
+				if (t) clicking = true;
+				else talentDragging = true;
+				lastMousePos = gg.mousePos;
+			}
+		}
+		else {
+			if (clicking && lastMousePos == gg.mousePos) {
+				assert(t);
+				if (t->canLevelUp) {
+					t->LevelUp();
+				}
+			}
+			clicking = false;
+			talentDragging = false;
+			lastMBPressed = false;
+		}
+		if (uiInfo) {
+			uiInfo->SwapRemove();
+		}
+		if (t) {
+			auto n = t->GetInfo();
+			n->position = cam.ToGLPos(talentBasePos + t->pos) + XY{ 0, 128.f * talentScale };
+			n->FillTransRecursive();
+			ui->Add(n);
+			uiInfo = n;
 		}
 
 		// fixed update
@@ -245,7 +304,9 @@ namespace Test5 {
 	}
 
 	void Scene::Draw() {
+		// todo: scissor
 		for (auto& o : talents) o->Draw();
+
 		gg.GLBlendFunc(gg.blendDefault);
 		gg.DrawNode(ui);
 	}

@@ -63,11 +63,17 @@ namespace Test5 {
 		float time{}, timePool{}, timeScale{ 1 };
 		float timer{};
 
+		xx::Weak<xx::Node> uiInfo;
 		int32_t currencyA{}, currencyB{}, currencyC{};
 		float talentScale{};
 		XY talentBasePos{};
+		XY lastMousePos{};
+		bool lastMBPressed{};	// for first press check
+		bool talentDragging{};
+		bool clicking{};
 		xx::List<xx::Shared<TalentBase>> talents;
 		void SetTalentLevel(int32_t id_, int32_t level_);
+		TalentBase* FindTalent(XY pos_);
 
 		void Init();
 		void Update() override;
