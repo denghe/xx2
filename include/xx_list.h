@@ -233,6 +233,10 @@ namespace xx {
 			(Emplace(std::forward<TS>(vs)), ...);
 		}
 
+		XX_INLINE void Adds(std::initializer_list<T> vs) noexcept {
+			AddRange(vs.begin(), vs.size());
+		}
+
 		void AddRange(T const* items, SizeType count) noexcept {
 			if (auto newBuf = ReserveBegin(len + count)) {
 				if constexpr (std::is_standard_layout_v<T> && std::is_trivial_v<T>) {

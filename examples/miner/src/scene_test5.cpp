@@ -41,60 +41,51 @@ namespace Test5 {
 		}
 	}
 
-	/***************************************************************************************/
-
-	void TalentA::LevelUp() {
-		assert(canLevelUp);
-		assert(level < maxLevel);
-		++level;
-		assert(scene->currencyA >= 1);
-		scene->currencyA -= 1;
-	}
-
-	xx::Shared<xx::Node> TalentA::GetInfo() {
-		auto node = xx::MakeShared<xx::Node>();
-		xx::Layouter L;
-		L.InitBegin(node, 2, {}, {0.5f, 0}, 500);
-		L.Text("talent info", 32, 48).EndLine();
-		L.Text("Price: 123 Level: 123", 32, 48);
-		L.InitEnd();
-		node->Make<xx::Scale9>()->Init(1, 0, 0, node->size);
-		return node; 
-	}
-
-	void TalentA::Update() {
-		visible = true;
-		if (level == maxLevel) {
-			canLevelUp = false;
-			return;
-		}
-		assert(level < maxLevel);
-		canLevelUp = scene->currencyA >= 1;
-	}
-
-	/***************************************************************************************/
-
-	void TalentB::LevelUp() {
-		assert(canLevelUp);
-		assert(level < maxLevel);
-		++level;
-		assert(scene->currencyB >= 1);
-		scene->currencyB -= 1;
-	}
-
-	xx::Shared<xx::Node> TalentB::GetInfo() { 
+	xx::Shared<xx::Node> TalentBase::GetInfo() {
+		assert(level <= maxLevel);
 		auto node = xx::MakeShared<xx::Node>();
 		xx::Layouter L;
 		L.InitBegin(node, 2, {}, { 0.5f, 0 }, 500);
-		L.Text("talent info", 32, 48).EndLine();
-		L.Text("Price: 123 Level: 123", 32, 48);
+		FillInfo(L);
+		L.EndLine();
+		if (level == maxLevel) {
+			L.Text("MAX", 32, 48);
+		}
+		else {
+			auto& ps = levelPricess[level];
+			xx::RGBA8 c;
+			for (auto& p : ps) {
+				if (scene->currency[(int32_t)p.currencyType] < p.value) c = xx::RGBA8_Red;
+				else c = xx::RGBA8_White;
+				// todo: change $ to currency icon
+				L.Text("$", 32, 48).Text(xx::ToString(p.value, " "), 32, 48, c);
+			}
+		}
+		L.EndLine(false).HAlign(xx::HAligns::Right);
+		L.Text(xx::ToString(level, "/", maxLevel), 32, 48);
 		L.InitEnd();
-		node->Make<xx::Scale9>()->Init(1, 0, 0, node->size);
+		node->Make<xx::Scale9>()->Init(1, { -15, -5 }, 0, node->size + XY{ 30, 10 });
 		return node;
 	}
 
-	void TalentB::Update() {
-		if (!parent->level) {
+	void TalentBase::FillInfo(xx::Layouter& L_) {
+		assert(false);	// must override
+	}
+
+	void TalentBase::LevelUp() {
+		assert(canLevelUp);
+		assert(level < maxLevel);
+		auto& prices = levelPricess[level];
+		for (auto& p : prices) {
+			auto& c = scene->currency[(int32_t)p.currencyType];
+			assert(c >= p.value);
+			c -= p.value;
+		}
+		++level;
+	}
+
+	void TalentBase::Update() {
+		if (parent && !parent->level) {
 			visible = false;
 			canLevelUp = false;
 			return;
@@ -107,45 +98,33 @@ namespace Test5 {
 			return;
 		}
 		assert(level < maxLevel);
-		canLevelUp = scene->currencyB >= 1;
+		auto& prices = levelPricess[level];
+		for (auto& p : prices) {
+			auto& c = scene->currency[(int32_t)p.currencyType];
+			if (c < p.value) {
+				canLevelUp = false;
+				return;
+			}
+		}
+		canLevelUp = true;
 	}
 
 	/***************************************************************************************/
 
-	void TalentC::LevelUp() {
-		assert(canLevelUp);
-		assert(level < maxLevel);
-		++level;
-		assert(scene->currencyC >= 1);
-		scene->currencyC -= 1;
+	void TalentA::FillInfo(xx::Layouter& L) {
+		L.Text("talent A info", 32, 48);
 	}
 
-	xx::Shared<xx::Node> TalentC::GetInfo() {
-		auto node = xx::MakeShared<xx::Node>();
-		xx::Layouter L;
-		L.InitBegin(node, 2, {}, { 0.5f, 0 }, 500);
-		L.Text("talent info", 32, 48).EndLine();
-		L.Text("Price: 123 Level: 123", 32, 48);
-		L.InitEnd();
-		node->Make<xx::Scale9>()->Init(1, 0, 0, node->size);
-		return node;
+	/***************************************************************************************/
+
+	void TalentB::FillInfo(xx::Layouter& L) {
+		L.Text("talent B info", 32, 48);
 	}
 
-	void TalentC::Update() {
-		if (!parent->level) {
-			visible = false;
-			canLevelUp = false;
-			return;
-		}
-		else {
-			visible = true;
-		}
-		if (level == maxLevel) {
-			canLevelUp = false;
-			return;
-		}
-		assert(level < maxLevel);
-		canLevelUp = scene->currencyC >= 1;
+	/***************************************************************************************/
+
+	void TalentC::FillInfo(xx::Layouter& L) {
+		L.Text("talent C info", 32, 48);
 	}
 
 	/***************************************************************************************/
@@ -178,9 +157,9 @@ namespace Test5 {
 
 		// todo: ui for currencyABC
 
-		currencyA = 1;
-		currencyB = 2;
-		currencyC = 2;
+		currency[(int32_t)CurrencyTypes::A] = 100;
+		currency[(int32_t)CurrencyTypes::B] = 100;
+		currency[(int32_t)CurrencyTypes::C] = 100;
 
 		talentScale = 1.f;
 		talentBasePos = gg.designSize / 2;
@@ -194,6 +173,8 @@ namespace Test5 {
 			t->parentId = 0;
 			t->maxLevel = 1;
 			t->pos = 0;
+			t->levelPricess.Resize(t->maxLevel);
+			t->levelPricess[0].Add(TalentPrice{ CurrencyTypes::A, 50 });
 		}
 		{
 			auto& t = talents.Emplace().Emplace<TalentB>();
@@ -202,6 +183,9 @@ namespace Test5 {
 			t->parentId = 0;
 			t->maxLevel = 2;
 			t->pos = -d;
+			t->levelPricess.Resize(t->maxLevel);
+			t->levelPricess[0].Adds({ { CurrencyTypes::A, 50 }, { CurrencyTypes::B, 50 } });
+			t->levelPricess[1].Adds({ { CurrencyTypes::A, 100 }, { CurrencyTypes::B, 100 } });
 		}
 		{
 			auto& t = talents.Emplace().Emplace<TalentC>();
@@ -210,16 +194,22 @@ namespace Test5 {
 			t->parentId = 0;
 			t->maxLevel = 3;
 			t->pos = { d, -d };
+			t->levelPricess.Resize(t->maxLevel);
+			t->levelPricess[0].Adds({ { CurrencyTypes::B, 50 }, { CurrencyTypes::C, 50 } });
+			t->levelPricess[1].Adds({ { CurrencyTypes::B, 100 }, { CurrencyTypes::C, 100 } });
+			t->levelPricess[2].Adds({ { CurrencyTypes::B, 200 }, { CurrencyTypes::C, 200 } });
 		}
 
 		// fill talent's parent, scene
 		for (auto& t : talents) {
+			assert(t->maxLevel > 0);
+			assert(t->level <= t->maxLevel);
+			assert(t->levelPricess.len == t->maxLevel);
 			t->scene = this;
 			for (auto& o : talents) {
 				if (t.pointer == o.pointer) continue;
 				if (o->parentId == t->id) {
 					o->parent = t.pointer;
-					//t->children.Add(o.pointer);
 				}
 			}
 		}
@@ -261,18 +251,24 @@ namespace Test5 {
 				assert(t);
 				if (t->canLevelUp) {
 					t->LevelUp();
+					gg.PlayAudio(gg.embed.ss_ui_focus);
 				}
 			}
 			clicking = false;
 			talentDragging = false;
 			lastMBPressed = false;
 		}
+		bool uiInfoExists{ false };
 		if (uiInfo) {
 			uiInfo->SwapRemove();
+			uiInfoExists = true;
 		}
 		if (t) {
+			if (!uiInfoExists) {
+				gg.PlayAudio(gg.embed.ss_ui_focus);
+			}
 			auto n = t->GetInfo();
-			n->position = cam.ToGLPos(talentBasePos + t->pos) + XY{ 0, 128.f * talentScale };
+			n->position = cam.ToGLPos(talentBasePos + t->pos * talentScale) + XY{ 0, 128.f * talentScale };
 			n->FillTransRecursive();
 			ui->Add(n);
 			uiInfo = n;
@@ -306,6 +302,9 @@ namespace Test5 {
 	void Scene::Draw() {
 		// todo: scissor
 		for (auto& o : talents) o->Draw();
+
+		// todo: sync some ui text
+
 
 		gg.GLBlendFunc(gg.blendDefault);
 		gg.DrawNode(ui);
