@@ -4,7 +4,6 @@
 #include "game_map.h"
 #include "game_minecart.h"
 #include "scene_mainmenu.h"
-#include <intrin.h>
 
 void Scene::Init(float totalScale_) {
 	cam.Init(gg.scale, 1.f, gg.designSize / 2);
