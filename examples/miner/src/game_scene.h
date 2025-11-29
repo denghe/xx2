@@ -6,7 +6,7 @@
 #include "game_map.h"
 #include "game_minecart.h"
 
-#define ENABLE_BUCKET_SORT
+#define ENABLE_BUCKET_SORT 1
 
 struct Scene : xx::SceneBase {
 	xx::Shared<xx::Node> ui;
@@ -37,7 +37,11 @@ struct Scene : xx::SceneBase {
 	xx::Shared<MineCart> minecart;
 
 #ifdef ENABLE_BUCKET_SORT
+#if ENABLE_BUCKET_SORT == 1
 	xx::List<xx::List<SceneItem*>> sortContainer;
+#else
+	xx::List<SceneItem*> sortContainer;
+#endif
 #else
 	xx::List<std::pair<float, SceneItem*>> sortContainer;
 #endif

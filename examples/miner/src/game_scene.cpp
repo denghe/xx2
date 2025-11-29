@@ -4,6 +4,7 @@
 #include "game_map.h"
 #include "game_minecart.h"
 #include "scene_mainmenu.h"
+#include <intrin.h>
 
 void Scene::Init(float totalScale_) {
 	cam.Init(gg.scale, 1.f, gg.designSize / 2);
@@ -14,7 +15,7 @@ void Scene::Init(float totalScale_) {
 	GenMonsters(10);
 
 #ifdef ENABLE_BUCKET_SORT
-	sortContainer.Resize((int32_t)gg.designSize.y);
+	sortContainer.Resize<true>((int32_t)gg.designSize.y);
 #endif
 }
 
@@ -196,6 +197,7 @@ void Scene::Draw() {
 	// sort order by y
 #ifdef ENABLE_BUCKET_SORT
 	// map y to 0 ~ 1080 ( design size.y )
+#if ENABLE_BUCKET_SORT == 1
 	// 4x faster than std::sort
 	for (auto& o : borningRocks) {
 		sortContainer[(int32_t)o->y].Emplace(o.pointer);
@@ -214,6 +216,41 @@ void Scene::Draw() {
 		for (auto& o : subList) o->Draw();
 		subList.Clear();
 	}
+#else
+	// 3x faster than std::sort
+	for (auto& o : borningRocks) {
+		auto& slot = sortContainer[(int32_t)o->y];
+		o->next = slot;
+		slot = o.pointer;
+	}
+	for (auto& o : breakingRocks) {
+		auto& slot = sortContainer[(int32_t)o.y];
+		o.next = slot;
+		slot = &o;
+	}
+	for (auto& o : monsters) {
+		auto& slot = sortContainer[(int32_t)o->y];
+		o->next = slot;
+		slot = o.pointer;
+	}
+	for (auto& o : rocks) {
+		auto& slot = sortContainer[(int32_t)o->y];
+		o->next = slot;
+		slot = o.pointer;
+	}
+	{
+		auto& slot = sortContainer[(int32_t)minecart->y];
+		minecart->next = slot;
+		slot = minecart.pointer;
+	}
+	for (auto o : sortContainer) {
+		while(o) {
+			o->Draw();
+			o = o->next;
+		}
+	}
+	memset(sortContainer.buf, 0, sortContainer.len * sizeof(void*));
+#endif
 #else
 	assert(sortContainer.Empty());
 	for (auto& o : borningRocks) sortContainer.Emplace(o->y, o.pointer);
