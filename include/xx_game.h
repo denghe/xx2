@@ -42,6 +42,10 @@ namespace xx {
 			glfwTerminate();
 		}
 
+		void SetMousePointerVisible(bool visible_) {
+			glfwSetInputMode(this->wnd, GLFW_CURSOR, visible_ ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_HIDDEN);
+		}
+
 		void SetFullScreenMode(XY size_ = {}) {
 			auto monitor = glfwGetPrimaryMonitor();
 			auto mode = glfwGetVideoMode(monitor);

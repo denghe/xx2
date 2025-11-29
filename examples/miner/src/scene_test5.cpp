@@ -48,7 +48,7 @@ namespace Test5 {
 		assert(level <= maxLevel);
 		auto node = xx::MakeShared<xx::Node>();
 		xx::Layouter L;
-		L.InitBegin(node, 2, {}, { 0.5f, 0 }, 500);
+		L.InitBegin(node, 100, {}, { 0.5f, 0 }, 500);
 		FillInfo(L);
 		L.EndLine();
 		if (level == maxLevel) {
@@ -67,7 +67,7 @@ namespace Test5 {
 		L.EndLine(false).HAlign(xx::HAligns::Right);
 		L.Text(xx::ToString(level, "/", maxLevel), 32, 48);
 		L.InitEnd();
-		node->Make<xx::Scale9>()->Init(1, { -15, -5 }, 0, node->size + XY{ 30, 10 });
+		node->Make<xx::Scale9>()->Init(node->z - 1, { -15, -5 }, 0, node->size + XY{ 30, 10 });
 		return node;
 	}
 
@@ -179,11 +179,11 @@ namespace Test5 {
 			for (int32_t i = 0; i < cNumCurrencyTypes; ++i) {
 				auto p = uiPos;
 				p.x += i * 250.f;
-				ui->Make<xx::Image>()->Init(1, p, a, gg.tf.rocks_[i][4], 64.f);
+				ui->Make<xx::Image>()->Init(2, p, a, gg.tf.rocks_[i][4], 64.f);
 				p.x += 64.f + 5.f;
 				auto lbl = ui->Make<xx::Label>();
 				currencyUI[i] = lbl;
-				lbl->Init(1, p, a, 48)("0");
+				lbl->Init(3, p, a, 48)("0");
 			}
 		}
 
@@ -277,6 +277,8 @@ namespace Test5 {
 			if (talentDragging) {
 				talentBasePos += (gg.mousePos - lastMousePos).FlipY();
 				lastMousePos = gg.mousePos;
+				mp = (cam.ToLogicPos(gg.mousePos) - talentBasePos) / talentScale;
+				currTalent = FindTalent(mp);
 			}
 			else if (!lastMBPressed) {	// first time
 				lastMBPressed = true;

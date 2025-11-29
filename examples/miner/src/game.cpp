@@ -14,6 +14,9 @@ void Game::Init() {
 }
 
 void Game::GLInit() {
+	// hide hardware mouse
+	SetMousePointerVisible(false);
+
 	// init basedata
 	sgrdd.Init(64, 64);
 
@@ -34,6 +37,7 @@ void Game::GLInit() {
 	tf.circle256 = LoadTexture("res/circle256.png");
 	tf.pickaxe = LoadTexture("res/pickaxe.png");
 	tf.bg1 = LoadTexture("res/bg1.png");
+	tf.mouse_pointer = LoadTexture("res/mouse_pointer.png");
 	for (size_t i = 0; i < tf.explosion_1_.size(); i++) {
 		tf.explosion_1_[i] = LoadTexture(xx::ToStringFormat("res/explosion_1_{0}.png", i + 1));
 	}
@@ -157,6 +161,9 @@ void Game::Update() {
 		scene->Draw();
 	}
 	if (oldScene) oldScene.Reset();
+
+	// draw mouse pointer
+	Quad().Draw(tf.mouse_pointer, tf.mouse_pointer, mousePos, 0.5f, 3.f);
 }
 
 void Game::Delay() {

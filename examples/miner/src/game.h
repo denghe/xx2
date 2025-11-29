@@ -30,9 +30,7 @@ struct Game : xx::Game<Game> {
 	XX_INLINE xx::Shader_Grass& Grass() { return ShaderBegin(shaderGrass); }
 
 	struct {
-		xx::TinyFrame circle256;
-		xx::TinyFrame pickaxe;
-		xx::TinyFrame bg1;
+		xx::TinyFrame circle256, pickaxe, bg1, mouse_pointer;
 		std::array<xx::TinyFrame, 8> explosion_1_;
 		std::array<xx::TinyFrame, 7> airplane_;
 		std::array<xx::TinyFrame, 3> talent_;
