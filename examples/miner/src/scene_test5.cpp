@@ -60,7 +60,6 @@ namespace Test5 {
 			for (auto& p : ps) {
 				if (scene->currency[(int32_t)p.currencyType] < p.value) c = xx::RGBA8_Red;
 				else c = xx::RGBA8_White;
-				// todo: change $ to currency icon
 				auto& tf = gg.tf.rocks_[std::to_underlying(p.currencyType)][4];
 				L.Image(tf, 48.f).Text(xx::ToString(p.value, " "), 32, 48, c);
 			}

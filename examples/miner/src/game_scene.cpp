@@ -12,6 +12,10 @@ void Scene::Init(float totalScale_) {
 	minecart.Emplace()->Init(this, { 50.f, cam.original.y - 100.f });
 	GenRocks(rocksFixedPosPool.len * 0.5);
 	GenMonsters(10);
+
+#ifdef ENABLE_BUCKET_SORT
+	sortContainer.Resize((int32_t)gg.designSize.y);
+#endif
 }
 
 void Scene::MakeUI() {
@@ -179,28 +183,51 @@ void Scene::FixedUpdate() {
 	map->Update();
 
 	//if (timer <= time) {
-	//	timer += 0.1f;
+	//	timer += 1.f;
 	//	std::sort((SceneItem**)monsters.buf, (SceneItem**)monsters.buf + monsters.len, [](auto& a, auto& b) { return a->y < b->y; });
 	//}
 }
 
 void Scene::Draw() {
 	// draw bg
+	// todo: grass ?
 	map->Draw();
 
 	// sort order by y
-	assert(sitems.Empty());
-	// todo: grass ?
-	for (auto& o : borningRocks) sitems.Emplace(o->y, o.pointer);
-	for (auto& o : breakingRocks) sitems.Emplace(o.y, &o);
-	for (auto& o : monsters) sitems.Emplace(o->y, o.pointer);
-	for (auto& o : rocks) sitems.Emplace(o->y, o.pointer);
-	sitems.Emplace(minecart->y, minecart.pointer);
-	std::sort(sitems.buf, sitems.buf + sitems.len, [](auto& a, auto& b) { return a.first < b.first; });
+#ifdef ENABLE_BUCKET_SORT
+	// map y to 0 ~ 1080 ( design size.y )
+	// 4x faster than std::sort
+	for (auto& o : borningRocks) {
+		sortContainer[(int32_t)o->y].Emplace(o.pointer);
+	}
+	for (auto& o : breakingRocks) {
+		sortContainer[(int32_t)o.y].Emplace(&o);
+	}
+	for (auto& o : monsters) {
+		sortContainer[(int32_t)o->y].Emplace(o.pointer);
+	}
+	for (auto& o : rocks) {
+		sortContainer[(int32_t)o->y].Emplace(o.pointer);
+	}
+	sortContainer[(int32_t)minecart->y].Emplace(minecart.pointer);
+	for (auto& subList : sortContainer) {
+		for (auto& o : subList) o->Draw();
+		subList.Clear();
+	}
+#else
+	assert(sortContainer.Empty());
+	for (auto& o : borningRocks) sortContainer.Emplace(o->y, o.pointer);
+	for (auto& o : breakingRocks) sortContainer.Emplace(o.y, &o);
+	for (auto& o : monsters) sortContainer.Emplace(o->y, o.pointer);
+	for (auto& o : rocks) sortContainer.Emplace(o->y, o.pointer);
+	sortContainer.Emplace(minecart->y, minecart.pointer);
+	std::sort(sortContainer.buf, sortContainer.buf + sortContainer.len
+		, [](auto& a, auto& b) { return a.first < b.first; });
 
 	// draw by y
-	for (auto& o : sitems) o.second->Draw();
-	sitems.Clear();
+	for (auto& o : sortContainer) o.second->Draw();
+	sortContainer.Clear();
+#endif
 
 	// draw fly rocks
 	for (auto& o : flyingRocks) o.Draw(this);

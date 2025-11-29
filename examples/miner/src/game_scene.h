@@ -6,6 +6,8 @@
 #include "game_map.h"
 #include "game_minecart.h"
 
+#define ENABLE_BUCKET_SORT
+
 struct Scene : xx::SceneBase {
 	xx::Shared<xx::Node> ui;
 	xx::Camera cam;
@@ -31,9 +33,14 @@ struct Scene : xx::SceneBase {
 	xx::List<xx::Shared<Monster>> monsters;
 	xx::List<xx::Shared<BorningRock>> borningRocks;	// life cycle: must below rocks
 	xx::List<BreakingRock> breakingRocks;	// effect
-	xx::List<std::pair<float, SceneItem*>> sitems;	// for draw order
 	xx::Shared<Map> map;
 	xx::Shared<MineCart> minecart;
+
+#ifdef ENABLE_BUCKET_SORT
+	xx::List<xx::List<SceneItem*>> sortContainer;
+#else
+	xx::List<std::pair<float, SceneItem*>> sortContainer;
+#endif
 
 	void GenRocks(int32_t count_);
 	void GenMonsters(int32_t count_);
