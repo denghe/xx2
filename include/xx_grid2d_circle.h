@@ -22,12 +22,18 @@ namespace xx {
 		template<typename V>
 		void Add(int32_t& nodeIndex_, V&& e) {
 			assert(nodeIndex_ == -1);
-			auto cri = PosToCRIndex(e->pos);	// todo: auto switch?
+			auto cri = PosToCRIndex(e->pos);
 			nodeIndex_ = Base::Alloc(cri.y, cri.x);
 			if constexpr (!std::is_void_v<C>) {
 				this->nodes[nodeIndex_].cache = e;
 			}
 			Base::Add(nodeIndex_, std::forward<V>(e));
+		}
+
+		template<typename V>
+		void Add(V&& e) {
+			int32_t tmp{-1};
+			Add(tmp, std::forward<V>(e));
 		}
 
 		void Update(int32_t nodeIndex_, T const& e) {

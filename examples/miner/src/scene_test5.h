@@ -81,6 +81,7 @@ namespace Test5 {
 		bool lastMBPressed{};	// for first press check
 		bool talentDragging{};
 		bool clicking{};
+		xx::Grid2dCircle<TalentBase*> talentsGrid;
 		xx::List<xx::Shared<TalentBase>> talents;
 		void SetTalentLevel(int32_t id_, int32_t level_);
 		TalentBase* FindTalent(XY pos_);

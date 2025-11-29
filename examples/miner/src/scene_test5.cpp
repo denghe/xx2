@@ -144,6 +144,7 @@ namespace Test5 {
 	}
 
 	TalentBase* Scene::FindTalent(XY pos_) {
+#if 0
 		for (auto& o : talents) {
 			if (!o->visible) continue;
 			auto d = o->pos - pos_;
@@ -152,6 +153,21 @@ namespace Test5 {
 			}
 		}
 		return {};
+#else
+		TalentBase* r{};
+		auto cri = talentsGrid.PosToCRIndex(pos_);
+		talentsGrid.ForeachBy9(cri.y, cri.x, [&](decltype(talentsGrid)::Node& node, float range)->bool {
+			if (auto p = node.value; p->visible) {
+				auto d = p->pos - pos_;
+				if (d.x * d.x + d.y * d.y < 128.f * 128.f) {
+					r = p;
+					return true;
+				}
+			}
+			return false;
+		});
+		return r;
+#endif
 	}
 
 	void Scene::Init() {
@@ -176,8 +192,9 @@ namespace Test5 {
 		currency[(int32_t)CurrencyTypes::C] = 100;
 
 		talentScale = 1.f;
-		talentBasePos = gg.designSize / 2;
+		talentBasePos = {};
 		static constexpr float d{ 300 };
+		auto basePos = gg.designSize / 2;
 
 		// fill talents
 		{
@@ -186,7 +203,7 @@ namespace Test5 {
 			t->id = 0;
 			t->parentId = 0;
 			t->maxLevel = 1;
-			t->pos = 0;
+			t->pos = basePos;
 			t->levelPricess.Resize(t->maxLevel);
 			t->levelPricess[0].Add(TalentPrice{ CurrencyTypes::A, 50 });
 		}
@@ -196,7 +213,7 @@ namespace Test5 {
 			t->id = 1;
 			t->parentId = 0;
 			t->maxLevel = 2;
-			t->pos = -d;
+			t->pos = basePos - d;
 			t->levelPricess.Resize(t->maxLevel);
 			t->levelPricess[0].Adds({ { CurrencyTypes::A, 50 }, { CurrencyTypes::B, 50 } });
 			t->levelPricess[1].Adds({ { CurrencyTypes::A, 100 }, { CurrencyTypes::B, 100 } });
@@ -207,19 +224,27 @@ namespace Test5 {
 			t->id = 2;
 			t->parentId = 0;
 			t->maxLevel = 3;
-			t->pos = { d, -d };
+			t->pos = basePos + XY{ d, -d };
 			t->levelPricess.Resize(t->maxLevel);
 			t->levelPricess[0].Adds({ { CurrencyTypes::B, 50 }, { CurrencyTypes::C, 50 } });
 			t->levelPricess[1].Adds({ { CurrencyTypes::B, 100 }, { CurrencyTypes::C, 100 } });
 			t->levelPricess[2].Adds({ { CurrencyTypes::B, 200 }, { CurrencyTypes::C, 200 } });
 		}
 
-		// fill talent's parent, scene
+		// init talents grid
+		auto numRows = (int32_t)std::ceilf(gg.designSize.y / 256.f);
+		auto numCols = (int32_t)std::ceilf(gg.designSize.x / 256.f);
+		talentsGrid.Init(256, numRows, numCols);
+		talentsGrid.Reserve(talents.len);
+
+		// fill talent's parent, scene, grid
 		for (auto& t : talents) {
 			assert(t->maxLevel > 0);
 			assert(t->level <= t->maxLevel);
 			assert(t->levelPricess.len == t->maxLevel);
 			t->scene = this;
+			talentsGrid.Add(t.pointer);
+
 			for (auto& o : talents) {
 				if (t.pointer == o.pointer) continue;
 				if (o->parentId == t->id) {
@@ -299,14 +324,23 @@ namespace Test5 {
 	}
 
 	void Scene::FixedUpdate() {
+
+		static constexpr xx::FromTo<float> cScaleRange{ 0.2f, 1.f };
+		static constexpr float cScaleStep{ 0.035f };
 		if (gg.mouse[GLFW_MOUSE_BUTTON_LAST + 1]) {	// mouse wheel up
-			if (talentScale < 1.f) {
-				talentScale += 0.02f;
+			if (talentScale < cScaleRange.to) {
+				auto mp = (cam.ToLogicPos(gg.mousePos) - talentBasePos) / talentScale;
+				auto mp2 = (cam.ToLogicPos(gg.mousePos) - talentBasePos) / (talentScale + cScaleStep);
+				talentScale += cScaleStep;
+				talentBasePos += (mp2 - mp) * talentScale;
 			}
 		}
 		if (gg.mouse[GLFW_MOUSE_BUTTON_LAST + 2]) { // mouse wheel down
-			if (talentScale > 0.1f) {
-				talentScale -= 0.02f;
+			if (talentScale > cScaleRange.from) {
+				auto mp = (cam.ToLogicPos(gg.mousePos) - talentBasePos) / talentScale;
+				auto mp2 = (cam.ToLogicPos(gg.mousePos) - talentBasePos) / (talentScale - cScaleStep);
+				talentScale -= cScaleStep;
+				talentBasePos += (mp2 - mp) * talentScale;
 			}
 		}
 
