@@ -95,7 +95,7 @@ namespace xx {
 			return *this;
 		}
 
-		Layouter& LineHeight(float h_) {
+		Layouter& LineHeight(float h_ = 0.f) {
 			lineHeight = h_;
 			return *this;
 		}

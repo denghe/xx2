@@ -3,14 +3,6 @@
 
 namespace Test5 {
 
-	// talent: config + data
-	// config: node ( id/index, parentId, [children], type, level, levelup condition, pos, info panel )
-	// data: [id+level]...
-	// colors: 
-	// can't levelup: red
-	// can levelup: green
-	// levelup max: blue
-
 	struct Scene;
 
 	enum class TalentTypes {
@@ -35,7 +27,7 @@ namespace Test5 {
 		int32_t maxLevel{};
 		xx::List<xx::List<TalentPrice>> levelPricess;
 		XY pos{};
-		// todo: grid for mouse pos check? joystick focus?
+		// todo: joystick focus?
 		int32_t level{};							// runtime / player settings?
 		bool canLevelUp{};							// runtime
 		bool visible{};								// runtime

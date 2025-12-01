@@ -54,3 +54,55 @@ void Map::Draw() {
 	gg.Quad().Draw(gg.tf.bg1, gg.tf.bg1, 0, 0.5f, gg.designSize.y / gg.tf.bg1.Size().y * scene->cam.scale, 0, 0.5f);
 
 }
+
+
+
+// todo: show player/scene properties ui
+// todo: when talent levelup, change some properties
+
+// properties / talents:
+//	scene: mining site / timer
+//		how long can it be mined
+//		+init rock numbers
+//		"drop rate" table for all rock types
+//		xxx% chance to spawn 1 rock when a rock is mined
+//		xxx% chance to add 1 second to timer when a rock is mined
+//		spawn 1 rock every 0.x second
+//		
+//	player: damage area(circle)
+//		size increase
+//		attack speed increase
+//		damage increase
+//  miner: little human/monsters
+//		search delay reduce
+//		movement speed increase
+//		damage increase( base, factor )
+//		attack speed increase
+//		critical chance / damage factor
+//  artifacts: ( from chests )
+//		damage area AI controller: ( auto change pos every ? second )
+//			level up effect: reduce the duration of stay
+//		harvest: ( more ores from rocks )
+//			level up effect: increase ores quantity ???%
+//		discount coupon:
+//			level up effect: reduce the price of miner summon by ??%
+//		sandglass: ( can change game's time scale )
+//			level up effect: more buttons of "time scale change" available
+//		pile driver: ( full screen range attack )
+//			level up effect: reduce cast delay, + damage
+//		sacred ox horn: reduces the durability of all rocks by ???%
+//			level up effect: +???%
+//		hormone: speedup for all miner
+//			level up effect: +???%
+//		... more
+//	special miner:
+//		drones? require artifacts electric generator
+//		todo( ranged? magic? ... )
+
+// talent: config + data
+// config: node ( id/index, parentId, [children], type, level, levelup condition, pos, info panel )
+// data: [id+level]...
+// colors: 
+// can't levelup: red
+// can levelup: green
+// levelup max: blue

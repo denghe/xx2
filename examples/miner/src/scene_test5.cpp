@@ -50,7 +50,9 @@ namespace Test5 {
 		xx::Layouter L;
 		L.InitBegin(node, 100, {}, { 0.5f, 0 }, 500);
 		FillInfo(L);
-		L.EndLine();
+		L.EndLine().LineHeight(10);
+		L.Image(gg.embed.shape_dot, {500, 2}, false);
+		L.EndLine().LineHeight();
 		if (level == maxLevel) {
 			L.Text("MAX", 32, 48);
 		}
