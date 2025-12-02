@@ -54,7 +54,28 @@ void PlistFileName::Load(std::string rootPath_) {
 int main() {
 	SetConsoleOutputCP(CP_UTF8);
 	auto&& cp = std::filesystem::current_path();
-	std::cout << "tool: *.plist -> *.h & cpp ( key can't contains space or dot ) \nworking dir: " << cp.string() << "\npress any key continue...";
+	std::cout << "tool: *.plist -> *.h & cpp\n\nworking dir: " << cp.string() << R"#(
+
+tips: 
+file name can't contains space or dot
+texture packer config( switch to advance )
+Data:
+	Data Format: cocos2d-x
+	Data file: ??????.plist
+	Trim sprite names: [v]
+Texture: ( optional )
+	PNG-8 ( indexed )
+Layout:
+	Max size: ?????
+	Size constraints: POT
+	Force squared: [v]
+	Allow rotation: [ ]
+	Detect identical sprites: [ ]
+Sprites:
+	Trim mode: None
+	Shape Padding: 8
+	
+press ENTER to continue...)#";
 	std::cin.get();
 
 	std::unordered_map<std::string, std::vector<std::string>> plists;		// plist file name : keys
@@ -88,6 +109,17 @@ int main() {
 		}
 
 		std::cout << "\nhandle file: " << p << std::endl;
+
+		// check file info
+		if (tp.metadata.size.width != tp.metadata.size.height) {
+			std::cerr << "**************************** bad file size( width == height ): " << p << std::endl;
+			return -__LINE__;
+		}
+		if (tp.metadata.size.width != xx::Round2n(tp.metadata.size.width)) {
+			std::cerr << "**************************** bad file size( width & height should be 2^n ): " << p << std::endl;
+			return -__LINE__;
+		}
+
 		for (auto& f : tp.frames) {
 			std::cout << "handle frame: " << f.name << std::endl;
 
@@ -328,7 +360,7 @@ void )#", structName, R"#(::Load(std::string rootPath_) {
 //		return -__LINE__;
 //	}
 
-	xx::CoutN("finished! press any key continue...");
+	xx::CoutN("finished! press ENTER to continue...");
 	std::cin.get();
 
 	return 0;
