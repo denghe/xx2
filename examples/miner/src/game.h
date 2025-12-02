@@ -30,40 +30,12 @@ struct Game : xx::Game<Game> {
 	XX_INLINE xx::Shader_Grass& Grass() { return ShaderBegin(shaderGrass); }
 
 	all all;
-	std::array<std::array<xx::Frame, 6>, 9>& all_rocks_();
-
-	//struct {
-	//	xx::Frame circle256, pickaxe, bg1, mouse_pointer;
-	//	std::array<xx::Frame, 8> explosion_1_;
-	//	std::array<xx::Frame, 7> airplane_;
-	//	std::array<xx::Frame, 3> talent_;
-	//	std::array<xx::Frame, 2> minecart_;
-	//	std::array<std::array<xx::Frame, 6>, 9> rocks_;	// rock_?_?
-
-	//	std::array<xx::Frame, 8> monster1_idle_;
-	//	std::array<xx::Frame, 11> monster1_move_;
-	//	std::array<xx::Frame, 6> monster1_atk_;
-
-	//	std::array<xx::Frame, 32> monster2_idle_;
-	//	std::array<xx::Frame, 45> monster2_move_;
-	//	std::array<xx::Frame, 28> monster2_atk_;
-
-	//	std::array<xx::Frame, 30> monster3_idle_;
-	//	std::array<xx::Frame, 4> monster3_move_;
-	//	std::array<xx::Frame, 10> monster3_atk_;
-
-	//	std::array<xx::Frame, 6> monster4_idle_;
-	//	std::array<xx::Frame, 5> monster4_move_;
-	//	std::array<xx::Frame, 7> monster4_atk_;
-	//} fs;
+	std::array<std::array<xx::Frame, 6>, 9>& all_rocks_();	// ref to all.rocks_?.  rock_?_?
 
 	struct {
 		std::array<char, 6> monster1_atk_{};
-
 		std::array<char, 28> monster2_atk_{};
-
 		std::array<char, 10> monster3_atk_{};
-
 		std::array<char, 6> monster4_atk_{};
 	} cd;	// collision detect
 

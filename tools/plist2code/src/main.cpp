@@ -7,7 +7,6 @@
 #pragma once
 #include "pch.h"
 struct PlistFileName {
-
 	xx::Frame xxx1;
 	xx::Frame xxx2;
 	xx::Frame xxx3;
@@ -29,6 +28,8 @@ include "pch.h"
 
 void PlistFileName::Load(std::string rootPath_) {
 	auto t = LoadTexture(rootPath_ + "/PlistFileName.png");
+	t->TryGenerateMipmap();
+
 	this->xxx1 = { t, X, Y, W, H, ANCHOR };
 	this->xxx2 = { t, X, Y, W, H, ANCHOR };
 	this->xxx3 = { t, X, Y, W, H, ANCHOR };
@@ -123,10 +124,11 @@ int main() {
 			if (auto idx = key.find_last_of('_'); idx != key.npos) {
 				auto k = key.substr(0, idx);
 				auto v = key.substr(idx + 1);
-				if (v.find_first_not_of("0123456789"sv) != v.npos) continue;
+				if (v.find_first_not_of("0123456789"sv) != v.npos) goto LabSingle;
 				keyGroups[k].push_back(v);
 			}
 			else {
+			LabSingle:
 				keys.push_back(key);
 			}
 		}
@@ -155,6 +157,7 @@ int main() {
 		xx::Append(code, R"#(#pragma once
 #include "pch.h"
 struct )#", structName, R"#( {)#", tmp, R"#(
+
 	void Load(std::string rootPath_);
 };
 )#");
@@ -206,7 +209,9 @@ struct )#", structName, R"#( {)#", tmp, R"#(
 #include "game.h"
 #include ")#", structName, R"#(.h"
 void )#", structName, R"#(::Load(std::string rootPath_) {
-	auto t = gg.LoadTexture(rootPath_ + "/)#", structName, R"#(.png");)#", tmp, R"#(
+	auto t = gg.LoadTexture(rootPath_ + "/)#", structName, R"#(.png");
+	t->TryGenerateMipmap();
+)#", tmp, R"#(
 };
 )#");
 		// save to file
