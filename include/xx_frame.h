@@ -19,11 +19,11 @@ namespace xx {
         TinyFrame& operator=(TinyFrame const&) = default;
         TinyFrame& operator=(TinyFrame &&) = default;
 
-        XX_INLINE operator GLuint const&() const {
+        XX_INLINE operator GLuint () const {
             return tex->id;
         }
 
-        XX_INLINE operator UVRect const&() const {
+        XX_INLINE operator UVRect () const {
             return uvRect;
         }
 
@@ -32,8 +32,7 @@ namespace xx {
         }
 
         TinyFrame(Shared<GLTexture> t) {
-            tex = std::move(t);
-            uvRect = tex->Rect();
+            operator=(std::move(t));
         }
 
         TinyFrame(Shared<GLTexture> t, int x, int y, int w, int h) {
@@ -47,16 +46,60 @@ namespace xx {
         }
     };
 
-    struct Frame : TinyFrame {
-        XY anchor;                              // unset / default: 0.5
-        XY spriteOffset{};                      // content pos for original size
+    // sprite frame with anchor point
+    struct Frame {
+        Shared<GLTexture> tex;
+        UVRect uvRect{};
+        XY anchor{};
+
+        Frame() = default;
+        Frame(Frame const&) = default;
+        Frame(Frame&&) = default;
+        Frame& operator=(Frame const&) = default;
+        Frame& operator=(Frame&&) = default;
+
+        XX_INLINE operator TinyFrame& () const {
+            return *(TinyFrame*)this;
+        }
+
+        XX_INLINE operator GLuint () const {
+            return tex->id;
+        }
+
+        XX_INLINE operator UVRect () const {
+            return uvRect;
+        }
+
+        XX_INLINE XY Size() const {
+            return { uvRect.w, uvRect.h };
+        }
+
+        Frame(Shared<GLTexture> t) {
+            operator=(std::move(t));
+        }
+
+        Frame(Shared<GLTexture> t, int x, int y, int w, int h) {
+            tex = std::move(t);
+            uvRect = { (uint16_t)x, (uint16_t)y, (uint16_t)w, (uint16_t)h };
+            anchor = 0.5f;
+        }
+
+        void operator=(Shared<GLTexture> t) {
+            tex = std::move(t);
+            uvRect = tex->Rect();
+            anchor = 0.5f;
+        }
+
+        XX_INLINE operator XY const& () const {
+            return anchor;
+        }
     };
 
     // texture packer element container
     struct TextureFrame {
         std::string key;
         // List<std::string> aliases;	        // unused
-        XY anchor;                              // unset / default: 0.5
+        XY anchor{};                            // unset / default: 0.5
         XY spriteOffset{};                      // content pos for original size
         XY spriteSize{};		                // content size( cut alpha )
         XY spriteSourceSize{};	                // original file size

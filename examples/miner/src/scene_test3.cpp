@@ -12,7 +12,7 @@ namespace Test3 {
 		track = tracks[trackIndex].second.buf;
 		trackLen = tracks[trackIndex].second.len;
 		trackPointIndex = 0;
-		tf = gg.tf.airplane_[gg.rnd.Next<int32_t>(gg.tf.airplane_.size())];
+		f = gg.rnd.NextElement(gg.fs.airplane_);
 	}
 
 	bool Airplane::Update() {
@@ -22,7 +22,7 @@ namespace Test3 {
 	}
 
 	void Airplane::Draw() {
-		gg.Quad().Draw(tf, tf, scene->cam.ToGLPos(track[trackPointIndex]), 0.5f, scene->cam.scale, radians);
+		gg.Quad().Draw(f, f, scene->cam.ToGLPos(track[trackPointIndex]), f, scene->cam.scale, radians);
 	}
 
 	/***************************************************************************************/

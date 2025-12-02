@@ -20,37 +20,36 @@ Monster& Monster::Init(Scene* scene_, int32_t monsterTypeId_, XY pos_, float rad
 
 void Monster::SetAnim(AnimTypes t) {
 	auto& mc = gg.mcs[monsterTypeId];
-	tfs = mc.tfss[(int32_t)t];
-	tfsLen = mc.tfsLens[(int32_t)t];
-	ap = mc.aps[(int32_t)t];
+	fs = mc.fss[(int32_t)t];
+	fsLen = mc.fsLens[(int32_t)t];
 	if (t == AnimTypes::Atk) cds = mc.cd;
 	else cds = {};
-	tfIndex = 0;
+	fsCursor = 0;
 }
 
 bool Monster::StepAnimOnce() {
-	tfIndex += frameDelay * speedScale;
-	return tfIndex >= tfsLen;
+	fsCursor += frameDelay * speedScale;
+	return fsCursor >= fsLen;
 }
 
 void Monster::StepAnimLoop() {
-	tfIndex += frameDelay * speedScale;
-	while (tfIndex >= tfsLen) {
-		tfIndex -= tfsLen;
+	fsCursor += frameDelay * speedScale;
+	while (fsCursor >= fsLen) {
+		fsCursor -= fsLen;
 	}
 }
 
 char Monster::GetHitData() const {
-	return cds[(int32_t)tfIndex];
+	return cds[(int32_t)fsCursor];
 }
 
 void Monster::Draw() {
 	auto& c = scene->cam;
-	auto i = (int32_t)tfIndex;
-	auto& f = tfs[i];
+	auto i = (int32_t)fsCursor;
+	auto& f = fs[i];
 	XY s{ radius / resRadius * c.scale };
 	if (flipX) s.x = -s.x;
-	gg.Quad().Draw(f, f, c.ToGLPos(pos), ap, s);
+	gg.Quad().Draw(f, f, c.ToGLPos(pos), f, s);
 	// todo: shadow ?
 }
 

@@ -17,7 +17,7 @@ namespace Test2 {
 
 	struct Rock {
 		Scene* scene{};
-		xx::TinyFrame tf;
+		xx::Frame f;
 		XY pos{}, centerPos{}, fixedPos{};
 		int32_t indexAtGrid{ -1 };
 		int32_t indexAtList{ -1 };	// fill by maker

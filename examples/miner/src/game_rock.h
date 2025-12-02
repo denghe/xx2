@@ -15,7 +15,7 @@ struct Pickaxe {
 };
 
 struct BorningRock : SceneItem {
-	xx::TinyFrame tf;
+	xx::Frame f;
 	XY pos{}, centerPos{}, fixedPos{};
 	int32_t indexAtGrid{ -1 };
 	XY scale{};

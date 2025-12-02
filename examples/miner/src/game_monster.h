@@ -8,12 +8,11 @@ enum class AnimTypes {
 };
 
 struct Monster : SceneItem {
-	xx::TinyFrame* tfs{};
+	xx::Frame* fs{};
 	char* cds{};
 	int32_t monsterTypeId{};
-	int32_t tfsLen{};
-	XY ap{};
-	float tfIndex{};
+	int32_t fsLen{};
+	float fsCursor{};
 	float resRadius{};
 	float frameDelay{};
 	float speedScale{};

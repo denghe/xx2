@@ -34,11 +34,10 @@ namespace Test4 {
 	};
 
 	struct Monster : OrderByYItem {
-		xx::TinyFrame* tfs{};
+		xx::Frame* tfs{};
 		char* cds{};
 		int32_t monsterTypeId{};
 		int32_t tfsLen{};
-		XY ap{};
 		float tfIndex{};
 		float resRadius{};
 		float frameDelay{};

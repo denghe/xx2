@@ -10,7 +10,7 @@ namespace Test3 {
 		int32_t trackLen{};
 		int32_t trackPointIndex{};
 		float radians{};
-		xx::TinyFrame tf;
+		xx::Frame f;
 		void Init(Scene* scene_);
 		bool Update();
 		void Draw();

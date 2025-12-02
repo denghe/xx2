@@ -8,13 +8,13 @@ CartRock& CartRock::Init(Scene * scene_, XY pos_) {
 	scene = scene_;
 	pos = pos_;
 	y = pos.y;
-	typeId = gg.rnd.Next(gg.tf.rocks_.size());
+	typeId = gg.rnd.Next(gg.fs.rocks_.size());
 	return *this;
 }
 
 void CartRock::Draw() {
 	auto& c = scene->cam;
-	auto& f = gg.tf.rocks_[typeId][4];
+	auto& f = gg.fs.rocks_[typeId][4];
 	gg.Quad().Draw(f, f, c.ToGLPos(pos), { 0.5f, 0.1f }, scene->cRocksScale * c.scale);
 }
 
@@ -98,11 +98,11 @@ void Scene::FixedUpdate() {
 
 void Scene::Draw() {
 	// bg
-	gg.Quad().Draw(gg.tf.bg1, gg.tf.bg1, 0, 0.5f, gg.designSize.y / gg.tf.bg1.Size().y * cam.scale, 0, 0.5f);
+	gg.Quad().Draw(gg.fs.bg1, gg.fs.bg1, 0, 0.5f, gg.designSize.y / gg.fs.bg1.Size().y * cam.scale, 0, 0.5f);
 
-	gg.Quad().Draw(gg.tf.minecart_[0], gg.tf.minecart_[0], 0, { 0.f, 1.f }, cam.scale, 0, 0.5f);
+	gg.Quad().Draw(gg.fs.minecart_[0], gg.fs.minecart_[0], 0, { 0.f, 1.f }, cam.scale, 0, 0.5f);
 	for (auto& o : cartrocks) o->Draw();
-	gg.Quad().Draw(gg.tf.minecart_[1], gg.tf.minecart_[1], 0, { 0.f, 1.f }, cam.scale, 0, 0.5f, {255,255,255,127});
+	gg.Quad().Draw(gg.fs.minecart_[1], gg.fs.minecart_[1], 0, { 0.f, 1.f }, cam.scale, 0, 0.5f, {255,255,255,127});
 
 
 	gg.GLBlendFunc(gg.blendDefault);

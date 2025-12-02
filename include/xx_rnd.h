@@ -143,6 +143,20 @@ namespace xx {
             }
 
         }
+
+        template<typename T>
+        auto& NextElement(T& container) {
+            uint32_t idx;
+            if constexpr (IsList_v<T>) {
+                static_assert(sizeof(container.len) <= 4);
+                idx = Next<uint32_t>(0, container.len);
+            }
+            else {
+                assert(container.size() <= 0xFFFFFFFFu);
+                idx = Next<uint32_t>(0, (uint32_t)container.size());
+            }
+            return container[idx];
+        }
     };
 
 

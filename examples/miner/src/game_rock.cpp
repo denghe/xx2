@@ -6,9 +6,9 @@
 
 void BorningRock::Init(Scene* scene_) {
 	scene = scene_;
-	typeId = gg.rnd.Next<int32_t>(0, gg.tf.rocks_.size());
+	typeId = gg.rnd.Next<int32_t>(0, gg.fs.rocks_.size());
 	qualityId = gg.rnd.Next<int32_t>(2);
-	tf = gg.tf.rocks_[typeId][qualityId * 2 + 1];
+	f = gg.fs.rocks_[typeId][qualityId * 2 + 1];
 
 	auto fpIdx = gg.rnd.Next<int32_t>(scene->rocksFixedPosPool.len);
 	fixedPos = scene->rocksFixedPosPool[fpIdx];
@@ -39,7 +39,7 @@ bool BorningRock::Update() {
 void BorningRock::Draw() {
 	XY s{ scene->cRocksScale * scale * scene->cam.scale };
 	if (flip) s.x = -s.x;
-	gg.Quad().Draw(tf, tf, scene->cam.ToGLPos(pos), { 0.5f, 0 }, s);
+	gg.Quad().Draw(f, f, scene->cam.ToGLPos(pos), f, s);
 }
 
 BorningRock::~BorningRock() {
@@ -58,7 +58,7 @@ void BreakingRock::Init(Rock* rock_) {
 }
 
 bool BreakingRock::Update() {
-	static constexpr auto n = gg.tf.explosion_1_.size();
+	static constexpr auto n = gg.fs.explosion_1_.size();
 	if (breakFrameIndex < n) {
 		breakFrameIndex += (gg.cDelta * n / 0.5f);
 	}
@@ -66,8 +66,8 @@ bool BreakingRock::Update() {
 }
 
 void BreakingRock::Draw() {
-	auto& f = gg.tf.explosion_1_[breakFrameIndex];
-	gg.Quad().Draw(f, f, scene->cam.ToGLPos(pos), 0.5f, scale * scene->cam.scale);
+	auto& f = gg.fs.explosion_1_[breakFrameIndex];
+	gg.Quad().Draw(f, f, scene->cam.ToGLPos(pos), f, scale * scene->cam.scale);
 }
 
 /********************************************************************************************************/
@@ -98,8 +98,9 @@ bool Pickaxe::Update() {
 }
 
 void Pickaxe::Draw(Scene* scene_) {
-	gg.Quad().Draw(gg.tf.pickaxe, gg.tf.pickaxe, scene_->cam.ToGLPos(pos)
-		, { 0.5f, 0.25f }, scene_->cRocksScale * scene_->cam.scale, radians);
+	auto& c = scene_->cam;
+	auto& f = gg.fs.pickaxe;
+	gg.Quad().Draw(f, f, c.ToGLPos(pos), f, scene_->cRocksScale * c.scale, radians);
 }
 
 /********************************************************************************************************/
@@ -107,7 +108,7 @@ void Pickaxe::Draw(Scene* scene_) {
 bool Rock::Hit(int32_t dmg_) {
 	hp -= dmg_;
 	if (hp <= cHPMax / 2) {
-		tf = gg.tf.rocks_[typeId][qualityId * 2];
+		f = gg.fs.rocks_[typeId][qualityId * 2];
 	}
 	if (hp <= 0) {
 		Break();
@@ -206,7 +207,7 @@ void Rock::Draw() {
 	if (whiteEndTime > scene->time) cp = 100000.f;
 	else cp = 1.f;
 	if (flip) s.x = -s.x;
-	gg.Quad().Draw(tf, tf, scene->cam.ToGLPos(pos), { 0.5f, 0 }, s, 0, cp);
+	gg.Quad().Draw(f, f, scene->cam.ToGLPos(pos), f, s, 0, cp);
 	if (digging) {
 		pickaxe.Draw(scene);
 	}
@@ -257,6 +258,7 @@ bool FlyingRock::Update() {
 }
 
 void FlyingRock::Draw(Scene* scene_) {
-	auto& f = gg.tf.rocks_[typeId][4];
-	gg.Quad().Draw(f, f, scene_->cam.ToGLPos(pos), 0.5f, scale * scene_->cam.scale);
+	auto& c = scene_->cam;
+	auto& f = gg.fs.rocks_[typeId][4];
+	gg.Quad().Draw(f, f, c.ToGLPos(pos), f, scale * c.scale);
 }

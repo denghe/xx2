@@ -33,7 +33,7 @@ void Scene::MakeUI() {
 	ui.Emplace()->InitRoot(gg.scale);
 	auto MakeCountUI = [&](int32_t i, XY pos) {
 		auto& o = ui->Make<xx::ImageLabelButton>()->Init(2, pos, anchor, fontSize, 0, 0, cfg, cfg)
-			(gg.tf.rocks_[i][4], cLineHeight * 1.5, cLineHeight * 0.5f, false)(xx::ToString(counts[i]));
+			(gg.fs.rocks_[i][4], cLineHeight * 1.5, cLineHeight * 0.5f, false)(xx::ToString(counts[i]));
 		o.At<xx::Scale9>(2).SetAlphaRecursive(0.5f);
 		countUIs[i] = xx::WeakFromThis(&o);
 		flyTargets[i] = cam.ToLogicPos((pos + XY{ cLineHeight * 0.5f, -cLineHeight * 0.5f }) * ui->scale);
@@ -93,7 +93,7 @@ void Scene::GenMonsters(int32_t count_) {
 		for (int32_t j = 0; j < gg.mcs.size(); ++j) {
 			//auto posOffset = xx::GetRndPosDoughnut(gg.rnd, cRockRadius * 5, 0);
 			//monsters.Emplace().Emplace<Monster>()->Init(this, j, cam.original + posOffset, 23);
-			auto pos = rocksFixedPoss[gg.rnd.Next(rocksFixedPoss.len)];
+			auto pos = gg.rnd.NextElement(rocksFixedPoss);
 			monsters.Emplace().Emplace<Monster>()->Init(this, j, pos, 23);
 		}
 	}
@@ -269,7 +269,7 @@ void Scene::Draw() {
 	for (auto& o : flyingRocks) o.Draw(this);
 
 	// draw mouse circle
-	gg.Quad().Draw(gg.tf.circle256, gg.tf.circle256, gg.mousePos, 0.5f
+	gg.Quad().Draw(gg.fs.circle256, gg.fs.circle256, gg.mousePos, 0.5f
 		, cMouseCircleRadius * 0.0078125f * cam.scale, 0, 1.f, { 255,255,255,127 });
 
 	// sync ui

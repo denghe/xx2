@@ -22,9 +22,8 @@ namespace Test4 {
 
 	void Monster::SetAnim(AnimTypes t) {
 		auto& mc = gg.mcs[monsterTypeId];
-		tfs = mc.tfss[(int32_t)t];
-		tfsLen = mc.tfsLens[(int32_t)t];
-		ap = mc.aps[(int32_t)t];
+		tfs = mc.fss[(int32_t)t];
+		tfsLen = mc.fsLens[(int32_t)t];
 		if (t == AnimTypes::Atk) {
 			cds = mc.cd;
 		}
@@ -56,7 +55,7 @@ namespace Test4 {
 		auto& f = tfs[i];
 		XY s{ radius / resRadius * c.scale };
 		if (flipX) s.x = -s.x;
-		gg.Quad().Draw(f, f, c.ToGLPos(pos), ap, s);
+		gg.Quad().Draw(f, f, c.ToGLPos(pos), f, s);
 	}
 
 	void Monster::Update() {
@@ -191,7 +190,7 @@ namespace Test4 {
 
 	void Rock::Draw() {
 		auto& c = scene->cam;
-		auto& f = gg.tf.rocks_[0][0];
+		auto& f = gg.fs.rocks_[0][0];
 		float cp;
 		if (whiteEndTime > scene->time) cp = 100000.f;
 		else cp = 1.f;

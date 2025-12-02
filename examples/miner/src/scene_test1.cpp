@@ -111,10 +111,10 @@ namespace Test1 {
 			XY offsetRange{ step / 3 };
 			for (int i = 0; i < d; ++i) {
 				auto& rock = rocks.Emplace().Emplace();
-				auto i1 = gg.rnd.Next<int32_t>(0, gg.tf.rocks_.size());
+				auto i1 = gg.rnd.Next<int32_t>(0, gg.fs.rocks_.size());
 				static constexpr int32_t cIdxs[]{ 1,3,4 };
 				auto i2 = cIdxs[gg.rnd.Next<int32_t>(3)];
-				rock->tf = gg.tf.rocks_[i1][i2];
+				rock->f = gg.fs.rocks_[i1][i2];
 
 				auto fpIdx = gg.rnd.Next<int32_t>(rocksFixedPosPool.len);
 				rock->fixedPos = rocksFixedPosPool[fpIdx];
@@ -193,14 +193,14 @@ namespace Test1 {
 
 	void Scene::Draw() {
 #if 0
-		auto& t = *gg.res.pickaxe_[0].tex;
-		gg.Quad().Draw(t, t.Rect(), 0, 0.5f, cam.scale);
+		{
+			auto& f = *gg.res.pickaxe_[0];
+			gg.Quad().Draw(f, f, 0, f, cam.scale);
+		}
 #endif
 		for (auto& rock : rocks) {
-			gg.Quad().Draw(rock->tf, rock->tf
-				, cam.ToGLPos(rock->pos)
-				, { 0.5f, 0 }
-			, cRocksScale * cam.scale);
+			auto& f = rock->f;
+			gg.Quad().Draw(f, f, cam.ToGLPos(rock->pos), f, cRocksScale * cam.scale);
 		}
 
 		gg.GLBlendFunc(gg.blendDefault);

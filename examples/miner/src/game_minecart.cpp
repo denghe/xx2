@@ -75,22 +75,22 @@ void MineCart::Add(int32_t typeId_) {
 }
 
 void MineCart::Draw() {
-	auto& f0 = gg.tf.minecart_[0];
-	auto& f1 = gg.tf.minecart_[1];
+	auto& f0 = gg.fs.minecart_[0];
+	auto& f1 = gg.fs.minecart_[1];
 	auto& c = scene->cam;
 	auto p = c.ToGLPos(pos);
 	// bg
-	gg.Quad().Draw(f0, f0, p, { 0,1 }, c.scale, 0, 0.5f);
+	gg.Quad().Draw(f0, f0, p, { 0, 1 }, c.scale, 0, 0.5f);
 
 	if (tex) {
 		//gg.Quad().Draw(tex, tex->Rect(), pos + offset, {0.f, 1.f}, c.scale);
 		// todo
 	}
 	for (auto& o : rocks) {
-		auto& f = gg.tf.rocks_[o.first][4];
-		gg.Quad().Draw(f, f, c.ToGLPos(o.second), { 0.5f, 0.1f }, cRocksScale * c.scale);
+		auto& f = gg.fs.rocks_[o.first][4];
+		gg.Quad().Draw(f, f, c.ToGLPos(o.second), f, cRocksScale * c.scale);
 	}
 	
 	// cover
-	gg.Quad().Draw(f1, f1, p, { 0,1 }, c.scale, 0, 0.5f, { 255,255,255,180 });
+	gg.Quad().Draw(f1, f1, p, { 0, 1 }, c.scale, 0, 0.5f, { 255,255,255,180 });
 }

@@ -4,7 +4,7 @@
 namespace Test1 {
 
 	struct Rock {
-		xx::TinyFrame tf;
+		xx::Frame f;
 		XY pos{}, fixedPos{};
 	};
 

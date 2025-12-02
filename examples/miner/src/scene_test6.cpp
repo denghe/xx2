@@ -22,9 +22,8 @@ Monster& Monster::Init(Scene* scene_, int32_t monsterTypeId_, XY pos_, float rad
 
 void Monster::SetAnim(AnimTypes t) {
 	auto& mc = gg.mcs[monsterTypeId];
-	tfs = mc.tfss[(int32_t)t];
-	tfsLen = mc.tfsLens[(int32_t)t];
-	ap = mc.aps[(int32_t)t];
+	tfs = mc.fss[(int32_t)t];
+	tfsLen = mc.fsLens[(int32_t)t];
 	if (t == AnimTypes::Atk) {
 		cds = mc.cd;
 	}
@@ -57,7 +56,7 @@ void Monster::Draw() {
 	auto& f = tfs[i];
 	XY s{ radius / resRadius * c.scale };
 	if (flipX) s.x = -s.x;
-	gg.Quad().Draw(f, f, c.ToGLPos(pos), ap, s);
+	gg.Quad().Draw(f, f, c.ToGLPos(pos), f, s);
 }
 
 void Monster::Update() {
@@ -153,7 +152,7 @@ void Rock::Update() {
 
 void Rock::Draw() {
 	auto& c = scene->cam;
-	auto& f = gg.tf.rocks_[0][0];
+	auto& f = gg.fs.rocks_[0][0];
 	gg.Quad().Draw(f, f, c.ToGLPos(pos), { 0.5f, 0.1f }, radius / 64.f * c.scale);
 }
 

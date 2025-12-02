@@ -9,7 +9,7 @@ namespace Test5 {
 		auto ts = scene->talentScale;
 		auto pos1 = pos * ts;
 		auto p = scene->cam.ToGLPos(scene->talentBasePos + pos1);
-		auto& fg = gg.tf.talent_[(int32_t)type];
+		auto& fg = gg.fs.talent_[(int32_t)type];
 		gg.Quad().Draw(fg, fg, p, 0.5f, scene->talentScale * scene->cam.scale);
 		xx::RGBA8 c;
 		if (level == maxLevel) {
@@ -24,7 +24,7 @@ namespace Test5 {
 		float cp;
 		if (scene->currTalent == this) cp = 1.f;
 		else cp = 0.5f;
-		auto& bg = gg.tf.circle256;
+		auto& bg = gg.fs.circle256;
 		gg.Quad().Draw(bg, bg, p, 0.5f, ts * scene->cam.scale, 0.f, cp, c);
 		// draw line
 		if (parent) {
@@ -62,7 +62,7 @@ namespace Test5 {
 			for (auto& p : ps) {
 				if (scene->currency[(int32_t)p.currencyType] < p.value) c = xx::RGBA8_Red;
 				else c = xx::RGBA8_White;
-				auto& tf = gg.tf.rocks_[std::to_underlying(p.currencyType)][4];
+				auto& tf = gg.fs.rocks_[std::to_underlying(p.currencyType)][4];
 				L.Image(tf, 48.f).Text(xx::ToString(p.value, " "), 32, 48, c);
 			}
 		}
@@ -181,7 +181,7 @@ namespace Test5 {
 			for (int32_t i = 0; i < cNumCurrencyTypes; ++i) {
 				auto p = uiPos;
 				p.x += i * 250.f;
-				ui->Make<xx::Image>()->Init(2, p, a, gg.tf.rocks_[i][4], 64.f);
+				ui->Make<xx::Image>()->Init(2, p, a, gg.fs.rocks_[i][4], 64.f);
 				p.x += 64.f + 5.f;
 				auto lbl = ui->Make<xx::Label>();
 				currencyUI[i] = lbl;
