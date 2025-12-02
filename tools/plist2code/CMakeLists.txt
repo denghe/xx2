@@ -17,6 +17,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 include_directories(
 	src/
+	../../pugixml/src
 	../../nameof/include
 	../../include
 )
@@ -33,6 +34,8 @@ add_executable(${name} ${sources})
 source_group("" FILES ${sources})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/../../ FILES ${sources})
 
+add_subdirectory(../../pugixml pugixml)
+target_link_libraries(${name} pugixml)
 
 
 if (WIN32)

@@ -1,16 +1,65 @@
 ﻿#include <pch.h>
 
+/*
+* template
+* PlistFileName.h
+
+#pragma once
+#include "pch.h"
+struct PlistFileName {
+
+	xx::Frame xxx1;
+	xx::Frame xxx2;
+	xx::Frame xxx3;
+	...
+	std::array<xx::Frame, ???> xxxA_;
+	std::array<xx::Frame, ???> xxxB_;
+	std::array<xx::Frame, ???> xxxC_;
+	...
+
+	void Load();
+};
+
+///////////////////////////////////////////////////////
+
+* PlistFileName.cpp
+
+include "pch.h"
+#include "PlistFileName.h"
+
+void PlistFileName::Load(std::string rootPath_) {
+	auto t = LoadTexture(rootPath_ + "/PlistFileName.png");
+	this->xxx1 = { t, X, Y, W, H, ANCHOR };
+	this->xxx2 = { t, X, Y, W, H, ANCHOR };
+	this->xxx3 = { t, X, Y, W, H, ANCHOR };
+	...
+	this->xxxA_[0] = { t, X, Y, W, H, ANCHOR };
+	this->xxxA_[1] = { t, X, Y, W, H, ANCHOR };
+	this->xxxA_[2] = { t, X, Y, W, H, ANCHOR };
+	...
+	this->xxxB_[0] = { t, X, Y, W, H, ANCHOR };
+	this->xxxB_[1] = { t, X, Y, W, H, ANCHOR };
+	this->xxxB_[2] = { t, X, Y, W, H, ANCHOR };
+	...
+	this->xxxC_[0] = { t, X, Y, W, H, ANCHOR };
+	this->xxxC_[1] = { t, X, Y, W, H, ANCHOR };
+	this->xxxC_[2] = { t, X, Y, W, H, ANCHOR };
+	...
+}
+
+
+*/
+
 int main() {
 	SetConsoleOutputCP(CP_UTF8);
 	auto&& cp = std::filesystem::current_path();
-	std::cout << "tool: *.plist -> *.blist ( key can't contains space or dot ) + res_tp_frames.h & cpp\nworking dir: " << cp.string() << "\npress any key continue...";
+	std::cout << "tool: *.plist -> *.h & cpp ( key can't contains space or dot ) \nworking dir: " << cp.string() << "\npress any key continue...";
 	std::cin.get();
 
 	std::unordered_map<std::string, std::vector<std::string>> plists;		// plist file name : keys
 	std::map<std::string, std::string> keys;								// key : owner plist file name
 	std::unordered_map<std::string, xx::TexturePackerReader::Plist> tps;	// plist file name : data
 
-	int n = 0;
 	for (auto&& entry : std::filesystem::/*recursive_*/directory_iterator(cp)) {
 		if (!entry.is_regular_file()) continue;
 		auto&& p = entry.path();
@@ -38,11 +87,6 @@ int main() {
 		}
 
 		std::cout << "\nhandle file: " << p << std::endl;
-		xx::Data d;
-		d.WriteBuf("blist_1 ");	// custom file head 8 bytes
-		d.Write(tp.metadata.realTextureFileName);
-		d.Write(tp.metadata.premultiplyAlpha);
-		d.Write(tp.frames.size());
 		for (auto& f : tp.frames) {
 			std::cout << "handle frame: " << f.name << std::endl;
 
@@ -63,172 +107,223 @@ int main() {
 				return -__LINE__;
 			}
 			iter->second.push_back(f.name);
+		}
+	}
 
 
-			d.Write(f.name);
-			d.Write(f.aliases);
-			if (f.anchor.has_value()) {
-				d.WriteFixed((uint8_t)1);
-				d.Write(f.anchor->x, f.anchor->y);
-			} else {
-				d.WriteFixed((uint8_t)0);
+	for (auto&& [plistFileName, tp] : tps) {
+		auto structName = plistFileName.substr(0, plistFileName.size() - 6);
+
+		// group by prefix...._number
+		std::map<std::string, std::vector<std::string>> keyGroups;
+		std::vector<std::string> keys;
+
+		auto&& allKeys = plists[plistFileName];
+		for (auto&& key : allKeys) {
+			if (auto idx = key.find_last_of('_'); idx != key.npos) {
+				auto k = key.substr(0, idx);
+				auto v = key.substr(idx + 1);
+				if (v.find_first_not_of("0123456789"sv) != v.npos) continue;
+				keyGroups[k].push_back(v);
 			}
-			d.WriteFixed(f.spriteOffset.x);
-			d.WriteFixed(f.spriteOffset.y);
-			d.WriteFixed(f.spriteSize.width);
-			d.WriteFixed(f.spriteSize.height);
-			d.WriteFixed(f.spriteSourceSize.width);
-			d.WriteFixed(f.spriteSourceSize.height);
-			d.WriteFixed(f.textureRect.x);
-			d.WriteFixed(f.textureRect.y);
-			d.WriteFixed(f.textureRect.width);
-			d.WriteFixed(f.textureRect.height);
-			d.WriteFixed(f.textureRotated);
+			else {
+				keys.push_back(key);
+			}
 		}
-		xx::WriteAllBytes((std::u8string&)blistPath, d);
-		++n;
-	}
 
-	// group by prefix...._number
-	std::map<std::string_view, std::vector<std::string_view>> keyGroups;
-
-	for (auto& [k, _] : keys) {
-		std::string_view sv(k);
-		if (auto idx = sv.find_last_of('_'); idx != sv.npos) {
-			auto k = sv.substr(0, idx);
-			auto v = sv.substr(idx + 1);
-			if (v.find_first_not_of("0123456789"sv) != v.npos) continue;
-			keyGroups[k].push_back(v);
+		// sort by number
+		for (auto&& kv : keyGroups) {
+			auto& ss = kv.second;
+			std::sort(ss.begin(), ss.end(), [](std::string const& a, std::string const& b)->bool {
+				return xx::SvToNumber<int>(a) < xx::SvToNumber<int>(b);
+			});
 		}
-	}
 
-	// sort by number
-	for (auto&& kv : keyGroups) {
-		auto& ss = kv.second;
-		std::sort(ss.begin(), ss.end(), [](std::string_view const& a, std::string_view const& b)->bool {
-			return xx::SvToNumber<int>(a) < xx::SvToNumber<int>(b);
-		});
-	}
+		std::string code, tmp;
 
+		for (auto&& k : keys) {
+			if (keyGroups.contains(k))
+				continue;
+			xx::Append(tmp, R"#(
+	xx::Frame )#", k, R"#(;)#");
+		}
+		for (auto&& kv : keyGroups) {
+			xx::Append(tmp, R"#(
+	std::array<xx::Frame, )#", kv.second.size(), R"#(> )#", kv.first, R"#(_;)#");
+		}
 
-	std::string h;
-
-	xx::Append(h, R"#(#pragma once
+		xx::Append(code, R"#(#pragma once
 #include "pch.h"
-
-// this file is generated by tool: plist2blist
-
-struct ResTpFrames {
-	xx::Task<> AsyncLoad(std::string picRoot);
-)#");
-
-	for (auto& [key, plistfn] : keys) {
-		auto& tp = tps[plistfn];
-		auto f = &tp.frames[0];
-		for (auto& o : tp.frames) {
-			if (o.name == key) {
-				f = &o;
-				break;
-			}
-		}
-
-		xx::XY anchor{ 0.5, 0.5 };
-		if (f->anchor.has_value()) {
-			anchor = *f->anchor;
-		}
-		
-		xx::AppendFormat(h, R"#(
-	xx::Ref<xx::Frame> {0};
-	xx::Ref<xx::GLTexture> _tex_{0};
-	GLuint _texid_{0}{{};	// unsafe
-	static constexpr xx::XY _size_{0}{{ {1}, {2} };
-	static constexpr xx::XY _anchor_{0}{{ {3}, {4} };
-	static constexpr xx::UVRect _uvrect_{0}{{ {5}, {6}, {7}, {8} };
-)#"
-			, key, f->spriteSize.width, f->spriteSize.height
-			, anchor.x, anchor.y
-			, f->textureRect.x, f->textureRect.y, f->textureRect.width, f->textureRect.height
-		);
-	}
-
-	if (!keyGroups.empty()) {
-		xx::Append(h, R"#(
-)#");
-	}
-
-	for (auto&& kv : keyGroups) {
-		xx::AppendFormat(h, R"(
-	xx::Listi32<xx::Ref<xx::Frame>> {0}_;
-	static constexpr int32_t _countof_{0}_{{ {1} };)", kv.first, kv.second.size());
-	}
-
-	xx::Append(h, R"#(
+struct )#", structName, R"#( {)#", tmp, R"#(
+	void Load(std::string rootPath_);
 };
 )#");
-
-	std::string c;
-
-
-	xx::Append(c, R"#(#include "pch.h"
-#include "res_tp_frames.h"
-
-// this file is generated by tool: plist2blist
-
-xx::Task<> ResTpFrames::AsyncLoad(std::string picRoot) {)#");
-
-	for (auto& plist : plists) {
-		xx::AppendFormat(c, R"#(
-	{{
-		auto& eg = xx::EngineBase3::Instance();
-#ifdef __EMSCRIPTEN__
-		auto tp = co_await eg.AsyncLoadTexturePackerFromUrl(picRoot + "{0}");
-#else
-		auto tp = eg.LoadTexturePacker<true>(picRoot + "{0}");
-#endif
-		xx_assert(tp);
-		auto map = tp->GetMapSV();
-)#", plist.first.substr(0, plist.first.size() - 5) + "blist");
-
-		for (auto& key : plist.second) {
-			xx::AppendFormat(c, R"#(
-		this->{0} = map["{0}"sv];
-		this->_tex_{0} = this->{0}->tex;
-		this->_texid_{0} = this->_tex_{0}->GetValue();)#", key);
+		// save to file
+		auto fn = structName + ".h";
+		if (int r = xx::WriteAllBytes((std::u8string&)fn, code.data(), code.size())) {
+			std::cerr << "write file failed! r = " << r << std::endl;
+			return -__LINE__;
 		}
-		xx::AppendFormat(c, R"#(
-	}
-)#");
-	}
 
-	if (!keyGroups.empty()) {
-		xx::Append(c, R"#(
-	// fill groups
-)#");
+		// todo: cpp
+		code.clear();
+		tmp.clear();
+
+		for (auto&& k : keys) {
+			auto f = &tp.frames[0];
+			for (auto& o : tp.frames) {
+				if (o.name == k) {
+					f = &o;
+					break;
+				}
+			}
+			xx::XY anchor{ 0.5f };
+			if (f->anchor.has_value()) anchor = *f->anchor;
+			xx::Append(tmp, R"#(
+	this->)#", k, " = { t, ", f->textureRect.x, ", ", f->textureRect.y, ", ", f->textureRect.width, ", ", f->textureRect.height, ", { ", anchor.x, ", ", anchor.y, " } };");
+		}
+
 		for (auto&& kv : keyGroups) {
-			for (auto&& s : kv.second) {
-				xx::AppendFormat(c, R"(
-	{0}_.Add({0}_{1});)", kv.first, s);
+			auto& k = kv.first;
+			auto& names = kv.second;
+			for(int i = 0; i < names.size(); ++i) {
+				auto name = k + "_" + names[i];
+				auto f = &tp.frames[0];
+				for (auto& o : tp.frames) {
+					if (o.name == name) {
+						f = &o;
+						break;
+					}
+				}
+				xx::XY anchor{ 0.5f };
+				if (f->anchor.has_value()) anchor = *f->anchor;
+				xx::Append(tmp, R"#(
+	this->)#", k, "_[", i, "] = { t, ", f->textureRect.x, ", ", f->textureRect.y, ", ", f->textureRect.width, ", ", f->textureRect.height, ", { ", anchor.x, ", ", anchor.y, " } };");
 			}
 		}
-	}
 
-	xx::Append(c, R"#(
-	co_return;
-}
+		xx::Append(code, R"#(#include "pch.h"
+#include "game.h"
+#include ")#", structName, R"#(.h"
+void )#", structName, R"#(::Load(std::string rootPath_) {
+	auto t = gg.LoadTexture(rootPath_ + "/)#", structName, R"#(.png");)#", tmp, R"#(
+};
 )#");
-
-
-	// save to file
-	if (int r = xx::WriteAllBytes(u8"res_tp_frames.h", h.data(), h.size())) {
-		std::cerr << "write file res_tp_frames.h failed! r = " << r << std::endl;
-		return -__LINE__;
-	}
-	if (int r = xx::WriteAllBytes(u8"res_tp_frames.cpp", c.data(), c.size())) {
-		std::cerr << "write file res_tp_frames.h failed! r = " << r << std::endl;
-		return -__LINE__;
+		// save to file
+		fn = structName + ".cpp";
+		if (int r = xx::WriteAllBytes((std::u8string&)fn, code.data(), code.size())) {
+			std::cerr << "write file failed! r = " << r << std::endl;
+			return -__LINE__;
+		}
 	}
 
-	xx::CoutN("finished! generated res_tp_frames.h & cpp! press any key continue...");
+
+//	for (auto& [key, plistfn] : keys) {
+//		auto& tp = tps[plistfn];
+//		auto f = &tp.frames[0];
+//		for (auto& o : tp.frames) {
+//			if (o.name == key) {
+//				f = &o;
+//				break;
+//			}
+//		}
+//
+//		xx::XY anchor{ 0.5, 0.5 };
+//		if (f->anchor.has_value()) {
+//			anchor = *f->anchor;
+//		}
+//		
+//		xx::AppendFormat(h, R"#(
+//	xx::Ref<xx::Frame> {0};
+//	xx::Ref<xx::GLTexture> _tex_{0};
+//	GLuint _texid_{0}{{};	// unsafe
+//	static constexpr xx::XY _size_{0}{{ {1}, {2} };
+//	static constexpr xx::XY _anchor_{0}{{ {3}, {4} };
+//	static constexpr xx::UVRect _uvrect_{0}{{ {5}, {6}, {7}, {8} };
+//)#"
+//			, key, f->spriteSize.width, f->spriteSize.height
+//			, anchor.x, anchor.y
+//			, f->textureRect.x, f->textureRect.y, f->textureRect.width, f->textureRect.height
+//		);
+//	}
+//
+//	if (!keyGroups.empty()) {
+//		xx::Append(h, R"#(
+//)#");
+//	}
+//
+//	for (auto&& kv : keyGroups) {
+//		xx::AppendFormat(h, R"(
+//	xx::Listi32<xx::Ref<xx::Frame>> {0}_;
+//	static constexpr int32_t _countof_{0}_{{ {1} };)", kv.first, kv.second.size());
+//	}
+//
+//	xx::Append(h, R"#(
+//};
+//)#");
+//
+//
+//
+//	xx::Append(c, R"#(#include "pch.h"
+//#include "res_tp_frames.h"
+//
+//// this file is generated by tool: plist2blist
+//
+//xx::Task<> ResTpFrames::AsyncLoad(std::string picRoot) {)#");
+//
+//	for (auto& plist : plists) {
+//		xx::AppendFormat(c, R"#(
+//	{{
+//		auto& eg = xx::EngineBase3::Instance();
+//#ifdef __EMSCRIPTEN__
+//		auto tp = co_await eg.AsyncLoadTexturePackerFromUrl(picRoot + "{0}");
+//#else
+//		auto tp = eg.LoadTexturePacker<true>(picRoot + "{0}");
+//#endif
+//		xx_assert(tp);
+//		auto map = tp->GetMapSV();
+//)#", plist.first.substr(0, plist.first.size() - 5) + "blist");
+//
+//		for (auto& key : plist.second) {
+//			xx::AppendFormat(c, R"#(
+//		this->{0} = map["{0}"sv];
+//		this->_tex_{0} = this->{0}->tex;
+//		this->_texid_{0} = this->_tex_{0}->GetValue();)#", key);
+//		}
+//		xx::AppendFormat(c, R"#(
+//	}
+//)#");
+//	}
+//
+//	if (!keyGroups.empty()) {
+//		xx::Append(c, R"#(
+//	// fill groups
+//)#");
+//		for (auto&& kv : keyGroups) {
+//			for (auto&& s : kv.second) {
+//				xx::AppendFormat(c, R"(
+//	{0}_.Add({0}_{1});)", kv.first, s);
+//			}
+//		}
+//	}
+//
+//	xx::Append(c, R"#(
+//	co_return;
+//}
+//)#");
+//
+//
+//	// save to file
+//	if (int r = xx::WriteAllBytes(u8"res_tp_frames.h", h.data(), h.size())) {
+//		std::cerr << "write file res_tp_frames.h failed! r = " << r << std::endl;
+//		return -__LINE__;
+//	}
+//	if (int r = xx::WriteAllBytes(u8"res_tp_frames.cpp", c.data(), c.size())) {
+//		std::cerr << "write file res_tp_frames.h failed! r = " << r << std::endl;
+//		return -__LINE__;
+//	}
+
+	xx::CoutN("finished! press any key continue...");
 	std::cin.get();
 
 	return 0;

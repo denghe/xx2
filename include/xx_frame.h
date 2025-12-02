@@ -35,7 +35,8 @@ namespace xx {
             operator=(std::move(t));
         }
 
-        TinyFrame(Shared<GLTexture> t, int x, int y, int w, int h) {
+        template<typename T>
+        TinyFrame(Shared<GLTexture> t, T x, T y, T w, T h) {
             tex = std::move(t);
             uvRect = { (uint16_t)x, (uint16_t)y, (uint16_t)w, (uint16_t)h };
         }
@@ -78,10 +79,11 @@ namespace xx {
             operator=(std::move(t));
         }
 
-        Frame(Shared<GLTexture> t, int x, int y, int w, int h) {
+        template<typename T>
+        Frame(Shared<GLTexture> t, T x, T y, T w, T h, XY anchor_ = 0.5f) {
             tex = std::move(t);
             uvRect = { (uint16_t)x, (uint16_t)y, (uint16_t)w, (uint16_t)h };
-            anchor = 0.5f;
+            anchor = anchor_;
         }
 
         void operator=(Shared<GLTexture> t) {
