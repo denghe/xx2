@@ -151,7 +151,7 @@ void Rock::Update() {
 
 void Rock::Draw() {
 	auto& c = scene->cam;
-	auto& f = gg.fs.rocks_[0][0];
+	auto& f = gg.all_rocks_()[0][0];
 	gg.Quad().Draw(f, f, c.ToGLPos(pos), { 0.5f, 0.1f }, radius / 64.f * c.scale);
 }
 

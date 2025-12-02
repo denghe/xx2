@@ -51,8 +51,8 @@ void Map::Update() {
 
 void Map::Draw() {
 	// draw bg
-	auto& f = gg.fs.bg1;
-	gg.Quad().Draw(f, f, 0, f, gg.designSize.y / gg.fs.bg1.Size().y * scene->cam.scale, 0, 0.5f);
+	auto& f = gg.all.bg1;
+	gg.Quad().Draw(f, f, 0, f, gg.designSize.y / f.Size().y * scene->cam.scale, 0, 0.5f);
 
 }
 

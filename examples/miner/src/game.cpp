@@ -13,6 +13,10 @@ void Game::Init() {
 	title = "examples_miner";
 }
 
+std::array<std::array<xx::Frame, 6>, 9>& Game::all_rocks_() {
+	return (std::array<std::array<xx::Frame, 6>, 9>&)all.rock_0_;
+}
+
 void Game::GLInit() {
 	// hide hardware mouse
 	SetMousePointerVisible(false);
@@ -33,49 +37,11 @@ void Game::GLInit() {
 	ss.monster3_atk = LoadSoundSource("res/monster3_atk.ogg");
 	ss.monster4_atk = LoadSoundSource("res/monster4_atk.ogg");
 
-	// load pngs
-	fs.circle256 = LoadTexture("res/circle256.png");
-	fs.pickaxe = LoadTexture("res/pickaxe.png");
-	fs.pickaxe.anchor = { 0.5f, 0.25f };
-	fs.bg1 = LoadTexture("res/bg1.png");
-	fs.mouse_pointer = LoadTexture("res/mouse_pointer.png");
-	for (size_t i = 0; i < fs.explosion_1_.size(); i++) {
-		fs.explosion_1_[i] = LoadTexture(xx::ToStringFormat("res/explosion_1_{0}.png", i + 1));
-	}
-	for (size_t i = 0; i < fs.airplane_.size(); i++) {
-		fs.airplane_[i] = LoadTexture(xx::ToStringFormat("res/airplane_{0}.png", i + 1));
-	}
-	for (size_t i = 0; i < fs.talent_.size(); i++) {
-		fs.talent_[i] = LoadTexture(xx::ToStringFormat("res/talent_{0}.png", i + 1));
-	}
-	for (size_t i = 0; i < fs.minecart_.size(); i++) {
-		fs.minecart_[i] = LoadTexture(xx::ToStringFormat("res/minecart_{0}.png", i + 1));
-	}
-	for (size_t i = 0; i < fs.rocks_.size(); i++) {
-		auto& sub = fs.rocks_[i];
-		for (size_t j = 0; j < sub.size(); j++) {
-			sub[j] = LoadTexture(xx::ToStringFormat("res/rock_{0}_{1}.png", i, j));
-			if (j >= 4) {
-				sub[j].anchor = { 0.5f, 0.05f };
-			}
-		}
-	}
+	// load texture packer
+	all.Load("res/_tp");
 
-	// load monster pngs & some config
-	auto LoadMonsterTFs = [this](auto& tfIdle, auto& tfMove, auto& tfAtk, auto const& pathPrefix
-		, int32_t configIndex, XY apIdle = { 0.5f, 0 }, XY apMove = { 0.5f, 0 }, XY apAtk = { 0.5f, 0 }) {
-		for (size_t i = 0; i < tfIdle.size(); i++) {
-			tfIdle[i] = LoadTexture(xx::ToStringFormat("{0}_idle_{1}.png", pathPrefix, i + 1));
-			tfIdle[i].anchor = apIdle;
-		}
-		for (size_t i = 0; i < tfMove.size(); i++) {
-			tfMove[i] = LoadTexture(xx::ToStringFormat("{0}_move_{1}.png", pathPrefix, i + 1));
-			tfMove[i].anchor = apMove;
-		}
-		for (size_t i = 0; i < tfAtk.size(); i++) {
-			tfAtk[i] = LoadTexture(xx::ToStringFormat("{0}_atk_{1}.png", pathPrefix, i + 1));
-			tfAtk[i].anchor = apAtk;
-		}
+	// fill monster some config
+	auto ConfigMonster = [this](auto& tfIdle, auto& tfMove, auto& tfAtk, int32_t configIndex) {
 		auto& mc = mcs[configIndex];
 		mc.fss[0] = tfIdle.data();
 		mc.fsLens[0] = tfIdle.size();
@@ -84,32 +50,18 @@ void Game::GLInit() {
 		mc.fss[2] = tfAtk.data();
 		mc.fsLens[2] = tfAtk.size();
 	};
-	LoadMonsterTFs(fs.monster1_idle_, fs.monster1_move_, fs.monster1_atk_, "res/monster1", 0);
-	LoadMonsterTFs(fs.monster2_idle_, fs.monster2_move_, fs.monster2_atk_, "res/monster2", 1);
-	LoadMonsterTFs(fs.monster3_idle_, fs.monster3_move_, fs.monster3_atk_, "res/monster3", 2
-	, { 0.5f, 1.f - 86.f / 95 }, { 0.5f, 1.f - 86.f / 95 }, { 74.f / 217, 1.f - 90.f / 108 });
-	LoadMonsterTFs(fs.monster4_idle_, fs.monster4_move_, fs.monster4_atk_, "res/monster4", 3);
+	ConfigMonster(all.monster1_idle_, all.monster1_move_, all.monster1_atk_, 0);
+	ConfigMonster(all.monster2_idle_, all.monster2_move_, all.monster2_atk_, 1);
+	ConfigMonster(all.monster3_idle_, all.monster3_move_, all.monster3_atk_, 2);
+	ConfigMonster(all.monster4_idle_, all.monster4_move_, all.monster4_atk_, 3);
 
-	// combine pngs into single texture
-	{
-		xx::RectPacker rp;
-		auto buf = (xx::Frame*)&fs;
-		static constexpr auto bufLen = sizeof(fs) / sizeof(xx::Frame);
-		for (int32_t i = 0; i < bufLen; ++i) {
-			rp.tfs.Add((xx::TinyFrame*)&buf[i]);
-		}
-		rp.AutoPack();
-	}
-
-	// fill collision detect data( left-top:0,0 )
+	// set hit frame flags
 	cd.monster1_atk_[3] = 1;
 	cd.monster2_atk_[7] = 1;
 	cd.monster3_atk_[4] = 1;
 	cd.monster4_atk_[3] = 1;
 
-
-
-	// fill monster configs
+	// fill monster some configs
 	{
 		auto& mc = mcs[0];
 		mc.animFPS = 12;
@@ -147,7 +99,7 @@ void Game::GLInit() {
 		mc.ss = ss.monster4_atk;
 	}
 
-	// load file data
+	// load file data( for memory scan )
 	stbi.bg1a.Fill(LoadFileData("res/bg1a.png"));
 	stbi.minecart_3.Fill(LoadFileData("res/minecart_3.png"));
 
@@ -164,7 +116,7 @@ void Game::Update() {
 	if (oldScene) oldScene.Reset();
 
 	// draw mouse pointer
-	Quad().Draw(fs.mouse_pointer, fs.mouse_pointer, mousePos, 0.5f, 3.f);
+	Quad().Draw(all.mouse_pointer, all.mouse_pointer, mousePos, 0.5f, 3.f);
 }
 
 void Game::Delay() {

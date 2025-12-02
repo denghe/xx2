@@ -243,7 +243,6 @@
                 <false/>
             </struct>
             <key type="filename">../bg1.png</key>
-            <key type="filename">../bg1a.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.5,0.5</point_f>
@@ -297,7 +296,6 @@
             </struct>
             <key type="filename">../minecart_1.png</key>
             <key type="filename">../minecart_2.png</key>
-            <key type="filename">../minecart_3.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.5,0.5</point_f>
@@ -1028,7 +1026,6 @@
                     <filename>../airplane_6.png</filename>
                     <filename>../airplane_7.png</filename>
                     <filename>../bg1.png</filename>
-                    <filename>../bg1a.png</filename>
                     <filename>../circle256.png</filename>
                     <filename>../explosion_1_1.png</filename>
                     <filename>../explosion_1_2.png</filename>
@@ -1040,7 +1037,6 @@
                     <filename>../explosion_1_8.png</filename>
                     <filename>../minecart_1.png</filename>
                     <filename>../minecart_2.png</filename>
-                    <filename>../minecart_3.png</filename>
                     <filename>../monster1_atk_1.png</filename>
                     <filename>../monster1_atk_2.png</filename>
                     <filename>../monster1_atk_3.png</filename>

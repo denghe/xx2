@@ -75,8 +75,8 @@ void MineCart::Add(int32_t typeId_) {
 }
 
 void MineCart::Draw() {
-	auto& f0 = gg.fs.minecart_[0];
-	auto& f1 = gg.fs.minecart_[1];
+	auto& f0 = gg.all.minecart_[0];
+	auto& f1 = gg.all.minecart_[1];
 	auto& c = scene->cam;
 	auto p = c.ToGLPos(pos);
 	// bg
@@ -87,7 +87,7 @@ void MineCart::Draw() {
 		// todo
 	}
 	for (auto& o : rocks) {
-		auto& f = gg.fs.rocks_[o.first][4];
+		auto& f = gg.all_rocks_()[o.first][4];
 		gg.Quad().Draw(f, f, c.ToGLPos(o.second), f, cRocksScale * c.scale);
 	}
 	

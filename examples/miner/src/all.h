@@ -2,12 +2,12 @@
 #include "pch.h"
 struct all {
 	xx::Frame bg1;
-	xx::Frame bg1a;
 	xx::Frame circle256;
+	xx::Frame mouse_pointer;
 	xx::Frame pickaxe;
 	std::array<xx::Frame, 7> airplane_;
 	std::array<xx::Frame, 8> explosion_1_;
-	std::array<xx::Frame, 3> minecart_;
+	std::array<xx::Frame, 2> minecart_;
 	std::array<xx::Frame, 6> monster1_atk_;
 	std::array<xx::Frame, 9> monster1_idle_;
 	std::array<xx::Frame, 11> monster1_move_;
@@ -30,5 +30,6 @@ struct all {
 	std::array<xx::Frame, 6> rock_7_;
 	std::array<xx::Frame, 6> rock_8_;
 	std::array<xx::Frame, 3> talent_;
+
 	void Load(std::string rootPath_);
 };

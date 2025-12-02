@@ -190,7 +190,7 @@ namespace Test4 {
 
 	void Rock::Draw() {
 		auto& c = scene->cam;
-		auto& f = gg.fs.rocks_[0][0];
+		auto& f = gg.all_rocks_()[0][0];
 		float cp;
 		if (whiteEndTime > scene->time) cp = 100000.f;
 		else cp = 1.f;

@@ -12,7 +12,7 @@ namespace Test3 {
 		track = tracks[trackIndex].second.buf;
 		trackLen = tracks[trackIndex].second.len;
 		trackPointIndex = 0;
-		f = gg.rnd.NextElement(gg.fs.airplane_);
+		f = gg.rnd.NextElement(gg.all.airplane_);
 	}
 
 	bool Airplane::Update() {

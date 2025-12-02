@@ -33,7 +33,7 @@ void Scene::MakeUI() {
 	ui.Emplace()->InitRoot(gg.scale);
 	auto MakeCountUI = [&](int32_t i, XY pos) {
 		auto& o = ui->Make<xx::ImageLabelButton>()->Init(2, pos, anchor, fontSize, 0, 0, cfg, cfg)
-			(gg.fs.rocks_[i][4], cLineHeight * 1.5, cLineHeight * 0.5f, false)(xx::ToString(counts[i]));
+			(gg.all_rocks_()[i][4], cLineHeight * 1.5, cLineHeight * 0.5f, false)(xx::ToString(counts[i]));
 		o.At<xx::Scale9>(2).SetAlphaRecursive(0.5f);
 		countUIs[i] = xx::WeakFromThis(&o);
 		flyTargets[i] = cam.ToLogicPos((pos + XY{ cLineHeight * 0.5f, -cLineHeight * 0.5f }) * ui->scale);
@@ -269,8 +269,11 @@ void Scene::Draw() {
 	for (auto& o : flyingRocks) o.Draw(this);
 
 	// draw mouse circle
-	gg.Quad().Draw(gg.fs.circle256, gg.fs.circle256, gg.mousePos, 0.5f
-		, cMouseCircleRadius * 0.0078125f * cam.scale, 0, 1.f, { 255,255,255,127 });
+	{
+		auto& f = gg.all.circle256;
+		gg.Quad().Draw(f, f, gg.mousePos, f
+			, cMouseCircleRadius * 0.0078125f * cam.scale, 0, 1.f, { 255,255,255,127 });
+	}
 
 	// sync ui
 	for (int32_t i = 0; i < counts.size(); ++i) {

@@ -19,7 +19,7 @@ void Rock::Update() {
 
 void Rock::Draw() {
 	auto& c = scene->cam;
-	auto& f = gg.fs.rocks_[0][0];
+	auto& f = gg.all_rocks_()[0][0];
 	gg.Quad().Draw(f, f, c.ToGLPos(pos), { 0.5f, 0.1f }, radius / 64.f * c.scale);
 }
 
@@ -103,7 +103,7 @@ void Scene::FixedUpdate() {
 
 void Scene::Draw() {
 	// bg
-	gg.Quad().Draw(gg.fs.bg1, gg.fs.bg1, 0, 0.5f, gg.designSize.y / gg.fs.bg1.Size().y * cam.scale, 0, 0.5f);
+	gg.Quad().Draw(gg.all.bg1, gg.all.bg1, 0, 0.5f, gg.designSize.y / gg.all.bg1.Size().y * cam.scale, 0, 0.5f);
 
 	// sort order by y
 	assert(obyis.Empty());

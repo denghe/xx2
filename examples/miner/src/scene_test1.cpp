@@ -111,10 +111,10 @@ namespace Test1 {
 			XY offsetRange{ step / 3 };
 			for (int i = 0; i < d; ++i) {
 				auto& rock = rocks.Emplace().Emplace();
-				auto i1 = gg.rnd.Next<int32_t>(0, gg.fs.rocks_.size());
+				auto i1 = gg.rnd.Next<int32_t>(0, gg.all_rocks_().size());
 				static constexpr int32_t cIdxs[]{ 1,3,4 };
 				auto i2 = cIdxs[gg.rnd.Next<int32_t>(3)];
-				rock->f = gg.fs.rocks_[i1][i2];
+				rock->f = gg.all_rocks_()[i1][i2];
 
 				auto fpIdx = gg.rnd.Next<int32_t>(rocksFixedPosPool.len);
 				rock->fixedPos = rocksFixedPosPool[fpIdx];

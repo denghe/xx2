@@ -31,7 +31,7 @@ namespace Test2 {
 
 	void Pickaxe::Draw(Scene* scene_) {
 		auto& c = scene_->cam;
-		auto& f = gg.fs.pickaxe;
+		auto& f = gg.all.pickaxe;
 		gg.Quad().Draw(f, f, c.ToGLPos(pos), f, scene_->cRocksScale * c.scale, radians, 1.f, { 255,255,255,127 });
 	}
 
@@ -46,9 +46,9 @@ namespace Test2 {
 	void Rock::Init(Scene* scene_) {
 		scene = scene_;
 		hp = cHPMax;
-		typeId = gg.rnd.Next<int32_t>(0, gg.fs.rocks_.size());
+		typeId = gg.rnd.Next<int32_t>(0, gg.all_rocks_().size());
 		qualityId = gg.rnd.Next<int32_t>(2);
-		f = gg.fs.rocks_[typeId][qualityId * 2 + 1];
+		f = gg.all_rocks_()[typeId][qualityId * 2 + 1];
 
 		auto fpIdx = gg.rnd.Next<int32_t>(scene->rocksFixedPosPool.len);
 		fixedPos = scene->rocksFixedPosPool[fpIdx];
@@ -90,7 +90,7 @@ namespace Test2 {
 	}
 
 	void Rock::Update() {
-		static constexpr auto esiz = gg.fs.explosion_1_.size();
+		static constexpr auto esiz = gg.all.explosion_1_.size();
 		static constexpr float cScaleStep{ 1.f / (gg.cFps * 0.25f) };
 
 		XX_BEGIN(_1);
@@ -109,7 +109,7 @@ namespace Test2 {
 				if (pickaxe.Update()) {
 					hp -= 25;
 					if (hp <= cHPMax / 2) {
-						f = gg.fs.rocks_[typeId][qualityId * 2];
+						f = gg.all_rocks_()[typeId][qualityId * 2];
 					}
 					if (hp <= 0) goto LabBreak;
 					else {
@@ -136,7 +136,7 @@ namespace Test2 {
 	void Rock::Draw() {
 		XY s{ scene->cRocksScale * scale * scene->cam.scale };
 		if (breaking) {
-			auto& f = gg.fs.explosion_1_[breakFrameIndex];
+			auto& f = gg.all.explosion_1_[breakFrameIndex];
 			gg.Quad().Draw(f, f, scene->cam.ToGLPos(centerPos), 0.5f, s * 3.f);
 		}
 		else {
@@ -200,7 +200,7 @@ namespace Test2 {
 
 	void FlyingRock::Draw(Scene* scene_) {
 		auto& c = scene_->cam;
-		auto& f = gg.fs.rocks_[typeId][4];
+		auto& f = gg.all_rocks_()[typeId][4];
 		gg.Quad().Draw(f, f, c.ToGLPos(pos), f, scale * c.scale);
 	}
 
@@ -264,7 +264,7 @@ namespace Test2 {
 		for (int i = 0; i < counts.size(); ++i) {
 			auto pos = basePos + XY{ i * gg.designSize.x / counts.size(), 0 };
 			auto& o = ui->Make<xx::ImageLabelButton>()->Init(2, pos, anchor, fontSize, 0, 0, cfg, cfg)
-				(gg.fs.rocks_[i][4], cLineHeight * 1.5, cLineHeight * 0.5f, false)(xx::ToString(counts[i]));
+				(gg.all_rocks_()[i][4], cLineHeight * 1.5, cLineHeight * 0.5f, false)(xx::ToString(counts[i]));
 			o.At<xx::Scale9>(2).SetAlphaRecursive(0.5f);
 			countUIs[i] = xx::WeakFromThis(&o);
 			flyTargets[i] = cam.ToLogicPos((pos + XY{ cLineHeight * 0.5f, -cLineHeight * 0.5f }) * ui->scale);
@@ -358,8 +358,11 @@ namespace Test2 {
 		for (auto& o : flyingRocks) o.Draw(this);
 
 		// draw mouse circle
-		gg.Quad().Draw(gg.fs.circle256, gg.fs.circle256, gg.mousePos, 0.5f
-			, cMouseCircleRadius * 0.0078125f * cam.scale, 0, 1.f, { 255,255,255,127 });
+		{
+			auto& f = gg.all.circle256;
+			gg.Quad().Draw(f, f, gg.mousePos, f
+				, cMouseCircleRadius * 0.0078125f * cam.scale, 0, 1.f, { 255,255,255,127 });
+		}
 
 		// sync ui
 		for (int32_t i = 0; i < counts.size(); ++i) {
