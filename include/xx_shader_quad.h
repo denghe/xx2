@@ -20,17 +20,6 @@ namespace xx {
             color = color_;
             texRect = rect_;
         }
-
-        XX_INLINE void Fill(Frame& frame_, XY pos_ = {}, XY scale_ = 1.f
-            , float radians_ = 0.f, float colorplus_ = 1.f, RGBA8 color_ = RGBA8_White) {
-            pos = pos_;
-            anchor = frame_;
-            scale = scale_;
-            radians = radians_;
-            colorplus = colorplus_;
-            color = color_;
-            texRect = frame_;
-        }
     };
 
     struct Shader_Quad : Shader {
@@ -191,13 +180,13 @@ void main() {
             Alloc(texId_, 1)->Fill(rect_, pos_, anchor_, scale_, radians_, colorplus_, color_);
         }
 
-        XX_INLINE void Draw(TinyFrame& tinyFrame_, XY pos_ = {}, XY anchor_ = 0.5f
+        XX_INLINE void DrawTinyFrame(TinyFrame& tinyFrame_, XY pos_ = {}, XY anchor_ = 0.5f
             , XY scale_ = 1.f, float radians_ = 0.f, float colorplus_ = 1.f, RGBA8 color_ = RGBA8_White) {
             Alloc(tinyFrame_, 1)->Fill(tinyFrame_, pos_, anchor_, scale_, radians_, colorplus_, color_);
         }
 
-        XX_INLINE void Draw(Frame& frame_, XY pos_ = {}, XY scale_ = 1.f, float radians_ = 0.f, float colorplus_ = 1.f, RGBA8 color_ = RGBA8_White) {
-            Alloc(frame_, 1)->Fill(frame_, pos_, frame_, scale_, radians_, colorplus_, color_);
+        XX_INLINE void DrawFrame(Frame& frame_, XY pos_ = {}, XY scale_ = 1.f, float radians_ = 0.f, float colorplus_ = 1.f, RGBA8 color_ = RGBA8_White) {
+            Alloc(frame_.tex->id, 1)->Fill(frame_, pos_, frame_.anchor, scale_, radians_, colorplus_, color_);
         }
     };
 

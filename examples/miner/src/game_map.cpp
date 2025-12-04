@@ -52,7 +52,7 @@ void Map::Update() {
 void Map::Draw() {
 	// draw bg
 	auto& f = gg.all.bg1;
-	gg.Quad().Draw(f, f, 0, f, gg.designSize.y / f.Size().y * scene->cam.scale, 0, 0.5f);
+	gg.Quad().DrawFrame(f, 0, gg.designSize.y / f.Size().y * scene->cam.scale, 0, 0.5f);
 
 }
 
@@ -70,16 +70,22 @@ void Map::Draw() {
 //		xxx% chance to add 1 second to timer when a rock is mined
 //		spawn 1 rock every 0.x second
 //		
-//	player: damage area(circle)
+//	player: damage area( mouse circle )
 //		size increase
 //		attack speed increase
 //		damage increase
+// 
 //  miner: little human/monsters
 //		search delay reduce
 //		movement speed increase
 //		damage increase( base, factor )
 //		attack speed increase
 //		critical chance / damage factor
+//	porter: little human/monsters / unmanned drone
+//  gambler: flip a coin likely
+//	special miner/porter/gambler:
+//		todo( supernatural? magic? ... )
+// 
 //  artifacts: ( from chests )
 //		damage area AI controller: ( auto change pos every ? second )
 //			level up effect: reduce the duration of stay
@@ -96,9 +102,6 @@ void Map::Draw() {
 //		hormone: speedup for all miner
 //			level up effect: +???%
 //		... more
-//	special miner:
-//		drones? require artifacts electric generator
-//		todo( ranged? magic? ... )
 
 // talent: config + data
 // config: node ( id/index, parentId, [children], type, level, levelup condition, pos, info panel )

@@ -49,7 +49,7 @@ void Monster::Draw() {
 	auto& f = fs[i];
 	XY s{ radius / resRadius * c.scale };
 	if (flipX) s.x = -s.x;
-	gg.Quad().Draw(f, f, c.ToGLPos(pos), f, s);
+	gg.Quad().DrawFrame(f, c.ToGLPos(pos), s);
 	// todo: shadow ?
 }
 

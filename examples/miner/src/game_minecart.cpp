@@ -80,7 +80,7 @@ void MineCart::Draw() {
 	auto& c = scene->cam;
 	auto p = c.ToGLPos(pos);
 	// bg
-	gg.Quad().Draw(f0, f0, p, { 0, 1 }, c.scale, 0, 0.5f);
+	gg.Quad().Draw(f0, f0.uvRect, p, {0, 1}, c.scale, 0, 0.5f);
 
 	if (tex) {
 		//gg.Quad().Draw(tex, tex->Rect(), pos + offset, {0.f, 1.f}, c.scale);
@@ -88,7 +88,7 @@ void MineCart::Draw() {
 	}
 	for (auto& o : rocks) {
 		auto& f = gg.all_rocks_()[o.first][4];
-		gg.Quad().Draw(f, f, c.ToGLPos(o.second), f, cRocksScale * c.scale);
+		gg.Quad().DrawFrame(f, c.ToGLPos(o.second), cRocksScale * c.scale);
 	}
 	
 	// cover

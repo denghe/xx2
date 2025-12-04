@@ -71,6 +71,10 @@ namespace xx {
             return uvRect;
         }
 
+        XX_INLINE operator XY const& () const {
+            return anchor;
+        }
+
         XX_INLINE XY Size() const {
             return { uvRect.w, uvRect.h };
         }
@@ -90,10 +94,6 @@ namespace xx {
             tex = std::move(t);
             uvRect = tex->Rect();
             anchor = 0.5f;
-        }
-
-        XX_INLINE operator XY const& () const {
-            return anchor;
         }
     };
 

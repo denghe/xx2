@@ -199,8 +199,7 @@ namespace Test1 {
 		}
 #endif
 		for (auto& rock : rocks) {
-			auto& f = rock->f;
-			gg.Quad().Draw(f, f, cam.ToGLPos(rock->pos), f, cRocksScale * cam.scale);
+			gg.Quad().DrawFrame(rock->f, cam.ToGLPos(rock->pos), cRocksScale * cam.scale);
 		}
 
 		gg.GLBlendFunc(gg.blendDefault);

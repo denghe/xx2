@@ -10,7 +10,7 @@ namespace Test5 {
 		auto pos1 = pos * ts;
 		auto p = scene->cam.ToGLPos(scene->talentBasePos + pos1);
 		auto& fg = gg.all.talent_[(int32_t)type];
-		gg.Quad().Draw(fg, fg, p, 0.5f, scene->talentScale * scene->cam.scale);
+		gg.Quad().DrawFrame(fg, p, scene->talentScale * scene->cam.scale);
 		xx::RGBA8 c;
 		if (level == maxLevel) {
 			c = xx::RGBA8_Blue;
@@ -25,7 +25,7 @@ namespace Test5 {
 		if (scene->currTalent == this) cp = 1.f;
 		else cp = 0.5f;
 		auto& bg = gg.all.circle256;
-		gg.Quad().Draw(bg, bg, p, 0.5f, ts * scene->cam.scale, 0.f, cp, c);
+		gg.Quad().DrawFrame(bg, p, ts * scene->cam.scale, 0.f, cp, c);
 		// draw line
 		if (parent) {
 			auto pos2 = parent->pos * ts;
@@ -39,7 +39,7 @@ namespace Test5 {
 			auto step = norm * dist * (1.f / numSteps);
 			for (int32_t i = 0; i < numSteps; ++i) {
 				auto pp = scene->cam.ToGLPos(scene->talentBasePos + pos1 + step * i);
-				gg.Quad().Draw(bg, bg, pp, 0.5f, ts * scene->cam.scale * 0.1f, 0.f, cp, c);
+				gg.Quad().DrawFrame(bg, pp, ts * scene->cam.scale * 0.1f, 0.f, cp, c);
 			}
 		}
 	}

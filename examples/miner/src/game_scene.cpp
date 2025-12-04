@@ -269,11 +269,8 @@ void Scene::Draw() {
 	for (auto& o : flyingRocks) o.Draw(this);
 
 	// draw mouse circle
-	{
-		auto& f = gg.all.circle256;
-		gg.Quad().Draw(f, f, gg.mousePos, f
-			, cMouseCircleRadius * 0.0078125f * cam.scale, 0, 1.f, { 255,255,255,127 });
-	}
+	gg.Quad().DrawFrame(gg.all.circle256, gg.mousePos
+		, cMouseCircleRadius * 0.0078125f * cam.scale, 0, 1.f, { 255,255,255,127 });
 
 	// sync ui
 	for (int32_t i = 0; i < counts.size(); ++i) {

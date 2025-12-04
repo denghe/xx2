@@ -116,7 +116,7 @@ void Game::Update() {
 	if (oldScene) oldScene.Reset();
 
 	// draw mouse pointer
-	Quad().Draw(all.mouse_pointer, all.mouse_pointer, mousePos, 0.5f, 3.f);
+	Quad().DrawFrame(all.mouse_pointer, mousePos, 3.f);
 }
 
 void Game::Delay() {

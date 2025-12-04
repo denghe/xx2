@@ -22,7 +22,7 @@ namespace Test3 {
 	}
 
 	void Airplane::Draw() {
-		gg.Quad().Draw(f, f, scene->cam.ToGLPos(track[trackPointIndex]), f, scene->cam.scale, radians);
+		gg.Quad().DrawFrame(f, scene->cam.ToGLPos(track[trackPointIndex]), scene->cam.scale, radians);
 	}
 
 	/***************************************************************************************/

@@ -32,7 +32,7 @@ namespace Test2 {
 	void Pickaxe::Draw(Scene* scene_) {
 		auto& c = scene_->cam;
 		auto& f = gg.all.pickaxe;
-		gg.Quad().Draw(f, f, c.ToGLPos(pos), f, scene_->cRocksScale * c.scale, radians, 1.f, { 255,255,255,127 });
+		gg.Quad().DrawFrame(f, c.ToGLPos(pos), scene_->cRocksScale * c.scale, radians, 1.f, { 255,255,255,127 });
 	}
 
 	/********************************************************************************************************/
@@ -201,7 +201,7 @@ namespace Test2 {
 	void FlyingRock::Draw(Scene* scene_) {
 		auto& c = scene_->cam;
 		auto& f = gg.all_rocks_()[typeId][4];
-		gg.Quad().Draw(f, f, c.ToGLPos(pos), f, scale * c.scale);
+		gg.Quad().DrawFrame(f, c.ToGLPos(pos), scale * c.scale);
 	}
 
 	/********************************************************************************************************/
@@ -360,8 +360,7 @@ namespace Test2 {
 		// draw mouse circle
 		{
 			auto& f = gg.all.circle256;
-			gg.Quad().Draw(f, f, gg.mousePos, f
-				, cMouseCircleRadius * 0.0078125f * cam.scale, 0, 1.f, { 255,255,255,127 });
+			gg.Quad().DrawFrame(f, gg.mousePos, cMouseCircleRadius * 0.0078125f * cam.scale, 0, 1.f, { 255,255,255,127 });
 		}
 
 		// sync ui
