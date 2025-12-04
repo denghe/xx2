@@ -129,7 +129,7 @@ void Equip::InitCfgs() {
 	{
 		auto& c = MakeMakerAndCfg<Equip_amulet_1>();
 		c->name = i18n::Strs::Equip_amulet_1;
-		c->icon = gg.res.amulet_1;
+		c->icon = gg.fs.amulet_1;
 		c->location = EquipLocations::Amulet;
 		c->quality = EquipQualities::Normal;
 		c->props.Emplace(EquipConfigProp{ EquipTargets::Creature, 0, {10, 10} });
@@ -138,7 +138,7 @@ void Equip::InitCfgs() {
 	{
 		auto& c = MakeMakerAndCfg<Equip_armor_1>();
 		c->name = i18n::Strs::Equip_armor_1;
-		c->icon = gg.res.armor_1;
+		c->icon = gg.fs.armor_1;
 		c->location = EquipLocations::Armor;
 		c->quality = EquipQualities::Normal;
 		//c->props.Emplace(......)
@@ -146,7 +146,7 @@ void Equip::InitCfgs() {
 	{
 		auto& c = MakeMakerAndCfg<Equip_armor_2>();
 		c->name = i18n::Strs::Equip_armor_2;
-		c->icon = gg.res.armor_2;
+		c->icon = gg.fs.armor_2;
 		c->location = EquipLocations::Armor;
 		c->quality = EquipQualities::Excellent;
 		//c->props.Emplace(......)
@@ -154,7 +154,7 @@ void Equip::InitCfgs() {
 	{
 		auto& c = MakeMakerAndCfg<Equip_armor_3>();
 		c->name = i18n::Strs::Equip_armor_3;
-		c->icon = gg.res.armor_3;
+		c->icon = gg.fs.armor_3;
 		c->location = EquipLocations::Armor;
 		c->quality = EquipQualities::Rare;
 		//c->props.Emplace(......)
@@ -162,7 +162,7 @@ void Equip::InitCfgs() {
 	{
 		auto& c = MakeMakerAndCfg<Equip_boots_1>();
 		c->name = i18n::Strs::Equip_boots_1;
-		c->icon = gg.res.boots_1;
+		c->icon = gg.fs.boots_1;
 		c->location = EquipLocations::Boots;
 		c->quality = EquipQualities::Normal;
 		//c->props.Emplace(......)
@@ -170,7 +170,7 @@ void Equip::InitCfgs() {
 	{
 		auto& c = MakeMakerAndCfg<Equip_consumable_1>();
 		c->name = i18n::Strs::Equip_consumable_1;
-		c->icon = gg.res.consumable_1;
+		c->icon = gg.fs.consumable_1;
 		c->location = EquipLocations::Consumables;
 		c->quality = EquipQualities::Normal;
 		//c->props.Emplace(......)
@@ -178,7 +178,7 @@ void Equip::InitCfgs() {
 	{
 		auto& c = MakeMakerAndCfg<Equip_currency_1>();
 		c->name = i18n::Strs::Equip_currency_1;
-		c->icon = gg.res.currency_1;
+		c->icon = gg.fs.currency_1;
 		c->location = EquipLocations::Currency;
 		c->quality = EquipQualities::Normal;
 		//c->props.Emplace(......)
@@ -186,7 +186,7 @@ void Equip::InitCfgs() {
 	{
 		auto& c = MakeMakerAndCfg<Equip_currency_2>();
 		c->name = i18n::Strs::Equip_currency_2;
-		c->icon = gg.res.currency_2;
+		c->icon = gg.fs.currency_2;
 		c->location = EquipLocations::Currency;
 		c->quality = EquipQualities::Normal;
 		//c->props.Emplace(......)
@@ -194,7 +194,7 @@ void Equip::InitCfgs() {
 	{
 		auto& c = MakeMakerAndCfg<Equip_helm_1>();
 		c->name = i18n::Strs::Equip_helm_1;
-		c->icon = gg.res.helm_1;
+		c->icon = gg.fs.helm_1;
 		c->location = EquipLocations::Helm;
 		c->quality = EquipQualities::Normal;
 		//c->props.Emplace(......)
@@ -202,7 +202,7 @@ void Equip::InitCfgs() {
 	{
 		auto& c = MakeMakerAndCfg<Equip_material_1>();
 		c->name = i18n::Strs::Equip_material_1;
-		c->icon = gg.res.material_1;
+		c->icon = gg.fs.material_1;
 		c->location = EquipLocations::Materials;
 		c->quality = EquipQualities::Normal;
 		//c->props.Emplace(......)
@@ -210,7 +210,7 @@ void Equip::InitCfgs() {
 	{
 		auto& c = MakeMakerAndCfg<Equip_ring_1>();
 		c->name = i18n::Strs::Equip_ring_1;
-		c->icon = gg.res.ring_1;
+		c->icon = gg.fs.ring_1;
 		c->location = EquipLocations::Ring;
 		c->quality = EquipQualities::Rare;
 		//c->props.Emplace(......)
@@ -218,7 +218,7 @@ void Equip::InitCfgs() {
 	{
 		auto& c = MakeMakerAndCfg<Equip_ring_2>();
 		c->name = i18n::Strs::Equip_ring_2;
-		c->icon = gg.res.ring_2;
+		c->icon = gg.fs.ring_2;
 		c->location = EquipLocations::Ring;
 		c->quality = EquipQualities::Epic;
 		//c->props.Emplace(......)
@@ -226,7 +226,7 @@ void Equip::InitCfgs() {
 	{
 		auto& c = MakeMakerAndCfg<Equip_ring_3>();
 		c->name = i18n::Strs::Equip_ring_3;
-		c->icon = gg.res.ring_3;
+		c->icon = gg.fs.ring_3;
 		c->location = EquipLocations::Ring;
 		c->quality = EquipQualities::Legendary;
 		//c->props.Emplace(......)
@@ -234,7 +234,7 @@ void Equip::InitCfgs() {
 	{
 		auto& c = MakeMakerAndCfg<Equip_ring_4>();
 		c->name = i18n::Strs::Equip_ring_4;
-		c->icon = gg.res.ring_4;
+		c->icon = gg.fs.ring_4;
 		c->location = EquipLocations::Ring;
 		c->quality = EquipQualities::Ancient;
 		//c->props.Emplace(......)
@@ -242,7 +242,7 @@ void Equip::InitCfgs() {
 	{
 		auto& c = MakeMakerAndCfg<Equip_weapon1_1>();
 		c->name = i18n::Strs::Equip_weapon1_1;
-		c->icon = gg.res.weapon1_1;
+		c->icon = gg.fs.weapon1_1;
 		c->location = EquipLocations::Weapon1;
 		c->quality = EquipQualities::Normal;
 		//c->props.Emplace(......)
@@ -250,7 +250,7 @@ void Equip::InitCfgs() {
 	{
 		auto& c = MakeMakerAndCfg<Equip_weapon1_2>();
 		c->name = i18n::Strs::Equip_weapon1_2;
-		c->icon = gg.res.weapon1_2;
+		c->icon = gg.fs.weapon1_2;
 		c->location = EquipLocations::Weapon1;
 		c->quality = EquipQualities::Excellent;
 		//c->props.Emplace(......)
@@ -258,7 +258,7 @@ void Equip::InitCfgs() {
 	{
 		auto& c = MakeMakerAndCfg<Equip_weapon1_3>();
 		c->name = i18n::Strs::Equip_weapon1_3;
-		c->icon = gg.res.weapon1_3;
+		c->icon = gg.fs.weapon1_3;
 		c->location = EquipLocations::Weapon1;
 		c->quality = EquipQualities::Epic;
 		c->props.Emplace(EquipConfigProp{ EquipTargets::Creature, 4, {30, 50} });
@@ -267,7 +267,7 @@ void Equip::InitCfgs() {
 	{
 		auto& c = MakeMakerAndCfg<Equip_weapon2_1>();
 		c->name = i18n::Strs::Equip_weapon2_1;
-		c->icon = gg.res.weapon2_1;
+		c->icon = gg.fs.weapon2_1;
 		c->location = EquipLocations::Weapon2;
 		c->quality = EquipQualities::Normal;
 		//c->props.Emplace(......)

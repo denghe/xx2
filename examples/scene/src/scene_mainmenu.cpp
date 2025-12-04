@@ -5,6 +5,9 @@
 #include "ui_settings_lang.h"
 #include "ui_animchar.h"
 
+#include "scene_test1.h"
+
+
 void Scene_MainMenu::Init() {
 	bak = gg.lang.language;
 	MakeUI();
@@ -72,6 +75,11 @@ void Scene_MainMenu::MakeUI() {
 		gg.running = false;
 	};
 
+	offset.y -= cLineHeight;
+	ui->Make<xx::LabelButton>()->Init(2, offset, anchor, fontSize)("test1").onClicked = [this] {
+		gg.MakeScene<Scene_Test1>()->Init();
+	};
+
 	ui->Make<xx::Label>()->Init(2, gg.p1 + cMargin, gg.a1, fontSize)("ver 0.1");
 
 	ui->Make<xx::Label>()->Init(2, gg.p3 + XY{ -cMargin, cMargin }, gg.a3, fontSize)(gg.lang(Strs::escBack));
@@ -97,7 +105,7 @@ void Scene_MainMenu::Update() {
 void Scene_MainMenu::Draw() {
 	// bg?
 #if 1
-	auto& tex = *gg.res.blade.tex;
+	auto& tex = *gg.fs.blade.tex;
 	gg.Quad().Draw(tex, tex.Rect(), {300, 0}, 0);
 #endif
 

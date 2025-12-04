@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 #include "scene_play.h"
 #include "scene_mainmenu.h"
+#include "ui_settings.h"
 
 // todo: equip + bag + props list + log panel
 // game logic: player auto attack monster. monster dead: drop items. monster auto reborn. 
@@ -60,9 +61,9 @@ void Scene_Play::Update() {
 
 	// fixed update
 	auto d = float(std::min((float)gg.delta, gg.cMaxDelta) * timeScale);
-	time += d;
 	timePool += d;
 	while (timePool >= gg.cDelta) {
+		time += gg.cDelta;
 		timePool -= gg.cDelta;
 		FixedUpdate();
 	}

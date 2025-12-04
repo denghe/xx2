@@ -19,11 +19,13 @@ struct Game : xx::Game<Game>, Sav {
 	}
 
 	struct {
-		xx::TinyFrame
+		xx::Frame
 			damage_numbers,
 			hpbar;
+	} res;
 
-		xx::TinyFrame
+	struct {
+		xx::Frame
 			blade,
 			monster,
 			player,
@@ -48,18 +50,20 @@ struct Game : xx::Game<Game>, Sav {
 			currency_2,
 			currency_1,
 			material_1,
-			consumable_1
+			consumable_1,
+
+			bug_body,
+			bug_head
 		;
 
-		xx::List<xx::TinyFrame>
-			explosion_
-		;
+		std::array<xx::Frame, 7> explosion_;
+	} fs;
 
+	struct {
 		xx::Shared<xx::SoundSource>
 			explosion
 		;
-
-	} res;
+	} ss;
 
 	// runtime vars
 	i18n::Lang lang;

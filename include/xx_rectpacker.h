@@ -4,6 +4,17 @@
 #include "xx_framebuffer.h"
 #include "xx_gamebase_shader.h"
 
+/*
+* example:
+
+	xx::RectPacker tp;
+	for (int32_t i = 0; i < sizeof(fs) / sizeof(xx::Frame); ++i) {
+		tp.tfs.Add((xx::TinyFrame*)&((xx::Frame*)&fs)[i]);
+	}
+	tp.AutoPack();
+
+*/
+
 namespace xx {
 
 	struct RectPacker {

@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include "game.h"
-#include "ui_settings.h"
 
 struct Scene_MainMenu : xx::SceneBase {
 	xx::Shared<xx::Node> ui;

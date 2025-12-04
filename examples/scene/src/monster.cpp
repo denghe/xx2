@@ -13,7 +13,7 @@ void Monster::Update() {
 
 void Monster::Draw() {
 	auto& c = scene->cam;
-	auto& f = gg.res.monster;
+	auto& f = gg.fs.monster;
 	auto s = scale * (c.scale * (radius / f.uvRect.w));
 	auto p = pos + shaker.offset;
 	gg.Quad().Draw(*f.tex, f.uvRect, c.ToGLPos(p), anchor, s, radians);

@@ -59,7 +59,7 @@ void Player::Update() {
 
 void Player::Draw() {
 	auto& c = scene->cam;
-	auto& f = gg.res.player;
+	auto& f = gg.fs.player;
 	auto s = scale * (c.scale * (radius / f.uvRect.w));
 	auto p = pos + shaker.offset;
 	gg.Quad().Draw(*f.tex, f.uvRect, c.ToGLPos(p), anchor, s, radians);
