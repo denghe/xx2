@@ -1,15 +1,15 @@
 ﻿#include "pch.h"
 #include "game_scene.h"
-#include "game_monster.h"
+#include "game_miner.h"
 
-Monster& Monster::Init(Scene* scene_, int32_t monsterTypeId_, XY pos_, float radius_) {
+Miner& Miner::Init(Scene* scene_, int32_t minerTypeId_, XY pos_, float radius_) {
 	scene = scene_;
 	pos = pos_;
 	y = pos.y;
-	monsterTypeId = monsterTypeId_;
+	minerTypeId = minerTypeId_;
 	radius = radius_;
 	speedScale = 1.f;
-	auto& mc = gg.mcs[monsterTypeId];
+	auto& mc = gg.mcs[minerTypeId];
 	frameDelay = mc.animFPS / gg.cFps;
 	resRadius = mc.resRadius;
 	moveSpeed = mc.moveSpeed;
@@ -18,8 +18,8 @@ Monster& Monster::Init(Scene* scene_, int32_t monsterTypeId_, XY pos_, float rad
 	return *this;
 }
 
-void Monster::SetAnim(AnimTypes t) {
-	auto& mc = gg.mcs[monsterTypeId];
+void Miner::SetAnim(AnimTypes t) {
+	auto& mc = gg.mcs[minerTypeId];
 	fs = mc.fss[(int32_t)t];
 	fsLen = mc.fsLens[(int32_t)t];
 	if (t == AnimTypes::Atk) cds = mc.cd;
@@ -27,23 +27,23 @@ void Monster::SetAnim(AnimTypes t) {
 	fsCursor = 0;
 }
 
-bool Monster::StepAnimOnce() {
+bool Miner::StepAnimOnce() {
 	fsCursor += frameDelay * speedScale;
 	return fsCursor >= fsLen;
 }
 
-void Monster::StepAnimLoop() {
+void Miner::StepAnimLoop() {
 	fsCursor += frameDelay * speedScale;
 	while (fsCursor >= fsLen) {
 		fsCursor -= fsLen;
 	}
 }
 
-char Monster::GetHitData() const {
+char Miner::GetHitData() const {
 	return cds[(int32_t)fsCursor];
 }
 
-void Monster::Draw() {
+void Miner::Draw() {
 	auto& c = scene->cam;
 	auto i = (int32_t)fsCursor;
 	auto& f = fs[i];
@@ -53,7 +53,7 @@ void Monster::Draw() {
 	// todo: shadow ?
 }
 
-bool Monster::Update() {
+bool Miner::Update() {
 	XX_BEGIN(_1);
 LabSearch:
 	SetAnim(AnimTypes::Idle);
@@ -90,7 +90,7 @@ LabMoveLoop:
 LabAttack:
 	SetAnim(AnimTypes::Atk);
 	if (gg.GetActiveVoiceCount() < 8) {
-		gg.PlayAudio(gg.mcs[monsterTypeId].ss.Lock(), 0.3f);
+		gg.PlayAudio(gg.mcs[minerTypeId].ss.Lock(), 0.3f);
 	}
 	hited = 0;
 	while (!StepAnimOnce()) {
@@ -110,7 +110,7 @@ LabAttack:
 	return false;
 }
 
-bool Monster::SearchTarget() {
+bool Miner::SearchTarget() {
 	target.Reset();
 	float minMag2 = std::numeric_limits<float>::max();
 	if (scene->rocks.len < 30) {

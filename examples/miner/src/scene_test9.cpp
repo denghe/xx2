@@ -77,23 +77,10 @@ void Scene::Update() {
 		gg.MakeScene<Scene_MainMenu>()->Init();
 		return;
 	}
-	if (gg.keyboard[GLFW_KEY_SPACE](0.2f)) {
+	if (gg.mouse[GLFW_MOUSE_BUTTON_1](0.2f)) {
 		AddCartRocks();
 		return;
 	}
-
-	// fixed update
-	auto d = float(std::min((float)gg.delta, gg.cMaxDelta) * timeScale);
-	timePool += d;
-	while (timePool >= gg.cDelta) {
-		time += gg.cDelta;
-		timePool -= gg.cDelta;
-		FixedUpdate();
-	}
-}
-
-void Scene::FixedUpdate() {
-	// todo: add new craftrock
 }
 
 void Scene::Draw() {

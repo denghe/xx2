@@ -75,13 +75,13 @@ void Map::Draw() {
 //		attack speed increase
 //		damage increase
 // 
-//  miner: little human/monsters
+//  miner: little human/miners
 //		search delay reduce
 //		movement speed increase
 //		damage increase( base, factor )
 //		attack speed increase
 //		critical chance / damage factor
-//	porter: little human/monsters / unmanned drone
+//	porter: little human/miners / unmanned drone
 //  gambler: flip a coin likely
 //	special miner/porter/gambler:
 //		todo( supernatural? magic? ... )

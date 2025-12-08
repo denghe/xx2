@@ -20,15 +20,23 @@ namespace Test7 {
 		XY pos{};
 		float radius{};
 		int32_t hp{};
+		float whiteEndTime{};
+		XY scale{};
+		bool bouncing{};
+		int32_t _2{};
+		void Hit();
+		void BeginWhite();
+		void BeginBounce();
+		void Bounce();	// _2
 		Rock& Init(Scene* scene_, XY pos_, float radius_);
 		void Update() override;
 		void Draw() override;
 	};
 
-	struct Monster : OrderByYItem {
+	struct Miner : OrderByYItem {
 		xx::Frame* tfs{};
 		char* cds{};
-		int32_t monsterTypeId{};
+		int32_t minerTypeId{};
 		int32_t tfsLen{};
 		float tfIndex{};
 		float resRadius{};
@@ -45,7 +53,7 @@ namespace Test7 {
 		char hited{};
 		int32_t _1{};
 
-		Monster& Init(Scene* scene_, int32_t monsterTypeId_, XY pos_, float radius_);
+		Miner& Init(Scene* scene_, int32_t minerTypeId_, XY pos_, float radius_);
 		void SetAnim(AnimTypes t);
 		bool StepAnimOnce();
 		void StepAnimLoop();
@@ -62,11 +70,11 @@ namespace Test7 {
 		float time{}, timePool{}, timeScale{ 1 };
 		float timer{};
 
-		xx::List<xx::Shared<Monster>> monsters;
+		xx::List<xx::Shared<Miner>> miners;
 		xx::List<xx::Shared<Rock>> rocks;
 		xx::List<std::pair<float, OrderByYItem*>> obyis;	// for draw order
 
-		void Init(int32_t monsterTypeId_);
+		void Init(int32_t minerTypeId_);
 		void Update() override;
 		void FixedUpdate();
 		void Draw() override;

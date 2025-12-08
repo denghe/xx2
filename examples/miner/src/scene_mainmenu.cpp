@@ -9,6 +9,7 @@
 #include "scene_test7.h"
 #include "scene_test8.h"
 #include "scene_test9.h"
+#include "scene_testa.h"
 #include "game_scene.h"
 
 void Scene_MainMenu::Init() {
@@ -48,31 +49,31 @@ void Scene_MainMenu::MakeUI() {
 	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test3(airplanes)")).onClicked = [this] {
 		gg.MakeScene<Test3::Scene>()->Init();
 	};
-	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test4(monster1 sound)")).onClicked = [this] {
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test4(miner1 sound)")).onClicked = [this] {
 		gg.MakeScene<Test4::Scene>()->Init(0);
 	};
-	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test4(monster2 sound)")).onClicked = [this] {
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test4(miner2 sound)")).onClicked = [this] {
 		gg.MakeScene<Test4::Scene>()->Init(1);
 	};
-	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test4(monster3 sound)")).onClicked = [this] {
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test4(miner3 sound)")).onClicked = [this] {
 		gg.MakeScene<Test4::Scene>()->Init(2);
 	};
-	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test4(monster4 sound)")).onClicked = [this] {
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test4(miner4 sound)")).onClicked = [this] {
 		gg.MakeScene<Test4::Scene>()->Init(3);
 	};
-	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test7(monster1)")).onClicked = [this] {
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test7(miner1)")).onClicked = [this] {
 		gg.MakeScene<Test7::Scene>()->Init(0);
 	};
-	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test7(monster2)")).onClicked = [this] {
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test7(miner2)")).onClicked = [this] {
 		gg.MakeScene<Test7::Scene>()->Init(1);
 	};
-	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test7(monster3)")).onClicked = [this] {
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test7(miner3)")).onClicked = [this] {
 		gg.MakeScene<Test7::Scene>()->Init(2);
 	};
-	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test7(monster4)")).onClicked = [this] {
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test7(miner4)")).onClicked = [this] {
 		gg.MakeScene<Test7::Scene>()->Init(3);
 	};
-	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test6(monster all)")).onClicked = [this] {
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test6(miner all)")).onClicked = [this] {
 		gg.MakeScene<Test6::Scene>()->Init();
 	};
 	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test8(map)")).onClicked = [this] {
@@ -83,6 +84,9 @@ void Scene_MainMenu::MakeUI() {
 	};
 	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test9(minecart)")).onClicked = [this] {
 		gg.MakeScene<Test9::Scene>()->Init();
+	};
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("testA(porter)")).onClicked = [this] {
+		gg.MakeScene<TestA::Scene>()->Init();
 	};
 	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("game scene")).onClicked = [this] {
 		gg.MakeScene<Scene>()->Init();

@@ -67,12 +67,14 @@ namespace xx {
     // return first bit '1' index
     template<typename T, typename = std::enable_if_t<std::is_integral_v<T>>>
     XX_INLINE size_t Calc2n(T n) {
+        static_assert(sizeof(T) >= 4);
         return (sizeof(size_t) * 8 - 1) - std::countl_zero(n);
     }
 
     // return 2^x ( >= n )
     template<typename T, typename = std::enable_if_t<std::is_integral_v<T>>>
     XX_INLINE T Round2n(T n) {
+        static_assert(sizeof(T) >= 4);
         auto shift = Calc2n(n);
         auto rtv = T(1) << shift;
         if (rtv == n) return n;

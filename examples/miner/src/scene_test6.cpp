@@ -4,14 +4,14 @@
 
 namespace Test6 {
 
-Monster& Monster::Init(Scene* scene_, int32_t monsterTypeId_, XY pos_, float radius_) {
+Miner& Miner::Init(Scene* scene_, int32_t minerTypeId_, XY pos_, float radius_) {
 	scene = scene_;
 	pos = pos_;
 	y = pos.y;
-	monsterTypeId = monsterTypeId_;
+	minerTypeId = minerTypeId_;
 	radius = radius_;
 	speedScale = 1.f;
-	auto& mc = gg.mcs[monsterTypeId];
+	auto& mc = gg.mcs[minerTypeId];
 	frameDelay = mc.animFPS / gg.cFps;
 	resRadius = mc.resRadius;
 	moveSpeed = mc.moveSpeed;
@@ -20,8 +20,8 @@ Monster& Monster::Init(Scene* scene_, int32_t monsterTypeId_, XY pos_, float rad
 	return *this;
 }
 
-void Monster::SetAnim(AnimTypes t) {
-	auto& mc = gg.mcs[monsterTypeId];
+void Miner::SetAnim(AnimTypes t) {
+	auto& mc = gg.mcs[minerTypeId];
 	tfs = mc.fss[(int32_t)t];
 	tfsLen = mc.fsLens[(int32_t)t];
 	if (t == AnimTypes::Atk) {
@@ -34,23 +34,23 @@ void Monster::SetAnim(AnimTypes t) {
 	
 }
 
-bool Monster::StepAnimOnce() {
+bool Miner::StepAnimOnce() {
 	tfIndex += frameDelay * speedScale;
 	return tfIndex >= tfsLen;
 }
 
-void Monster::StepAnimLoop() {
+void Miner::StepAnimLoop() {
 	tfIndex += frameDelay * speedScale;
 	while (tfIndex >= tfsLen) {
 		tfIndex -= tfsLen;
 	}
 }
 
-char Monster::GetHitData() const {
+char Miner::GetHitData() const {
 	return cds[(int32_t)tfIndex];
 }
 
-void Monster::Draw() {
+void Miner::Draw() {
 	auto& c = scene->cam;
 	auto i = (int32_t)tfIndex;
 	auto& f = tfs[i];
@@ -59,7 +59,7 @@ void Monster::Draw() {
 	gg.Quad().DrawFrame(f, c.ToGLPos(pos), s);
 }
 
-void Monster::Update() {
+void Miner::Update() {
 	XX_BEGIN(_1);
 LabSearch:
 	SetAnim(AnimTypes::Idle);
@@ -96,7 +96,7 @@ LabMoveLoop:
 LabAttack:
 	SetAnim(AnimTypes::Atk);
 	if (gg.GetActiveVoiceCount() < 8) {
-		gg.PlayAudio(gg.mcs[monsterTypeId].ss.Lock(), 0.3f);
+		gg.PlayAudio(gg.mcs[minerTypeId].ss.Lock(), 0.3f);
 	}
 	hited = 0;
 	while (!StepAnimOnce()) {
@@ -104,6 +104,7 @@ LabAttack:
 		if (!target) goto LabSearch;
 		if (auto r = GetHitData(); r > hited) {
 			// todo: sound? effect?
+			target->Hit();
 			// todo: hit logic
 			hited = r;
 		}
@@ -112,7 +113,7 @@ LabAttack:
 	XX_END(_1);
 }
 
-bool Monster::SearchTarget() {
+bool Miner::SearchTarget() {
 	target.Reset();
 	float minMag2 = std::numeric_limits<float>::max();
 	for (auto& o : scene->rocks) {	// todo: optimize by Grid
@@ -137,23 +138,64 @@ bool Monster::SearchTarget() {
 
 /***************************************************************************************/
 
-Rock& Rock::Init(Scene * scene_, XY pos_, float radius_) {
+void Rock::Hit() {
+	BeginWhite();
+	BeginBounce();
+}
+
+void Rock::BeginWhite() {
+	whiteEndTime = scene->time + 0.05f;
+}
+
+void Rock::BeginBounce() {
+	bouncing = true;
+	_2 = 0;
+	scale = 1.f;
+}
+
+void Rock::Bounce() {
+	static constexpr float cScaleStep{ 0.1f / (gg.cFps * 0.133333f) };
+	XX_BEGIN(_2);
+	for (scale.x = 1.f; scale.x < 1.1f; scale.x += cScaleStep) {
+		scale.y = 2.f - scale.x;
+		XX_YIELD(_2);
+	}
+	for (; scale.x > 0.95f; scale.x -= cScaleStep) {
+		scale.y = 2.f - scale.x;
+		XX_YIELD(_2);
+	}
+	for (; scale.x < 1.f; scale.x += cScaleStep) {
+		scale.y = 2.f - scale.x;
+		XX_YIELD(_2);
+	}
+	scale = 1.f;
+	bouncing = false;
+	XX_END(_2);
+}
+
+Rock& Rock::Init(Scene* scene_, XY pos_, float radius_) {
 	scene = scene_;
 	pos = pos_;
 	y = pos.y;
 	radius = radius_;
+	scale = 1.f;
 	return *this;
 }
 
 void Rock::Update() {
-	// todo: color white effect
-	// todo: hit bounce effect
+	// hit bounce effect
+	if (bouncing) {
+		Bounce();
+	}
 }
 
 void Rock::Draw() {
 	auto& c = scene->cam;
 	auto& f = gg.all_rocks_()[0][0];
-	gg.Quad().Draw(f, f, c.ToGLPos(pos), { 0.5f, 0.1f }, radius / 64.f * c.scale);
+	float cp;
+	if (whiteEndTime > scene->time) cp = 100000.f;
+	else cp = 1.f;
+	gg.Quad().Draw(f, f, c.ToGLPos(pos), { 0.5f, 0.1f }, radius / 64.f * scale * c.scale, 0, cp);
 }
 
 
@@ -170,8 +212,8 @@ void Scene::Init() {
 	}
 	for (size_t i = 0; i < 1000; i++) {
 		XY pos{ gg.rnd.Next(posRange.from.x, posRange.to.x), gg.rnd.Next(posRange.from.y, posRange.to.y) };
-		auto monsterTypeId = gg.rnd.Next(gg.mcs.size());
-		monsters.Emplace().Emplace<Monster>()->Init(this, monsterTypeId, pos, 23);
+		auto minerTypeId = gg.rnd.Next(gg.mcs.size());
+		miners.Emplace().Emplace<Miner>()->Init(this, minerTypeId, pos, 23);
 	}
 
 }
@@ -197,17 +239,17 @@ void Scene::FixedUpdate() {
 	if (timer <= time) {
 		timer += 2.f;
 		std::sort((OrderByYItem**)rocks.buf, (OrderByYItem**)rocks.buf + rocks.len, [](auto& a, auto& b) { return a->y < b->y; });
-		std::sort((OrderByYItem**)monsters.buf, (OrderByYItem**)monsters.buf + monsters.len, [](auto& a, auto& b) { return a->y < b->y; });
+		std::sort((OrderByYItem**)miners.buf, (OrderByYItem**)miners.buf + miners.len, [](auto& a, auto& b) { return a->y < b->y; });
 	}
 
-	for (auto& o : monsters) o->Update();
+	for (auto& o : miners) o->Update();
 	for (auto& o : rocks) o->Update();
 }
 
 void Scene::Draw() {
 	// sort order by y
 	assert(obyis.Empty());
-	for (auto& o : monsters) obyis.Emplace(o->y, o.pointer);
+	for (auto& o : miners) obyis.Emplace(o->y, o.pointer);
 	for (auto& o : rocks) obyis.Emplace(o->y, o.pointer);
 	std::sort(obyis.buf, obyis.buf + obyis.len, [](auto& a, auto& b) { return a.first < b.first; });
 

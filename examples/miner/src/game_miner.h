@@ -7,10 +7,10 @@ enum class AnimTypes {
 	Idle, Move, Atk
 };
 
-struct Monster : SceneItem {
+struct Miner : SceneItem {
 	xx::Frame* fs{};
 	char* cds{};
-	int32_t monsterTypeId{};
+	int32_t minerTypeId{};
 	int32_t fsLen{};
 	float fsCursor{};
 	float resRadius{};
@@ -27,7 +27,7 @@ struct Monster : SceneItem {
 	char hited{};
 	int32_t _1{};
 
-	Monster& Init(Scene* scene_, int32_t monsterTypeId_, XY pos_, float radius_);
+	Miner& Init(Scene* scene_, int32_t minerTypeId_, XY pos_, float radius_);
 	void SetAnim(AnimTypes t);
 	bool StepAnimOnce();
 	void StepAnimLoop();

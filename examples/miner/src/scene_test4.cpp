@@ -4,14 +4,14 @@
 
 namespace Test4 {
 
-	Monster& Monster::Init(Scene* scene_, int32_t monsterTypeId_, XY pos_, float radius_) {
+	Miner& Miner::Init(Scene* scene_, int32_t minerTypeId_, XY pos_, float radius_) {
 		scene = scene_;
 		pos = pos_;
 		y = pos.y;
-		monsterTypeId = monsterTypeId_;
+		minerTypeId = minerTypeId_;
 		radius = radius_;
 		speedScale = 1.f;
-		auto& mc = gg.mcs[monsterTypeId];
+		auto& mc = gg.mcs[minerTypeId];
 		frameDelay = mc.animFPS / gg.cFps;
 		resRadius = mc.resRadius;
 		moveSpeed = mc.moveSpeed;
@@ -20,8 +20,8 @@ namespace Test4 {
 		return *this;
 	}
 
-	void Monster::SetAnim(AnimTypes t) {
-		auto& mc = gg.mcs[monsterTypeId];
+	void Miner::SetAnim(AnimTypes t) {
+		auto& mc = gg.mcs[minerTypeId];
 		tfs = mc.fss[(int32_t)t];
 		tfsLen = mc.fsLens[(int32_t)t];
 		if (t == AnimTypes::Atk) {
@@ -33,23 +33,23 @@ namespace Test4 {
 		tfIndex = 0;
 	}
 
-	bool Monster::StepAnimOnce() {
+	bool Miner::StepAnimOnce() {
 		tfIndex += frameDelay * speedScale;
 		return tfIndex >= tfsLen;
 	}
 
-	void Monster::StepAnimLoop() {
+	void Miner::StepAnimLoop() {
 		tfIndex += frameDelay * speedScale;
 		while (tfIndex >= tfsLen) {
 			tfIndex -= tfsLen;
 		}
 	}
 
-	char Monster::GetHitData() const {
+	char Miner::GetHitData() const {
 		return cds[(int32_t)tfIndex];
 	}
 
-	void Monster::Draw() {
+	void Miner::Draw() {
 		auto& c = scene->cam;
 		auto i = (int32_t)tfIndex;
 		auto& f = tfs[i];
@@ -58,7 +58,7 @@ namespace Test4 {
 		gg.Quad().DrawFrame(f, c.ToGLPos(pos), s);
 	}
 
-	void Monster::Update() {
+	void Miner::Update() {
 		XX_BEGIN(_1);
 	LabSearch:
 		SetAnim(AnimTypes::Idle);
@@ -95,7 +95,7 @@ namespace Test4 {
 	LabAttack:
 		SetAnim(AnimTypes::Atk);
 		if (gg.GetActiveVoiceCount() < 32) {
-			gg.PlayAudio(gg.mcs[monsterTypeId].ss.Lock());
+			gg.PlayAudio(gg.mcs[minerTypeId].ss.Lock());
 		}
 		hited = 0;
 		while (!StepAnimOnce()) {
@@ -112,7 +112,7 @@ namespace Test4 {
 		XX_END(_1);
 	}
 
-	bool Monster::SearchTarget() {
+	bool Miner::SearchTarget() {
 		target.Reset();
 		float minMag2 = std::numeric_limits<float>::max();
 		for (auto& o : scene->rocks) {	// todo: optimize by Grid
@@ -200,23 +200,23 @@ namespace Test4 {
 
 	/***************************************************************************************/
 
-	void Scene::Init(int32_t monsterTypeId_) {
+	void Scene::Init(int32_t minerTypeId_) {
 		cam.Init(gg.scale, 2.5f);
 		ui.Emplace()->InitRoot(gg.scale * cUIScale);
 
 		rocks.Emplace().Emplace<Rock>()->Init(this, { 0, 0 }, 23);
-		monsters.Emplace().Emplace<Monster>()->Init(this, monsterTypeId_, { -50, 0 }, 23);
-		//monsters.Emplace().Emplace<Monster>()->Init(this, monsterTypeId_, { -200, -50 }, 23);
-		//monsters.Emplace().Emplace<Monster>()->Init(this, monsterTypeId_, { -200, 50 }, 23);
-		//monsters.Emplace().Emplace<Monster>()->Init(this, monsterTypeId_, { -200, 100 }, 23);
-		//monsters.Emplace().Emplace<Monster>()->Init(this, monsterTypeId_, { -200, 150 }, 23);
-		//monsters.Emplace().Emplace<Monster>()->Init(this, monsterTypeId_, { 200, 0 }, 23);
-		//monsters.Emplace().Emplace<Monster>()->Init(this, monsterTypeId_, { 200, -50 }, 23);
-		//monsters.Emplace().Emplace<Monster>()->Init(this, monsterTypeId_, { 200, 50 }, 23);
-		//monsters.Emplace().Emplace<Monster>()->Init(this, monsterTypeId_, { 200, 100 }, 23);
-		//monsters.Emplace().Emplace<Monster>()->Init(this, monsterTypeId_, { 200, 150 }, 23);
-		//monsters.Emplace().Emplace<Monster>()->Init(this, monsterTypeId_, { 10, -100 }, 23);
-		//monsters.Emplace().Emplace<Monster>()->Init(this, monsterTypeId_, { -10, 100 }, 23);
+		miners.Emplace().Emplace<Miner>()->Init(this, minerTypeId_, { -50, 0 }, 23);
+		//miners.Emplace().Emplace<Miner>()->Init(this, minerTypeId_, { -200, -50 }, 23);
+		//miners.Emplace().Emplace<Miner>()->Init(this, minerTypeId_, { -200, 50 }, 23);
+		//miners.Emplace().Emplace<Miner>()->Init(this, minerTypeId_, { -200, 100 }, 23);
+		//miners.Emplace().Emplace<Miner>()->Init(this, minerTypeId_, { -200, 150 }, 23);
+		//miners.Emplace().Emplace<Miner>()->Init(this, minerTypeId_, { 200, 0 }, 23);
+		//miners.Emplace().Emplace<Miner>()->Init(this, minerTypeId_, { 200, -50 }, 23);
+		//miners.Emplace().Emplace<Miner>()->Init(this, minerTypeId_, { 200, 50 }, 23);
+		//miners.Emplace().Emplace<Miner>()->Init(this, minerTypeId_, { 200, 100 }, 23);
+		//miners.Emplace().Emplace<Miner>()->Init(this, minerTypeId_, { 200, 150 }, 23);
+		//miners.Emplace().Emplace<Miner>()->Init(this, minerTypeId_, { 10, -100 }, 23);
+		//miners.Emplace().Emplace<Miner>()->Init(this, minerTypeId_, { -10, 100 }, 23);
 	}
 
 	void Scene::Update() {
@@ -240,17 +240,17 @@ namespace Test4 {
 		if (timer <= time) {
 			timer += 2.f;
 			std::sort((OrderByYItem**)rocks.buf, (OrderByYItem**)rocks.buf + rocks.len, [](auto& a, auto& b) { return a->y < b->y; });
-			std::sort((OrderByYItem**)monsters.buf, (OrderByYItem**)monsters.buf + monsters.len, [](auto& a, auto& b) { return a->y < b->y; });
+			std::sort((OrderByYItem**)miners.buf, (OrderByYItem**)miners.buf + miners.len, [](auto& a, auto& b) { return a->y < b->y; });
 		}
 
-		for (auto& o : monsters) o->Update();
+		for (auto& o : miners) o->Update();
 		for (auto& o : rocks) o->Update();
 	}
 
 	void Scene::Draw() {
 		// sort order by y
 		assert(obyis.Empty());
-		for (auto& o : monsters) obyis.Emplace(o->y, o.pointer);
+		for (auto& o : miners) obyis.Emplace(o->y, o.pointer);
 		for (auto& o : rocks) obyis.Emplace(o->y, o.pointer);
 		std::sort(obyis.buf, obyis.buf + obyis.len, [](auto& a, auto& b) { return a.first < b.first; });
 

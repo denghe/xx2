@@ -32,16 +32,16 @@ void Game::GLInit() {
 	ss.pickaxe = LoadSoundSource("res/pickaxe.wav");
 	ss.rockbreak = LoadSoundSource("res/rockbreak.ogg");
 	ss.pop = LoadSoundSource("res/pop.wav");
-	ss.monster1_atk = LoadSoundSource("res/monster1_atk.ogg");
-	ss.monster2_atk = LoadSoundSource("res/monster2_atk.ogg");
-	ss.monster3_atk = LoadSoundSource("res/monster3_atk.ogg");
-	ss.monster4_atk = LoadSoundSource("res/monster4_atk.ogg");
+	ss.miner1_atk = LoadSoundSource("res/miner1_atk.ogg");
+	ss.miner2_atk = LoadSoundSource("res/miner2_atk.ogg");
+	ss.miner3_atk = LoadSoundSource("res/miner3_atk.ogg");
+	ss.miner4_atk = LoadSoundSource("res/miner4_atk.ogg");
 
 	// load texture packer
 	all.Load("res/");
 
-	// fill monster some config
-	auto ConfigMonster = [this](auto& tfIdle, auto& tfMove, auto& tfAtk, int32_t configIndex) {
+	// fill miner some config
+	auto ConfigMiner = [this](auto& tfIdle, auto& tfMove, auto& tfAtk, int32_t configIndex) {
 		auto& mc = mcs[configIndex];
 		mc.fss[0] = tfIdle.data();
 		mc.fsLens[0] = tfIdle.size();
@@ -50,26 +50,26 @@ void Game::GLInit() {
 		mc.fss[2] = tfAtk.data();
 		mc.fsLens[2] = tfAtk.size();
 	};
-	ConfigMonster(all.monster1_idle_, all.monster1_move_, all.monster1_atk_, 0);
-	ConfigMonster(all.monster2_idle_, all.monster2_move_, all.monster2_atk_, 1);
-	ConfigMonster(all.monster3_idle_, all.monster3_move_, all.monster3_atk_, 2);
-	ConfigMonster(all.monster4_idle_, all.monster4_move_, all.monster4_atk_, 3);
+	ConfigMiner(all.miner1_idle_, all.miner1_move_, all.miner1_atk_, 0);
+	ConfigMiner(all.miner2_idle_, all.miner2_move_, all.miner2_atk_, 1);
+	ConfigMiner(all.miner3_idle_, all.miner3_move_, all.miner3_atk_, 2);
+	ConfigMiner(all.miner4_idle_, all.miner4_move_, all.miner4_atk_, 3);
 
 	// set hit frame flags
-	cd.monster1_atk_[3] = 1;
-	cd.monster2_atk_[7] = 1;
-	cd.monster3_atk_[4] = 1;
-	cd.monster4_atk_[3] = 1;
+	cd.miner1_atk_[3] = 1;
+	cd.miner2_atk_[7] = 1;
+	cd.miner3_atk_[4] = 1;
+	cd.miner4_atk_[3] = 1;
 
-	// fill monster some configs
+	// fill miner some configs
 	{
 		auto& mc = mcs[0];
 		mc.animFPS = 12;
 		mc.resRadius = 23;
 		mc.moveSpeed = 30 / gg.cFps;
 		mc.attackRange = 50;
-		mc.cd = cd.monster1_atk_.data();
-		mc.ss = ss.monster1_atk;
+		mc.cd = cd.miner1_atk_.data();
+		mc.ss = ss.miner1_atk;
 	}
 	{
 		auto& mc = mcs[1];
@@ -77,8 +77,8 @@ void Game::GLInit() {
 		mc.resRadius = 40;
 		mc.moveSpeed = 20 / gg.cFps;
 		mc.attackRange = 26;
-		mc.cd = cd.monster2_atk_.data();
-		mc.ss = ss.monster2_atk;
+		mc.cd = cd.miner2_atk_.data();
+		mc.ss = ss.miner2_atk;
 	}
 	{
 		auto& mc = mcs[2];
@@ -86,8 +86,8 @@ void Game::GLInit() {
 		mc.resRadius = 50;
 		mc.moveSpeed = 30 / gg.cFps;
 		mc.attackRange = 44;
-		mc.cd = cd.monster3_atk_.data();
-		mc.ss = ss.monster3_atk;
+		mc.cd = cd.miner3_atk_.data();
+		mc.ss = ss.miner3_atk;
 	}
 	{
 		auto& mc = mcs[3];
@@ -95,8 +95,8 @@ void Game::GLInit() {
 		mc.resRadius = 40;
 		mc.moveSpeed = 50 / gg.cFps;
 		mc.attackRange = 32;
-		mc.cd = cd.monster4_atk_.data();
-		mc.ss = ss.monster4_atk;
+		mc.cd = cd.miner4_atk_.data();
+		mc.ss = ss.miner4_atk;
 	}
 
 	// load file data( for memory scan )

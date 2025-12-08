@@ -11,7 +11,7 @@ void Scene::Init(float totalScale_) {
 	map.Emplace<Map>()->Init(this);
 	minecart.Emplace()->Init(this, { 50.f, cam.original.y - 100.f });
 	GenRocks(rocksFixedPosPool.len * 0.5);
-	GenMonsters(10);
+	GenMiners(10);
 
 #ifdef ENABLE_BUCKET_SORT
 	sortContainer.Resize<true>((int32_t)gg.designSize.y);
@@ -70,31 +70,31 @@ void Scene::MakeUI() {
 		timeScale = 1000.f;
 	};
 	basePos.x += ui->children.Back()->size.x + cMargin * 2;
-	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, fontSize, {}, cfg, cfgH)("monster count:40").onClicked = [this]() {
-		GenMonsters(10);
+	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, fontSize, {}, cfg, cfgH)("miner count:40").onClicked = [this]() {
+		GenMiners(10);
 	};
 	basePos.x += ui->children.Back()->size.x + cMargin;
 	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, fontSize, {}, cfg, cfgH)("400").onClicked = [this]() {
-		GenMonsters(100);
+		GenMiners(100);
 	};
 	basePos.x += ui->children.Back()->size.x + cMargin;
 	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, fontSize, {}, cfg, cfgH)("4K").onClicked = [this]() {
-		GenMonsters(1000);
+		GenMiners(1000);
 	};
 	basePos.x += ui->children.Back()->size.x + cMargin;
 	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, fontSize, {}, cfg, cfgH)("40K").onClicked = [this]() {
-		GenMonsters(10000);
+		GenMiners(10000);
 	};
 }
 
-void Scene::GenMonsters(int32_t count_) {
-	monsters.Clear();
+void Scene::GenMiners(int32_t count_) {
+	miners.Clear();
 	for (int32_t i = 0; i < count_; ++i) {
 		for (int32_t j = 0; j < gg.mcs.size(); ++j) {
 			//auto posOffset = xx::GetRndPosDoughnut(gg.rnd, cRockRadius * 5, 0);
-			//monsters.Emplace().Emplace<Monster>()->Init(this, j, cam.original + posOffset, 23);
+			//miners.Emplace().Emplace<Miner>()->Init(this, j, cam.original + posOffset, 23);
 			auto pos = gg.rnd.NextElement(rocksFixedPoss);
-			monsters.Emplace().Emplace<Monster>()->Init(this, j, pos, 23);
+			miners.Emplace().Emplace<Miner>()->Init(this, j, pos, 23);
 		}
 	}
 }
@@ -146,9 +146,9 @@ void Scene::FixedUpdate() {
 		});
 	}
 
-	for (auto i = monsters.len - 1; i >= 0; --i) {
-		if (monsters[i]->Update()) {
-			monsters.SwapRemoveAt(i);
+	for (auto i = miners.len - 1; i >= 0; --i) {
+		if (miners[i]->Update()) {
+			miners.SwapRemoveAt(i);
 		}
 	}
 	for (auto i = rocks.len - 1; i >= 0; --i) {
@@ -184,7 +184,7 @@ void Scene::FixedUpdate() {
 
 	//if (timer <= time) {
 	//	timer += 1.f;
-	//	std::sort((SceneItem**)monsters.buf, (SceneItem**)monsters.buf + monsters.len, [](auto& a, auto& b) { return a->y < b->y; });
+	//	std::sort((SceneItem**)miners.buf, (SceneItem**)miners.buf + miners.len, [](auto& a, auto& b) { return a->y < b->y; });
 	//}
 }
 
@@ -204,7 +204,7 @@ void Scene::Draw() {
 	for (auto& o : breakingRocks) {
 		sortContainer[(int32_t)o.y].Emplace(&o);
 	}
-	for (auto& o : monsters) {
+	for (auto& o : miners) {
 		sortContainer[(int32_t)o->y].Emplace(o.pointer);
 	}
 	for (auto& o : rocks) {
@@ -227,7 +227,7 @@ void Scene::Draw() {
 		o.next = slot;
 		slot = &o;
 	}
-	for (auto& o : monsters) {
+	for (auto& o : miners) {
 		auto& slot = sortContainer[(int32_t)o->y];
 		o->next = slot;
 		slot = o.pointer;
@@ -254,7 +254,7 @@ void Scene::Draw() {
 	assert(sortContainer.Empty());
 	for (auto& o : borningRocks) sortContainer.Emplace(o->y, o.pointer);
 	for (auto& o : breakingRocks) sortContainer.Emplace(o.y, &o);
-	for (auto& o : monsters) sortContainer.Emplace(o->y, o.pointer);
+	for (auto& o : miners) sortContainer.Emplace(o->y, o.pointer);
 	for (auto& o : rocks) sortContainer.Emplace(o->y, o.pointer);
 	sortContainer.Emplace(minecart->y, minecart.pointer);
 	std::sort(sortContainer.buf, sortContainer.buf + sortContainer.len

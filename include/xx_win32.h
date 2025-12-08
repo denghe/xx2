@@ -59,10 +59,9 @@ namespace xx {
 		BOOL bSuccess = FALSE;
 
 		while(true) {
-			bSuccess = ReadFile(hPipe, chBuf, sizeof(chBuf) - 1, &dwRead, NULL);
+			bSuccess = ReadFile(hPipe, chBuf, sizeof(chBuf), &dwRead, NULL);
 			if (!bSuccess || dwRead == 0) break;
-			chBuf[dwRead] = '\0';
-			out.append(chBuf);
+			out.append(chBuf, dwRead);
 		}
 	}
 

@@ -4,7 +4,7 @@
 using XY = xx::XY;
 using XYi = xx::XYi;
 
-struct MonsterConfig {
+struct MinerConfig {
 	float animFPS, resRadius, moveSpeed, attackRange;
 	int32_t fsLens[3]; // aIdleLen, aMoveLen, aAtkLen;
 	xx::Frame* fss[3];	// aIdle, * aMove, * aAtk;
@@ -33,21 +33,21 @@ struct Game : xx::Game<Game> {
 	std::array<std::array<xx::Frame, sizeof(all::rock_0_) / sizeof(xx::Frame)>, 9>& all_rocks_();	// ref to all.rocks_?.  rock_?_?
 
 	struct {
-		std::array<char, 6> monster1_atk_{};
-		std::array<char, 28> monster2_atk_{};
-		std::array<char, 10> monster3_atk_{};
-		std::array<char, 6> monster4_atk_{};
+		std::array<char, 6> miner1_atk_{};
+		std::array<char, 28> miner2_atk_{};
+		std::array<char, 10> miner3_atk_{};
+		std::array<char, 6> miner4_atk_{};
 	} cd;	// collision detect
 
-	std::array<MonsterConfig, 4> mcs;
+	std::array<MinerConfig, 4> mcs;
 
 	struct {
 		xx::Shared<xx::SoundSource>
 			pickaxe, rockbreak, pop
-			, monster1_atk
-			, monster2_atk
-			, monster3_atk
-			, monster4_atk;
+			, miner1_atk
+			, miner2_atk
+			, miner3_atk
+			, miner4_atk;
 	} ss;
 
 	struct {

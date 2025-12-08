@@ -2,7 +2,7 @@
 #include "game.h"
 #include "game_sceneitem.h"
 #include "game_rock.h"
-#include "game_monster.h"
+#include "game_miner.h"
 #include "game_map.h"
 #include "game_minecart.h"
 
@@ -22,7 +22,7 @@ struct Scene : xx::SceneBase {
 	XY cRocksPivotOffset{};
 	int32_t rocksDisposedCountPerFrame{};
 
-	xx::List<XY> rocksFixedPoss;			// for random monster pos
+	xx::List<XY> rocksFixedPoss;			// for random miner pos
 	xx::List<XY> rocksFixedPosPool;			// life cycle: must upon rocks
 	xx::Grid2dCircle<Rock*> rocksGrid;		// life cycle: must upon rocks
 	xx::List<xx::Shared<Rock>> rocks;
@@ -30,7 +30,7 @@ struct Scene : xx::SceneBase {
 	std::array<int32_t, 9> counts{};
 	std::array<xx::Weak<xx::ImageLabelButton>, 9> countUIs;
 	xx::List<FlyingRock> flyingRocks;
-	xx::List<xx::Shared<Monster>> monsters;
+	xx::List<xx::Shared<Miner>> miners;
 	xx::List<xx::Shared<BorningRock>> borningRocks;	// life cycle: must below rocks
 	xx::List<BreakingRock> breakingRocks;	// effect
 	xx::Shared<Map> map;
@@ -47,7 +47,7 @@ struct Scene : xx::SceneBase {
 #endif
 
 	void GenRocks(int32_t count_);
-	void GenMonsters(int32_t count_);
+	void GenMiners(int32_t count_);
 
 	virtual void MakeUI();
 	void Init(float totalScale_ = 1);

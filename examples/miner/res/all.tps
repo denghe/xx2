@@ -310,12 +310,12 @@
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
-            <key type="filename">all_pics/monster1_atk_1.png</key>
-            <key type="filename">all_pics/monster1_atk_2.png</key>
-            <key type="filename">all_pics/monster1_atk_3.png</key>
-            <key type="filename">all_pics/monster1_atk_4.png</key>
-            <key type="filename">all_pics/monster1_atk_5.png</key>
-            <key type="filename">all_pics/monster1_atk_6.png</key>
+            <key type="filename">all_pics/miner1_atk_1.png</key>
+            <key type="filename">all_pics/miner1_atk_2.png</key>
+            <key type="filename">all_pics/miner1_atk_3.png</key>
+            <key type="filename">all_pics/miner1_atk_4.png</key>
+            <key type="filename">all_pics/miner1_atk_5.png</key>
+            <key type="filename">all_pics/miner1_atk_6.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.4,0.95</point_f>
@@ -330,15 +330,15 @@
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
-            <key type="filename">all_pics/monster1_idle_0.png</key>
-            <key type="filename">all_pics/monster1_idle_1.png</key>
-            <key type="filename">all_pics/monster1_idle_2.png</key>
-            <key type="filename">all_pics/monster1_idle_3.png</key>
-            <key type="filename">all_pics/monster1_idle_4.png</key>
-            <key type="filename">all_pics/monster1_idle_5.png</key>
-            <key type="filename">all_pics/monster1_idle_6.png</key>
-            <key type="filename">all_pics/monster1_idle_7.png</key>
-            <key type="filename">all_pics/monster1_idle_8.png</key>
+            <key type="filename">all_pics/miner1_idle_0.png</key>
+            <key type="filename">all_pics/miner1_idle_1.png</key>
+            <key type="filename">all_pics/miner1_idle_2.png</key>
+            <key type="filename">all_pics/miner1_idle_3.png</key>
+            <key type="filename">all_pics/miner1_idle_4.png</key>
+            <key type="filename">all_pics/miner1_idle_5.png</key>
+            <key type="filename">all_pics/miner1_idle_6.png</key>
+            <key type="filename">all_pics/miner1_idle_7.png</key>
+            <key type="filename">all_pics/miner1_idle_8.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.5,0.95</point_f>
@@ -353,17 +353,17 @@
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
-            <key type="filename">all_pics/monster1_move_1.png</key>
-            <key type="filename">all_pics/monster1_move_10.png</key>
-            <key type="filename">all_pics/monster1_move_11.png</key>
-            <key type="filename">all_pics/monster1_move_2.png</key>
-            <key type="filename">all_pics/monster1_move_3.png</key>
-            <key type="filename">all_pics/monster1_move_4.png</key>
-            <key type="filename">all_pics/monster1_move_5.png</key>
-            <key type="filename">all_pics/monster1_move_6.png</key>
-            <key type="filename">all_pics/monster1_move_7.png</key>
-            <key type="filename">all_pics/monster1_move_8.png</key>
-            <key type="filename">all_pics/monster1_move_9.png</key>
+            <key type="filename">all_pics/miner1_move_1.png</key>
+            <key type="filename">all_pics/miner1_move_10.png</key>
+            <key type="filename">all_pics/miner1_move_11.png</key>
+            <key type="filename">all_pics/miner1_move_2.png</key>
+            <key type="filename">all_pics/miner1_move_3.png</key>
+            <key type="filename">all_pics/miner1_move_4.png</key>
+            <key type="filename">all_pics/miner1_move_5.png</key>
+            <key type="filename">all_pics/miner1_move_6.png</key>
+            <key type="filename">all_pics/miner1_move_7.png</key>
+            <key type="filename">all_pics/miner1_move_8.png</key>
+            <key type="filename">all_pics/miner1_move_9.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.5,0.95</point_f>
@@ -378,34 +378,34 @@
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
-            <key type="filename">all_pics/monster2_atk_1.png</key>
-            <key type="filename">all_pics/monster2_atk_10.png</key>
-            <key type="filename">all_pics/monster2_atk_11.png</key>
-            <key type="filename">all_pics/monster2_atk_12.png</key>
-            <key type="filename">all_pics/monster2_atk_13.png</key>
-            <key type="filename">all_pics/monster2_atk_14.png</key>
-            <key type="filename">all_pics/monster2_atk_15.png</key>
-            <key type="filename">all_pics/monster2_atk_16.png</key>
-            <key type="filename">all_pics/monster2_atk_17.png</key>
-            <key type="filename">all_pics/monster2_atk_18.png</key>
-            <key type="filename">all_pics/monster2_atk_19.png</key>
-            <key type="filename">all_pics/monster2_atk_2.png</key>
-            <key type="filename">all_pics/monster2_atk_20.png</key>
-            <key type="filename">all_pics/monster2_atk_21.png</key>
-            <key type="filename">all_pics/monster2_atk_22.png</key>
-            <key type="filename">all_pics/monster2_atk_23.png</key>
-            <key type="filename">all_pics/monster2_atk_24.png</key>
-            <key type="filename">all_pics/monster2_atk_25.png</key>
-            <key type="filename">all_pics/monster2_atk_26.png</key>
-            <key type="filename">all_pics/monster2_atk_27.png</key>
-            <key type="filename">all_pics/monster2_atk_28.png</key>
-            <key type="filename">all_pics/monster2_atk_3.png</key>
-            <key type="filename">all_pics/monster2_atk_4.png</key>
-            <key type="filename">all_pics/monster2_atk_5.png</key>
-            <key type="filename">all_pics/monster2_atk_6.png</key>
-            <key type="filename">all_pics/monster2_atk_7.png</key>
-            <key type="filename">all_pics/monster2_atk_8.png</key>
-            <key type="filename">all_pics/monster2_atk_9.png</key>
+            <key type="filename">all_pics/miner2_atk_1.png</key>
+            <key type="filename">all_pics/miner2_atk_10.png</key>
+            <key type="filename">all_pics/miner2_atk_11.png</key>
+            <key type="filename">all_pics/miner2_atk_12.png</key>
+            <key type="filename">all_pics/miner2_atk_13.png</key>
+            <key type="filename">all_pics/miner2_atk_14.png</key>
+            <key type="filename">all_pics/miner2_atk_15.png</key>
+            <key type="filename">all_pics/miner2_atk_16.png</key>
+            <key type="filename">all_pics/miner2_atk_17.png</key>
+            <key type="filename">all_pics/miner2_atk_18.png</key>
+            <key type="filename">all_pics/miner2_atk_19.png</key>
+            <key type="filename">all_pics/miner2_atk_2.png</key>
+            <key type="filename">all_pics/miner2_atk_20.png</key>
+            <key type="filename">all_pics/miner2_atk_21.png</key>
+            <key type="filename">all_pics/miner2_atk_22.png</key>
+            <key type="filename">all_pics/miner2_atk_23.png</key>
+            <key type="filename">all_pics/miner2_atk_24.png</key>
+            <key type="filename">all_pics/miner2_atk_25.png</key>
+            <key type="filename">all_pics/miner2_atk_26.png</key>
+            <key type="filename">all_pics/miner2_atk_27.png</key>
+            <key type="filename">all_pics/miner2_atk_28.png</key>
+            <key type="filename">all_pics/miner2_atk_3.png</key>
+            <key type="filename">all_pics/miner2_atk_4.png</key>
+            <key type="filename">all_pics/miner2_atk_5.png</key>
+            <key type="filename">all_pics/miner2_atk_6.png</key>
+            <key type="filename">all_pics/miner2_atk_7.png</key>
+            <key type="filename">all_pics/miner2_atk_8.png</key>
+            <key type="filename">all_pics/miner2_atk_9.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.4,0.98</point_f>
@@ -420,38 +420,38 @@
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
-            <key type="filename">all_pics/monster2_idle_1.png</key>
-            <key type="filename">all_pics/monster2_idle_10.png</key>
-            <key type="filename">all_pics/monster2_idle_11.png</key>
-            <key type="filename">all_pics/monster2_idle_12.png</key>
-            <key type="filename">all_pics/monster2_idle_13.png</key>
-            <key type="filename">all_pics/monster2_idle_14.png</key>
-            <key type="filename">all_pics/monster2_idle_15.png</key>
-            <key type="filename">all_pics/monster2_idle_16.png</key>
-            <key type="filename">all_pics/monster2_idle_17.png</key>
-            <key type="filename">all_pics/monster2_idle_18.png</key>
-            <key type="filename">all_pics/monster2_idle_19.png</key>
-            <key type="filename">all_pics/monster2_idle_2.png</key>
-            <key type="filename">all_pics/monster2_idle_20.png</key>
-            <key type="filename">all_pics/monster2_idle_21.png</key>
-            <key type="filename">all_pics/monster2_idle_22.png</key>
-            <key type="filename">all_pics/monster2_idle_23.png</key>
-            <key type="filename">all_pics/monster2_idle_24.png</key>
-            <key type="filename">all_pics/monster2_idle_25.png</key>
-            <key type="filename">all_pics/monster2_idle_26.png</key>
-            <key type="filename">all_pics/monster2_idle_27.png</key>
-            <key type="filename">all_pics/monster2_idle_28.png</key>
-            <key type="filename">all_pics/monster2_idle_29.png</key>
-            <key type="filename">all_pics/monster2_idle_3.png</key>
-            <key type="filename">all_pics/monster2_idle_30.png</key>
-            <key type="filename">all_pics/monster2_idle_31.png</key>
-            <key type="filename">all_pics/monster2_idle_32.png</key>
-            <key type="filename">all_pics/monster2_idle_4.png</key>
-            <key type="filename">all_pics/monster2_idle_5.png</key>
-            <key type="filename">all_pics/monster2_idle_6.png</key>
-            <key type="filename">all_pics/monster2_idle_7.png</key>
-            <key type="filename">all_pics/monster2_idle_8.png</key>
-            <key type="filename">all_pics/monster2_idle_9.png</key>
+            <key type="filename">all_pics/miner2_idle_1.png</key>
+            <key type="filename">all_pics/miner2_idle_10.png</key>
+            <key type="filename">all_pics/miner2_idle_11.png</key>
+            <key type="filename">all_pics/miner2_idle_12.png</key>
+            <key type="filename">all_pics/miner2_idle_13.png</key>
+            <key type="filename">all_pics/miner2_idle_14.png</key>
+            <key type="filename">all_pics/miner2_idle_15.png</key>
+            <key type="filename">all_pics/miner2_idle_16.png</key>
+            <key type="filename">all_pics/miner2_idle_17.png</key>
+            <key type="filename">all_pics/miner2_idle_18.png</key>
+            <key type="filename">all_pics/miner2_idle_19.png</key>
+            <key type="filename">all_pics/miner2_idle_2.png</key>
+            <key type="filename">all_pics/miner2_idle_20.png</key>
+            <key type="filename">all_pics/miner2_idle_21.png</key>
+            <key type="filename">all_pics/miner2_idle_22.png</key>
+            <key type="filename">all_pics/miner2_idle_23.png</key>
+            <key type="filename">all_pics/miner2_idle_24.png</key>
+            <key type="filename">all_pics/miner2_idle_25.png</key>
+            <key type="filename">all_pics/miner2_idle_26.png</key>
+            <key type="filename">all_pics/miner2_idle_27.png</key>
+            <key type="filename">all_pics/miner2_idle_28.png</key>
+            <key type="filename">all_pics/miner2_idle_29.png</key>
+            <key type="filename">all_pics/miner2_idle_3.png</key>
+            <key type="filename">all_pics/miner2_idle_30.png</key>
+            <key type="filename">all_pics/miner2_idle_31.png</key>
+            <key type="filename">all_pics/miner2_idle_32.png</key>
+            <key type="filename">all_pics/miner2_idle_4.png</key>
+            <key type="filename">all_pics/miner2_idle_5.png</key>
+            <key type="filename">all_pics/miner2_idle_6.png</key>
+            <key type="filename">all_pics/miner2_idle_7.png</key>
+            <key type="filename">all_pics/miner2_idle_8.png</key>
+            <key type="filename">all_pics/miner2_idle_9.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.5,0.98</point_f>
@@ -466,51 +466,51 @@
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
-            <key type="filename">all_pics/monster2_move_1.png</key>
-            <key type="filename">all_pics/monster2_move_10.png</key>
-            <key type="filename">all_pics/monster2_move_11.png</key>
-            <key type="filename">all_pics/monster2_move_12.png</key>
-            <key type="filename">all_pics/monster2_move_13.png</key>
-            <key type="filename">all_pics/monster2_move_14.png</key>
-            <key type="filename">all_pics/monster2_move_15.png</key>
-            <key type="filename">all_pics/monster2_move_16.png</key>
-            <key type="filename">all_pics/monster2_move_17.png</key>
-            <key type="filename">all_pics/monster2_move_18.png</key>
-            <key type="filename">all_pics/monster2_move_19.png</key>
-            <key type="filename">all_pics/monster2_move_2.png</key>
-            <key type="filename">all_pics/monster2_move_20.png</key>
-            <key type="filename">all_pics/monster2_move_21.png</key>
-            <key type="filename">all_pics/monster2_move_22.png</key>
-            <key type="filename">all_pics/monster2_move_23.png</key>
-            <key type="filename">all_pics/monster2_move_24.png</key>
-            <key type="filename">all_pics/monster2_move_25.png</key>
-            <key type="filename">all_pics/monster2_move_26.png</key>
-            <key type="filename">all_pics/monster2_move_27.png</key>
-            <key type="filename">all_pics/monster2_move_28.png</key>
-            <key type="filename">all_pics/monster2_move_29.png</key>
-            <key type="filename">all_pics/monster2_move_3.png</key>
-            <key type="filename">all_pics/monster2_move_30.png</key>
-            <key type="filename">all_pics/monster2_move_31.png</key>
-            <key type="filename">all_pics/monster2_move_32.png</key>
-            <key type="filename">all_pics/monster2_move_33.png</key>
-            <key type="filename">all_pics/monster2_move_34.png</key>
-            <key type="filename">all_pics/monster2_move_35.png</key>
-            <key type="filename">all_pics/monster2_move_36.png</key>
-            <key type="filename">all_pics/monster2_move_37.png</key>
-            <key type="filename">all_pics/monster2_move_38.png</key>
-            <key type="filename">all_pics/monster2_move_39.png</key>
-            <key type="filename">all_pics/monster2_move_4.png</key>
-            <key type="filename">all_pics/monster2_move_40.png</key>
-            <key type="filename">all_pics/monster2_move_41.png</key>
-            <key type="filename">all_pics/monster2_move_42.png</key>
-            <key type="filename">all_pics/monster2_move_43.png</key>
-            <key type="filename">all_pics/monster2_move_44.png</key>
-            <key type="filename">all_pics/monster2_move_45.png</key>
-            <key type="filename">all_pics/monster2_move_5.png</key>
-            <key type="filename">all_pics/monster2_move_6.png</key>
-            <key type="filename">all_pics/monster2_move_7.png</key>
-            <key type="filename">all_pics/monster2_move_8.png</key>
-            <key type="filename">all_pics/monster2_move_9.png</key>
+            <key type="filename">all_pics/miner2_move_1.png</key>
+            <key type="filename">all_pics/miner2_move_10.png</key>
+            <key type="filename">all_pics/miner2_move_11.png</key>
+            <key type="filename">all_pics/miner2_move_12.png</key>
+            <key type="filename">all_pics/miner2_move_13.png</key>
+            <key type="filename">all_pics/miner2_move_14.png</key>
+            <key type="filename">all_pics/miner2_move_15.png</key>
+            <key type="filename">all_pics/miner2_move_16.png</key>
+            <key type="filename">all_pics/miner2_move_17.png</key>
+            <key type="filename">all_pics/miner2_move_18.png</key>
+            <key type="filename">all_pics/miner2_move_19.png</key>
+            <key type="filename">all_pics/miner2_move_2.png</key>
+            <key type="filename">all_pics/miner2_move_20.png</key>
+            <key type="filename">all_pics/miner2_move_21.png</key>
+            <key type="filename">all_pics/miner2_move_22.png</key>
+            <key type="filename">all_pics/miner2_move_23.png</key>
+            <key type="filename">all_pics/miner2_move_24.png</key>
+            <key type="filename">all_pics/miner2_move_25.png</key>
+            <key type="filename">all_pics/miner2_move_26.png</key>
+            <key type="filename">all_pics/miner2_move_27.png</key>
+            <key type="filename">all_pics/miner2_move_28.png</key>
+            <key type="filename">all_pics/miner2_move_29.png</key>
+            <key type="filename">all_pics/miner2_move_3.png</key>
+            <key type="filename">all_pics/miner2_move_30.png</key>
+            <key type="filename">all_pics/miner2_move_31.png</key>
+            <key type="filename">all_pics/miner2_move_32.png</key>
+            <key type="filename">all_pics/miner2_move_33.png</key>
+            <key type="filename">all_pics/miner2_move_34.png</key>
+            <key type="filename">all_pics/miner2_move_35.png</key>
+            <key type="filename">all_pics/miner2_move_36.png</key>
+            <key type="filename">all_pics/miner2_move_37.png</key>
+            <key type="filename">all_pics/miner2_move_38.png</key>
+            <key type="filename">all_pics/miner2_move_39.png</key>
+            <key type="filename">all_pics/miner2_move_4.png</key>
+            <key type="filename">all_pics/miner2_move_40.png</key>
+            <key type="filename">all_pics/miner2_move_41.png</key>
+            <key type="filename">all_pics/miner2_move_42.png</key>
+            <key type="filename">all_pics/miner2_move_43.png</key>
+            <key type="filename">all_pics/miner2_move_44.png</key>
+            <key type="filename">all_pics/miner2_move_45.png</key>
+            <key type="filename">all_pics/miner2_move_5.png</key>
+            <key type="filename">all_pics/miner2_move_6.png</key>
+            <key type="filename">all_pics/miner2_move_7.png</key>
+            <key type="filename">all_pics/miner2_move_8.png</key>
+            <key type="filename">all_pics/miner2_move_9.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.5,0.93</point_f>
@@ -525,16 +525,16 @@
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
-            <key type="filename">all_pics/monster3_atk_1.png</key>
-            <key type="filename">all_pics/monster3_atk_10.png</key>
-            <key type="filename">all_pics/monster3_atk_2.png</key>
-            <key type="filename">all_pics/monster3_atk_3.png</key>
-            <key type="filename">all_pics/monster3_atk_4.png</key>
-            <key type="filename">all_pics/monster3_atk_5.png</key>
-            <key type="filename">all_pics/monster3_atk_6.png</key>
-            <key type="filename">all_pics/monster3_atk_7.png</key>
-            <key type="filename">all_pics/monster3_atk_8.png</key>
-            <key type="filename">all_pics/monster3_atk_9.png</key>
+            <key type="filename">all_pics/miner3_atk_1.png</key>
+            <key type="filename">all_pics/miner3_atk_10.png</key>
+            <key type="filename">all_pics/miner3_atk_2.png</key>
+            <key type="filename">all_pics/miner3_atk_3.png</key>
+            <key type="filename">all_pics/miner3_atk_4.png</key>
+            <key type="filename">all_pics/miner3_atk_5.png</key>
+            <key type="filename">all_pics/miner3_atk_6.png</key>
+            <key type="filename">all_pics/miner3_atk_7.png</key>
+            <key type="filename">all_pics/miner3_atk_8.png</key>
+            <key type="filename">all_pics/miner3_atk_9.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.35,0.83</point_f>
@@ -549,40 +549,40 @@
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
-            <key type="filename">all_pics/monster3_idle_1.png</key>
-            <key type="filename">all_pics/monster3_idle_10.png</key>
-            <key type="filename">all_pics/monster3_idle_11.png</key>
-            <key type="filename">all_pics/monster3_idle_12.png</key>
-            <key type="filename">all_pics/monster3_idle_13.png</key>
-            <key type="filename">all_pics/monster3_idle_14.png</key>
-            <key type="filename">all_pics/monster3_idle_15.png</key>
-            <key type="filename">all_pics/monster3_idle_16.png</key>
-            <key type="filename">all_pics/monster3_idle_17.png</key>
-            <key type="filename">all_pics/monster3_idle_18.png</key>
-            <key type="filename">all_pics/monster3_idle_19.png</key>
-            <key type="filename">all_pics/monster3_idle_2.png</key>
-            <key type="filename">all_pics/monster3_idle_20.png</key>
-            <key type="filename">all_pics/monster3_idle_21.png</key>
-            <key type="filename">all_pics/monster3_idle_22.png</key>
-            <key type="filename">all_pics/monster3_idle_23.png</key>
-            <key type="filename">all_pics/monster3_idle_24.png</key>
-            <key type="filename">all_pics/monster3_idle_25.png</key>
-            <key type="filename">all_pics/monster3_idle_26.png</key>
-            <key type="filename">all_pics/monster3_idle_27.png</key>
-            <key type="filename">all_pics/monster3_idle_28.png</key>
-            <key type="filename">all_pics/monster3_idle_29.png</key>
-            <key type="filename">all_pics/monster3_idle_3.png</key>
-            <key type="filename">all_pics/monster3_idle_30.png</key>
-            <key type="filename">all_pics/monster3_idle_4.png</key>
-            <key type="filename">all_pics/monster3_idle_5.png</key>
-            <key type="filename">all_pics/monster3_idle_6.png</key>
-            <key type="filename">all_pics/monster3_idle_7.png</key>
-            <key type="filename">all_pics/monster3_idle_8.png</key>
-            <key type="filename">all_pics/monster3_idle_9.png</key>
-            <key type="filename">all_pics/monster3_move_1.png</key>
-            <key type="filename">all_pics/monster3_move_2.png</key>
-            <key type="filename">all_pics/monster3_move_3.png</key>
-            <key type="filename">all_pics/monster3_move_4.png</key>
+            <key type="filename">all_pics/miner3_idle_1.png</key>
+            <key type="filename">all_pics/miner3_idle_10.png</key>
+            <key type="filename">all_pics/miner3_idle_11.png</key>
+            <key type="filename">all_pics/miner3_idle_12.png</key>
+            <key type="filename">all_pics/miner3_idle_13.png</key>
+            <key type="filename">all_pics/miner3_idle_14.png</key>
+            <key type="filename">all_pics/miner3_idle_15.png</key>
+            <key type="filename">all_pics/miner3_idle_16.png</key>
+            <key type="filename">all_pics/miner3_idle_17.png</key>
+            <key type="filename">all_pics/miner3_idle_18.png</key>
+            <key type="filename">all_pics/miner3_idle_19.png</key>
+            <key type="filename">all_pics/miner3_idle_2.png</key>
+            <key type="filename">all_pics/miner3_idle_20.png</key>
+            <key type="filename">all_pics/miner3_idle_21.png</key>
+            <key type="filename">all_pics/miner3_idle_22.png</key>
+            <key type="filename">all_pics/miner3_idle_23.png</key>
+            <key type="filename">all_pics/miner3_idle_24.png</key>
+            <key type="filename">all_pics/miner3_idle_25.png</key>
+            <key type="filename">all_pics/miner3_idle_26.png</key>
+            <key type="filename">all_pics/miner3_idle_27.png</key>
+            <key type="filename">all_pics/miner3_idle_28.png</key>
+            <key type="filename">all_pics/miner3_idle_29.png</key>
+            <key type="filename">all_pics/miner3_idle_3.png</key>
+            <key type="filename">all_pics/miner3_idle_30.png</key>
+            <key type="filename">all_pics/miner3_idle_4.png</key>
+            <key type="filename">all_pics/miner3_idle_5.png</key>
+            <key type="filename">all_pics/miner3_idle_6.png</key>
+            <key type="filename">all_pics/miner3_idle_7.png</key>
+            <key type="filename">all_pics/miner3_idle_8.png</key>
+            <key type="filename">all_pics/miner3_idle_9.png</key>
+            <key type="filename">all_pics/miner3_move_1.png</key>
+            <key type="filename">all_pics/miner3_move_2.png</key>
+            <key type="filename">all_pics/miner3_move_3.png</key>
+            <key type="filename">all_pics/miner3_move_4.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.5,0.9</point_f>
@@ -597,13 +597,13 @@
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
-            <key type="filename">all_pics/monster4_atk_1.png</key>
-            <key type="filename">all_pics/monster4_atk_2.png</key>
-            <key type="filename">all_pics/monster4_atk_3.png</key>
-            <key type="filename">all_pics/monster4_atk_4.png</key>
-            <key type="filename">all_pics/monster4_atk_5.png</key>
-            <key type="filename">all_pics/monster4_atk_6.png</key>
-            <key type="filename">all_pics/monster4_atk_7.png</key>
+            <key type="filename">all_pics/miner4_atk_1.png</key>
+            <key type="filename">all_pics/miner4_atk_2.png</key>
+            <key type="filename">all_pics/miner4_atk_3.png</key>
+            <key type="filename">all_pics/miner4_atk_4.png</key>
+            <key type="filename">all_pics/miner4_atk_5.png</key>
+            <key type="filename">all_pics/miner4_atk_6.png</key>
+            <key type="filename">all_pics/miner4_atk_7.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.45,1</point_f>
@@ -618,7 +618,7 @@
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
-            <key type="filename">all_pics/monster4_atk_8.png</key>
+            <key type="filename">all_pics/miner4_atk_8.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.5,1</point_f>
@@ -633,12 +633,12 @@
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
-            <key type="filename">all_pics/monster4_idle_1.png</key>
-            <key type="filename">all_pics/monster4_idle_2.png</key>
-            <key type="filename">all_pics/monster4_idle_3.png</key>
-            <key type="filename">all_pics/monster4_idle_4.png</key>
-            <key type="filename">all_pics/monster4_idle_5.png</key>
-            <key type="filename">all_pics/monster4_idle_6.png</key>
+            <key type="filename">all_pics/miner4_idle_1.png</key>
+            <key type="filename">all_pics/miner4_idle_2.png</key>
+            <key type="filename">all_pics/miner4_idle_3.png</key>
+            <key type="filename">all_pics/miner4_idle_4.png</key>
+            <key type="filename">all_pics/miner4_idle_5.png</key>
+            <key type="filename">all_pics/miner4_idle_6.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.5,0.98</point_f>
@@ -653,11 +653,11 @@
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
-            <key type="filename">all_pics/monster4_move_1.png</key>
-            <key type="filename">all_pics/monster4_move_2.png</key>
-            <key type="filename">all_pics/monster4_move_3.png</key>
-            <key type="filename">all_pics/monster4_move_4.png</key>
-            <key type="filename">all_pics/monster4_move_5.png</key>
+            <key type="filename">all_pics/miner4_move_1.png</key>
+            <key type="filename">all_pics/miner4_move_2.png</key>
+            <key type="filename">all_pics/miner4_move_3.png</key>
+            <key type="filename">all_pics/miner4_move_4.png</key>
+            <key type="filename">all_pics/miner4_move_5.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.42,1</point_f>
@@ -699,6 +699,21 @@
                 <rect>42,48,83,97</rect>
                 <key>scale9Paddings</key>
                 <rect>42,48,83,97</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
+            <key type="filename">all_pics/porter1.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0.5,0.5</point_f>
+                <key>spriteScale</key>
+                <double>1</double>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>102,87,204,174</rect>
+                <key>scale9Paddings</key>
+                <rect>102,87,204,174</rect>
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
@@ -749,29 +764,6 @@
                 <rect>35,31,70,61</rect>
                 <key>scale9Paddings</key>
                 <rect>35,31,70,61</rect>
-                <key>scale9FromFile</key>
-                <false/>
-            </struct>
-            <key type="filename">all_pics/rock_0_5.png</key>
-            <key type="filename">all_pics/rock_1_5.png</key>
-            <key type="filename">all_pics/rock_2_5.png</key>
-            <key type="filename">all_pics/rock_3_5.png</key>
-            <key type="filename">all_pics/rock_4_5.png</key>
-            <key type="filename">all_pics/rock_5_5.png</key>
-            <key type="filename">all_pics/rock_6_5.png</key>
-            <key type="filename">all_pics/rock_7_5.png</key>
-            <key type="filename">all_pics/rock_8_5.png</key>
-            <struct type="IndividualSpriteSettings">
-                <key>pivotPoint</key>
-                <point_f>0.5,0.5</point_f>
-                <key>spriteScale</key>
-                <double>1</double>
-                <key>scale9Enabled</key>
-                <false/>
-                <key>scale9Borders</key>
-                <rect>53,42,105,85</rect>
-                <key>scale9Paddings</key>
-                <rect>53,42,105,85</rect>
                 <key>scale9FromFile</key>
                 <false/>
             </struct>

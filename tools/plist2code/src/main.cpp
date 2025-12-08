@@ -115,7 +115,7 @@ press ENTER to continue...)#";
 			std::cerr << "**************************** bad file size( width == height ): " << p << std::endl;
 			return -__LINE__;
 		}
-		if (tp.metadata.size.width != xx::Round2n(tp.metadata.size.width)) {
+		if (auto w = xx::Round2n((uint32_t)tp.metadata.size.width); tp.metadata.size.width != w) {
 			std::cerr << "**************************** bad file size( width & height should be 2^n ): " << p << std::endl;
 			return -__LINE__;
 		}
@@ -241,7 +241,7 @@ struct )#", structName, R"#( {)#", tmp, R"#(
 #include "game.h"
 #include ")#", structName, R"#(.h"
 void )#", structName, R"#(::Load(std::string rootPath_) {
-	auto t = gg.LoadTexture(rootPath_ + "/)#", structName, R"#(.png");
+	auto t = gg.LoadTexture(rootPath_ + ")#", structName, R"#(.png");
 	t->TryGenerateMipmap();
 )#", tmp, R"#(
 };
