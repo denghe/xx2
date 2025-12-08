@@ -11,7 +11,7 @@ struct Porter : SceneItem {
 
 	xx::List<CatchingRock> catchingRocks;
 	xx::List<StackedRock> stackedRocks;
-	xx::Weak<FlyingRock> target;
+	xx::Weak<CollectingRock> target;
 	XY targetPos{};
 	float stepTime{};
 	float catchRange{}, moveSpeed{};

@@ -61,12 +61,12 @@ void Scene::MakeUI() {
 	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, fontSize, {}, cfg, cfgH)("100x").onClicked = [this]() {
 		timeScale = 100.f;
 	};
-	basePos.x += ui->children.Back()->size.x + cMargin;
-	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, fontSize, {}, cfg, cfgH)("1K").onClicked = [this]() {
-		timeScale = 1000.f;
-	};
 	basePos.x += ui->children.Back()->size.x + cMargin * 2;
-	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, fontSize, {}, cfg, cfgH)("miner count:40").onClicked = [this]() {
+	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, fontSize, {}, cfg, cfgH)("miner count:10").onClicked = [this]() {
+		GenMiners(1);
+	};
+	basePos.x += ui->children.Back()->size.x + cMargin;
+	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, fontSize, {}, cfg, cfgH)("40").onClicked = [this]() {
 		GenMiners(10);
 	};
 	basePos.x += ui->children.Back()->size.x + cMargin;
@@ -77,9 +77,32 @@ void Scene::MakeUI() {
 	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, fontSize, {}, cfg, cfgH)("4K").onClicked = [this]() {
 		GenMiners(1000);
 	};
+	basePos.x += ui->children.Back()->size.x + cMargin * 2;
+	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, fontSize, {}, cfg, cfgH)("porter count:1").onClicked = [this]() {
+		GenPorters(1);
+	};
 	basePos.x += ui->children.Back()->size.x + cMargin;
-	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, fontSize, {}, cfg, cfgH)("40K").onClicked = [this]() {
-		GenMiners(10000);
+	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, fontSize, {}, cfg, cfgH)("10").onClicked = [this]() {
+		GenPorters(10);
+	};
+	basePos.x += ui->children.Back()->size.x + cMargin;
+	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, fontSize, {}, cfg, cfgH)("100").onClicked = [this]() {
+		GenPorters(100);
+	};
+	basePos.x += ui->children.Back()->size.x + cMargin * 2;
+	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, fontSize, {}, cfg, cfgH)("rocks count:10%").onClicked = [this]() {
+		rocks.Clear();
+		GenRocks(rocksFixedPosPool.len * 0.1);
+	};
+	basePos.x += ui->children.Back()->size.x + cMargin;
+	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, fontSize, {}, cfg, cfgH)("50%").onClicked = [this]() {
+		rocks.Clear();
+		GenRocks(rocksFixedPosPool.len * 0.5);
+	};
+	basePos.x += ui->children.Back()->size.x + cMargin;
+	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, fontSize, {}, cfg, cfgH)("90%").onClicked = [this]() {
+		rocks.Clear();
+		GenRocks(rocksFixedPosPool.len * 0.9);
 	};
 }
 
@@ -182,9 +205,9 @@ void Scene::FixedUpdate() {
 			breakingRocks.SwapRemoveAt(i);
 		}
 	}
-	for (auto i = flyingRocks.len - 1; i >= 0; --i) {
-		if (flyingRocks[i]->Update()) {
-			flyingRocks[i]->Dispose();
+	for (auto i = collectingRocks.len - 1; i >= 0; --i) {
+		if (collectingRocks[i]->Update()) {
+			collectingRocks[i]->Dispose();
 			//++counts[o.typeId];
 			//minecart->Add(o.typeId);
 		}
@@ -228,7 +251,7 @@ void Scene::Draw() {
 	for (auto& o : borningRocks) SortContainerAdd(o.pointer);
 	for (auto& o : rocks) SortContainerAdd(o.pointer);
 	for (auto& o : breakingRocks) SortContainerAdd(&o);
-	for (auto& o : flyingRocks) SortContainerAdd(o.pointer);
+	for (auto& o : collectingRocks) SortContainerAdd(o.pointer);
 	SortContainerAdd(minecart.pointer);
 	SortContainerDraw();
 

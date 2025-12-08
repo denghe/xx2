@@ -40,8 +40,8 @@ struct Scene : xx::SceneBase {
 
 	xx::List<BreakingRock> breakingRocks;
 
-	xx::Grid2dCircle<FlyingRock*> flyingRocksGrid;
-	xx::List<xx::Shared<FlyingRock>> flyingRocks;	// life cycle: must below flyingRocksGrid
+	xx::Grid2dCircle<CollectingRock*> collectingRocksGrid;
+	xx::List<xx::Shared<CollectingRock>> collectingRocks;	// life cycle: must below collectingRocksGrid
 
 	xx::List<SceneItem*> sortContainer;				// for draw order by Y
 	void SortContainerAdd(SceneItem* o);

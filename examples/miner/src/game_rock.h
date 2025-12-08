@@ -56,7 +56,7 @@ struct BreakingRock : SceneItem {
 };
 
 struct Porter;
-struct FlyingRock : SceneItem {
+struct CollectingRock : SceneItem {
 	int32_t indexAtGrid{ -1 };
 	int32_t typeId{ -1 }, qualityId{ -1 };
 	XY pos{};
@@ -66,14 +66,14 @@ struct FlyingRock : SceneItem {
 	void Draw() override;
 	void Dispose();	// unsafe: release indexAtList
 	void CatchBy(Porter* owner_);	// unsafe: release indexAtGrid & Dispose
-	~FlyingRock();	// try release indexAtGrid
+	~CollectingRock();	// try release indexAtGrid
 };
 
 struct CatchingRock {
 	int32_t typeId{ -1 }, qualityId{ -1 };
 	XY pos{};
 	float flySpeed{};
-	void Init(FlyingRock* flyingRock_);
+	void Init(CollectingRock* tar_);
 	bool Update(Porter* porter_);
 	void Draw(Scene* scene_);
 };

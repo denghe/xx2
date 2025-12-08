@@ -91,7 +91,7 @@ bool Rock::Hit(int32_t dmg_) {
 		f = gg.all_rocks_()[typeId][qualityId * 2];
 	}
 	if (hp <= 0) {
-		scene->flyingRocks.Emplace().Emplace()->Init(this);
+		scene->collectingRocks.Emplace().Emplace()->Init(this);
 		scene->breakingRocks.Emplace().Init(this);
 		gg.PlayAudio(gg.ss.rockbreak);
 		++scene->rocksDisposedCountPerFrame;
@@ -220,17 +220,17 @@ void BreakingRock::Draw() {
 /********************************************************************************************************/
 // FlyingRock
 
-void FlyingRock::Init(Rock* rock_) {
+void CollectingRock::Init(Rock* rock_) {
 	scene = rock_->scene;
 	pos = rock_->pos;
 	y = pos.y;
 	typeId = rock_->typeId;
 	qualityId = rock_->qualityId;
-	scene->flyingRocksGrid.Add(indexAtGrid, this);
-	indexAtList = scene->flyingRocks.len - 1;
+	scene->collectingRocksGrid.Add(indexAtGrid, this);
+	indexAtList = scene->collectingRocks.len - 1;
 }
 
-bool FlyingRock::Update() {
+bool CollectingRock::Update() {
 	// fade in
 	static constexpr auto cAlphaStep{ 1.f / (gg.cFps * 0.5f) };
 	if (alpha < 1.f) {
@@ -243,41 +243,41 @@ bool FlyingRock::Update() {
 	return false;
 }
 
-void FlyingRock::Draw() {
+void CollectingRock::Draw() {
 	auto& c = scene->cam;
 	auto& f = gg.all_rocks_()[typeId][4];
 	gg.Quad().DrawFrame(f, c.ToGLPos(pos), scene->cRocksScale * c.scale * 0.8f
 		, 0, 1.f, {255,255,255,(uint8_t)(255.f * alpha)});
 }
 
-void FlyingRock::Dispose() {
+void CollectingRock::Dispose() {
 	assert(indexAtList > -1);
-	assert(scene->flyingRocks[indexAtList].pointer == this);
+	assert(scene->collectingRocks[indexAtList].pointer == this);
 	auto ial = indexAtList;
-	scene->flyingRocks.Back()->indexAtList = ial;
-	scene->flyingRocks.SwapRemoveAt(ial);
+	scene->collectingRocks.Back()->indexAtList = ial;
+	scene->collectingRocks.SwapRemoveAt(ial);
 }
 
-void FlyingRock::CatchBy(Porter* owner_) {
+void CollectingRock::CatchBy(Porter* owner_) {
 	owner_->catchingRocks.Emplace().Init(this);
 	assert(indexAtGrid > -1);
-	scene->flyingRocksGrid.Remove(indexAtGrid, this);
+	scene->collectingRocksGrid.Remove(indexAtGrid, this);
 	Dispose();
 }
 
-FlyingRock::~FlyingRock() {
+CollectingRock::~CollectingRock() {
 	if(indexAtGrid > -1) {
-		scene->flyingRocksGrid.Remove(indexAtGrid, this);
+		scene->collectingRocksGrid.Remove(indexAtGrid, this);
 	}
 }
 
 /********************************************************************************************************/
 // CatchingRock
 
-void CatchingRock::Init(FlyingRock* flyingRock_) {
-	pos = flyingRock_->pos;
-	typeId = flyingRock_->typeId;
-	qualityId = flyingRock_->qualityId;
+void CatchingRock::Init(CollectingRock* tar_) {
+	pos = tar_->pos;
+	typeId = tar_->typeId;
+	qualityId = tar_->qualityId;
 	flySpeed = 500.f / gg.cFps;
 }
 

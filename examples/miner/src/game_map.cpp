@@ -20,8 +20,8 @@ void Map::Init(Scene* scene_) {
 	scene->rocksGrid.Init(cellSize, numCRs.y, numCRs.x);
 	scene->rocks.Reserve(scene->cRocksMaxCount);
 	scene->breakingRocks.Reserve(scene->cRocksMaxCount);
-	scene->flyingRocksGrid.Init(cellSize, numCRs.y, numCRs.x);
-	scene->flyingRocks.Reserve(scene->cRocksMaxCount);
+	scene->collectingRocksGrid.Init(cellSize, numCRs.y, numCRs.x);
+	scene->collectingRocks.Reserve(scene->cRocksMaxCount);
 	scene->sortContainer.Reserve(scene->cRocksMaxCount * 2);
 
 	// pos filter
