@@ -24,12 +24,11 @@ struct BorningRock : SceneItem {
 	void Init(Scene* scene_);
 	bool Update() override;
 	void Draw() override;
-	~BorningRock();
+	~BorningRock();	// try release fixedPos
 };
 
 struct Rock : BorningRock {
 	static constexpr float cHPMax{ 100 };
-	int32_t indexAtList{ -1 };
 	int32_t hp{};
 	int32_t _1{}, _2{};
 	float whiteEndTime{};
@@ -41,12 +40,11 @@ struct Rock : BorningRock {
 	void BeginDig();
 	void BeginBounce();
 	void Bounce();	// coroutine _2
-	void Break();
-	void Dispose();	// unsafe: Release this
+	void Dispose();	// unsafe: release indexAtList
 	void Init(BorningRock* src_);
 	bool Update() override;	// coroutine _1
 	void Draw() override;
-	~Rock();
+	~Rock();	// try release indexAtGrid
 };
 
 struct BreakingRock : SceneItem {
@@ -57,15 +55,31 @@ struct BreakingRock : SceneItem {
 	void Draw() override;
 };
 
-struct FlyingRock {
-	static constexpr float cFlySpeed{ 1200 / gg.cFps };
-	static constexpr float cScaleStep{ 1.f / (gg.cFps * 0.6f) };
-	Scene* scene{};
-	XY pos{}, inc{};
-	float scale{}, scaleStep{}, moveCount{}, moveIndex{};
+struct Porter;
+struct FlyingRock : SceneItem {
+	int32_t indexAtGrid{ -1 };
 	int32_t typeId{ -1 }, qualityId{ -1 };
-	int32_t _1{};
+	XY pos{};
+	float alpha{};
 	void Init(Rock* rock_);
-	bool Update();	// coroutine _1
+	bool Update();
+	void Draw() override;
+	void Dispose();	// unsafe: release indexAtList
+	void CatchBy(Porter* owner_);	// unsafe: release indexAtGrid & Dispose
+	~FlyingRock();	// try release indexAtGrid
+};
+
+struct CatchingRock {
+	int32_t typeId{ -1 }, qualityId{ -1 };
+	XY pos{};
+	void Init(FlyingRock* flyingRock_);
+	bool Update(Porter* porter_);
 	void Draw(Scene* scene_);
+};
+
+struct StackedRock {
+	int32_t typeId{ -1 }, qualityId{ -1 };
+	XY pos{};
+	void Init(Porter* porter_, CatchingRock* catchingRock_);
+	void Draw(Porter* porter_);
 };

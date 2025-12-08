@@ -83,6 +83,11 @@ namespace xx {
         }
 
         template<typename R = T>
+        constexpr auto FlipX() const -> X_Y<R> {
+            return { R(-x), R(y) };
+        }
+
+        template<typename R = T>
         constexpr auto Floor() const -> X_Y<R> requires std::is_same_v<float, T> {
             return { std::floorf(x), std::floorf(y) };
         }

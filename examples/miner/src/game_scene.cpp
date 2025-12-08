@@ -6,20 +6,17 @@
 #include "scene_mainmenu.h"
 
 void Scene::Init(float totalScale_) {
+	sortContainer.Resize<true>((int32_t)gg.designSize.y);
 	cam.Init(gg.scale, 1.f, gg.designSize / 2);
 	MakeUI();
 	map.Emplace<Map>()->Init(this);
 	minecart.Emplace()->Init(this, { 50.f, cam.original.y - 100.f });
-	GenRocks(rocksFixedPosPool.len * 0.5);
-	GenMiners(10);
-
-#ifdef ENABLE_BUCKET_SORT
-	sortContainer.Resize<true>((int32_t)gg.designSize.y);
-#endif
+	GenRocks(rocksFixedPosPool.len * 0.1);
+	GenMiners(1);
+	GenPorters(1);
 }
 
 void Scene::MakeUI() {
-	// todo: change counts display style
 
 	static constexpr float cLineHeight{ 50 };
 	static constexpr float cMargin{ 10 };
@@ -36,7 +33,6 @@ void Scene::MakeUI() {
 			(gg.all_rocks_()[i][4], cLineHeight * 1.5, cLineHeight * 0.5f, false)(xx::ToString(counts[i]));
 		o.At<xx::Scale9>(2).SetAlphaRecursive(0.5f);
 		countUIs[i] = xx::WeakFromThis(&o);
-		flyTargets[i] = cam.ToLogicPos((pos + XY{ cLineHeight * 0.5f, -cLineHeight * 0.5f }) * ui->scale);
 	};
 	assert(counts.size() == 9);
 	MakeCountUI(0, basePos + XY{ 0 * gg.designSize.x / counts.size(), 0 });
@@ -91,11 +87,17 @@ void Scene::GenMiners(int32_t count_) {
 	miners.Clear();
 	for (int32_t i = 0; i < count_; ++i) {
 		for (int32_t j = 0; j < gg.mcs.size(); ++j) {
-			//auto posOffset = xx::GetRndPosDoughnut(gg.rnd, cRockRadius * 5, 0);
-			//miners.Emplace().Emplace<Miner>()->Init(this, j, cam.original + posOffset, 23);
 			auto pos = gg.rnd.NextElement(rocksFixedPoss);
 			miners.Emplace().Emplace<Miner>()->Init(this, j, pos, 23);
 		}
+	}
+}
+
+void Scene::GenPorters(int32_t count_) {
+	porters.Clear();
+	for (int32_t i = 0; i < count_; ++i) {
+		auto pos = gg.rnd.NextElement(rocksFixedPoss);
+		porters.Emplace().Emplace<Porter>()->Init(this, pos);
 	}
 }
 
@@ -130,6 +132,7 @@ void Scene::Update() {
 void Scene::FixedUpdate() {
 	rocksDisposedCountPerFrame = 0;
 
+	// todo: mouse logic -> Player
 	// mouse dig logic
 	auto mp = cam.ToLogicPos(gg.mousePos);
 	if (mp.x >= 0 && mp.y >= 0 && mp.x < rocksGrid.pixelSize.x && mp.y < rocksGrid.pixelSize.y) {
@@ -151,14 +154,27 @@ void Scene::FixedUpdate() {
 			miners.SwapRemoveAt(i);
 		}
 	}
-	for (auto i = rocks.len - 1; i >= 0; --i) {
-		if (rocks[i]->Update()) {
-			rocks[i]->Dispose();
+
+	for (auto i = porters.len - 1; i >= 0; --i) {
+		if (porters[i]->Update()) {
+			porters.SwapRemoveAt(i);
 		}
 	}
+
+	//for (auto i = gamblers.len - 1; i >= 0; --i) {
+	//	if (gamblers[i]->Update()) {
+	//		gamblers.SwapRemoveAt(i);
+	//	}
+	//}
+
 	for (auto i = borningRocks.len - 1; i >= 0; --i) {
 		if (borningRocks[i]->Update()) {
 			borningRocks.SwapRemoveAt(i);
+		}
+	}
+	for (auto i = rocks.len - 1; i >= 0; --i) {
+		if (rocks[i]->Update()) {
+			rocks[i]->Dispose();
 		}
 	}
 	for (auto i = breakingRocks.len - 1; i >= 0; --i) {
@@ -166,26 +182,38 @@ void Scene::FixedUpdate() {
 			breakingRocks.SwapRemoveAt(i);
 		}
 	}
+	for (auto i = flyingRocks.len - 1; i >= 0; --i) {
+		if (flyingRocks[i]->Update()) {
+			flyingRocks[i]->Dispose();
+			//++counts[o.typeId];
+			//minecart->Add(o.typeId);
+		}
+	}
 
 	if (rocksDisposedCountPerFrame > 0) {
 		GenRocks(rocksDisposedCountPerFrame);
 	}
 
-	for (auto i = flyingRocks.len - 1; i >= 0; --i) {
-		auto& o = flyingRocks[i];
-		if (o.Update()) {
-			++counts[o.typeId];
-			minecart->Add(o.typeId);
-			flyingRocks.SwapRemoveAt(i);
+	map->Update();
+}
+
+
+XX_INLINE void Scene::SortContainerAdd(SceneItem* o) {
+	//assert(o->y >= 0.f);
+	//assert(o->y < gg.designSize.y);
+	auto& slot = sortContainer[(int32_t)o->y];
+	o->next = slot;
+	slot = o;
+}
+
+XX_INLINE void Scene::SortContainerDraw() {
+	for (auto o : sortContainer) {
+		while (o) {
+			o->Draw();
+			o = o->next;
 		}
 	}
-
-	map->Update();
-
-	//if (timer <= time) {
-	//	timer += 1.f;
-	//	std::sort((SceneItem**)miners.buf, (SceneItem**)miners.buf + miners.len, [](auto& a, auto& b) { return a->y < b->y; });
-	//}
+	memset(sortContainer.buf, 0, sortContainer.len * sizeof(void*));
 }
 
 void Scene::Draw() {
@@ -193,80 +221,16 @@ void Scene::Draw() {
 	// todo: grass ?
 	map->Draw();
 
-	// sort order by y
-#ifdef ENABLE_BUCKET_SORT
-	// map y to 0 ~ 1080 ( design size.y )
-#if ENABLE_BUCKET_SORT == 1
-	// 4x faster than std::sort
-	for (auto& o : borningRocks) {
-		sortContainer[(int32_t)o->y].Emplace(o.pointer);
-	}
-	for (auto& o : breakingRocks) {
-		sortContainer[(int32_t)o.y].Emplace(&o);
-	}
-	for (auto& o : miners) {
-		sortContainer[(int32_t)o->y].Emplace(o.pointer);
-	}
-	for (auto& o : rocks) {
-		sortContainer[(int32_t)o->y].Emplace(o.pointer);
-	}
-	sortContainer[(int32_t)minecart->y].Emplace(minecart.pointer);
-	for (auto& subList : sortContainer) {
-		for (auto& o : subList) o->Draw();
-		subList.Clear();
-	}
-#else
-	// 3x faster than std::sort
-	for (auto& o : borningRocks) {
-		auto& slot = sortContainer[(int32_t)o->y];
-		o->next = slot;
-		slot = o.pointer;
-	}
-	for (auto& o : breakingRocks) {
-		auto& slot = sortContainer[(int32_t)o.y];
-		o.next = slot;
-		slot = &o;
-	}
-	for (auto& o : miners) {
-		auto& slot = sortContainer[(int32_t)o->y];
-		o->next = slot;
-		slot = o.pointer;
-	}
-	for (auto& o : rocks) {
-		auto& slot = sortContainer[(int32_t)o->y];
-		o->next = slot;
-		slot = o.pointer;
-	}
-	{
-		auto& slot = sortContainer[(int32_t)minecart->y];
-		minecart->next = slot;
-		slot = minecart.pointer;
-	}
-	for (auto o : sortContainer) {
-		while(o) {
-			o->Draw();
-			o = o->next;
-		}
-	}
-	memset(sortContainer.buf, 0, sortContainer.len * sizeof(void*));
-#endif
-#else
-	assert(sortContainer.Empty());
-	for (auto& o : borningRocks) sortContainer.Emplace(o->y, o.pointer);
-	for (auto& o : breakingRocks) sortContainer.Emplace(o.y, &o);
-	for (auto& o : miners) sortContainer.Emplace(o->y, o.pointer);
-	for (auto& o : rocks) sortContainer.Emplace(o->y, o.pointer);
-	sortContainer.Emplace(minecart->y, minecart.pointer);
-	std::sort(sortContainer.buf, sortContainer.buf + sortContainer.len
-		, [](auto& a, auto& b) { return a.first < b.first; });
-
-	// draw by y
-	for (auto& o : sortContainer) o.second->Draw();
-	sortContainer.Clear();
-#endif
-
-	// draw fly rocks
-	for (auto& o : flyingRocks) o.Draw(this);
+	// sort order by y. map y to 0 ~ 1080 ( design size.y ). FPS 3x faster than std::sort
+	for (auto& o : miners) SortContainerAdd(o.pointer);
+	for (auto& o : porters) SortContainerAdd(o.pointer);
+	//for (auto& o : gamblers) SortContainerAdd(o.pointer);
+	for (auto& o : borningRocks) SortContainerAdd(o.pointer);
+	for (auto& o : rocks) SortContainerAdd(o.pointer);
+	for (auto& o : breakingRocks) SortContainerAdd(&o);
+	for (auto& o : flyingRocks) SortContainerAdd(o.pointer);
+	SortContainerAdd(minecart.pointer);
+	SortContainerDraw();
 
 	// draw mouse circle
 	gg.Quad().DrawFrame(gg.all.circle256, gg.mousePos
@@ -280,11 +244,6 @@ void Scene::Draw() {
 	// draw ui
 	gg.GLBlendFunc(gg.blendDefault);
 	gg.DrawNode(ui);
-
-	//// gizmos
-	//for (auto& p : flyTargets) {
-	//	gg.Quad().Draw(gg.embed.shape_gear, gg.embed.shape_gear, cam.ToGLPos(p), 0.5f, cam.scale);
-	//}
 }
 
 void Scene::OnResize(bool modeChanged_) {

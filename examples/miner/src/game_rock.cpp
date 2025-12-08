@@ -1,8 +1,43 @@
 ﻿#include "pch.h"
 #include "game_rock.h"
+#include "game_porter.h"
 #include "game_scene.h"
 
 /********************************************************************************************************/
+// Pickaxe
+
+void Pickaxe::Init(Rock* target_) {
+	pos = target_->centerPos + XY{ Scene::cRockRadius * target_->scene->cRocksScale, 0 };
+	radians = {};
+	_1 = {};
+}
+
+bool Pickaxe::Update() {
+	static constexpr float cStep1Radians{ 30.f / 180.f * M_PI };
+	static constexpr float cStep1RadiansStep{ cStep1Radians / (gg.cFps * 0.1f) };
+	static constexpr float cStep2Radians{ -50.f / 180.f * M_PI };
+	static constexpr float cStep2RadiansStep{ (cStep2Radians - cStep1Radians) / (gg.cFps * 0.2f) };
+
+	XX_BEGIN(_1);
+	for (radians = 0; radians < cStep1Radians; radians += cStep1RadiansStep) {
+		XX_YIELD_F(_1);
+	}
+	gg.PlayAudio(gg.ss.pickaxe);
+	for (; radians > cStep2Radians; radians += cStep2RadiansStep) {
+		XX_YIELD_F(_1);
+	}
+	return true;
+	XX_END(_1);
+	return false;
+}
+
+void Pickaxe::Draw(Scene* scene_) {
+	auto& c = scene_->cam;
+	gg.Quad().DrawFrame(gg.all.pickaxe, c.ToGLPos(pos), scene_->cRocksScale * c.scale, radians);
+}
+
+/********************************************************************************************************/
+// BorningRock
 
 void BorningRock::Init(Scene* scene_) {
 	scene = scene_;
@@ -48,61 +83,7 @@ BorningRock::~BorningRock() {
 }
 
 /********************************************************************************************************/
-
-void BreakingRock::Init(Rock* rock_) {
-	scene = rock_->scene;
-	pos = rock_->centerPos;
-	y = pos.y;
-	scale = scene->cRocksScale * 3.f;
-	breakFrameIndex = 0.f;
-}
-
-bool BreakingRock::Update() {
-	static constexpr auto n = gg.all.explosion_1_.size();
-	if (breakFrameIndex < n) {
-		breakFrameIndex += (gg.cDelta * n / 0.5f);
-	}
-	return breakFrameIndex >= n;
-}
-
-void BreakingRock::Draw() {
-	auto& f = gg.all.explosion_1_[breakFrameIndex];
-	gg.Quad().DrawFrame(f, scene->cam.ToGLPos(pos), scale * scene->cam.scale);
-}
-
-/********************************************************************************************************/
-
-void Pickaxe::Init(Rock* target_) {
-	pos = target_->centerPos + XY{ Scene::cRockRadius * target_->scene->cRocksScale, 0 };
-	radians = {};
-	_1 = {};
-}
-
-bool Pickaxe::Update() {
-	static constexpr float cStep1Radians{ 30.f / 180.f * M_PI };
-	static constexpr float cStep1RadiansStep{ cStep1Radians / (gg.cFps * 0.1f) };
-	static constexpr float cStep2Radians{ -50.f / 180.f * M_PI };
-	static constexpr float cStep2RadiansStep{ (cStep2Radians - cStep1Radians) / (gg.cFps * 0.2f) };
-
-	XX_BEGIN(_1);
-	for (radians = 0; radians < cStep1Radians; radians += cStep1RadiansStep) {
-		XX_YIELD_F(_1);
-	}
-	gg.PlayAudio(gg.ss.pickaxe);
-	for (; radians > cStep2Radians; radians += cStep2RadiansStep) {
-		XX_YIELD_F(_1);
-	}
-	return true;
-	XX_END(_1);
-	return false;
-}
-
-void Pickaxe::Draw(Scene* scene_) {
-	auto& c = scene_->cam;
-	gg.Quad().DrawFrame(gg.all.pickaxe, c.ToGLPos(pos), scene_->cRocksScale * c.scale, radians);
-}
-
-/********************************************************************************************************/
+// Rock
 
 bool Rock::Hit(int32_t dmg_) {
 	hp -= dmg_;
@@ -110,7 +91,10 @@ bool Rock::Hit(int32_t dmg_) {
 		f = gg.all_rocks_()[typeId][qualityId * 2];
 	}
 	if (hp <= 0) {
-		Break();
+		scene->flyingRocks.Emplace().Emplace()->Init(this);
+		scene->breakingRocks.Emplace().Init(this);
+		gg.PlayAudio(gg.ss.rockbreak);
+		++scene->rocksDisposedCountPerFrame;
 		return true;
 	}
 	else {
@@ -156,13 +140,6 @@ void Rock::Bounce() {
 	XX_END(_2);
 }
 
-void Rock::Break() {
-	scene->flyingRocks.Emplace().Init(this);
-	scene->breakingRocks.Emplace().Init(this);
-	gg.PlayAudio(gg.ss.rockbreak);
-	++scene->rocksDisposedCountPerFrame;
-}
-
 void Rock::Dispose() {
 	assert(indexAtList > -1);
 	assert(scene->rocks[indexAtList].pointer == this);
@@ -172,9 +149,8 @@ void Rock::Dispose() {
 }
 
 void Rock::Init(BorningRock* src_) {
-	// move data
-	*(BorningRock*)this = *src_;
-	src_->fixedPos = {};
+	*(BorningRock*)this = *src_;	// move logic
+	src_->fixedPos = {};	// avoid src_ release
 	hp = 100;
 	scene->rocksGrid.Add(indexAtGrid, this);
 	indexAtList = scene->rocks.len - 1;
@@ -218,46 +194,132 @@ Rock::~Rock() {
 }
 
 /********************************************************************************************************/
+// BreakingRock
+
+void BreakingRock::Init(Rock* rock_) {
+	scene = rock_->scene;
+	pos = rock_->centerPos;
+	y = pos.y;
+	scale = scene->cRocksScale * 3.f;
+	breakFrameIndex = 0.f;
+}
+
+bool BreakingRock::Update() {
+	static constexpr auto n = gg.all.explosion_1_.size();
+	if (breakFrameIndex < n) {
+		breakFrameIndex += (gg.cDelta * n / 0.5f);
+	}
+	return breakFrameIndex >= n;
+}
+
+void BreakingRock::Draw() {
+	auto& f = gg.all.explosion_1_[breakFrameIndex];
+	gg.Quad().DrawFrame(f, scene->cam.ToGLPos(pos), scale * scene->cam.scale);
+}
+
+/********************************************************************************************************/
+// FlyingRock
 
 void FlyingRock::Init(Rock* rock_) {
 	scene = rock_->scene;
-	pos = rock_->centerPos;
+	pos = rock_->pos;
+	y = pos.y;
 	typeId = rock_->typeId;
 	qualityId = rock_->qualityId;
-	//auto target = rock_->scene->flyTargets[typeId];
-	auto target = scene->minecart->flyTargetPos;
-	auto d = target - pos;
-	auto mag2 = d.x * d.x + d.y * d.y;
-	assert(mag2 > 0);
-	auto mag = std::sqrtf(mag2);
-	auto norm = d / mag;
-	inc = norm * cFlySpeed;
-	moveCount = mag / cFlySpeed;
-	assert(moveCount > 0);
-	moveIndex = 0;
-	scale = 0;
-	//scaleStep = (50 * 1.5f / 128.f - scene->cRocksScale) / moveCount;
-	scaleStep = (scene->minecart->cRocksScale - scene->cRocksScale) / moveCount;
+	scene->flyingRocksGrid.Add(indexAtGrid, this);
+	indexAtList = scene->flyingRocks.len - 1;
 }
 
 bool FlyingRock::Update() {
-	XX_BEGIN(_1);
-	for (; scale < scene->cRocksScale; scale += cScaleStep * scene->cRocksScale) {
-		XX_YIELD_F(_1);
+	// fade in
+	static constexpr auto cAlphaStep{ 1.f / (gg.cFps * 0.5f) };
+	if (alpha < 1.f) {
+		alpha += cAlphaStep;
 	}
-	scale = scene->cRocksScale;
-	for (; moveIndex < moveCount; ++moveIndex) {
-		pos += inc;
-		scale += scaleStep;
-		XX_YIELD_F(_1);
+	else {
+		alpha = 1.f;
 	}
-	return true;
-	XX_END(_1);
+	// todo: flash effect
 	return false;
 }
 
-void FlyingRock::Draw(Scene* scene_) {
+void FlyingRock::Draw() {
+	auto& c = scene->cam;
+	auto& f = gg.all_rocks_()[typeId][4];
+	gg.Quad().DrawFrame(f, c.ToGLPos(pos), scene->cRocksScale * c.scale * 0.8f
+		, 0, 1.f, {255,255,255,(uint8_t)(255.f * alpha)});
+}
+
+void FlyingRock::Dispose() {
+	assert(indexAtList > -1);
+	assert(scene->flyingRocks[indexAtList].pointer == this);
+	auto ial = indexAtList;
+	scene->flyingRocks.Back()->indexAtList = ial;
+	scene->flyingRocks.SwapRemoveAt(ial);
+}
+
+void FlyingRock::CatchBy(Porter* owner_) {
+	owner_->catchingRocks.Emplace().Init(this);
+	assert(indexAtGrid > -1);
+	scene->flyingRocksGrid.Remove(indexAtGrid, this);
+	Dispose();
+}
+
+FlyingRock::~FlyingRock() {
+	if(indexAtGrid > -1) {
+		scene->flyingRocksGrid.Remove(indexAtGrid, this);
+	}
+}
+
+/********************************************************************************************************/
+// CatchingRock
+
+void CatchingRock::Init(FlyingRock* flyingRock_) {
+	pos = flyingRock_->pos;
+	typeId = flyingRock_->typeId;
+	qualityId = flyingRock_->qualityId;
+}
+
+bool CatchingRock::Update(Porter* porter_) {
+	// fly to porter_
+	static constexpr auto cFlySpeed{ 500.f / gg.cFps };
+	auto d = porter_->catchingPos - pos;
+	auto mag2 = d.x * d.x + d.y * d.y;
+	if (mag2 < cFlySpeed * cFlySpeed) {	// reached
+		// todo
+		return true;
+	}
+	pos += d / std::sqrtf(mag2) * cFlySpeed;
+	return false;
+}
+
+void CatchingRock::Draw(Scene* scene_) {
 	auto& c = scene_->cam;
 	auto& f = gg.all_rocks_()[typeId][4];
-	gg.Quad().DrawFrame(f, c.ToGLPos(pos), scale * c.scale);
+	gg.Quad().DrawFrame(f, c.ToGLPos(pos), scene_->cRocksScale * c.scale * 0.8f);
+}
+
+/********************************************************************************************************/
+// StackedRock
+
+void StackedRock::Init(Porter* porter_, CatchingRock* catchingRock_) {
+	pos = porter_->rocksBasePos;
+	// todo: + offset
+	porter_->rocksBasePos += XY{ 0, -5.f };
+	typeId = catchingRock_->typeId;
+	qualityId = catchingRock_->qualityId;
+}
+
+void StackedRock::Draw(Porter* porter_) {
+	auto& scene = porter_->scene;
+	auto& c = scene->cam;
+	auto& f = gg.all_rocks_()[typeId][4];
+	XY p{};
+	if (porter_->flipX) {
+		p = porter_->pos + pos.FlipX();
+	}
+	else {
+		p = porter_->pos + pos;
+	}
+	gg.Quad().DrawFrame(f, c.ToGLPos(p), scene->cRocksScale * c.scale * 0.8f);
 }

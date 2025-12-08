@@ -1,7 +1,9 @@
 ﻿#pragma once
 #include <soloud.h>
 #include <soloud_wav.h>
-#include <soloud_file.h>
+//#include <soloud_file.h>
+
+// todo: opus support
 
 namespace xx {
 	struct SoundSource {

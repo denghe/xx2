@@ -113,7 +113,7 @@ LabAttack:
 bool Miner::SearchTarget() {
 	target.Reset();
 	float minMag2 = std::numeric_limits<float>::max();
-	if (scene->rocks.len < 30) {
+	if (scene->rocks.len < 10) {
 		for (auto& o : scene->rocks) {
 			auto d = o->pos - pos;
 			auto mag2 = d.x * d.x + d.y * d.y;
@@ -126,7 +126,7 @@ bool Miner::SearchTarget() {
 	else {
 		auto& g = scene->rocksGrid;
 		auto cri = g.PosToCRIndex(pos);
-		auto searchRange = scene->cRockRadius * 2;
+		auto searchRange = gg.designSize.x;
 		auto rockRadius = scene->cRockRadius * scene->cRocksScale;
 		auto r = searchRange + rockRadius;
 		auto rr = r * r;

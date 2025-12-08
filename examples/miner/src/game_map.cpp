@@ -12,12 +12,17 @@ void Map::Init(Scene* scene_) {
 	scene->cRocksScale = 0.4f / totalScale_;
 	scene->cRocksMaxCount = cGridSize.x * cGridSize.y;
 	scene->cMouseCircleRadius = 128.f;
-	scene->cRocksPivotOffset = { 0, -scene->cRockRadius * scene->cRocksScale };
+	scene->cRocksPivotOffset = { 0, -scene->cRockRadius * scene->cRocksScale * 0.5f };
 
 	auto cellSize = (int32_t)std::ceilf(std::max(scene->cRockMargin.x, scene->cRockMargin.y));
 	auto numCRs = gg.designSize.As<int32_t>() / cellSize + 1;
+	scene->borningRocks.Reserve(scene->cRocksMaxCount);
 	scene->rocksGrid.Init(cellSize, numCRs.y, numCRs.x);
 	scene->rocks.Reserve(scene->cRocksMaxCount);
+	scene->breakingRocks.Reserve(scene->cRocksMaxCount);
+	scene->flyingRocksGrid.Init(cellSize, numCRs.y, numCRs.x);
+	scene->flyingRocks.Reserve(scene->cRocksMaxCount);
+	scene->sortContainer.Reserve(scene->cRocksMaxCount * 2);
 
 	// pos filter
 	auto& img = gg.stbi.bg1a;
