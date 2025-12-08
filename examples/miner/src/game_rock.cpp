@@ -278,18 +278,19 @@ void CatchingRock::Init(FlyingRock* flyingRock_) {
 	pos = flyingRock_->pos;
 	typeId = flyingRock_->typeId;
 	qualityId = flyingRock_->qualityId;
+	flySpeed = 500.f / gg.cFps;
 }
 
 bool CatchingRock::Update(Porter* porter_) {
 	// fly to porter_
-	static constexpr auto cFlySpeed{ 500.f / gg.cFps };
 	auto d = porter_->catchingPos - pos;
 	auto mag2 = d.x * d.x + d.y * d.y;
-	if (mag2 < cFlySpeed * cFlySpeed) {	// reached
-		// todo
+	if (mag2 < flySpeed * flySpeed) {	// reached
+		porter_->stackedRocks.Emplace().Init(porter_, this);
 		return true;
 	}
-	pos += d / std::sqrtf(mag2) * cFlySpeed;
+	pos += d / std::sqrtf(mag2) * flySpeed;
+	flySpeed += 0.1f;
 	return false;
 }
 
@@ -302,6 +303,15 @@ void CatchingRock::Draw(Scene* scene_) {
 /********************************************************************************************************/
 // StackedRock
 
+XY StackedRock::CalcDrawPos(Porter* porter_) const {
+	if (porter_->flipX) {
+		return porter_->scene->cam.ToGLPos(porter_->pos + pos.FlipX());
+	}
+	else {
+		return porter_->scene->cam.ToGLPos(porter_->pos + pos);
+	}
+}
+
 void StackedRock::Init(Porter* porter_, CatchingRock* catchingRock_) {
 	pos = porter_->rocksBasePos;
 	// todo: + offset
@@ -310,16 +320,8 @@ void StackedRock::Init(Porter* porter_, CatchingRock* catchingRock_) {
 	qualityId = catchingRock_->qualityId;
 }
 
-void StackedRock::Draw(Porter* porter_) {
-	auto& scene = porter_->scene;
-	auto& c = scene->cam;
+void StackedRock::Draw(Scene* scene_, XY p_) {
+	auto& c = scene_->cam;
 	auto& f = gg.all_rocks_()[typeId][4];
-	XY p{};
-	if (porter_->flipX) {
-		p = porter_->pos + pos.FlipX();
-	}
-	else {
-		p = porter_->pos + pos;
-	}
-	gg.Quad().DrawFrame(f, c.ToGLPos(p), scene->cRocksScale * c.scale * 0.8f);
+	gg.Quad().DrawFrame(f, p_, scene_->cRocksScale * c.scale * 0.8f);
 }

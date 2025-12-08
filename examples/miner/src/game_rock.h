@@ -72,6 +72,7 @@ struct FlyingRock : SceneItem {
 struct CatchingRock {
 	int32_t typeId{ -1 }, qualityId{ -1 };
 	XY pos{};
+	float flySpeed{};
 	void Init(FlyingRock* flyingRock_);
 	bool Update(Porter* porter_);
 	void Draw(Scene* scene_);
@@ -80,6 +81,7 @@ struct CatchingRock {
 struct StackedRock {
 	int32_t typeId{ -1 }, qualityId{ -1 };
 	XY pos{};
+	XY CalcDrawPos(Porter* porter_) const;
 	void Init(Porter* porter_, CatchingRock* catchingRock_);
-	void Draw(Porter* porter_);
+	void Draw(Scene* scene_, XY p_);
 };

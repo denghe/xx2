@@ -17,7 +17,6 @@ struct Porter : SceneItem {
 	float catchRange{}, moveSpeed{};
 	int32_t _1{};
 
-	void UpdateCatchingRocks();
 	bool SearchTarget();
 	void CatchFlyingRocks();
 	bool MoveToTarget();

@@ -24,12 +24,23 @@ void Porter::Draw() {
 	XY s{ radius / resRadius * c.scale };
 	if (flipX) s.x = -s.x;
 	gg.Quad().DrawFrame(f, c.ToGLPos(pos), s);
+	auto screenMinY = gg.size_2.y;
+	for (auto& o : stackedRocks) {
+		auto p = o.CalcDrawPos(this);
+		if (p.y > screenMinY)
+			break;
+		o.Draw(scene, p);
+	}
 	for (auto& o : catchingRocks) o.Draw(scene);
-	for (auto& o : stackedRocks) o.Draw(this);
 }
 
 bool Porter::Update() {
-	UpdateCatchingRocks();
+	for (auto i = catchingRocks.len - 1; i >= 0; --i) {
+		if (catchingRocks[i].Update(this)) {
+			catchingRocks.SwapRemoveAt(i);
+		}
+	}
+
 	XX_BEGIN(_1);
 LabSearch:
 	//SetAnim(AnimTypes::Idle);
@@ -58,16 +69,6 @@ LabMoveLoop:
 	goto LabMoveLoop;
 	XX_END(_1);
 	return false;
-}
-
-void Porter::UpdateCatchingRocks() {
-	for (auto i = catchingRocks.len - 1; i >= 0; --i) {
-		auto& o = catchingRocks[i];
-		if (o.Update(this)) {
-			stackedRocks.Emplace().Init(this, &o);
-			catchingRocks.SwapRemoveAt(i);
-		}
-	}
 }
 
 void Porter::CalcCatchingPos() {
