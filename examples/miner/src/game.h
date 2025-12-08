@@ -30,7 +30,7 @@ struct Game : xx::Game<Game> {
 	XX_INLINE xx::Shader_Grass& Grass() { return ShaderBegin(shaderGrass); }
 
 	all all;
-	std::array<std::array<xx::Frame, 6>, 9>& all_rocks_();	// ref to all.rocks_?.  rock_?_?
+	std::array<std::array<xx::Frame, sizeof(all::rock_0_) / sizeof(xx::Frame)>, 9>& all_rocks_();	// ref to all.rocks_?.  rock_?_?
 
 	struct {
 		std::array<char, 6> monster1_atk_{};

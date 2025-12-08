@@ -13,8 +13,8 @@ void Game::Init() {
 	title = "examples_miner";
 }
 
-std::array<std::array<xx::Frame, 6>, 9>& Game::all_rocks_() {
-	return (std::array<std::array<xx::Frame, 6>, 9>&)all.rock_0_;
+std::array<std::array<xx::Frame, sizeof(all::rock_0_) / sizeof(xx::Frame)>, 9>& Game::all_rocks_() {
+	return (std::array<std::array<xx::Frame, sizeof(all::rock_0_) / sizeof(xx::Frame)>, 9>&)all.rock_0_;
 }
 
 void Game::GLInit() {
@@ -38,7 +38,7 @@ void Game::GLInit() {
 	ss.monster4_atk = LoadSoundSource("res/monster4_atk.ogg");
 
 	// load texture packer
-	all.Load("res/_tp");
+	all.Load("res/");
 
 	// fill monster some config
 	auto ConfigMonster = [this](auto& tfIdle, auto& tfMove, auto& tfAtk, int32_t configIndex) {
