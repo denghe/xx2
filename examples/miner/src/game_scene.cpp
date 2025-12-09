@@ -17,7 +17,6 @@ void Scene::Init(float totalScale_) {
 }
 
 void Scene::MakeUI() {
-
 	static constexpr float cLineHeight{ 50 };
 	static constexpr float cMargin{ 10 };
 	auto cfg = xx::MakeShared<xx::Scale9Config>();
@@ -74,8 +73,8 @@ void Scene::MakeUI() {
 		GenMiners(100);
 	};
 	basePos.x += ui->children.Back()->size.x + cMargin;
-	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, fontSize, {}, cfg, cfgH)("4K").onClicked = [this]() {
-		GenMiners(1000);
+	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, fontSize, {}, cfg, cfgH)("2K").onClicked = [this]() {
+		GenMiners(500);
 	};
 	basePos.x += ui->children.Back()->size.x + cMargin * 2;
 	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, fontSize, {}, cfg, cfgH)("porter count:1").onClicked = [this]() {
@@ -91,18 +90,21 @@ void Scene::MakeUI() {
 	};
 	basePos.x += ui->children.Back()->size.x + cMargin * 2;
 	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, fontSize, {}, cfg, cfgH)("rocks count:10%").onClicked = [this]() {
+		borningRocks.Clear();
 		rocks.Clear();
 		GenRocks(rocksFixedPosPool.len * 0.1);
 	};
 	basePos.x += ui->children.Back()->size.x + cMargin;
-	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, fontSize, {}, cfg, cfgH)("50%").onClicked = [this]() {
+	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, fontSize, {}, cfg, cfgH)("25%").onClicked = [this]() {
+		borningRocks.Clear();
 		rocks.Clear();
-		GenRocks(rocksFixedPosPool.len * 0.5);
+		GenRocks(rocksFixedPosPool.len * 0.25);
 	};
 	basePos.x += ui->children.Back()->size.x + cMargin;
-	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, fontSize, {}, cfg, cfgH)("90%").onClicked = [this]() {
+	ui->Make<xx::LabelButton>()->Init(2, basePos, anchor, fontSize, {}, cfg, cfgH)("50%").onClicked = [this]() {
+		borningRocks.Clear();
 		rocks.Clear();
-		GenRocks(rocksFixedPosPool.len * 0.9);
+		GenRocks(rocksFixedPosPool.len * 0.5);
 	};
 }
 
@@ -156,6 +158,9 @@ void Scene::FixedUpdate() {
 	rocksDisposedCountPerFrame = 0;
 
 	// todo: mouse logic -> Player
+	// 
+	// todo: mouse catch rock to minecart
+	// 
 	// mouse dig logic
 	auto mp = cam.ToLogicPos(gg.mousePos);
 	if (mp.x >= 0 && mp.y >= 0 && mp.x < rocksGrid.pixelSize.x && mp.y < rocksGrid.pixelSize.y) {
