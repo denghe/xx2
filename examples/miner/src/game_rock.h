@@ -62,7 +62,7 @@ struct CollectingRock : SceneItem {
 	XY pos{};
 	float alpha{};
 	void Init(Rock* rock_);
-	bool Update();
+	bool Update() override;
 	void Draw() override;
 	void Dispose();	// unsafe: release indexAtList
 	void CatchBy(Porter* owner_);	// unsafe: release indexAtGrid & Dispose
