@@ -115,7 +115,7 @@ press ENTER to continue...)#";
 			std::cerr << "**************************** bad file size( width == height ): " << p << std::endl;
 			return -__LINE__;
 		}
-		if (auto w = xx::Round2n((uint32_t)tp.metadata.size.width); tp.metadata.size.width != w) {
+		if (!xx::IsPowerOfTwo(tp.metadata.size.width)) {
 			std::cerr << "**************************** bad file size( width & height should be 2^n ): " << p << std::endl;
 			return -__LINE__;
 		}

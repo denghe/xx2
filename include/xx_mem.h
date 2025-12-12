@@ -81,6 +81,11 @@ namespace xx {
         else return rtv << 1;
     }
 
+    template<typename T, typename = std::enable_if_t<std::is_integral_v<T>>>
+    XX_INLINE bool IsPowerOfTwo(T n) {
+        return (n != 0) && ((n & (n - 1)) == 0);
+    }
+
     // signed int encode: return in < 0 ? (-in * 2 - 1) : (in * 2)
     XX_INLINE uint16_t ZigZagEncode(int16_t in) {
         return (uint16_t)((in << 1) ^ (in >> 15));
