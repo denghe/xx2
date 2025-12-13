@@ -25,6 +25,10 @@ struct Game : xx::Game<Game> {
 	xx::SpaceGridRingDiffuseData sgrdd;
 	// ...
 
+	struct {
+		xx::Frame circle256;
+	} fs;
+
 	void Init();
 	void GLInit();
 	void Update();

@@ -91,7 +91,7 @@ namespace xx {
 		XX_INLINE void SleepSecs(double secs) {
 #if WIN32
 			if (secs > 0) {
-				WaitForSingleObjectEx(eventForDelay, uint64_t(secs * 1000.0/* + 0.5*/), FALSE);
+				WaitForSingleObjectEx(eventForDelay, uint64_t(secs * 1000.0 + 0.5), FALSE);
 			}
 #else
 			for (; secs > 0.003; secs -= 0.003) Sleep(3);

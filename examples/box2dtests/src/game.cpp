@@ -27,6 +27,8 @@ void Game::GLInit() {
 	sgrdd.Init(64, 64);
 
 	// begin load res
+	fs.circle256 = LoadTexture("res/circle256.png");
+	fs.circle256.tex->TryGenerateMipmap();
 
 	// init first scene
 	scene.Emplace<Scene_MainMenu>()->Init();
