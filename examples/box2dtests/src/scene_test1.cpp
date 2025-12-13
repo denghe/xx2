@@ -4,6 +4,17 @@
 
 namespace Test1 {
 
+	void SceneItem::Init(Scene* scene_, XY pos_, XY halfSize_) {
+		size = halfSize_ * 2;
+		b2body.InitTypePos(scene_->b2world, pos_, b2_dynamicBody).AddBox(halfSize_);
+	}
+
+	void SceneItem::Draw() {
+		auto tran = b2Body_GetTransform(b2body);
+		auto rot = std::atan2(tran.q.c, tran.q.s);
+		gg.Quad().DrawTinyFrame(gg.embed.shape_dot, (XY&)tran.p, 0.5f, size, rot);
+	}
+
 	/***************************************************************************************/
 
 	void Scene::Init() {
@@ -50,8 +61,13 @@ namespace Test1 {
 		//ui->SetAlphaRecursive(0.7f);
 
 
-		b2world.InitGravity({ 0, -10.f });
-		b2body.InitBox(b2world, b2_dynamicBody, { 0,0 }, { 10,10 });
+		b2world.InitGravity({ 0, -1.f });
+		for (int i = 0; i < 1000; ++i) {
+			XY pos;
+			pos.x = gg.rnd.Next(-500, 500);
+			pos.y = gg.rnd.Next(-500, 500);
+			items.Emplace().Emplace()->Init(this, pos, 10);
+		}
 	}
 
 	void Scene::Update() {
@@ -72,11 +88,11 @@ namespace Test1 {
 	}
 
 	void Scene::FixedUpdate() {
-		auto p = b2Body_GetPosition(b2body);
-		xx::CoutN(p.x, " ", p.y);
+		b2world.Step();
 	}
 
 	void Scene::Draw() {
+		for (auto& o : items) o->Draw();
 
 		gg.GLBlendFunc(gg.blendDefault);
 		gg.DrawNode(ui);

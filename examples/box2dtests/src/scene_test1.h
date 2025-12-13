@@ -3,8 +3,6 @@
 
 namespace Test1 {
 
-	struct Scene;
-
 	template<typename T>
 	struct alignas(4) B2Id {
 		T id{};
@@ -15,7 +13,7 @@ namespace Test1 {
 		B2Id(B2Id&& o) noexcept { std::swap(id, o.id); }
 		B2Id& operator=(B2Id&& o) noexcept { std::swap(id, o.id); return *this; }
 
-		//B2Id(T id_) : id(id_) {}
+		B2Id(T id_) : id(id_) {}
 		operator T const& () const { return id; }
 
 		XX_INLINE bool IsNull() const {
@@ -47,9 +45,9 @@ namespace Test1 {
 
 	struct B2World : B2Id<b2WorldId> {
 		using B2Id<b2WorldId>::B2Id;
-		XX_INLINE void InitDef(b2WorldDef const& def_) {
+		XX_INLINE void InitDef(b2WorldDef const& b2worlddef_) {
 			assert(IsNull());
-			id = b2CreateWorld(&def_);
+			id = b2CreateWorld(&b2worlddef_);
 		}
 		XX_INLINE void InitGravity(XY gravity_) {
 			auto def = b2DefaultWorldDef();
@@ -57,26 +55,55 @@ namespace Test1 {
 			InitDef(def);
 		}
 		// ...
+		XX_INLINE void Step(float timeStep_ = gg.cDelta, int subStepCount_ = 4) {
+			b2World_Step(id, timeStep_, subStepCount_);
+		}
 	};
 
+	struct B2Shape;
 	struct B2Body : B2Id<b2BodyId> {
-		XX_INLINE void InitDef(B2World const& b2World_, b2BodyDef const& def_) {
+		using B2Id<b2BodyId>::B2Id; 
+		XX_INLINE void InitDef(B2World const& b2World_, b2BodyDef const& b2bodydef_) {
 			assert(IsNull());
 			assert(!b2World_.IsNull());
-			id = b2CreateBody(b2World_, &def_);
+			id = b2CreateBody(b2World_, &b2bodydef_);
 		}
-		XX_INLINE void InitBox(B2World const& b2World_, b2BodyType type_, XY pos_, XY halfSize_) {
+		XX_INLINE B2Body& InitTypePos(B2World const& b2World_, XY pos_, b2BodyType type_ = b2_staticBody) {
 			auto def = b2DefaultBodyDef();
 			def.type = type_;
 			def.position = (b2Vec2&)pos_;
 			InitDef(b2World_, def);
-			auto shape = b2MakeBox(halfSize_.x, halfSize_.y);
-			// todo
+			return *this;
 		}
-		// ...
+		XX_INLINE b2ShapeId AddBox(XY halfSize_) {
+			assert(!IsNull());
+			auto b2polygon = b2MakeBox(halfSize_.x, halfSize_.y);
+			auto shapeDef = b2DefaultShapeDef();
+			return b2CreatePolygonShape(id, &shapeDef, &b2polygon);
+		}
+		// ... more AddPolygon
+	};
+
+	struct B2Shape : B2Id<b2ShapeId> {
+		using B2Id<b2ShapeId>::B2Id;
+		XX_INLINE void InitDef(B2Body const& b2body_, b2ShapeDef const& b2shapedef_, b2Polygon const& b2polygon_) {
+			assert(IsNull());
+			assert(!b2body_.IsNull());
+			id = b2CreatePolygonShape(b2body_, &b2shapedef_, &b2polygon_);
+		}
 	};
 
 	// ...
+
+	struct Scene;
+
+	struct SceneItem {
+		Scene* scene{};
+		B2Body b2body;
+		XY size{};
+		void Init(Scene* scene_, XY pos_, XY halfSize_);
+		void Draw();
+	};
 
 	struct Scene : xx::SceneBase {
 		static constexpr float cUIScale{ 0.5f };
@@ -85,8 +112,7 @@ namespace Test1 {
 		float time{}, timePool{}, timeScale{ 1 };
 
 		B2World b2world;
-		B2Body b2body;
-		
+		xx::List<xx::Shared<SceneItem>> items;
 		//static constexpr xx::FromTo<float> cCamScaleRange{ 0.3, 1 };
 		//xx::Shared<xx::Slider> uiCamScale;
 
