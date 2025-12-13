@@ -10,9 +10,8 @@ namespace Test1 {
 	}
 
 	void SceneItem::Draw() {
-		auto tran = b2Body_GetTransform(b2body);
-		auto rot = std::atan2(tran.q.c, tran.q.s);
-		gg.Quad().DrawTinyFrame(gg.embed.shape_dot, (XY&)tran.p, 0.5f, size, rot);
+		auto [p, r] = b2body.GetPosRadians();
+		gg.Quad().DrawTinyFrame(gg.embed.shape_dot, p, 0.5f, size, r);
 	}
 
 	/***************************************************************************************/

@@ -82,6 +82,10 @@ namespace Test1 {
 			return b2CreatePolygonShape(id, &shapeDef, &b2polygon);
 		}
 		// ... more AddPolygon
+		XX_INLINE std::pair<XY, float> GetPosRadians() const {
+			auto tran = b2Body_GetTransform(id);
+			return { (XY&)tran.p, b2Rot_GetAngle(tran.q) };
+		}
 	};
 
 	struct B2Shape : B2Id<b2ShapeId> {
