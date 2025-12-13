@@ -5,63 +5,78 @@ namespace Test1 {
 
 	struct Scene;
 
-	static_assert(sizeof(b2Vec2) == sizeof(XY));
-	struct B2World {
-		b2WorldId worldId{};
+	template<typename T>
+	struct alignas(4) B2Id {
+		T id{};
 
-		XX_INLINE bool IsInited() {
-			static_assert(sizeof(b2WorldId) == sizeof(int32_t));
-			return (int32_t&)worldId != 0;
+		B2Id() = default;
+		B2Id(B2Id const&) = delete;
+		B2Id& operator=(B2Id const&) = delete;
+		B2Id(B2Id&& o) noexcept { std::swap(id, o.id); }
+		B2Id& operator=(B2Id&& o) noexcept { std::swap(id, o.id); return *this; }
+
+		//B2Id(T id_) : id(id_) {}
+		operator T const& () const { return id; }
+
+		XX_INLINE bool IsNull() const {
+			auto p = (int32_t*)&id;
+			if constexpr (sizeof(id) == 4) if (p[0]) return false;
+			if constexpr (sizeof(id) == 8) if (p[0] || p[1]) return false;
+			if constexpr (sizeof(id) == 12) if (p[0] || p[1] || p[2]) return false;
+			// ...
+			return true;
 		}
 
-		void InitByDef(b2WorldDef const& def_) {
-			assert(!IsInited());
-			worldId = b2CreateWorld(&def_);
+		XX_INLINE void ZeroMem() {
+			assert(!IsNull());
+			auto p = (int32_t*)&id;
+			if constexpr (sizeof(id) == 4) p[0] = 0;
+			if constexpr (sizeof(id) == 8) p[0] = p[1] = 0;
+			if constexpr (sizeof(id) == 12) p[0] = p[1] = p[2] = 0;
+			// ...
 		}
 
-		void Init(XY gravity_) {
-			auto def = b2DefaultWorldDef();
-			def.gravity = (b2Vec2&)gravity_;
-			InitByDef(def);
-		}
-
-		// todo: more Init
-
-		~B2World() {
-			if ((int32_t&)worldId) {
-				b2DestroyWorld(worldId);
-				worldId = {};
-			}
+		~B2Id() {
+			if (IsNull()) return;
+			if constexpr (std::is_same_v<T, b2WorldId>) b2DestroyWorld(id);
+			if constexpr (std::is_same_v<T, b2BodyId>) b2DestroyBody(id);
+			// ...
+			ZeroMem();
 		}
 	};
 
-	struct B2Body {
-		B2World* owner{};
-		b2BodyId bodyId{};
-
-		void InitByDef(B2World* owner_, b2BodyDef def_) {
-			assert(memcmp(&bodyId, 0, sizeof(bodyId)) == 0);
-			assert(owner_->IsInited());
-			owner = owner_;
-			bodyId = b2CreateBody(owner_->worldId, &def_);
+	struct B2World : B2Id<b2WorldId> {
+		using B2Id<b2WorldId>::B2Id;
+		XX_INLINE void InitDef(b2WorldDef const& def_) {
+			assert(IsNull());
+			id = b2CreateWorld(&def_);
 		}
+		XX_INLINE void InitGravity(XY gravity_) {
+			auto def = b2DefaultWorldDef();
+			def.gravity = (b2Vec2&)gravity_;
+			InitDef(def);
+		}
+		// ...
+	};
 
-		void InitShapeBox(B2World* owner_, b2BodyType type_, XY pos_, XY halfSize_) {
+	struct B2Body : B2Id<b2BodyId> {
+		XX_INLINE void InitDef(B2World const& b2World_, b2BodyDef const& def_) {
+			assert(IsNull());
+			assert(!b2World_.IsNull());
+			id = b2CreateBody(b2World_, &def_);
+		}
+		XX_INLINE void InitBox(B2World const& b2World_, b2BodyType type_, XY pos_, XY halfSize_) {
 			auto def = b2DefaultBodyDef();
 			def.type = type_;
 			def.position = (b2Vec2&)pos_;
-			InitByDef(owner_, def);
+			InitDef(b2World_, def);
 			auto shape = b2MakeBox(halfSize_.x, halfSize_.y);
+			// todo
 		}
-
-		~B2Body() {
-			if (memcmp(&bodyId, 0, sizeof(bodyId)) != 0) {
-				assert(owner->IsInited());
-				b2DestroyBody(bodyId);
-				bodyId = {};
-			}
-		}
+		// ...
 	};
+
+	// ...
 
 	struct Scene : xx::SceneBase {
 		static constexpr float cUIScale{ 0.5f };
@@ -70,6 +85,7 @@ namespace Test1 {
 		float time{}, timePool{}, timeScale{ 1 };
 
 		B2World b2world;
+		B2Body b2body;
 		
 		//static constexpr xx::FromTo<float> cCamScaleRange{ 0.3, 1 };
 		//xx::Shared<xx::Slider> uiCamScale;

@@ -50,7 +50,8 @@ namespace Test1 {
 		//ui->SetAlphaRecursive(0.7f);
 
 
-		b2world.Init({ 0, -10.f });
+		b2world.InitGravity({ 0, -10.f });
+		b2body.InitBox(b2world, b2_dynamicBody, { 0,0 }, { 10,10 });
 	}
 
 	void Scene::Update() {
@@ -71,6 +72,8 @@ namespace Test1 {
 	}
 
 	void Scene::FixedUpdate() {
+		auto p = b2Body_GetPosition(b2body);
+		xx::CoutN(p.x, " ", p.y);
 	}
 
 	void Scene::Draw() {

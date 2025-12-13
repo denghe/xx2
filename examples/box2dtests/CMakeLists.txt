@@ -5,7 +5,7 @@ if(NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel." FORCE)
 endif()
 
-set(name box2dtests)
+set(name examples_box2dtests)
 project(${name})
 
 set(CMAKE_CXX_STANDARD 23)
@@ -54,6 +54,7 @@ SET(ZSTD_MULTITHREAD_SUPPORT OFF CACHE BOOL "ZSTD_MULTITHREAD_SUPPORT" FORCE)
 add_subdirectory(../../zstd/build/cmake zstd)
 target_link_libraries(${name} libzstd_static)
 
+SET(BOX2D_AVX2 ON CACHE BOOL "BOX2D_AVX2" FORCE)
 add_subdirectory(../../box2d box2d)
 target_link_libraries(${name} box2d)
 
