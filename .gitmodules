@@ -25,3 +25,6 @@
 [submodule "box2d"]
 	path = box2d
 	url = https://github.com/erincatto/box2d.git
+[submodule "enkiTS"]
+	path = enkiTS
+	url = https://github.com/dougbinks/enkiTS.git

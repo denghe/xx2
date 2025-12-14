@@ -58,6 +58,11 @@ SET(BOX2D_AVX2 ON CACHE BOOL "BOX2D_AVX2" FORCE)
 add_subdirectory(../../box2d box2d)
 target_link_libraries(${name} box2d)
 
+SET(ENKITS_BUILD_C_INTERFACE OFF CACHE BOOL "ENKITS_BUILD_C_INTERFACE" FORCE)
+SET(ENKITS_BUILD_EXAMPLES OFF CACHE BOOL "ENKITS_BUILD_EXAMPLES" FORCE)
+add_subdirectory(../../enkiTS enkiTS)
+target_link_libraries(${name} enkiTS)
+
 add_subdirectory(../../lmdb lmdb)
 target_link_libraries(${name} lmdb)
 

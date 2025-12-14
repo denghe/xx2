@@ -13,7 +13,7 @@ namespace Test1 {
 	}
 
 	bool SceneItem1::Update() {
-		static constexpr float cStep{ 1.f / (gg.cFps * 0.5f) };
+		static constexpr float cStep{ 1.f / (gg.cFps * 1.5f) };
 		XX_BEGIN(_1);
 		for (i = 0; i < 5; ++i) {
 			for (; scale < 2.f; scale += cStep) {
@@ -82,49 +82,11 @@ namespace Test1 {
 		cam.Init(gg.scale, 1.f);
 		ui.Emplace()->InitRoot(gg.scale * cUIScale);
 
-		//static constexpr float cSliderWidths[]{ 600, 1000, 240 };
-		//static constexpr float cMargin{ 5 };
-		//static constexpr float cLineHeight{ 100 };
-		//static constexpr XY cItemSize{ cSliderWidths[0] + cSliderWidths[1] + cSliderWidths[2], cLineHeight - cMargin };
-		//auto fontSize = cItemSize.y - gg.embed.cfg_s9bN->paddings.TopBottom();
-		//auto anchor = gg.a7;
-		//auto offset = gg.p7 * 2 + XY{ cMargin, -cMargin };
-
-		///*************************************************************************************************/
-
-		//uiCamScale = ui->Make<xx::Slider>();
-		//uiCamScale->callbackWhenBlockMoving = true;
-		//uiCamScale->valueToString = [this](double v)->std::string {
-		//	char buf[32];
-		//	snprintf(buf, 32, "%.2f", cCamScaleRange.from + v * (cCamScaleRange.to - cCamScaleRange.from));
-		//	return buf;
-		//	};
-		//uiCamScale->Init(2, offset, anchor, cItemSize.y, cSliderWidths[0], cSliderWidths[1], cSliderWidths[2]
-		//	, (double)(cam.logicScale - cCamScaleRange.from) / (cCamScaleRange.to - cCamScaleRange.from))("camera scale");
-		//uiCamScale->onChanged = [this](double v) {
-		//	cam.SetLogicScale(cCamScaleRange.from + float(v * (cCamScaleRange.to - cCamScaleRange.from)));
-		//	};
-
-		///*************************************************************************************************/
-		//offset.y -= cLineHeight;
-		//uiGenAirplaneNumPerFrame = ui->Make<xx::Slider>();
-		//uiGenAirplaneNumPerFrame->callbackWhenBlockMoving = true;
-		//uiGenAirplaneNumPerFrame->valueToString = [this](double v)->std::string {
-		//	return xx::ToString(cGenAirplaneNumPerFrameRange.from + (uint32_t(v * (cGenAirplaneNumPerFrameRange.to - cGenAirplaneNumPerFrameRange.from))));
-		//	};
-		//uiGenAirplaneNumPerFrame->Init(2, offset, anchor, cItemSize.y, cSliderWidths[0], cSliderWidths[1], cSliderWidths[2]
-		//	, (double)(cGenAirplaneNumPerFrame - cGenAirplaneNumPerFrameRange.from) / (cGenAirplaneNumPerFrameRange.to - cGenAirplaneNumPerFrameRange.from))("N gen per frame");
-		//uiGenAirplaneNumPerFrame->onChanged = [this](double v) {
-		//	cGenAirplaneNumPerFrame = cGenAirplaneNumPerFrameRange.from + int32_t(v * (cGenAirplaneNumPerFrameRange.to - cGenAirplaneNumPerFrameRange.from));
-		//	};
-
-		///*************************************************************************************************/
-		//ui->SetAlphaRecursive(0.7f);
-
-
-		b2world.InitGravity(0);
-		//auto& o = items.Emplace().Emplace();
-		//o->Init(this, 0, 10);
+		auto def = b2DefaultWorldDef();
+		def.gravity = {};
+		//def.restitutionThreshold = 10.0f * b2GetLengthUnitsPerMeter();
+		//def.hitEventThreshold = 10.0f * b2GetLengthUnitsPerMeter();
+		b2world.Init(def);
 	}
 
 	void Scene::Gen(int32_t num_) {
@@ -132,9 +94,9 @@ namespace Test1 {
 			XY pos;
 			pos.x = gg.rnd.Next(-800, 800);
 			pos.y = gg.rnd.Next(-800, 800);
-			//if (gg.rnd.Next<bool>())
-				//item1s.Emplace().Emplace()->Init(this, pos, 5);
-			//else 
+			if (gg.rnd.Next<bool>())
+				item1s.Emplace().Emplace()->Init(this, pos, 5);
+			else 
 				item2s.Emplace().Emplace()->Init(this, pos, 5);
 		}
 	}
@@ -163,7 +125,9 @@ namespace Test1 {
 		for (auto i = item2s.len - 1; i >= 0; --i) {
 			if (item2s[i]->Update()) item2s.SwapRemoveAt(i);
 		}
+
 		b2world.Step();
+
 		genTimer += gg.cDelta * 500.f;
 		if (genTimer >= 1.f) {
 			auto n = (int32_t)genTimer;

@@ -5,7 +5,6 @@
 
 #include <xx_game.h>
 #include <xx_grid2d_circle.h>
-#include <box2d/box2d.h>
-#include <box2d/math_functions.h>
+#include <xx_box2d.h>
 
 #endif
