@@ -59,38 +59,46 @@ namespace xx {
 		}
 	};
 
-	// single thread version
-	struct B2World : B2Id<b2WorldId> {
-		using B2Id<b2WorldId>::B2Id;
-
-		XX_INLINE void InitDef(b2WorldDef const& b2worlddef_) {
-			assert(IsNull());
-			id = b2CreateWorld(&b2worlddef_);
-		}
-
-		virtual void Step(float timeStep_ = gg.cDelta, int subStepCount_ = 4) {
-			b2World_Step(id, timeStep_, subStepCount_);
-		}
-	};
-
-	// multi-thread version's task
 	struct B2Task : public enki::ITaskSet {
 		b2TaskCallback* task{};
 		void* taskContext{};
+
 		B2Task() = default;
 		void ExecuteRange(enki::TaskSetPartition range_, uint32_t threadIndex_) override {
 			task(range_.start, range_.end, threadIndex_, taskContext);
 		}
 	};
 
-	// multi-thread version
-	struct B2WorldMT : B2World {
+	struct B2World : B2Id<b2WorldId> {
+		using B2Id<b2WorldId>::B2Id;
+
 		enki::TaskScheduler taskScheduler;
 		B2Task tasks[64];
 		int taskCount{};
 
+		XX_INLINE void InitDef(b2WorldDef const& b2worlddef_, int workerCount_ = 8) {
+			assert(IsNull());
+			if (workerCount_ > 1) {
+				taskScheduler.Initialize(workerCount_);
+				auto def = b2worlddef_;
+				def.workerCount = workerCount_;
+				def.enqueueTask = EnqueueTask;
+				def.finishTask = FinishTask;
+				def.userTaskContext = this;
+				id = b2CreateWorld(&def);
+			}
+			else {
+				id = b2CreateWorld(&b2worlddef_);
+			}
+		}
+
+		void Step(float timeStep_ = gg.cDelta, int subStepCount_ = 4) {
+			b2World_Step(id, timeStep_, subStepCount_);
+			taskCount = 0;
+		}
+
 		inline static void* EnqueueTask(b2TaskCallback* task_, int32_t itemCount_, int32_t minRange_, void* taskContext, void* userContext_) {
-			auto o = (B2WorldMT*)userContext_;
+			auto o = (B2World*)userContext_;
 			if (o->taskCount < _countof(o->tasks)) {
 				B2Task& t = o->tasks[o->taskCount];
 				t.m_SetSize = itemCount_;
@@ -112,27 +120,12 @@ namespace xx {
 		inline static void FinishTask(void* taskPtr_, void* userContext_) {
 			if (taskPtr_ != nullptr) {
 				auto t = (B2Task*)taskPtr_;
-				auto o = (B2WorldMT*)userContext_;
+				auto o = (B2World*)userContext_;
 				o->taskScheduler.WaitforTask(t);
 			}
 		}
-
-		void Init(b2WorldDef& b2worlddef_, int workerCount_ = 4) {
-			assert(IsNull());
-			assert(workerCount_ > 0);
-			taskScheduler.Initialize(workerCount_);
-			b2worlddef_.workerCount = workerCount_;
-			b2worlddef_.enqueueTask = EnqueueTask;
-			b2worlddef_.finishTask = FinishTask;
-			b2worlddef_.userTaskContext = this;
-			InitDef(b2worlddef_);
-		}
-
-		virtual void Step(float timeStep_ = gg.cDelta, int subStepCount_ = 4) override {
-			b2World_Step(id, timeStep_, subStepCount_);
-			taskCount = 0;
-		}
 	};
+
 
 	struct B2Body : B2Id<b2BodyId> {
 		using B2Id<b2BodyId>::B2Id; 

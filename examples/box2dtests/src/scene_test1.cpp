@@ -86,7 +86,7 @@ namespace Test1 {
 		def.gravity = {};
 		//def.restitutionThreshold = 10.0f * b2GetLengthUnitsPerMeter();
 		//def.hitEventThreshold = 10.0f * b2GetLengthUnitsPerMeter();
-		b2world.Init(def);
+		b2world.InitDef(def, 1);
 	}
 
 	void Scene::Gen(int32_t num_) {
@@ -128,7 +128,7 @@ namespace Test1 {
 
 		b2world.Step();
 
-		genTimer += gg.cDelta * 500.f;
+		genTimer += gg.cDelta * 300.f;
 		if (genTimer >= 1.f) {
 			auto n = (int32_t)genTimer;
 			genTimer -= n;

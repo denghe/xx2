@@ -45,7 +45,7 @@ namespace Test1 {
 		xx::Camera cam;
 		float time{}, timePool{}, timeScale{ 1 };
 
-		xx::B2WorldMT b2world;
+		xx::B2World b2world;
 		SceneEdge edge;
 		xx::List<xx::Shared<SceneItem1>> item1s;
 		xx::List<xx::Shared<SceneItem2>> item2s;
