@@ -7,9 +7,8 @@ namespace TestA {
 	void Miner::Init(Scene* scene_, int32_t index_, XY pos_) {
 		scene = scene_;
 		pos = pos_;
-		frames = gg.spines.framess[index_].buf;
-		framesLen = gg.spines.framess[index_].len;
-		eventDatas = gg.spines.eventDatass[index_].buf;
+		frames = gg.spines.attacks[index_].buf;
+		framesLen = gg.spines.attacks[index_].len;
 	}
 
 	void Miner::Update() {

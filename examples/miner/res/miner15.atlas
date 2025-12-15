@@ -1,0 +1,13 @@
+
+miner15.png
+size: 1024,1024
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+miner15
+  rotate: false
+  xy: 0, 243
+  size: 565, 322
+  orig: 565, 322
+  offset: 0, 0
+  index: -1

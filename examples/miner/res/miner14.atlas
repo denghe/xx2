@@ -1,0 +1,13 @@
+
+miner14.png
+size: 1024,1024
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+miner14
+  rotate: false
+  xy: 0, 0
+  size: 482, 714
+  orig: 482, 714
+  offset: 0, 0
+  index: -1

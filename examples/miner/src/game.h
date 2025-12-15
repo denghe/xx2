@@ -12,6 +12,11 @@ struct MinerConfig {
 	xx::Weak<xx::SoundSource> ss;
 };
 
+struct SpineFrameConfig {
+	XY size{}, offset{};
+	float scale{}, delta{};
+};
+
 struct Game : xx::Game<Game> {
 	static constexpr float cFps{ 120 };
 	static constexpr float cDelta{ 1.f / cFps };
@@ -59,15 +64,10 @@ struct Game : xx::Game<Game> {
 		xx::STBImage minecart_3;
 	} stbi;
 
-
 	struct {
-		static constexpr int32_t N{ 13 };
-		std::array<xx::Shared<xx::GLTexture>, N> texs;
-		std::array<spine::SkeletonData*, N> skels;
-		std::array<spine::Animation*, N> anims_attack;
-		std::array<spine::Animation*, N> anims_idle;
-		std::array<xx::List<xx::Frame>, N> framess;
-		std::array<xx::List<xx::SpineEventData>, N> eventDatass;
+		static constexpr int32_t N{ 15 };
+		std::array<xx::List<xx::Frame>, N> attacks, idles;
+		xx::List<xx::SpineEventData> eventDatas;
 	} spines;
 
 	// runtime vars

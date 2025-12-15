@@ -73,7 +73,7 @@ namespace xx {
 		SpineTextureLoader textureLoader;
 
 		// key: file path
-		std::unordered_map<std::string, Shared<GLTexture>, StdStringHash, std::equal_to<>> textures;								// need preload
+		std::unordered_map<std::string, Shared<GLTexture>, StdStringHash, std::equal_to<>> textures;							// need preload
 		std::unordered_map<std::string, Data, StdStringHash, std::equal_to<>> fileDatas;										// need preload Atlas & SkeletonData files
 		std::unordered_map<std::string, std::unique_ptr<spine::Atlas>, StdStringHash, std::equal_to<>> atlass;					// fill by AddAtlas
 		std::unordered_map<std::string, std::unique_ptr<spine::SkeletonData>, StdStringHash, std::equal_to<>> skeletonDatas;	// fill by AddSkeletonData
@@ -87,6 +87,8 @@ namespace xx {
 
 		template<bool skeletonFileIsJson = false>
 		void Load(std::string const& baseFileNameWithPath, spine::SkeletonData*& sd, xx::Shared<xx::GLTexture>& tex, float scale = 1.f);
+
+		void Clear();
 	};
 	inline SpineEnv gSpineEnv;	// need init at GameBase
 
@@ -432,6 +434,13 @@ namespace xx {
 
 	inline void SpineEnv::Init() {
 		spine::SpineExtension::setInstance(&ext);
+	}
+
+	inline void SpineEnv::Clear() {
+		skeletonDatas.clear();
+		atlass.clear();
+		fileDatas.clear();
+		textures.clear();
 	}
 
 	template<bool skeletonFileIsJson>

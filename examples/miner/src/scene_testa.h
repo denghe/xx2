@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include "game.h"
-#include "game_scene.h"
 
 namespace TestA {
 
@@ -8,7 +7,6 @@ namespace TestA {
 	struct Miner {
 		Scene* scene{};
 		xx::Frame* frames{};
-		xx::SpineEventData* eventDatas{};
 		int32_t framesLen{};
 		int32_t frameIndex{};
 		XY pos{};

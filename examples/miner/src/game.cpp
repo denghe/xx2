@@ -111,46 +111,46 @@ void Game::GLInit() {
 
 
 	// load spines
-	auto& se = xx::gSpineEnv;
-	for (auto i = 0; i < spines.N; ++i) {
-		auto fn = xx::ToString("res/miner", i + 1);
-		se.Load(fn, spines.skels[i], spines.texs[i]);
-		spines.anims_attack[i] = spines.skels[i]->findAnimation("attack");
-		spines.anims_idle[i] = spines.skels[i]->findAnimation("idle");
-	}
-	auto FillFramesEventDatas = [this](int32_t num_, XY size_, XY offset_, float drawScale_, float frameDelta_) {
-		auto i = num_ - 1;
-		xx::SpineToFrames(
-			spines.framess[i], spines.eventDatass[i], 
-			spines.skels[i], spines.anims_attack[i], 
-			size_, offset_, drawScale_, frameDelta_);
-	};
-	FillFramesEventDatas(1, { 275 + 135, 10 + 400 }, { 275, 10 }, 0.312, gg.cDelta * 2.f);
-	FillFramesEventDatas(2, { 280 + 175, 5 + 420 }, { 280, 5 }, 0.312, gg.cDelta * 2.f);
-	FillFramesEventDatas(3, { 325 + 180, 5 + 400 }, { 325, 5 }, 0.312, gg.cDelta * 2.f);
-	FillFramesEventDatas(4, { 335 + 170, 10 + 440 }, { 335, 10 }, 0.312, gg.cDelta * 2.f);
-	FillFramesEventDatas(5, { 325 + 170, 10 + 440 }, { 325, 10 }, 0.312, gg.cDelta * 2.f);
-	FillFramesEventDatas(6, { 275 + 125, 10 + 390 }, { 275, 10 }, 0.312, gg.cDelta * 2.f);
-	FillFramesEventDatas(7, { 200 + 150, 10 + 370 }, { 200, 10 }, 0.312, gg.cDelta * 2.f);
-	FillFramesEventDatas(8, { 440 + 300, 20 + 550 }, { 440, 20 }, 0.312, gg.cDelta * 2.f);
-	FillFramesEventDatas(9, { 275 + 200, 20 + 425 }, { 275, 20 }, 0.312, gg.cDelta * 2.f);
-	FillFramesEventDatas(10, { 380 + 110, 20 + 470 }, { 380, 20 }, 0.312, gg.cDelta * 2.f);
-	FillFramesEventDatas(11, { 335 + 160, 20 + 440 }, { 335, 20 }, 0.312, gg.cDelta * 2.f);
-	FillFramesEventDatas(12, { 450 + 190, 10 + 580 }, { 450, 10 }, 0.312, gg.cDelta * 2.f);
-	FillFramesEventDatas(13, { 390 + 190, 20 + 450 }, { 390, 20 }, 0.312, gg.cDelta * 2.f);
+	{
+		std::array<SpineFrameConfig, spines.N> cfgs;
+		cfgs[1 - 1] = {{ 275 + 135, 10 + 400 }, { 275, 10 }, 0.312, gg.cDelta * 2.f};
+		cfgs[2 - 1] = {{ 280 + 175, 5 + 420 }, { 280, 5 }, 0.312, gg.cDelta * 2.f};
+		cfgs[3 - 1] = {{ 325 + 180, 5 + 400 }, { 325, 5 }, 0.312, gg.cDelta * 2.f};
+		cfgs[4 - 1] = {{ 335 + 170, 10 + 440 }, { 335, 10 }, 0.312, gg.cDelta * 2.f};
+		cfgs[5 - 1] = {{ 325 + 170, 10 + 440 }, { 325, 10 }, 0.412, gg.cDelta * 2.f};
+		cfgs[6 - 1] = {{ 275 + 125, 10 + 390 }, { 275, 10 }, 0.412, gg.cDelta * 2.f};
+		cfgs[7 - 1] = {{ 200 + 150, 10 + 370 }, { 200, 10 }, 0.412, gg.cDelta * 2.f};
+		cfgs[8 - 1] = {{ 440 + 300, 20 + 550 }, { 440, 20 }, 0.26, gg.cDelta * 2.f};
+		cfgs[9 - 1] = {{ 275 + 200, 20 + 425 }, { 275, 20 }, 0.312, gg.cDelta * 2.f};
+		cfgs[10 - 1] = {{ 380 + 110, 20 + 470 }, { 380, 20 }, 0.312, gg.cDelta * 2.f};
+		cfgs[11 - 1] = {{ 335 + 160, 20 + 440 }, { 335, 20 }, 0.312, gg.cDelta * 2.f};
+		cfgs[12 - 1] = {{ 450 + 190, 10 + 580 }, { 450, 10 }, 0.312, gg.cDelta * 2.f};
+		cfgs[13 - 1] = {{ 390 + 190, 20 + 450 }, { 390, 20 }, 0.312, gg.cDelta * 2.f};
+		cfgs[14 - 1] = {{ 640 + 200, 10 + 850 }, { 640, 10 }, 0.212, gg.cDelta * 2.f};
+		cfgs[15 - 1] = {{ 1550 + 830, 160 + 1450 }, { 1550, 160 }, 0.1, gg.cDelta * 2.f};
 
-	// combine all.frames & spines.framess
-	xx::RectPacker tp;
-	for (int32_t i = 0; i < sizeof(all) / sizeof(xx::Frame); ++i) {
-		tp.tfs.Add((xx::TinyFrame*)&((xx::Frame*)&all)[i]);
-	}
-	for (auto& frames : spines.framess) {
-		for (auto& frame : frames) {
-			tp.tfs.Add(frame);
+		for (auto i = 0; i < spines.N; ++i) {
+			auto& c = cfgs[i];
+			xx::Shared<xx::GLTexture> t;
+			spine::SkeletonData* s{};
+			xx::gSpineEnv.Load(xx::ToString("res/miner", i + 1), s, t);
+			auto a = s->findAnimation("attack");
+			xx::SpineToFrames(spines.attacks[i], spines.eventDatas,	s, a, c.size, c.offset, c.scale, c.delta);
+			a = s->findAnimation("idle");
+			xx::SpineToFrames(spines.idles[i], spines.eventDatas, s, a, c.size, c.offset, c.scale, c.delta);
 		}
-	}
-	tp.AutoPack();
 
+		// combine all.frames & spines.framess
+		xx::RectPacker tp;
+		for (int32_t i = 0; i < sizeof(all) / sizeof(xx::Frame); ++i) {
+			tp.tfs.Add((xx::TinyFrame*)&((xx::Frame*)&all)[i]);
+		}
+		for (auto& fs : spines.attacks) for (auto& f : fs) tp.tfs.Add(f);
+		for (auto& fs : spines.idles) for (auto& f : fs) tp.tfs.Add(f);
+		tp.AutoPack();
+
+		xx::gSpineEnv.Clear();
+	}
 
 	// init first scene
 	scene.Emplace<Scene_MainMenu>()->Init();
