@@ -88,6 +88,7 @@ namespace xx {
 		template<bool skeletonFileIsJson = false>
 		void Load(std::string const& baseFileNameWithPath, spine::SkeletonData*& sd, xx::Shared<xx::GLTexture>& tex, float scale = 1.f);
 
+		// unsafe. careful SkeletonData* refs
 		void Clear();
 	};
 	inline SpineEnv gSpineEnv;	// need init at GameBase
