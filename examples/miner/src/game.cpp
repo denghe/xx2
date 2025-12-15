@@ -109,6 +109,21 @@ void Game::GLInit() {
 	stbi.bg1a.Fill(LoadFileData("res/bg1a.png"));
 	stbi.minecart_3.Fill(LoadFileData("res/minecart_3.png"));
 
+
+	// load spines
+	auto& se = xx::gSpineEnv;
+	for (auto i = 0; i < spines.N; ++i) {
+		auto fn = xx::ToString("res/miner", i + 1);
+		se.Load(fn, spines.skels[i], spines.texs[i]);
+		spines.anims_attack[i] = spines.skels[i]->findAnimation("attack");
+		spines.anims_idle[i] = spines.skels[i]->findAnimation("idle");
+	}
+
+	// todo: convert spines to frames & event handle
+
+	// todo: combine all.tex & spines.tex
+
+
 	// init first scene
 	scene.Emplace<Scene_MainMenu>()->Init();
 }

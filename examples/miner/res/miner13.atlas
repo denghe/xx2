@@ -1,0 +1,13 @@
+
+miner13.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+miner13
+  rotate: false
+  xy: 0, 49
+  size: 420, 371
+  orig: 420, 371
+  offset: 0, 0
+  index: -1

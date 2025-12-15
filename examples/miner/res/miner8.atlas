@@ -1,0 +1,13 @@
+
+miner8.png
+size: 1024,1024
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+miner8
+  rotate: false
+  xy: 0, 169
+  size: 646, 477
+  orig: 646, 477
+  offset: 0, 0
+  index: -1

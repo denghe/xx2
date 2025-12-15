@@ -1,0 +1,13 @@
+
+miner7.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+miner7
+  rotate: false
+  xy: 0, 0
+  size: 314, 366
+  orig: 314, 366
+  offset: 0, 0
+  index: -1

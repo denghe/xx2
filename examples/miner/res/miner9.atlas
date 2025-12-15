@@ -1,0 +1,13 @@
+
+miner9.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+miner9
+  rotate: false
+  xy: 0, 13
+  size: 434, 421
+  orig: 434, 421
+  offset: 0, 0
+  index: -1

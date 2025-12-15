@@ -1,0 +1,13 @@
+
+miner6.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+miner6
+  rotate: false
+  xy: 0, 0
+  size: 311, 379
+  orig: 311, 379
+  offset: 0, 0
+  index: -1

@@ -59,6 +59,15 @@ struct Game : xx::Game<Game> {
 		xx::STBImage minecart_3;
 	} stbi;
 
+
+	struct {
+		static constexpr int32_t N{ 13 };
+		std::array<xx::Shared<xx::GLTexture>, N> texs;
+		std::array<spine::SkeletonData*, N> skels;
+		std::array<spine::Animation*, N> anims_attack;
+		std::array<spine::Animation*, N> anims_idle;
+	} spines;
+
 	// runtime vars
 	xx::Rnd rnd;
 	xx::SpaceGridRingDiffuseData sgrdd;
