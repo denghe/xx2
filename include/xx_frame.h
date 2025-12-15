@@ -52,6 +52,7 @@ namespace xx {
         Shared<GLTexture> tex;
         UVRect uvRect{};
         XY anchor{};
+        ptrdiff_t userData{};
 
         Frame() = default;
         Frame(Frame const&) = default;
@@ -61,6 +62,9 @@ namespace xx {
 
         XX_INLINE operator TinyFrame& () const {
             return *(TinyFrame*)this;
+        }
+        XX_INLINE operator TinyFrame* () const {
+            return (TinyFrame*)this;
         }
 
         XX_INLINE operator GLuint () const {

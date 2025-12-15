@@ -85,9 +85,9 @@ void Scene_MainMenu::MakeUI() {
 	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test9(minecart)")).onClicked = [this] {
 		gg.MakeScene<Test9::Scene>()->Init();
 	};
-	//L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("testA(porter)")).onClicked = [this] {
-	//	gg.MakeScene<TestA::Scene>()->Init();
-	//};
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("testA(spine miners)")).onClicked = [this] {
+		gg.MakeScene<TestA::Scene>()->Init();
+	};
 	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("game scene")).onClicked = [this] {
 		gg.MakeScene<Scene>()->Init();
 	};

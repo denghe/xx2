@@ -66,6 +66,8 @@ struct Game : xx::Game<Game> {
 		std::array<spine::SkeletonData*, N> skels;
 		std::array<spine::Animation*, N> anims_attack;
 		std::array<spine::Animation*, N> anims_idle;
+		std::array<xx::List<xx::Frame>, N> framess;
+		std::array<xx::List<xx::SpineEventData>, N> eventDatass;
 	} spines;
 
 	// runtime vars

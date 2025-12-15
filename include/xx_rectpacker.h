@@ -69,10 +69,11 @@ namespace xx {
 		}
 
 		// try resize & auto generate mipmap
-		int32_t AutoPack(int32_t minPackSize_ = 1024, XY padding_ = 4) {
+		int32_t AutoPack(int32_t minPackSize_ = 1024, XY padding_ = 8) {
 		LabRetry:
 			if (auto r = Pack(minPackSize_); r) {
 				minPackSize_ *= 2;
+				assert(minPackSize_ <= 16384);
 				goto LabRetry;
 			}
 			tfs[0]->tex->TryGenerateMipmap();

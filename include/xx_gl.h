@@ -64,6 +64,8 @@ namespace xx {
 		UVRect Rect() const {
 			return { 0,0, (uint16_t)size.x, (uint16_t)size.y };
 		}
+		operator XY () const { return size; }
+		operator UVRect () const { return Rect(); }
 
 		inline static GLuint MakeTex(int textureUnit = 0) {
 			GLuint id{};

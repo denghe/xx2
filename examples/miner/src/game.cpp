@@ -118,10 +118,38 @@ void Game::GLInit() {
 		spines.anims_attack[i] = spines.skels[i]->findAnimation("attack");
 		spines.anims_idle[i] = spines.skels[i]->findAnimation("idle");
 	}
+	auto FillFramesEventDatas = [this](int32_t num_, XY size_, XY offset_, float drawScale_, float frameDelta_) {
+		auto i = num_ - 1;
+		xx::SpineToFrames(
+			spines.framess[i], spines.eventDatass[i], 
+			spines.skels[i], spines.anims_attack[i], 
+			size_, offset_, drawScale_, frameDelta_);
+	};
+	FillFramesEventDatas(1, { 275 + 135, 10 + 400 }, { 275, 10 }, 0.312, gg.cDelta * 2.f);
+	FillFramesEventDatas(2, { 280 + 175, 5 + 420 }, { 280, 5 }, 0.312, gg.cDelta * 2.f);
+	FillFramesEventDatas(3, { 325 + 180, 5 + 400 }, { 325, 5 }, 0.312, gg.cDelta * 2.f);
+	FillFramesEventDatas(4, { 335 + 170, 10 + 440 }, { 335, 10 }, 0.312, gg.cDelta * 2.f);
+	FillFramesEventDatas(5, { 325 + 170, 10 + 440 }, { 325, 10 }, 0.312, gg.cDelta * 2.f);
+	FillFramesEventDatas(6, { 275 + 125, 10 + 390 }, { 275, 10 }, 0.312, gg.cDelta * 2.f);
+	FillFramesEventDatas(7, { 200 + 150, 10 + 370 }, { 200, 10 }, 0.312, gg.cDelta * 2.f);
+	FillFramesEventDatas(8, { 440 + 300, 20 + 550 }, { 440, 20 }, 0.312, gg.cDelta * 2.f);
+	FillFramesEventDatas(9, { 275 + 200, 20 + 425 }, { 275, 20 }, 0.312, gg.cDelta * 2.f);
+	FillFramesEventDatas(10, { 380 + 110, 20 + 470 }, { 380, 20 }, 0.312, gg.cDelta * 2.f);
+	FillFramesEventDatas(11, { 335 + 160, 20 + 440 }, { 335, 20 }, 0.312, gg.cDelta * 2.f);
+	FillFramesEventDatas(12, { 450 + 190, 10 + 580 }, { 450, 10 }, 0.312, gg.cDelta * 2.f);
+	FillFramesEventDatas(13, { 390 + 190, 20 + 450 }, { 390, 20 }, 0.312, gg.cDelta * 2.f);
 
-	// todo: convert spines to frames & event handle
-
-	// todo: combine all.tex & spines.tex
+	// combine all.frames & spines.framess
+	xx::RectPacker tp;
+	for (int32_t i = 0; i < sizeof(all) / sizeof(xx::Frame); ++i) {
+		tp.tfs.Add((xx::TinyFrame*)&((xx::Frame*)&all)[i]);
+	}
+	for (auto& frames : spines.framess) {
+		for (auto& frame : frames) {
+			tp.tfs.Add(frame);
+		}
+	}
+	tp.AutoPack();
 
 
 	// init first scene
