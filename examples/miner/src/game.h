@@ -68,6 +68,7 @@ struct Game : xx::Game<Game> {
 		static constexpr int32_t N{ 15 };
 		std::array<xx::List<xx::Frame>, N> attacks, idles;
 		xx::List<xx::SpineEventData> eventDatas;
+		xx::List<xx::Frame> grassIdle;
 	} spines;
 
 	// runtime vars

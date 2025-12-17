@@ -112,6 +112,17 @@ void Game::GLInit() {
 
 	// load spines
 	{
+		// grass
+		{
+			xx::Shared<xx::GLTexture> t;
+			spine::SkeletonData* s{};
+			xx::gSpineEnv.Load("res/grass_4", s, t);
+			auto a = s->findAnimation("idle");
+			xx::SpineToFrames(spines.grassIdle, spines.eventDatas, s, a
+				, { 275 + 275, 25 + 350 }, { 275, 25 }, 0.2f, gg.cDelta * 0.2f);
+		}
+		
+		// miners
 		static constexpr float cScale{ 0.6f };
 		std::array<SpineFrameConfig, spines.N> cfgs;
 		cfgs[1 - 1] = {{ 275 + 135, 10 + 400 }, { 275, 10 }, cScale * 0.312f, gg.cDelta * 2.f };
@@ -146,6 +157,7 @@ void Game::GLInit() {
 		for (int32_t i = 0; i < sizeof(all) / sizeof(xx::Frame); ++i) {
 			tp.tfs.Add((xx::TinyFrame*)&((xx::Frame*)&all)[i]);
 		}
+		for (auto& f : spines.grassIdle) tp.tfs.Add(f);
 		for (auto& fs : spines.attacks) for (auto& f : fs) tp.tfs.Add(f);
 		for (auto& fs : spines.idles) for (auto& f : fs) tp.tfs.Add(f);
 		tp.AutoPack();
