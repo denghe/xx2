@@ -40,7 +40,7 @@ namespace xx {
 		bool hasEventData{};
 		SpineEventData eventData;
 		sl.SetCallBack([&](spine::AnimationState* state, spine::EventType type, spine::TrackEntry* entry, spine::Event* e) {
-			assert(type == spine::EventType::EventType_Event);
+			if (type != spine::EventType::EventType_Event) return;
 			auto&& ed = e->getData();// .getIntValue());
 			auto&& s = ed.getStringValue();
 			eventData.name = { s.buffer(), s.length() };

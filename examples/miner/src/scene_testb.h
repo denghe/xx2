@@ -26,7 +26,7 @@ namespace TestB {
 	struct Grass : SceneItem {
 		xx::Frame* frames{};
 		int32_t framesLen{};
-		int32_t frameIndex{};
+		float frameIndex{};
 		int32_t gridIndex{ -1 };
 		void Init(Scene* scene_, XY pos_, bool randomFrameIndex_ = true);
 		int Update() override;
@@ -60,9 +60,14 @@ namespace TestB {
 		int32_t cGrassMaxCount{};
 		xx::List<Grass> grasses;
 
+		xx::List<XY> rocksFixedPosPool;
 		xx::List<Rock> rocks;
 
 		xx::List<xx::Shared<Miner>> miners;
+
+		void GenGrass();
+		void GenRocks();
+		void GenMiners();
 
 		/***********************************************/
 		// for draw order by Y

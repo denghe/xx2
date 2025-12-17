@@ -29,10 +29,10 @@ namespace TestB {
 		scene = scene_;
 		pos = pos_;
 		y = pos.y;
-		scale = 0.5f;
+		scale = 0.4f;
 		frames = gg.spines.grassIdle.buf;
 		framesLen = gg.spines.grassIdle.len;
-		colorPlus = 0.4f;
+		colorPlus = 0.7f;
 		if (randomFrameIndex_) {
 			frameIndex = gg.rnd.Next(framesLen);
 		}
@@ -40,9 +40,9 @@ namespace TestB {
 	}
 
 	int Grass::Update() {
-		++frameIndex;
+		frameIndex += 0.1f;
 		if (frameIndex >= framesLen) {
-			frameIndex = 0;
+			frameIndex -= framesLen;
 		}
 		return 0;
 	}
@@ -52,7 +52,8 @@ namespace TestB {
 		s.y = scale;
 		if (flipX) s.x = scale;
 		else s.x = -scale;
-		gg.Quad().DrawFrame(frames[frameIndex], scene->cam.ToGLPos(pos), s * scene->cam.scale, 0, colorPlus);
+		gg.Quad().DrawFrame(frames[(int32_t)frameIndex], scene->cam.ToGLPos(pos)
+			, s * scene->cam.scale, 0, colorPlus, { 255, 161, 161, 255 });
 	}
 
 	/***************************************************************************************/
@@ -86,34 +87,53 @@ namespace TestB {
 
 	/***************************************************************************************/
 
-	void Scene::Init() {
-		ui.Emplace()->InitRoot(gg.scale);
-		cam.Init(gg.scale, 1.f, gg.designSize / 2.f);
-		sortContainer.Resize<true>((int32_t)gg.designSize.y);
-
-		XYi cGridSize{ 100, 50 };
-		auto cRockMargin = gg.designSize / cGridSize;
-		cGrassMarginOffsetRange = { cRockMargin / 3 };
-		cGrassMaxCount = cGridSize.x * cGridSize.y;
-
-		XY basePoss[]{ { cRockMargin.x * 0.5f, cRockMargin.y * 0.25f }, { cRockMargin.x * 0.5f, cRockMargin.y * 0.75f } };
+	void Scene::GenGrass() {
+		XYi cGridSize{ 100, 70 };
+		auto cMargin = gg.designSize / cGridSize;
+		auto cOffsetRange = cMargin / 5;
+		XY basePoss[]{ { cMargin.x * 0.5f, cMargin.y * 0.25f }, { cMargin.x * 0.5f, cMargin.y * 0.75f } };
 		for (int y = 0; y < cGridSize.y; ++y) {
 			for (int x = 0; x < cGridSize.x; ++x) {
 				auto& basePos = basePoss[x & 1];
-				XY pos{ basePos.x + cRockMargin.x * x, basePos.y + cRockMargin.y * y };
-				// todo: gen grass
-				grasses.Emplace().Init(this, pos);
+				XY pos{ basePos.x + cMargin.x * x, basePos.y + cMargin.y * y };
+				XY posOffset{
+					gg.rnd.Next<float>(-cOffsetRange.x, cOffsetRange.x),
+					gg.rnd.Next<float>(-cOffsetRange.y, cOffsetRange.y)
+				};
+				grasses.Emplace().Init(this, pos + posOffset);
+			}
+		}
+	}
+
+	void Scene::GenRocks() {
+		XYi cGridSize{ 25, 13 };
+		auto cMargin = gg.designSize / cGridSize;
+		cGrassMarginOffsetRange = { cMargin / 5 };
+		cGrassMaxCount = cGridSize.x * cGridSize.y;
+
+		XY basePoss[]{ { cMargin.x * 0.5f, cMargin.y * 0.25f }, { cMargin.x * 0.5f, cMargin.y * 0.75f } };
+		for (int y = 0; y < cGridSize.y; ++y) {
+			for (int x = 0; x < cGridSize.x; ++x) {
+				auto& basePos = basePoss[x & 1];
+				XY pos{ basePos.x + cMargin.x * x, basePos.y + cMargin.y * y };
+				rocksFixedPosPool.Emplace(pos);
 			}
 		}
 
-		for (int32_t i = 0; i < 200; ++i) {
-			XY pos;
-			pos.x = gg.rnd.Next(gg.designSize.x);
-			pos.y = gg.rnd.Next(64.f, gg.designSize.y);
-			auto idx = gg.rnd.Next(gg.all.r_.size());
-			rocks.Emplace().Init(this, idx, pos);
-		}
+		// todo
 
+		for (int32_t i = 0; i < 200; ++i) {
+			auto pos = gg.rnd.NextElement(rocksFixedPosPool);
+			XY posOffset{
+				gg.rnd.Next<float>(-cGrassMarginOffsetRange.x, cGrassMarginOffsetRange.x),
+				gg.rnd.Next<float>(-cGrassMarginOffsetRange.y, cGrassMarginOffsetRange.y)
+			};
+			auto idx = gg.rnd.Next(gg.all.r_.size());
+			rocks.Emplace().Init(this, idx, pos + posOffset);
+		}
+	}
+
+	void Scene::GenMiners() {
 		for (int32_t i = 0; i < 100; ++i) {
 			XY pos;
 			pos.x = gg.rnd.Next(gg.designSize.x);
@@ -121,6 +141,15 @@ namespace TestB {
 			auto idx = gg.rnd.Next(gg.spines.N);
 			miners.Emplace().Emplace()->Init(this, idx, pos);
 		}
+	}
+
+	void Scene::Init() {
+		ui.Emplace()->InitRoot(gg.scale);
+		cam.Init(gg.scale, 1.f, gg.designSize / 2.f);
+		sortContainer.Resize<true>((int32_t)gg.designSize.y);
+		GenGrass();
+		GenRocks();
+		GenMiners();
 	}
 
 	void Scene::Update() {

@@ -119,7 +119,7 @@ void Game::GLInit() {
 			xx::gSpineEnv.Load("res/grass_4", s, t);
 			auto a = s->findAnimation("idle");
 			xx::SpineToFrames(spines.grassIdle, spines.eventDatas, s, a
-				, { 275 + 275, 25 + 350 }, { 275, 25 }, 0.2f, gg.cDelta * 0.2f);
+				, { 275 + 275, 25 + 350 }, { 275, 25 }, 0.2f, gg.cDelta * 0.5f);
 		}
 		
 		// miners
