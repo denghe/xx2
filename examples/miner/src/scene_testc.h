@@ -21,19 +21,21 @@ namespace TestC {
 		int32_t framesLen{};
 		int32_t frameIndex{};
 		float yOffset{};		// for Draw: pos.y = y + yOffset
+		float pcDiff{};			// fill by InitYOffset()
 		XY moveTargetPos{};
 		void Init(Scene* scene_, int32_t index_, XY pos_);
 		int32_t _1{};
 		int Update() override;
 		void Draw() override;
 
-		void SetYOffset();
+		void InitYOffset();
+		void UpdateYOffset();
 		void SetMoveTargetPos();
 		int32_t MoveToTarget();
 
 		int32_t _2{};
 		float bounceHeight{}, bounceInc{}, radians{}, radiansStep{}, radiansTarget{}, timer{};
-		float bounceHeightMax{};	// call AnimBounceRotate() before: need fill
+		float bounceHeightMax{}, bounceHalfDuration{};	// call AnimBounceRotate() before: need fill
 		bool bouncing{};
 		void AnimBounceRotate();
 		void AnimInit();		// init args

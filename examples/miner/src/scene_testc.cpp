@@ -14,8 +14,10 @@ namespace TestC {
 		colorPlus = 1.f;
 		flipX = gg.rnd.Next<bool>();
 
+		InitYOffset();
 		AnimInit();
 		bounceHeightMax = 20.f;
+		bounceHalfDuration = 1.f / 10.f;
 	}
 
 	int Miner::Update() {
@@ -56,13 +58,16 @@ namespace TestC {
 		gg.Quad().Draw(f, f, scene->cam.ToGLPos(p), anchor, s * scene->cam.scale, radians, colorPlus);
 	}
 
-	// todo: optimize
-	XX_INLINE void Miner::SetYOffset() {
+	XX_INLINE void Miner::InitYOffset() {
 		auto& frame = frames[frameIndex];
 		auto frameHeight = (float)frame.uvRect.h;
 		auto centerHeight = frameHeight * 0.5f;
 		auto pivotHeight = frameHeight * frame.anchor.y;
-		yOffset = centerHeight - pivotHeight + bounceHeight;
+		pcDiff = centerHeight - pivotHeight;
+	}
+
+	XX_INLINE void Miner::UpdateYOffset() {
+		yOffset = pcDiff + bounceHeight;
 	}
 
 	XX_INLINE void Miner::SetMoveTargetPos() {
@@ -89,15 +94,15 @@ namespace TestC {
 		radiansTarget = 0;
 		bounceHeight = 0;
 		bouncing = {};
-		SetYOffset();
+		UpdateYOffset();
 	}
 
 	// jump + rotate anim
 	XX_INLINE void Miner::AnimBounceRotate() {
-		assert(bounceHeightMax > 0);
-		static constexpr float bounceStepNums{ 1.f / 6.f * gg.cFps };
 		static constexpr float bounceRadiansTarget1 { 25.f / 180.f };
 		static constexpr float bounceRadiansTarget2 { -35.f / 180.f };
+		assert(bounceHeightMax > 0);
+		float bounceStepNums{ gg.cFps * bounceHalfDuration };
 		float bounceStepSpeed { bounceHeightMax / bounceStepNums };
 		float bounceStepSpeedMax { bounceStepSpeed * 2.f };
 		float bounceStepSpeedDecrease { bounceStepSpeedMax / bounceStepNums };
@@ -114,12 +119,12 @@ namespace TestC {
 		do {
 			bounceHeight -= bounceInc;
 			bounceInc -= bounceStepSpeedDecrease;
-			SetYOffset();
+			UpdateYOffset();
 			radians += radiansStep;
 			XX_YIELD(_2);
 		} while (bounceInc >= 0);
 		bounceHeight = -bounceHeightMax;
-		SetYOffset();
+		UpdateYOffset();
 		XX_YIELD(_2);
 
 		// falling
@@ -128,7 +133,7 @@ namespace TestC {
 		do {
 			bounceHeight += bounceInc;
 			bounceInc += bounceStepSpeedDecrease;
-			SetYOffset();
+			UpdateYOffset();
 			XX_YIELD(_2);
 		} while (bounceInc < bounceStepSpeedMax);
 		assert(std::fabs(bounceHeight) < bounceInc);
@@ -146,12 +151,12 @@ namespace TestC {
 		do {
 			bounceHeight -= bounceInc;
 			bounceInc -= bounceStepSpeedDecrease;
-			SetYOffset();
+			UpdateYOffset();
 			radians += radiansStep;
 			XX_YIELD(_2);
 		} while (bounceInc >= 0);
 		bounceHeight = -bounceHeightMax;
-		SetYOffset();
+		UpdateYOffset();
 		XX_YIELD(_2);
 
 		// falling
@@ -160,12 +165,12 @@ namespace TestC {
 		do {
 			bounceHeight += bounceInc;
 			bounceInc += bounceStepSpeedDecrease;
-			SetYOffset();
+			UpdateYOffset();
 			XX_YIELD(_2);
 		} while (bounceInc < bounceStepSpeedMax);
 		assert(std::fabs(bounceHeight) < bounceInc);
 		bounceHeight = 0;
-		SetYOffset();
+		UpdateYOffset();
 		XX_YIELD(_2);
 
 		// for anim end notice
