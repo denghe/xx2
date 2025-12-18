@@ -184,16 +184,16 @@ void Game::Update() {
 	scene->Update();
 	if (!minimized) {
 		scene->Draw();
+
+		// draw ui
+		uiFPS->SetText(fpsVal);
+		gg.GLBlendFunc(gg.blendDefault);
+		gg.DrawNode(ui);
+
+		// draw mouse pointer
+		Quad().DrawFrame(all.mouse_pointer, mousePos, 3.f);
 	}
 	if (oldScene) oldScene.Reset();
-
-	// draw ui
-	uiFPS->SetText(fpsVal);
-	gg.GLBlendFunc(gg.blendDefault);
-	gg.DrawNode(ui);
-	
-	// draw mouse pointer
-	Quad().DrawFrame(all.mouse_pointer, mousePos, 3.f);
 }
 
 void Game::Delay() {
