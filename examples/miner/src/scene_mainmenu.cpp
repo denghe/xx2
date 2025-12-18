@@ -11,6 +11,7 @@
 #include "scene_test9.h"
 #include "scene_testa.h"
 #include "scene_testb.h"
+#include "scene_testc.h"
 #include "game_scene.h"
 
 void Scene_MainMenu::Init() {
@@ -91,6 +92,9 @@ void Scene_MainMenu::MakeUI() {
 	};
 	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("testB(grass)")).onClicked = [this] {
 		gg.MakeScene<TestB::Scene>()->Init();
+	};
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("testC(bounce rotate anim)")).onClicked = [this] {
+		gg.MakeScene<TestC::Scene>()->Init();
 	};
 	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("game scene")).onClicked = [this] {
 		gg.MakeScene<Scene>()->Init();
