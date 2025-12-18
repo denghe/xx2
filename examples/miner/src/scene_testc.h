@@ -44,9 +44,10 @@ namespace TestC {
 		xx::Camera cam;
 		float time{}, timePool{}, timeScale{ 1 };
 
+		XY mapSize{}, mapCenterPos{};
 		xx::List<xx::Shared<Miner>> miners;
 
-		void GenMiners();
+		void GenMiners(int32_t count_);
 
 		/***********************************************/
 		// for draw order by Y
@@ -55,7 +56,7 @@ namespace TestC {
 		void SortContainerDraw();
 		/***********************************************/
 
-		void Init();
+		void Init(float logicScale_, int32_t count_);
 		void Update() override;
 		void FixedUpdate();
 		void Draw() override;

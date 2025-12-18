@@ -56,6 +56,7 @@ namespace TestC {
 		gg.Quad().Draw(f, f, scene->cam.ToGLPos(p), anchor, s * scene->cam.scale, radians, colorPlus);
 	}
 
+	// todo: optimize
 	XX_INLINE void Miner::SetYOffset() {
 		auto& frame = frames[frameIndex];
 		auto frameHeight = (float)frame.uvRect.h;
@@ -65,8 +66,8 @@ namespace TestC {
 	}
 
 	XX_INLINE void Miner::SetMoveTargetPos() {
-		moveTargetPos.x = gg.rnd.Next(gg.designSize.x);
-		moveTargetPos.y = gg.rnd.Next(gg.designSize.y);
+		moveTargetPos.x = gg.rnd.Next(scene->mapSize.x);
+		moveTargetPos.y = gg.rnd.Next(scene->mapSize.y);
 		flipX = moveTargetPos.x <= pos.x;
 	}
 
@@ -117,6 +118,9 @@ namespace TestC {
 			radians += radiansStep;
 			XX_YIELD(_2);
 		} while (bounceInc >= 0);
+		bounceHeight = -bounceHeightMax;
+		SetYOffset();
+		XX_YIELD(_2);
 
 		// falling
 		bounceInc = 0;
@@ -127,6 +131,7 @@ namespace TestC {
 			SetYOffset();
 			XX_YIELD(_2);
 		} while (bounceInc < bounceStepSpeedMax);
+		assert(std::fabs(bounceHeight) < bounceInc);
 
 		// for anim end notice
 		bouncing = false;
@@ -145,6 +150,9 @@ namespace TestC {
 			radians += radiansStep;
 			XX_YIELD(_2);
 		} while (bounceInc >= 0);
+		bounceHeight = -bounceHeightMax;
+		SetYOffset();
+		XX_YIELD(_2);
 
 		// falling
 		bounceInc = 0;
@@ -155,6 +163,10 @@ namespace TestC {
 			SetYOffset();
 			XX_YIELD(_2);
 		} while (bounceInc < bounceStepSpeedMax);
+		assert(std::fabs(bounceHeight) < bounceInc);
+		bounceHeight = 0;
+		SetYOffset();
+		XX_YIELD(_2);
 
 		// for anim end notice
 		bouncing = false;
@@ -167,21 +179,20 @@ namespace TestC {
 
 	/***************************************************************************************/
 
-	void Scene::GenMiners() {
-		for (int32_t i = 0; i < 100; ++i) {
-			XY pos;
-			pos.x = gg.rnd.Next(gg.designSize.x);
-			pos.y = gg.rnd.Next(64.f, gg.designSize.y);
+	void Scene::GenMiners(int32_t count_) {
+		for (int32_t i = 0; i < count_; ++i) {
 			auto idx = gg.rnd.Next(gg.spines.N);
-			miners.Emplace().Emplace()->Init(this, idx, pos);
+			miners.Emplace().Emplace()->Init(this, idx, mapCenterPos);
 		}
 	}
 
-	void Scene::Init() {
+	void Scene::Init(float logicScale_, int32_t count_) {
 		ui.Emplace()->InitRoot(gg.scale);
-		cam.Init(gg.scale, 1.f, gg.designSize / 2.f);
-		sortContainer.Resize<true>((int32_t)gg.designSize.y);
-		GenMiners();
+		mapSize = gg.designSize / logicScale_;
+		mapCenterPos = mapSize * 0.5f;
+		cam.Init(gg.scale, logicScale_, mapCenterPos);
+		sortContainer.Resize<true>((int32_t)mapSize.y + 1);
+		GenMiners(count_);
 	}
 
 	void Scene::Update() {
