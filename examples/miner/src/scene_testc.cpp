@@ -95,11 +95,11 @@ namespace TestC {
 	XX_INLINE void Miner::AnimBounceRotate() {
 		assert(bounceHeightMax > 0);
 		static constexpr float bounceStepNums{ 1.f / 6.f * gg.cFps };
+		static constexpr float bounceRadiansTarget1 { 25.f / 180.f };
+		static constexpr float bounceRadiansTarget2 { -35.f / 180.f };
 		float bounceStepSpeed { bounceHeightMax / bounceStepNums };
 		float bounceStepSpeedMax { bounceStepSpeed * 2.f };
 		float bounceStepSpeedDecrease { bounceStepSpeedMax / bounceStepNums };
-		float bounceRadiansTarget1 { 25.f / 180.f };
-		float bounceRadiansTarget2 { -35.f / 180.f };
 		
 		XX_BEGIN(_2);
 		AnimInit();
