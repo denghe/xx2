@@ -10,7 +10,7 @@ namespace TestB {
 		pos = pos_;
 		y = pos.y;
 		scale = 0.5f;
-		colorPlus = 0.4f;
+		colorPlus = 1.f;
 		flipX = gg.rnd.Next<bool>();
 	}
 
@@ -19,7 +19,7 @@ namespace TestB {
 		s.y = scale;
 		if (flipX) s.x = scale;
 		else s.x = -scale;
-		gg.Quad().DrawFrame(gg.all.r_[typeId]
+		gg.Quad().DrawFrame(gg.all.r0_[typeId]
 			, scene->cam.ToGLPos(pos), s * scene->cam.scale, 0, colorPlus);
 	}
 
@@ -30,9 +30,9 @@ namespace TestB {
 		pos = pos_;
 		y = pos.y;
 		scale = 0.4f;
-		frames = gg.spines.grassIdle.buf;
-		framesLen = gg.spines.grassIdle.len;
-		colorPlus = 0.7f;
+		frames = gg.spines.idles[0].buf;
+		framesLen = gg.spines.idles[0].len;
+		colorPlus = 1.f;
 		if (randomFrameIndex_) {
 			frameIndex = gg.rnd.Next(framesLen);
 		}
@@ -53,7 +53,7 @@ namespace TestB {
 		if (flipX) s.x = scale;
 		else s.x = -scale;
 		gg.Quad().DrawFrame(frames[(int32_t)frameIndex], scene->cam.ToGLPos(pos)
-			, s * scene->cam.scale, 0, colorPlus, { 255, 161, 161, 255 });
+			, s * scene->cam.scale, 0, colorPlus, { 255, 211, 211, 255 });
 	}
 
 	/***************************************************************************************/
@@ -128,7 +128,7 @@ namespace TestB {
 				gg.rnd.Next<float>(-cGrassMarginOffsetRange.x, cGrassMarginOffsetRange.x),
 				gg.rnd.Next<float>(-cGrassMarginOffsetRange.y, cGrassMarginOffsetRange.y)
 			};
-			auto idx = gg.rnd.Next(gg.all.r_.size());
+			auto idx = gg.rnd.Next(gg.all.r0_.size());
 			rocks.Emplace().Init(this, idx, pos + posOffset);
 		}
 	}
@@ -138,7 +138,7 @@ namespace TestB {
 			XY pos;
 			pos.x = gg.rnd.Next(gg.designSize.x);
 			pos.y = gg.rnd.Next(64.f, gg.designSize.y);
-			auto idx = gg.rnd.Next(gg.spines.N);
+			auto idx = gg.rnd.Next(gg.spines.attacks.len);
 			miners.Emplace().Emplace()->Init(this, idx, pos);
 		}
 	}

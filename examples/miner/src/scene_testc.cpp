@@ -186,7 +186,7 @@ namespace TestC {
 
 	void Scene::GenMiners(int32_t count_) {
 		for (int32_t i = 0; i < count_; ++i) {
-			auto idx = gg.rnd.Next(gg.spines.N);
+			auto idx = gg.rnd.Next(gg.spines.attacks.len);
 			miners.Emplace().Emplace()->Init(this, idx, mapCenterPos);
 		}
 	}

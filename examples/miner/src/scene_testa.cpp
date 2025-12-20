@@ -94,7 +94,7 @@ namespace TestA {
 			XY pos;
 			pos.x = gg.rnd.Next(gg.designSize.x);
 			pos.y = gg.rnd.Next(64.f, gg.designSize.y);
-			auto idx = gg.rnd.Next(gg.spines.N);
+			auto idx = gg.rnd.Next(gg.spines.attacks.len);
 			miners.Emplace().Emplace()->Init(this, idx, pos);
 		}
 	}

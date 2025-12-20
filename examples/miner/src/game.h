@@ -65,10 +65,9 @@ struct Game : xx::Game<Game> {
 	} stbi;
 
 	struct {
-		static constexpr int32_t N{ 15 };
-		std::array<xx::List<xx::Frame>, N> attacks, idles;
+		xx::List<xx::List<xx::Frame>> idles;	// grass
+		xx::List<xx::List<xx::Frame>> attacks;	// creatures
 		xx::List<xx::SpineEventData> eventDatas;
-		xx::List<xx::Frame> grassIdle;
 	} spines;
 
 	// runtime vars

@@ -21,7 +21,10 @@ struct all {
 	std::array<xx::Frame, 8> miner4_atk_;
 	std::array<xx::Frame, 6> miner4_idle_;
 	std::array<xx::Frame, 5> miner4_move_;
-	std::array<xx::Frame, 3> r_;
+	std::array<xx::Frame, 6> r0_;
+	std::array<xx::Frame, 6> r1_;
+	std::array<xx::Frame, 6> r2_;
+	std::array<xx::Frame, 6> r3_;
 	std::array<xx::Frame, 5> rock_0_;
 	std::array<xx::Frame, 5> rock_1_;
 	std::array<xx::Frame, 5> rock_2_;
