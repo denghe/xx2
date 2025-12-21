@@ -123,7 +123,13 @@ void Game::GLInit() {
 		};
 		// grass
 		LoadSpineToFrames("res/grass_4", "idle", spines.idles.Emplace(), spines.eventDatas
-				, { 275 + 275, 25 + 350 }, { 275, 25 }, 0.2f, gg.cDelta * 0.5f);
+				, { 275 + 275, 25 + 350 }, { 275, 25 }, 0.15f, gg.cDelta);
+		// grassa
+		LoadSpineToFrames("res/grassa", "idle", spines.idles.Emplace(), spines.eventDatas
+				, { 300 + 300, 25 + 400 }, { 300, 25 }, 0.15f, gg.cDelta);
+		// grassb
+		LoadSpineToFrames("res/grassb", "idle", spines.idles.Emplace(), spines.eventDatas
+				, { 250 + 250, 25 + 280 }, { 300, 25 }, 0.15f, gg.cDelta);
 		// bird1
 		LoadSpineToFrames("res/bird1", "attack", spines.attacks.Emplace(), spines.eventDatas
 			, { 300 + 160, 10 + 330 }, { 300, 10 }, 0.4f, gg.cDelta);

@@ -31,10 +31,11 @@ namespace TestB {
 		scene = scene_;
 		pos = pos_;
 		y = pos.y;
-		scale = 0.4f;
-		frames = gg.spines.idles[0].buf;
-		framesLen = gg.spines.idles[0].len;
-		colorPlus = 0.3f;
+		scale = 1.f;
+		auto idx = gg.rnd.Next(gg.spines.idles.len);
+		frames = gg.spines.idles[idx].buf;
+		framesLen = gg.spines.idles[idx].len;
+		colorPlus = 1.f;
 		if (randomFrameIndex_) {
 			frameIndex = gg.rnd.Next(framesLen);
 		}
@@ -95,7 +96,7 @@ namespace TestB {
 	/***************************************************************************************/
 
 	void Scene::GenGrass() {
-		XYi cGridSize{ 100, 70 };
+		XYi cGridSize{ 70, 50 };
 		auto cMargin = gg.designSize / cGridSize;
 		auto cOffsetRange = cMargin / 5;
 		XY basePoss[]{ { cMargin.x * 0.5f, cMargin.y * 0.25f }, { cMargin.x * 0.5f, cMargin.y * 0.75f } };
@@ -186,6 +187,15 @@ namespace TestB {
 	}
 
 	void Scene::FixedUpdate() {
+		static constexpr xx::FromTo<float> cScaleRange{ 0.2f, 1.f };
+		static constexpr float cScaleStep{ 0.035f };
+		if (gg.mouse[GLFW_MOUSE_BUTTON_LAST + 1]) {	// mouse wheel up
+			cam.SetLogicScale(cam.logicScale + cScaleStep);
+		}
+		if (gg.mouse[GLFW_MOUSE_BUTTON_LAST + 2]) { // mouse wheel down
+			cam.SetLogicScale(cam.logicScale - cScaleStep);
+		}
+
 		for (auto& o : grasses) o.Update();
 		for (auto& o : miners) o->Update();
 	}
