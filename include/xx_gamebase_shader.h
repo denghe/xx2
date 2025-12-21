@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "xx_gamebase.h"
 #include "xx_shader_quad.h"
+#include "xx_shader_quad_light.h"
 #include "xx_shader_spine.h"
 #include "xx_shader_texvert.h"
 
@@ -18,6 +19,9 @@ namespace xx {
 		// shaders
 		Shader_Quad shaderQuad;
 		XX_INLINE Shader_Quad& Quad() { return ShaderBegin(shaderQuad); }
+
+		Shader_QuadLight shaderQuadLight;
+		XX_INLINE Shader_QuadLight& QuadLight() { return ShaderBegin(shaderQuadLight); }
 
 		Shader_Spine shaderSpine;
 		XX_INLINE Shader_Spine& Spine() { return ShaderBegin(shaderSpine); }
@@ -122,6 +126,7 @@ namespace xx {
 
 			// init shaders
 			shaderQuad.Init();
+			shaderQuadLight.Init();
 			shaderSpine.Init();
 			shaderTexVert.Init();
 			// ...

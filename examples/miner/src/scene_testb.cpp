@@ -4,9 +4,10 @@
 
 namespace TestB {
 
-	void Rock::Init(Scene* scene_, int32_t typeId_, XY pos_) {
+	void Rock::Init(Scene* scene_, int32_t typeId_, int32_t qualityId_, XY pos_) {
 		scene = scene_;
 		typeId = typeId_;
+		qualityId = qualityId_;
 		pos = pos_;
 		y = pos.y;
 		scale = 0.5f;
@@ -19,7 +20,8 @@ namespace TestB {
 		s.y = scale;
 		if (flipX) s.x = scale;
 		else s.x = -scale;
-		gg.Quad().DrawFrame(gg.all.r0_[typeId]
+		auto& fs = (std::array<std::array<xx::Frame, 6>, 5>&)gg.all.r0_;
+		gg.Quad().DrawFrame(fs[qualityId][typeId]
 			, scene->cam.ToGLPos(pos), s * scene->cam.scale, 0, colorPlus);
 	}
 
@@ -32,7 +34,7 @@ namespace TestB {
 		scale = 0.4f;
 		frames = gg.spines.idles[0].buf;
 		framesLen = gg.spines.idles[0].len;
-		colorPlus = 1.f;
+		colorPlus = 0.3f;
 		if (randomFrameIndex_) {
 			frameIndex = gg.rnd.Next(framesLen);
 		}
@@ -40,7 +42,7 @@ namespace TestB {
 	}
 
 	int Grass::Update() {
-		frameIndex += 0.1f;
+		frameIndex += 1.f;// 0.1f;
 		if (frameIndex >= framesLen) {
 			frameIndex -= framesLen;
 		}
@@ -85,6 +87,11 @@ namespace TestB {
 		gg.Quad().DrawFrame(frames[frameIndex], scene->cam.ToGLPos(pos), s * scene->cam.scale, 0, colorPlus);
 	}
 
+	void Miner::DrawLight() {
+		gg.Quad().DrawFrame(gg.all.light64, scene->cam.ToGLPos(pos + XY{0, -32}), scale * 7 * scene->cam.scale
+		, 0, 0.6);
+	}
+
 	/***************************************************************************************/
 
 	void Scene::GenGrass() {
@@ -106,7 +113,7 @@ namespace TestB {
 	}
 
 	void Scene::GenRocks() {
-		XYi cGridSize{ 25, 13 };
+		XYi cGridSize{ 28, 10 };
 		auto cMargin = gg.designSize / cGridSize;
 		cGrassMarginOffsetRange = { cMargin / 5 };
 		cGrassMaxCount = cGridSize.x * cGridSize.y;
@@ -117,24 +124,32 @@ namespace TestB {
 				auto& basePos = basePoss[x & 1];
 				XY pos{ basePos.x + cMargin.x * x, basePos.y + cMargin.y * y };
 				rocksFixedPosPool.Emplace(pos);
+				if (gg.rnd.Next<bool>()) continue;
+				XY posOffset{
+					gg.rnd.Next<float>(-cGrassMarginOffsetRange.x, cGrassMarginOffsetRange.x),
+					gg.rnd.Next<float>(-cGrassMarginOffsetRange.y, cGrassMarginOffsetRange.y)
+				};
+				auto typeId = gg.rnd.Next(gg.all.r0_.size());
+				auto qualityId = gg.rnd.Next(2);
+				rocks.Emplace().Init(this, typeId, qualityId, pos + posOffset);
 			}
 		}
 
 		// todo
 
-		for (int32_t i = 0; i < 200; ++i) {
+		for (int32_t i = 0; i < 100; ++i) {
 			auto pos = gg.rnd.NextElement(rocksFixedPosPool);
 			XY posOffset{
 				gg.rnd.Next<float>(-cGrassMarginOffsetRange.x, cGrassMarginOffsetRange.x),
 				gg.rnd.Next<float>(-cGrassMarginOffsetRange.y, cGrassMarginOffsetRange.y)
 			};
 			auto idx = gg.rnd.Next(gg.all.r0_.size());
-			rocks.Emplace().Init(this, idx, pos + posOffset);
+			//rocks.Emplace().Init(this, idx, pos/* + posOffset*/);
 		}
 	}
 
 	void Scene::GenMiners() {
-		for (int32_t i = 0; i < 100; ++i) {
+		for (int32_t i = 0; i < 15; ++i) {
 			XY pos;
 			pos.x = gg.rnd.Next(gg.designSize.x);
 			pos.y = gg.rnd.Next(64.f, gg.designSize.y);
@@ -144,6 +159,7 @@ namespace TestB {
 	}
 
 	void Scene::Init() {
+		fb.Init();
 		ui.Emplace()->InitRoot(gg.scale);
 		cam.Init(gg.scale, 1.f, gg.designSize / 2.f);
 		sortContainer.Resize<true>((int32_t)gg.designSize.y);
@@ -175,13 +191,33 @@ namespace TestB {
 	}
 
 	void Scene::Draw() {
-		for (auto& o : grasses) SortContainerAdd(&o);
-		for (auto& o : rocks) SortContainerAdd(&o);
-		for (auto& o : miners) SortContainerAdd(o.pointer);
-		SortContainerDraw();
+		// tex
+		auto t = xx::FrameBuffer{}.Init().Draw(gg.windowSize, true, xx::RGBA8{ 0,0,0,0 }, [&]() {
+			for (auto& o : grasses) SortContainerAdd(&o);
+			for (auto& o : rocks) SortContainerAdd(&o);
+			for (auto& o : miners) SortContainerAdd(o.pointer);
+			SortContainerDraw();
+		});
+
+		// light
+		static constexpr float lightTexScale{ 0.25f };	// for improve performance
+		cam.SetBaseScale(gg.scale * lightTexScale);
+		auto bgColor = xx::RGBA8{ 10,10,10,255 };
+		auto t2 = fb.Draw(gg.windowSize * lightTexScale, true, bgColor, [&] {
+			gg.GLBlendFunc({ GL_SRC_COLOR, GL_ONE, GL_FUNC_ADD });
+			gg.Quad().DrawFrame(gg.all.light64, gg.mousePos * lightTexScale, 10.f * cam.scale, 0, 0.7f);
+			for (auto& o : miners) o->DrawLight();
+			// ...
+		});
+
+		cam.SetBaseScale(gg.scale);
+
+		// combine tex & light
+		gg.QuadLight().Draw(t, t2, xx::RGBA8_White, 2);
 
 		gg.GLBlendFunc(gg.blendDefault);
 		gg.DrawNode(ui);
+		gg.ShaderEnd();	// ensure tmp texture not release
 	}
 
 	void Scene::OnResize(bool modeChanged_) {

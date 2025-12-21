@@ -1,0 +1,13 @@
+
+food2.png
+size: 1024,1024
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+food (342)
+  rotate: false
+  xy: 0, 67
+  size: 514, 447
+  orig: 514, 447
+  offset: 0, 0
+  index: -1

@@ -3,6 +3,7 @@
 struct all {
 	xx::Frame bg1;
 	xx::Frame circle256;
+	xx::Frame light64;
 	xx::Frame mouse_pointer;
 	xx::Frame pickaxe;
 	xx::Frame porter1;
@@ -25,6 +26,7 @@ struct all {
 	std::array<xx::Frame, 6> r1_;
 	std::array<xx::Frame, 6> r2_;
 	std::array<xx::Frame, 6> r3_;
+	std::array<xx::Frame, 6> r4_;
 	std::array<xx::Frame, 5> rock_0_;
 	std::array<xx::Frame, 5> rock_1_;
 	std::array<xx::Frame, 5> rock_2_;

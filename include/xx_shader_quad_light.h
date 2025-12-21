@@ -1,35 +1,16 @@
 ﻿#pragma once
-#include "xx_gamebase.h"
-#include "xx_frame.h"
+#include "xx_shader_quad.h"
 
 namespace xx {
 
-    struct Shader_QuadData {
-        XY pos{}, anchor{ 0.5, 0.5 };                           // float * 4
-        XY scale{ 1, 1 }; float radians{}, colorplus{ 1 };      // float * 4
-        RGBA8 color{ 255, 255, 255, 255 };                      // u8n * 4
-        UVRect texRect{};                                       // u16 * 4 ( left-top: 0,0 )
-
-        XX_INLINE void Fill(UVRect rect_, XY pos_ = {}, XY anchor_ = 0.5f, XY scale_ = 1.f
-            , float radians_ = 0.f, float colorplus_ = 1.f, RGBA8 color_ = RGBA8_White) {
-            pos = pos_;
-            anchor = anchor_;
-            scale = scale_;
-            radians = radians_;
-            colorplus = colorplus_;
-            color = color_;
-            texRect = rect_;
-        }
-    };
-
-    struct Shader_Quad : Shader {
+    struct Shader_QuadLight : Shader {
         using Shader::Shader;
-        GLint uTex0{ -1 }, aVert{ -1 }, aPosAnchor{ -1 }, aScaleRadiansColorplus{ -1 }, aColor{ -1 }, aTexRect{ -1 };
+        GLint uTex0{ -1 }, uTex1{ -1 }, aVert{ -1 }, aPosAnchor{ -1 }, aScaleRadiansColorplus{ -1 }, aColor{ -1 }, aTexRect{ -1 };
         GLVertexArrays va;
         GLBuffer vb, ib;
 
-        static constexpr int32_t maxNums{ 200000 };
-        GLuint lastTextureId{};
+        static constexpr int32_t maxNums{ 20000 };
+        GLuint lastTextureId{}, lastLightTextureId{};
         std::unique_ptr<Shader_QuadData[]> data = std::make_unique_for_overwrite<Shader_QuadData[]>(maxNums);
         int32_t count{};
 
@@ -72,6 +53,7 @@ void main() {
             f = LoadGLFragmentShader({ XX_SHADER_CODE_FIRST_LINE R"(
 precision highp float;          // mediump draw border has issue
 uniform sampler2D uTex0;
+uniform sampler2D uTex1;
 
 in vec2 vTexCoord;
 flat in float vColorplus;
@@ -80,14 +62,19 @@ flat in vec4 vColor;
 out vec4 oColor;
 
 void main() {
-    vec4 c = vColor * texture(uTex0, vTexCoord / vec2(textureSize(uTex0, 0)));
-    oColor = vec4( (c.x + 0.00001f) * vColorplus, (c.y + 0.00001f) * vColorplus, (c.z + 0.00001f) * vColorplus, c.w );
+    vec2 uv = vTexCoord / vec2(textureSize(uTex0, 0));
+    vec4 c = vColor * texture(uTex0, uv);
+    vec4 c1 = texture(uTex1, uv);
+    oColor = vec4( (c.x + 0.00001f) * vColorplus * c1.x
+                 , (c.y + 0.00001f) * vColorplus * c1.y
+                 , (c.z + 0.00001f) * vColorplus * c1.z, c.w );
 })"sv });
 
             p = LinkGLProgram(v, f);
 
             uCxy = glGetUniformLocation(p, "uCxy");
             uTex0 = glGetUniformLocation(p, "uTex0");
+            uTex1 = glGetUniformLocation(p, "uTex1");
 
             aVert = glGetAttribLocation(p, "aVert");
             aPosAnchor = glGetAttribLocation(p, "aPosAnchor");
@@ -133,9 +120,11 @@ void main() {
         virtual void Begin() override {
             assert(!GameBase::instance->shader);
             assert(lastTextureId == 0);
+            assert(lastLightTextureId == 0);
             assert(count == 0);
             glUseProgram(p);
             glUniform1i(uTex0, 0);
+            glUniform1i(uTex1, 1);
             glUniform2f(uCxy, 2 / GameBase::instance->windowSize.x, 2 / GameBase::instance->windowSize.y * GameBase::instance->flipY);
             glBindVertexArray(va);
         }
@@ -153,6 +142,8 @@ void main() {
 
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, lastTextureId);
+            glActiveTexture(GL_TEXTURE0 + 1);
+            glBindTexture(GL_TEXTURE_2D, lastLightTextureId);
             glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, count);
             CheckGLError();
 
@@ -160,33 +151,28 @@ void main() {
             GameBase::instance->drawCall += 1;
 
             lastTextureId = 0;
+            lastLightTextureId = 0;
             count = 0;
         }
 
-        XX_INLINE Shader_QuadData* Alloc(GLuint texId_, int32_t num_) {
+        XX_INLINE Shader_QuadData* Alloc(GLuint texId, GLuint lightTexId, int32_t num_) {
             assert(GameBase::instance->shader == this);
             assert(num_ <= maxNums);
-            if (count + num_ > maxNums || (lastTextureId && lastTextureId != texId_)) {
+            if (count + num_ > maxNums
+                || (lastTextureId && lastTextureId != texId)
+                || (lastLightTextureId && lastLightTextureId != lightTexId)
+                ) {
                 Commit();
             }
-            lastTextureId = texId_;
+            lastTextureId = texId;
+            lastLightTextureId = lightTexId;
             auto r = &data[count];
             count += num_;
             return r;
         }
 
-        XX_INLINE void Draw(GLuint texId_, UVRect rect_, XY pos_ = {}, XY anchor_ = 0.5f
-            , XY scale_ = 1.f, float radians_ = 0.f, float colorplus_ = 1.f, RGBA8 color_ = RGBA8_White) {
-            Alloc(texId_, 1)->Fill(rect_, pos_, anchor_, scale_, radians_, colorplus_, color_);
-        }
-
-        XX_INLINE void DrawTinyFrame(TinyFrame& tinyFrame_, XY pos_ = {}, XY anchor_ = 0.5f
-            , XY scale_ = 1.f, float radians_ = 0.f, float colorplus_ = 1.f, RGBA8 color_ = RGBA8_White) {
-            Alloc(tinyFrame_, 1)->Fill(tinyFrame_, pos_, anchor_, scale_, radians_, colorplus_, color_);
-        }
-
-        XX_INLINE void DrawFrame(Frame& frame_, XY pos_ = {}, XY scale_ = 1.f, float radians_ = 0.f, float colorplus_ = 1.f, RGBA8 color_ = RGBA8_White) {
-            Alloc(frame_.tex->id, 1)->Fill(frame_, pos_, frame_.anchor, scale_, radians_, colorplus_, color_);
+        XX_INLINE void Draw(Shared<GLTexture> tex, Shared<GLTexture> lightTex, RGBA8 color = xx::RGBA8_White, float colorplus = 1.f) {
+            Alloc(*tex, *lightTex, 1)->Fill(*tex, 0, 0.5f, 1.f, 0, colorplus, color);
         }
     };
 

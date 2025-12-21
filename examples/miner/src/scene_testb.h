@@ -13,13 +13,14 @@ namespace TestB {
 		bool flipX{};
 		virtual int Update() { return 0; }
 		virtual void Draw() {}
+		virtual void DrawLight() {}
 		virtual ~SceneItem() {}
 	};
 
 	struct Rock : SceneItem {
-		int32_t typeId{};
+		int32_t typeId{}, qualityId{};
 		int32_t gridIndex{ -1 };
-		void Init(Scene* scene_, int32_t typeId_, XY pos_);
+		void Init(Scene* scene_, int32_t typeId_, int32_t qualityId_, XY pos_);
 		void Draw() override;
 	};
 
@@ -40,12 +41,14 @@ namespace TestB {
 		void Init(Scene* scene_, int32_t index_, XY pos_);
 		int Update() override;
 		void Draw() override;
+		void DrawLight() override;
 	};
 
 	struct Scene : xx::SceneBase {
 		xx::Shared<xx::Node> ui;
 		xx::Camera cam;
 		float time{}, timePool{}, timeScale{ 1 };
+		xx::FrameBuffer fb;										// for light
 
 		int32_t cGrassCount{};
 		bool cGrassRandomFrameIndex{};

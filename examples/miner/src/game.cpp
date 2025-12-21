@@ -139,6 +139,12 @@ void Game::GLInit() {
 		// ghost1
 		LoadSpineToFrames("res/ghost1", "attack", spines.attacks.Emplace(), spines.eventDatas
 			, { 340 + 200, 10 + 385 }, { 340, 10 }, 0.32f, gg.cDelta);
+		// food1
+		LoadSpineToFrames("res/food1", "attack", spines.attacks.Emplace(), spines.eventDatas
+			, { 375 + 200, 15 + 440 }, { 375, 15 }, 0.28f, gg.cDelta);
+		// food2
+		LoadSpineToFrames("res/food2", "attack", spines.attacks.Emplace(), spines.eventDatas
+			, { 400 + 200, 15 + 450 }, { 400, 15 }, 0.28f, gg.cDelta);
 
 		//// miners
 		//static constexpr float cScale{ 0.6f };
@@ -178,6 +184,7 @@ void Game::GLInit() {
 		for (auto& fs : spines.idles) for (auto& f : fs) tp.tfs.Add(f);
 		for (auto& fs : spines.attacks) for (auto& f : fs) tp.tfs.Add(f);
 		tp.AutoPack();
+		tp.Tex().SetParm(GL_LINEAR, GL_CLAMP_TO_EDGE);
 
 		xx::gSpineEnv.Clear();
 	}

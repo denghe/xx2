@@ -90,19 +90,16 @@ void Scene_MainMenu::MakeUI() {
 	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("testA(spine miners)")).onClicked = [this] {
 		gg.MakeScene<TestA::Scene>()->Init();
 	};
-	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("testB(grass)")).onClicked = [this] {
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("testB(grass + miners + rocks)")).onClicked = [this] {
 		gg.MakeScene<TestB::Scene>()->Init();
 	};
-	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("testC(bounce rotate anim, count == 100)")).onClicked = [this] {
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("testC(move anim, count == 100)")).onClicked = [this] {
 		gg.MakeScene<TestC::Scene>()->Init(1, 100);
 	};
-	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("testC(bounce rotate anim, count == 1K)")).onClicked = [this] {
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("testC(1K)")).onClicked = [this] {
 		gg.MakeScene<TestC::Scene>()->Init(0.5, 1000);
 	};
-	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("testC(bounce rotate anim, count == 10K)")).onClicked = [this] {
-		gg.MakeScene<TestC::Scene>()->Init(0.2, 10000);
-	};
-	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("testC(bounce rotate anim, count == 100K)")).onClicked = [this] {
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("testC(100K)")).onClicked = [this] {
 		gg.MakeScene<TestC::Scene>()->Init(0.1, 100000);
 	};
 	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("game scene")).onClicked = [this] {

@@ -65,19 +65,19 @@ namespace xx {
 			return { 0,0, (uint16_t)size.x, (uint16_t)size.y };
 		}
 		operator XY () const { return size; }
+		operator XYu () const { return size; }
 		operator UVRect () const { return Rect(); }
 
-		inline static GLuint MakeTex(int textureUnit = 0) {
+		inline static GLuint MakeTex() {
 			GLuint id{};
 			glGenTextures(1, &id);
-			//glActiveTexture(GL_TEXTURE0 + textureUnit);
-			glBindTexture(GL_TEXTURE_2D, id);
 			SetTexParm(id, GL_NEAREST, GL_NEAREST, GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
 			return id;
 		}
 
 		// filter:  GL_NEAREST  GL_LINEAR    wraper:  GL_CLAMP_TO_EDGE   GL_REPEAT
 		inline static void SetTexParm(GLuint id_, GLuint minFilter_, GLuint magFilter_, GLuint sWraper_, GLuint tWraper_) {
+			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, id_);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter_);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter_);
@@ -103,6 +103,7 @@ namespace xx {
 
 		void TryGenerateMipmap() {
 			if (size.x == size.y && Round2n((size_t)size.x) == (size_t)size.x) {
+				glActiveTexture(GL_TEXTURE0);
 				glBindTexture(GL_TEXTURE_2D, id);
 				glGenerateMipmap(GL_TEXTURE_2D);
 				CheckGLError();
@@ -323,6 +324,7 @@ namespace xx {
 			auto id = GLTexture::MakeTex();
 			glCompressedTexImage2D(GL_TEXTURE_2D, 0, format == 3 ? /*GL_COMPRESSED_RGBA8_ETC2_EAC*/0x9278
 				: /*GL_COMPRESSED_RGB8_ETC2*/0x9274, (GLsizei)width, (GLsizei)height, 0, (GLsizei)(buf.size() - 16), p + 16);
+			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, 0);
 			CheckGLError();
 			return { id, {width, height}/*, fullPath*/ };

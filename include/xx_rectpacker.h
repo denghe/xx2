@@ -79,6 +79,11 @@ namespace xx {
 			tfs[0]->tex->TryGenerateMipmap();
 			return 0;
 		}
+
+		// after pack, visit tex
+		GLTexture& Tex() {
+			return *tfs[0]->tex;
+		}
 	};
 
 }
