@@ -6,7 +6,7 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 
-set(name plist2code)
+set(name physicseditor2code)
 project(${name})
 
 

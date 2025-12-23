@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 #include "scene_mainmenu.h"
 #include "scene_test1.h"
+#include "scene_test2.h"
 
 void Scene_MainMenu::Init() {
 	MakeUI();
@@ -23,8 +24,12 @@ void Scene_MainMenu::MakeUI() {
 	L.Append(C->Make<xx::Label>()->Init(2, 0, 0, fontSize * 2)("box2d v3 tests"));
 	L.EndLine();
 
-	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test1")).onClicked = [this] {
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test1( stars )")).onClicked = [this] {
 		gg.MakeScene<Test1::Scene>()->Init();
+	};
+
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test2( fishs )")).onClicked = [this] {
+		gg.MakeScene<Test2::Scene>()->Init();
 	};
 
 	L.InitEnd();
