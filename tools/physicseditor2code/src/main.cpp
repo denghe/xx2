@@ -7,10 +7,60 @@
 #pragma once
 #include "pch.h"
 struct XMLFileName {
-	static constexpr XY xxxPolygonData[] { {?,?}, {?,?}, ... };
-	static constexpr XY xxxPolygonData[] { {?,?}, {?,?}, ... };
-	...
+	struct {
+		static constexpr XY anchorpoint{ ?,? };
+		struct {
+			static constexpr float density{ ? };
+			static constexpr float friction{ ? };
+			static constexpr float restitution{ ? };
+			static constexpr uint32_t filter_categoryBits{ ? };
+			static constexpr uint32_t filter_groupIndex{ ? };
+			static constexpr uint32_t filter_maskBits{ ? };
+			static constexpr bool isSensor{ ? };
+			static constexpr XY polygons1[] { {?,?}, {?,?}, ... };
+			static constexpr XY polygons2[] { {?,?}, {?,?}, ... };
+			......
+		} fixture1;
+		struct {
+			static constexpr float density{ ? };
+			static constexpr float friction{ ? };
+			static constexpr float restitution{ ? };
+			static constexpr uint32_t filter_categoryBits{ ? };
+			static constexpr uint32_t filter_groupIndex{ ? };
+			static constexpr uint32_t filter_maskBits{ ? };
+			static constexpr bool isSensor{ ? };
+			static constexpr float r{ ? }, x{ ? }, y{ ? };	// CIRCLE
+		} fixture2;
+		......
+		void Init(b2BodyId const& id_, b2ShapeDef& def_, float radius_ = 1.f);
+	} xxx;
+	......
+	static constexpr float ptm_ratio{ ? };
 };
+
+* template
+* XMLFileName.cpp
+
+#include "pch.h"
+#include "XMLFileName.h"
+
+void ::XMLFileName::xxx::Init(b2BodyId const& id_, b2ShapeDef& def_, float radius_) {
+	// fixture1
+	{
+		auto hull = b2ComputeHull((b2Vec2*)::XMLFileName::xxx::polys.buf, _countof(::XMLFileName::xxx::polys.buf));
+		auto polygon = b2MakePolygon(&hull, radius_);
+		def.density = ::XMLFileName::xxx::fixture1::density;
+		def.material.friction = ::XMLFileName::xxx::fixture1::friction;
+		def.material.restitution = ::XMLFileName::xxx::fixture1::restitution;
+		// todo: filter_categoryBits  filter_groupIndex  filter_maskBits  isSensor
+		b2CreatePolygonShape(id_, &def_, &polygon);
+	}
+	......
+}
+
+......
+
+
 
 
 XML content example:
@@ -61,7 +111,7 @@ XML content example:
 int main() {
 	SetConsoleOutputCP(CP_UTF8);
 	auto&& cp = std::filesystem::current_path();
-	std::cout << "tool: PhysicsEditor's Box2d XML store file -> *.h\n\nworking dir: " << cp.string() << R"#(
+	std::cout << "tool: PhysicsEditor's Box2d XML store file -> *.h & .cpp\n\nworking dir: " << cp.string() << R"#(
 press ENTER to continue...)#";
 	std::cin.get();
 
@@ -72,6 +122,7 @@ press ENTER to continue...)#";
 
 		auto fileName = xx::U8AsString(p.filename().u8string());
 		auto fullPath = xx::U8AsString(std::filesystem::absolute(p).u8string());
+		auto xmlName = fileName.substr(0, fileName.size() - 4);
 
 		xx::Data fd;
 		if (int r = xx::ReadAllBytes(p, fd)) {
@@ -81,8 +132,12 @@ press ENTER to continue...)#";
 
 		std::cout << "\nhandle file: " << fullPath << std::endl;
 
-		std::string code;
+		std::string h;
 		static_assert(sizeof(pugi::char_t) == 1);
+
+		xx::Append(h, R"#(#pragma once
+#include "pch.h"
+struct {)#");
 		
 		pugi::xml_document doc;
 		if (auto&& r = doc.load_buffer(fd.buf, fd.len); r.status) { std::cerr << "load_buffer error : " << r.description() << std::endl; return __LINE__; }
@@ -93,75 +148,113 @@ press ENTER to continue...)#";
 		auto version = bodydef.attribute("version"sv).value();
 		if (version != "1.0"sv) { std::cerr << "<bodydef version is wrong?\n"; return __LINE__; }
 
+		auto metadata = bodydef.find_child([](auto& node_) { return strcmp(node_.name(), "metadata") == 0; });
+		if (metadata.empty()) { std::cerr << "can't find <bodydef><metadata>\n"; return __LINE__; }
+
+		auto format = metadata.find_child([](auto& node_) { return strcmp(node_.name(), "format") == 0; });
+		if (format.empty()) { std::cerr << "can't find <bodydef><metadata><format>\n"; return __LINE__; }
+		if (format.text().as_int() != 1) { std::cerr << "bad <bodydef><metadata><format> version. should be 1.\n"; return __LINE__; }
+		auto ptm_ratio = metadata.find_child([](auto& node_) { return strcmp(node_.name(), "ptm_ratio") == 0; });
+		if (ptm_ratio.empty()) { std::cerr << "can't find <bodydef><metadata><ptm_ratio>\n"; return __LINE__; }
+		auto ptm_ratio_value = ptm_ratio.text().as_float();
+
+		xx::AppendFormat(h, R"#(
+	static constexpr float ptm_ratio{{ {0} };		// need call b2SetLengthUnitsPerMeter(  ????  );
+)#", ptm_ratio_value);
+
 		auto bodies = bodydef.find_child([](auto& node_) { return strcmp(node_.name(), "bodies") == 0; });
 		if (bodydef.empty()) { std::cerr << "can't find <bodydef><bodies>\n"; return __LINE__; }
 
 		auto bodies_children = bodies.children();
 		for (auto body = bodies_children.begin(); body != bodies_children.end(); ++body) {
 			if(strcmp(body->name(), "body")) { std::cerr << "<bodydef><bodies>'s children 's name isn't <body> ??\n"; return __LINE__; }
+			
+			std::string_view name = body->attribute("name").as_string();
+			if (!name.size()) { std::cerr << "<bodydef><bodies><body name= empty ??\n"; return __LINE__; }
 
 			auto anchorpoint = body->find_child([](auto& node_) { return strcmp(node_.name(), "anchorpoint") == 0; });
 			if (anchorpoint.empty()) { std::cerr << "can't find <anchorpoint> in <bodydef><bodies><body>'s children\n"; return __LINE__; }
+			std::string_view anchorpoint_value = anchorpoint.text().as_string();
+			xx::AppendFormat(h, R"#(
+	struct {{
+		static constexpr XY anchorpoint{{ {0} };)#", anchorpoint_value);
 
 			auto fixtures = body->find_child([](auto& node_) { return strcmp(node_.name(), "fixtures") == 0; });
 			if (fixtures.empty()) { std::cerr << "can't find <fixtures> in <bodydef><bodies><body>'s children\n"; return __LINE__; }
 
+			xx::Append(h, R"#(
+		struct {)#");
+
+			int j{};
 			auto fixtures_children = fixtures.children();
 			for (auto fixture = fixtures_children.begin(); fixture != fixtures_children.end(); ++fixture) {
 
 				auto density = fixture->find_child([](auto& node_) { return strcmp(node_.name(), "density") == 0; });
 				if (density.empty()) { std::cerr << "can't find <density> in <bodydef><bodies><body><fixtures><fixture>'s children\n"; return __LINE__; }
-				auto density_value = density.text().as_float();
+				std::string_view density_value = density.text().as_string();
 
 				auto friction = fixture->find_child([](auto& node_) { return strcmp(node_.name(), "friction") == 0; });
 				if (friction.empty()) { std::cerr << "can't find <friction> in <bodydef><bodies><body><fixtures><fixture>'s children\n"; return __LINE__; }
-				auto friction_value = friction.text().as_float();
+				std::string_view friction_value = friction.text().as_string();
 
 				auto restitution = fixture->find_child([](auto& node_) { return strcmp(node_.name(), "restitution") == 0; });
 				if (restitution.empty()) { std::cerr << "can't find <restitution> in <bodydef><bodies><body><fixtures><fixture>'s children\n"; return __LINE__; }
-				auto restitution_value = restitution.text().as_float();
+				std::string_view restitution_value = restitution.text().as_string();
 
 				auto filter_categoryBits = fixture->find_child([](auto& node_) { return strcmp(node_.name(), "filter_categoryBits") == 0; });
 				if (filter_categoryBits.empty()) { std::cerr << "can't find <filter_categoryBits> in <bodydef><bodies><body><fixtures><fixture>'s children\n"; return __LINE__; }
-				auto filter_categoryBits_value = filter_categoryBits.text().as_uint();
+				std::string_view filter_categoryBits_value = filter_categoryBits.text().as_string();
 
 				auto filter_groupIndex = fixture->find_child([](auto& node_) { return strcmp(node_.name(), "filter_groupIndex") == 0; });
 				if (filter_groupIndex.empty()) { std::cerr << "can't find <filter_groupIndex> in <bodydef><bodies><body><fixtures><fixture>'s children\n"; return __LINE__; }
-				auto filter_groupIndex_value = filter_groupIndex.text().as_uint();
+				auto filter_groupIndex_value = filter_groupIndex.text().as_string();
 
 				auto filter_maskBits = fixture->find_child([](auto& node_) { return strcmp(node_.name(), "filter_maskBits") == 0; });
 				if (filter_maskBits.empty()) { std::cerr << "can't find <filter_maskBits> in <bodydef><bodies><body><fixtures><fixture>'s children\n"; return __LINE__; }
-				auto filter_maskBits_value = filter_maskBits.text().as_uint();
+				auto filter_maskBits_value = filter_maskBits.text().as_string();
 
 				auto isSensor = fixture->find_child([](auto& node_) { return strcmp(node_.name(), "isSensor") == 0; });
 				bool isSensor_value = !isSensor.empty();
 
+				xx::AppendFormat(h, R"#(
+			static constexpr float density{{ {0} };
+			static constexpr float friction{{ {1} };
+			static constexpr float restitution{{ {2} };
+			static constexpr uint32_t filter_categoryBits{{ {3} };
+			static constexpr uint32_t filter_groupIndex{{ {4} };
+			static constexpr uint32_t filter_maskBits{{ {5} };
+			static constexpr bool isSensor{{ {6} };)#"
+					, density_value
+					, friction_value
+					, restitution_value
+					, filter_categoryBits_value
+					, filter_groupIndex_value
+					, filter_maskBits_value
+					, isSensor_value ? "true":"false"
+				);
+
 				auto fixture_type = fixture->find_child([](auto& node_) { return strcmp(node_.name(), "fixture_type") == 0; });
 				if (fixture_type.empty()) { std::cerr << "can't find <fixture_type> in <bodydef><bodies><body><fixtures><fixture>'s children\n"; return __LINE__; }
 				std::string_view fixture_type_value = fixture_type.text().as_string();
-				xx::CoutN(fixture_type_value);
 				if (fixture_type_value == "POLYGON"sv) {
 					auto polygons = fixture->find_child([](auto& node_) { return strcmp(node_.name(), "polygons") == 0; });
 					if (polygons.empty()) { std::cerr << "can't find <polygons> in <bodydef><bodies><body><fixtures><fixture>'s children\n"; return __LINE__; }
 					auto polygons_children = polygons.children();
+					int i{};
 					for (auto polygon = polygons_children.begin(); polygon != polygons_children.end(); ++polygon) {
 						if (strcmp(polygon->name(), "polygon")) { std::cerr << "<bodydef><bodies><body><fixtures><fixture><polygons>'s children 's name isn't <polygon> ??\n" << std::endl; return __LINE__; }
+						xx::AppendFormat(h, R"#(
+			static constexpr XY polygons{0}[] {{)#", ++i);
+
 						std::string_view sv = polygon->text().as_string();
-						//xx::CoutN(sv);
-						std::string_view x, y;
-						//xx::XY p;
 						do {
-							x = xx::Trim(xx::SplitOnce(sv, ","));
-							if (!x.size()) { std::cerr << "<polygon> data </polygon> read error\n"; return __LINE__; }
-							//p.x = xx::SvToNumber(s, 0.f);
-							y = xx::Trim(xx::SplitOnce(sv, ","));
-							if (!y.size()) { std::cerr << "<polygon> data </polygon> read error\n"; return __LINE__; }
-							//p.y = xx::SvToNumber(s, 0.f);
-							// todo
-							//xx::CoutN(x, " ", y);
+							auto x = xx::SvToNumber( xx::Trim(xx::SplitOnce(sv, ",")), 0.f) / ptm_ratio_value;
+							auto y = xx::SvToNumber( xx::Trim(xx::SplitOnce(sv, ",")), 0.f) / ptm_ratio_value;
+							xx::AppendFormat(h, "{{ {0}, {1} }, ", x, -y);	// flip y
 						} while (sv.size());
+						h.resize(h.size() - 2);	// remove last ", "
+						xx::Append(h, "};");
 					}
-					// todo
 				}
 				else if (fixture_type_value == "CIRCLE") {
 					auto circle = fixture->find_child([](auto& node_) { return strcmp(node_.name(), "circle") == 0; });
@@ -170,27 +263,39 @@ press ENTER to continue...)#";
 					std::string_view x = circle.attribute("x").as_string();
 					std::string_view y = circle.attribute("y").as_string();
 					// todo
-					xx::CoutN(r, " ", x, " ", y);
 				}
 				else {
 					std::cerr << "wrong fixture_type.value:" << fixture_type_value << std::endl;
 					return __LINE__;
 				}
+				xx::AppendFormat(h, R"#(
+		} fixture{0};)#", ++j);
 			}
+
+			std::string n;
+			if (name[0] >= '0' && name[0] <= '9') {
+				xx::Append(n, '_', name);
+			}
+			else {
+				xx::Append(n, name);
+			}
+			xx::AppendFormat(h, R"#(
+	} {0};)#", n);
 		}
 
-		auto metadata = bodies.next_sibling();
-		assert(metadata.name() == "metadata"sv);
-		//auto format = metadata
-
+		xx::AppendFormat(h, R"#(
+} {0};
+)#", xmlName);
 
 #if 0
 		// save to file
 		auto outPath = fullPath.substr(0, fullPath.size() - 4) + ".h";
-		if (int r = xx::WriteAllBytes((std::u8string&)outPath, code.data(), code.size())) {
+		if (int r = xx::WriteAllBytes((std::u8string&)outPath, h.data(), h.size())) {
 			std::cerr << "write file failed! r = " << r << std::endl;
 			return -__LINE__;
 		}
+#else
+		xx::CoutN(h);
 #endif
 	}
 
