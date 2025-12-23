@@ -4,16 +4,24 @@
 
 namespace Test2 {
 
-	void SceneItem1::Init(Scene* scene_, XY pos_) {
+	void SceneItem1::Init(Scene* scene_, XY pos_, float scale_) {
 		scene = scene_;
 		frame = gg.fs._10;
+		scale = scale_;
 
-		b2body.InitTypePos(scene_->b2world, pos_, b2_dynamicBody);
+		auto bodyDef = b2DefaultBodyDef();
+		bodyDef.type = b2_dynamicBody;
+		bodyDef.position = (b2Vec2&)pos_;
+		bodyDef.angularDamping = 1.f;
+		//bodyDef.gravityScale = 2.f;
+		bodyDef.linearVelocity = { 1000.f, 0 };
+		b2body.InitDef(scene_->b2world, bodyDef);
+
 #if 1
 		xx::List<XY> polys;
 		auto AddPoly = [&](auto polydata_, size_t len_, auto& shapeDef)->void {
 			polys.Clear();
-			for (size_t i = 0; i < len_ / 2; ++i) polys.Add(((XY*)polydata_)[i].FlipY());
+			for (size_t i = 0; i < len_ / 2; ++i) polys.Add(((XY*)polydata_)[i].FlipY() * scale_);
 			auto hull = b2ComputeHull((b2Vec2*)polys.buf, polys.len);
 			auto polygon = b2MakePolygon(&hull, 1);
 			b2CreatePolygonShape(b2body, &shapeDef, &polygon);
@@ -32,6 +40,11 @@ namespace Test2 {
 		static constexpr float polygons11[] = { -174.0000, -66.0000, -137.0000, -63.0000, -143.0000, 54.0000, -167.0000, 61.0000 };
 
 		auto def = b2DefaultShapeDef();
+		def.material.restitution = 1.1f;
+		def.material.friction = 1.f;
+		//def.material.rollingResistance = 0.02f;
+		//def.density = 50.0f;
+
 		AddPoly(polygons1, _countof(polygons1), def);
 		AddPoly(polygons2, _countof(polygons2), def);
 		AddPoly(polygons3, _countof(polygons3), def);
@@ -51,15 +64,16 @@ namespace Test2 {
 	}
 
 	bool SceneItem1::Update() {
-		return (b2body.GetPos().x > 3500);
+		auto p = b2body.GetPos();
+		return (p.x > 5000 || p.x < -5000 || p.y > 3000 || p.y < -3000);
 	}
 
 	void SceneItem1::Draw() {
 		auto [p, r] = b2body.GetPosRadians();
 #if 1
-		gg.Quad().DrawFrame(frame, scene->cam.ToGLPos(p), scene->cam.scale, r);
+		gg.Quad().DrawFrame(frame, scene->cam.ToGLPos(p), scale * scene->cam.scale, r);
 #else
-		gg.Quad().DrawFrame(gg.fs.circle256, scene->cam.ToGLPos(p), 100.f * 2.f / 256.f * scene->cam.scale, r);
+		gg.Quad().DrawFrame(gg.fs.circle256, scene->cam.ToGLPos(p), scale * 100.f * 2.f / 256.f * scene->cam.scale, r);
 #endif
 	}
 
@@ -91,19 +105,28 @@ namespace Test2 {
 		cam.Init(gg.scale, 0.3f);
 		ui.Emplace()->InitRoot(gg.scale * cUIScale);
 
+		//b2SetLengthUnitsPerMeter(1);
 		auto def = b2DefaultWorldDef();
-		def.gravity = { 3000, 0 };
+		def.gravity = { 1000, 0 };
+		def.maximumLinearSpeed = 1000;
+		//def.restitutionThreshold = 5.f;
+		//def.contactHertz = 240;
+		//def.contactDampingRatio = 10;
+		//def.contactSpeed = 0.5;
 		b2world.InitDef(def, 1);
 		item2.Init(this, {}, 100);
-		Gen(1);
 	}
 
 	void Scene::Gen(int32_t num_) {
 		for (int i = 0; i < num_; ++i) {
 			XY pos;
 			pos.x = -3500;
-			pos.y = gg.rnd.Next(-1500, 1500);
-			item1s.Emplace().Emplace()->Init(this, pos);
+			pos.y = lastGenY;
+			lastGenY += 150.f;
+			if (lastGenY >= 1500) {
+				lastGenY = -1500.f;
+			}
+			item1s.Emplace().Emplace()->Init(this, pos, 0.3);
 		}
 	}
 
@@ -136,18 +159,17 @@ namespace Test2 {
 		b2world.Step();
 
 #if 1
-		genTimer += gg.cDelta;// *300.f;
-		if (genTimer >= 1.f) {
-			auto n = (int32_t)genTimer;
-			genTimer -= n;
-			Gen(n);
+		if (genTimer < time) {
+			genTimer += 0.1;
+			Gen(5);
+			xx::CoutN("num items = ", item1s.len);
 		}
 #endif
 	}
 
 	void Scene::Draw() {
 		gg.Quad().DrawTinyFrame(gg.embed.shape_dot, 0, 0.5f, gg.windowSize, 0, 1, {38,194,208,255});
-		gg.Quad().DrawFrame(gg.fs.bg_fish, {0, -200});
+		gg.Quad().DrawFrame(gg.fs.bg_fish, { 0, -200 }, cam.scale * 3.3);
 
 		for (auto& o : item1s) o->Draw();
 		item2.Draw();

@@ -6,6 +6,6 @@
 #include <xx_prims.h>
 #include <xx_file.h>
 #include <xx_string.h>
-#include "texturepacker_reader.h"
+#include <pugixml.hpp>
 
 #endif

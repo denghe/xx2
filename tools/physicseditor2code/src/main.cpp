@@ -2,97 +2,76 @@
 
 /*
 * template
-* PlistFileName.h
+* XMLFileName.h
 
 #pragma once
 #include "pch.h"
-struct PlistFileName {
-	xx::Frame xxx1;
-	xx::Frame xxx2;
-	xx::Frame xxx3;
+struct XMLFileName {
+	static constexpr XY xxxPolygonData[] { {?,?}, {?,?}, ... };
+	static constexpr XY xxxPolygonData[] { {?,?}, {?,?}, ... };
 	...
-	std::array<xx::Frame, ???> xxxA_;
-	std::array<xx::Frame, ???> xxxB_;
-	std::array<xx::Frame, ???> xxxC_;
-	...
-
-	void Load();
 };
 
-///////////////////////////////////////////////////////
 
-* PlistFileName.cpp
+XML content example:
 
-include "pch.h"
-#include "PlistFileName.h"
-
-void PlistFileName::Load(std::string rootPath_) {
-	auto t = LoadTexture(rootPath_ + "/PlistFileName.png");
-	t->TryGenerateMipmap();
-
-	this->xxx1 = { t, X, Y, W, H, ANCHOR };
-	this->xxx2 = { t, X, Y, W, H, ANCHOR };
-	this->xxx3 = { t, X, Y, W, H, ANCHOR };
-	...
-	this->xxxA_[0] = { t, X, Y, W, H, ANCHOR };
-	this->xxxA_[1] = { t, X, Y, W, H, ANCHOR };
-	this->xxxA_[2] = { t, X, Y, W, H, ANCHOR };
-	...
-	this->xxxB_[0] = { t, X, Y, W, H, ANCHOR };
-	this->xxxB_[1] = { t, X, Y, W, H, ANCHOR };
-	this->xxxB_[2] = { t, X, Y, W, H, ANCHOR };
-	...
-	this->xxxC_[0] = { t, X, Y, W, H, ANCHOR };
-	this->xxxC_[1] = { t, X, Y, W, H, ANCHOR };
-	this->xxxC_[2] = { t, X, Y, W, H, ANCHOR };
-	...
-}
-
-
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- created with http://www.physicseditor.de -->
+<bodydef version="1.0">
+	<bodies>
+		<body name="10">
+			<anchorpoint>0.5000,0.5000</anchorpoint>
+			<fixtures>
+				<fixture>
+					<density>2</density>
+					<friction>0</friction>
+					<restitution>0</restitution>
+					<filter_categoryBits>1</filter_categoryBits>
+					<filter_groupIndex>0</filter_groupIndex>
+					<filter_maskBits>65535</filter_maskBits>
+					<fixture_type>POLYGON</fixture_type>
+					<isSensor/>
+					<polygons>
+						<polygon>  44.0000, -189.0000  ,  68.0000, -185.0000  ,  ...... </polygon>
+						......
+					</polygons>
+				</fixture>
+				<fixture>
+					<density>2</density>
+					<friction>0</friction>
+					<restitution>0</restitution>
+					<filter_categoryBits>1</filter_categoryBits>
+					<filter_groupIndex>0</filter_groupIndex>
+					<filter_maskBits>65535</filter_maskBits>
+					<fixture_type>CIRCLE</fixture_type>
+					<circle r="20.000" x="247.728" y="-98.000"/>
+				</fixture>
+				......
+			</fixtures>
+		</body>
+		......
+	</bodies>
+	<metadata>
+		<format>1</format>
+		<ptm_ratio>32</ptm_ratio>
+	</metadata>
+</bodydef>
 */
 
 int main() {
 	SetConsoleOutputCP(CP_UTF8);
 	auto&& cp = std::filesystem::current_path();
-	std::cout << "tool: *.plist -> *.h & cpp\n\nworking dir: " << cp.string() << R"#(
-
-tips: 
-file name can't contains space or dot
-texture packer config( switch to advance )
-Data:
-	Data Format: cocos2d-x
-	Data file: ??????.plist
-	Trim sprite names: [v]
-Texture: ( optional )
-	PNG-8 ( indexed )
-Layout:
-	Max size: ?????
-	Size constraints: POT
-	Force squared: [v]
-	Allow rotation: [ ]
-	Detect identical sprites: [ ]
-Sprites:
-	Trim mode: None
-	Shape Padding: 8
-	
+	std::cout << "tool: PhysicsEditor's Box2d XML store file -> *.h\n\nworking dir: " << cp.string() << R"#(
 press ENTER to continue...)#";
 	std::cin.get();
-
-	std::unordered_map<std::string, std::vector<std::string>> plists;		// plist file name : keys
-	std::map<std::string, std::string> keys;								// key : owner plist file name
-	std::unordered_map<std::string, xx::TexturePackerReader::Plist> tps;	// plist file name : data
 
 	for (auto&& entry : std::filesystem::/*recursive_*/directory_iterator(cp)) {
 		if (!entry.is_regular_file()) continue;
 		auto&& p = entry.path();
-		if (p.extension() != u8".plist") continue;
+		if (p.extension() != u8".xml") continue;
 
-		auto plistName = xx::U8AsString(p.filename().u8string());
-		auto fullpath = xx::U8AsString(std::filesystem::absolute(p).u8string());
-		auto blistPath = fullpath.substr(0, fullpath.size() - 6) + ".blist";
-
-		auto [iter, success] = plists.emplace(plistName, std::vector<std::string>{});
-		assert(success);
+		auto fileName = xx::U8AsString(p.filename().u8string());
+		auto fullPath = xx::U8AsString(std::filesystem::absolute(p).u8string());
 
 		xx::Data fd;
 		if (int r = xx::ReadAllBytes(p, fd)) {
@@ -100,265 +79,120 @@ press ENTER to continue...)#";
 			return -__LINE__;
 		}
 
-		auto&& rtv = tps.emplace(plistName, xx::TexturePackerReader::Plist{});
-		assert(rtv.second);
-		auto& tp = rtv.first->second;
-		if (int r = tp.Load(fd)) {
-			std::cerr << "tp.Load failed. r = " << r << " fn = " << p << std::endl;
-			return -__LINE__;
-		}
+		std::cout << "\nhandle file: " << fullPath << std::endl;
 
-		std::cout << "\nhandle file: " << p << std::endl;
+		std::string code;
+		static_assert(sizeof(pugi::char_t) == 1);
+		
+		pugi::xml_document doc;
+		if (auto&& r = doc.load_buffer(fd.buf, fd.len); r.status) { std::cerr << "load_buffer error : " << r.description() << std::endl; return __LINE__; }
 
-		// check file info
-		if (tp.metadata.size.width != tp.metadata.size.height) {
-			std::cerr << "**************************** bad file size( width == height ): " << p << std::endl;
-			return -__LINE__;
-		}
-		if (!xx::IsPowerOfTwo(tp.metadata.size.width)) {
-			std::cerr << "**************************** bad file size( width & height should be 2^n ): " << p << std::endl;
-			return -__LINE__;
-		}
+		auto bodydef = doc.find_child([](auto& node_) { return strcmp(node_.name(), "bodydef") == 0; });
+		if (bodydef.empty()) { std::cerr << "can't find <bodydef>\n"; return __LINE__; }
 
-		for (auto& f : tp.frames) {
-			std::cout << "handle frame: " << f.name << std::endl;
+		auto version = bodydef.attribute("version"sv).value();
+		if (version != "1.0"sv) { std::cerr << "<bodydef version is wrong?\n"; return __LINE__; }
 
-			for (auto const& c : f.name) {
-				if (c == '.' || c == ' ') {
-					std::cerr << "**************************** bad key name( can't contain ' ' or '.' ): " << f.name
-						<< "\n**************************** in plist: " << plistName
-						<< std::endl;
-					return -__LINE__;
-				}
-			}
+		auto bodies = bodydef.find_child([](auto& node_) { return strcmp(node_.name(), "bodies") == 0; });
+		if (bodydef.empty()) { std::cerr << "can't find <bodydef><bodies>\n"; return __LINE__; }
 
-			if (auto [iter, success] = keys.emplace(f.name, plistName); !success) {
-				std::cerr << "**************************** duplicate res name: " << f.name
-					<< "\n**************************** in plist: " << iter->second
-					<< "\n**************************** and plist " << plistName
-					<< std::endl;
-				return -__LINE__;
-			}
-			iter->second.push_back(f.name);
-		}
-	}
+		auto bodies_children = bodies.children();
+		for (auto body = bodies_children.begin(); body != bodies_children.end(); ++body) {
+			if(strcmp(body->name(), "body")) { std::cerr << "<bodydef><bodies>'s children 's name isn't <body> ??\n"; return __LINE__; }
 
+			auto anchorpoint = body->find_child([](auto& node_) { return strcmp(node_.name(), "anchorpoint") == 0; });
+			if (anchorpoint.empty()) { std::cerr << "can't find <anchorpoint> in <bodydef><bodies><body>'s children\n"; return __LINE__; }
 
-	for (auto&& [plistFileName, tp] : tps) {
-		auto structName = plistFileName.substr(0, plistFileName.size() - 6);
+			auto fixtures = body->find_child([](auto& node_) { return strcmp(node_.name(), "fixtures") == 0; });
+			if (fixtures.empty()) { std::cerr << "can't find <fixtures> in <bodydef><bodies><body>'s children\n"; return __LINE__; }
 
-		// group by prefix...._number
-		std::map<std::string, std::vector<std::string>> keyGroups;
-		std::vector<std::string> keys;
+			auto fixtures_children = fixtures.children();
+			for (auto fixture = fixtures_children.begin(); fixture != fixtures_children.end(); ++fixture) {
 
-		auto&& allKeys = plists[plistFileName];
-		for (auto&& key : allKeys) {
-			if (auto idx = key.find_last_of('_'); idx != key.npos) {
-				auto k = key.substr(0, idx);
-				auto v = key.substr(idx + 1);
-				if (v.find_first_not_of("0123456789"sv) != v.npos) goto LabSingle;
-				keyGroups[k].push_back(v);
-			}
-			else {
-			LabSingle:
-				keys.push_back(key);
-			}
-		}
+				auto density = fixture->find_child([](auto& node_) { return strcmp(node_.name(), "density") == 0; });
+				if (density.empty()) { std::cerr << "can't find <density> in <bodydef><bodies><body><fixtures><fixture>'s children\n"; return __LINE__; }
+				auto density_value = density.text().as_float();
 
-		// sort by number
-		for (auto&& kv : keyGroups) {
-			auto& ss = kv.second;
-			std::sort(ss.begin(), ss.end(), [](std::string const& a, std::string const& b)->bool {
-				return xx::SvToNumber<int>(a) < xx::SvToNumber<int>(b);
-			});
-		}
+				auto friction = fixture->find_child([](auto& node_) { return strcmp(node_.name(), "friction") == 0; });
+				if (friction.empty()) { std::cerr << "can't find <friction> in <bodydef><bodies><body><fixtures><fixture>'s children\n"; return __LINE__; }
+				auto friction_value = friction.text().as_float();
 
-		std::string code, tmp;
+				auto restitution = fixture->find_child([](auto& node_) { return strcmp(node_.name(), "restitution") == 0; });
+				if (restitution.empty()) { std::cerr << "can't find <restitution> in <bodydef><bodies><body><fixtures><fixture>'s children\n"; return __LINE__; }
+				auto restitution_value = restitution.text().as_float();
 
-		for (auto&& k : keys) {
-			if (keyGroups.contains(k))
-				continue;
-			xx::Append(tmp, R"#(
-	xx::Frame )#", k, R"#(;)#");
-		}
-		for (auto&& kv : keyGroups) {
-			xx::Append(tmp, R"#(
-	std::array<xx::Frame, )#", kv.second.size(), R"#(> )#", kv.first, R"#(_;)#");
-		}
+				auto filter_categoryBits = fixture->find_child([](auto& node_) { return strcmp(node_.name(), "filter_categoryBits") == 0; });
+				if (filter_categoryBits.empty()) { std::cerr << "can't find <filter_categoryBits> in <bodydef><bodies><body><fixtures><fixture>'s children\n"; return __LINE__; }
+				auto filter_categoryBits_value = filter_categoryBits.text().as_uint();
 
-		xx::Append(code, R"#(#pragma once
-#include "pch.h"
-struct )#", structName, R"#( {)#", tmp, R"#(
+				auto filter_groupIndex = fixture->find_child([](auto& node_) { return strcmp(node_.name(), "filter_groupIndex") == 0; });
+				if (filter_groupIndex.empty()) { std::cerr << "can't find <filter_groupIndex> in <bodydef><bodies><body><fixtures><fixture>'s children\n"; return __LINE__; }
+				auto filter_groupIndex_value = filter_groupIndex.text().as_uint();
 
-	void Load(std::string rootPath_);
-};
-)#");
-		// save to file
-		auto fn = structName + ".h";
-		if (int r = xx::WriteAllBytes((std::u8string&)fn, code.data(), code.size())) {
-			std::cerr << "write file failed! r = " << r << std::endl;
-			return -__LINE__;
-		}
+				auto filter_maskBits = fixture->find_child([](auto& node_) { return strcmp(node_.name(), "filter_maskBits") == 0; });
+				if (filter_maskBits.empty()) { std::cerr << "can't find <filter_maskBits> in <bodydef><bodies><body><fixtures><fixture>'s children\n"; return __LINE__; }
+				auto filter_maskBits_value = filter_maskBits.text().as_uint();
 
-		// todo: cpp
-		code.clear();
-		tmp.clear();
+				auto isSensor = fixture->find_child([](auto& node_) { return strcmp(node_.name(), "isSensor") == 0; });
+				bool isSensor_value = !isSensor.empty();
 
-		for (auto&& k : keys) {
-			auto f = &tp.frames[0];
-			for (auto& o : tp.frames) {
-				if (o.name == k) {
-					f = &o;
-					break;
-				}
-			}
-			xx::XY anchor{ 0.5f };
-			if (f->anchor.has_value()) anchor = *f->anchor;
-			xx::Append(tmp, R"#(
-	this->)#", k, " = { t, ", f->textureRect.x, ", ", f->textureRect.y, ", ", f->textureRect.width, ", ", f->textureRect.height, ", { ", anchor.x, ", ", anchor.y, " } };");
-		}
-
-		for (auto&& kv : keyGroups) {
-			auto& k = kv.first;
-			auto& names = kv.second;
-			for(int i = 0; i < names.size(); ++i) {
-				auto name = k + "_" + names[i];
-				auto f = &tp.frames[0];
-				for (auto& o : tp.frames) {
-					if (o.name == name) {
-						f = &o;
-						break;
+				auto fixture_type = fixture->find_child([](auto& node_) { return strcmp(node_.name(), "fixture_type") == 0; });
+				if (fixture_type.empty()) { std::cerr << "can't find <fixture_type> in <bodydef><bodies><body><fixtures><fixture>'s children\n"; return __LINE__; }
+				std::string_view fixture_type_value = fixture_type.text().as_string();
+				xx::CoutN(fixture_type_value);
+				if (fixture_type_value == "POLYGON"sv) {
+					auto polygons = fixture->find_child([](auto& node_) { return strcmp(node_.name(), "polygons") == 0; });
+					if (polygons.empty()) { std::cerr << "can't find <polygons> in <bodydef><bodies><body><fixtures><fixture>'s children\n"; return __LINE__; }
+					auto polygons_children = polygons.children();
+					for (auto polygon = polygons_children.begin(); polygon != polygons_children.end(); ++polygon) {
+						if (strcmp(polygon->name(), "polygon")) { std::cerr << "<bodydef><bodies><body><fixtures><fixture><polygons>'s children 's name isn't <polygon> ??\n" << std::endl; return __LINE__; }
+						std::string_view sv = polygon->text().as_string();
+						//xx::CoutN(sv);
+						std::string_view x, y;
+						//xx::XY p;
+						do {
+							x = xx::Trim(xx::SplitOnce(sv, ","));
+							if (!x.size()) { std::cerr << "<polygon> data </polygon> read error\n"; return __LINE__; }
+							//p.x = xx::SvToNumber(s, 0.f);
+							y = xx::Trim(xx::SplitOnce(sv, ","));
+							if (!y.size()) { std::cerr << "<polygon> data </polygon> read error\n"; return __LINE__; }
+							//p.y = xx::SvToNumber(s, 0.f);
+							// todo
+							//xx::CoutN(x, " ", y);
+						} while (sv.size());
 					}
+					// todo
 				}
-				xx::XY anchor{ 0.5f };
-				if (f->anchor.has_value()) anchor = *f->anchor;
-				xx::Append(tmp, R"#(
-	this->)#", k, "_[", i, "] = { t, ", f->textureRect.x, ", ", f->textureRect.y, ", ", f->textureRect.width, ", ", f->textureRect.height, ", { ", anchor.x, ", ", anchor.y, " } };");
+				else if (fixture_type_value == "CIRCLE") {
+					auto circle = fixture->find_child([](auto& node_) { return strcmp(node_.name(), "circle") == 0; });
+					if (circle.empty()) { std::cerr << "can't find <circle> in <bodydef><bodies><body><fixtures><fixture>'s children\n"; return __LINE__; }
+					std::string_view r = circle.attribute("r").as_string();
+					std::string_view x = circle.attribute("x").as_string();
+					std::string_view y = circle.attribute("y").as_string();
+					// todo
+					xx::CoutN(r, " ", x, " ", y);
+				}
+				else {
+					std::cerr << "wrong fixture_type.value:" << fixture_type_value << std::endl;
+					return __LINE__;
+				}
 			}
 		}
 
-		xx::Append(code, R"#(#include "pch.h"
-#include "game.h"
-#include ")#", structName, R"#(.h"
-void )#", structName, R"#(::Load(std::string rootPath_) {
-	auto t = gg.LoadTexture(rootPath_ + ")#", structName, R"#(.png");
-	t->TryGenerateMipmap();
-)#", tmp, R"#(
-};
-)#");
+		auto metadata = bodies.next_sibling();
+		assert(metadata.name() == "metadata"sv);
+		//auto format = metadata
+
+
+#if 0
 		// save to file
-		fn = structName + ".cpp";
-		if (int r = xx::WriteAllBytes((std::u8string&)fn, code.data(), code.size())) {
+		auto outPath = fullPath.substr(0, fullPath.size() - 4) + ".h";
+		if (int r = xx::WriteAllBytes((std::u8string&)outPath, code.data(), code.size())) {
 			std::cerr << "write file failed! r = " << r << std::endl;
 			return -__LINE__;
 		}
+#endif
 	}
-
-
-//	for (auto& [key, plistfn] : keys) {
-//		auto& tp = tps[plistfn];
-//		auto f = &tp.frames[0];
-//		for (auto& o : tp.frames) {
-//			if (o.name == key) {
-//				f = &o;
-//				break;
-//			}
-//		}
-//
-//		xx::XY anchor{ 0.5, 0.5 };
-//		if (f->anchor.has_value()) {
-//			anchor = *f->anchor;
-//		}
-//		
-//		xx::AppendFormat(h, R"#(
-//	xx::Ref<xx::Frame> {0};
-//	xx::Ref<xx::GLTexture> _tex_{0};
-//	GLuint _texid_{0}{{};	// unsafe
-//	static constexpr xx::XY _size_{0}{{ {1}, {2} };
-//	static constexpr xx::XY _anchor_{0}{{ {3}, {4} };
-//	static constexpr xx::UVRect _uvrect_{0}{{ {5}, {6}, {7}, {8} };
-//)#"
-//			, key, f->spriteSize.width, f->spriteSize.height
-//			, anchor.x, anchor.y
-//			, f->textureRect.x, f->textureRect.y, f->textureRect.width, f->textureRect.height
-//		);
-//	}
-//
-//	if (!keyGroups.empty()) {
-//		xx::Append(h, R"#(
-//)#");
-//	}
-//
-//	for (auto&& kv : keyGroups) {
-//		xx::AppendFormat(h, R"(
-//	xx::Listi32<xx::Ref<xx::Frame>> {0}_;
-//	static constexpr int32_t _countof_{0}_{{ {1} };)", kv.first, kv.second.size());
-//	}
-//
-//	xx::Append(h, R"#(
-//};
-//)#");
-//
-//
-//
-//	xx::Append(c, R"#(#include "pch.h"
-//#include "res_tp_frames.h"
-//
-//// this file is generated by tool: plist2blist
-//
-//xx::Task<> ResTpFrames::AsyncLoad(std::string picRoot) {)#");
-//
-//	for (auto& plist : plists) {
-//		xx::AppendFormat(c, R"#(
-//	{{
-//		auto& eg = xx::EngineBase3::Instance();
-//#ifdef __EMSCRIPTEN__
-//		auto tp = co_await eg.AsyncLoadTexturePackerFromUrl(picRoot + "{0}");
-//#else
-//		auto tp = eg.LoadTexturePacker<true>(picRoot + "{0}");
-//#endif
-//		xx_assert(tp);
-//		auto map = tp->GetMapSV();
-//)#", plist.first.substr(0, plist.first.size() - 5) + "blist");
-//
-//		for (auto& key : plist.second) {
-//			xx::AppendFormat(c, R"#(
-//		this->{0} = map["{0}"sv];
-//		this->_tex_{0} = this->{0}->tex;
-//		this->_texid_{0} = this->_tex_{0}->GetValue();)#", key);
-//		}
-//		xx::AppendFormat(c, R"#(
-//	}
-//)#");
-//	}
-//
-//	if (!keyGroups.empty()) {
-//		xx::Append(c, R"#(
-//	// fill groups
-//)#");
-//		for (auto&& kv : keyGroups) {
-//			for (auto&& s : kv.second) {
-//				xx::AppendFormat(c, R"(
-//	{0}_.Add({0}_{1});)", kv.first, s);
-//			}
-//		}
-//	}
-//
-//	xx::Append(c, R"#(
-//	co_return;
-//}
-//)#");
-//
-//
-//	// save to file
-//	if (int r = xx::WriteAllBytes(u8"res_tp_frames.h", h.data(), h.size())) {
-//		std::cerr << "write file res_tp_frames.h failed! r = " << r << std::endl;
-//		return -__LINE__;
-//	}
-//	if (int r = xx::WriteAllBytes(u8"res_tp_frames.cpp", c.data(), c.size())) {
-//		std::cerr << "write file res_tp_frames.h failed! r = " << r << std::endl;
-//		return -__LINE__;
-//	}
 
 	xx::CoutN("finished! press ENTER to continue...");
 	std::cin.get();

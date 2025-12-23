@@ -9,7 +9,8 @@ namespace Test2 {
 		Scene* scene{};
 		xx::Frame frame;
 		xx::B2Body b2body;
-		void Init(Scene* scene_, XY pos_);
+		float scale{};
+		void Init(Scene* scene_, XY pos_, float scale_ = 1);
 		bool Update();
 		void Draw();
 	};
@@ -34,6 +35,7 @@ namespace Test2 {
 		SceneItem2 item2;	// mouse
 
 		float genTimer{};
+		float lastGenY{};
 		void Gen(int32_t num_);
 
 		void Init();
