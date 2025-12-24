@@ -1,8 +1,10 @@
 ﻿#include "pch.h"
-#include "scene_test2.h"
+#include "scene_test3.h"
 #include "scene_mainmenu.h"
 
-namespace Test2 {
+namespace Test3 {
+
+	// todo
 
 	float SceneItem1::Init(Scene* scene_, XY pos_, float scale_) {
 		scene = scene_;

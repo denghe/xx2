@@ -2,6 +2,7 @@
 #include "scene_mainmenu.h"
 #include "scene_test1.h"
 #include "scene_test2.h"
+#include "scene_test3.h"
 
 void Scene_MainMenu::Init() {
 	MakeUI();
@@ -30,6 +31,10 @@ void Scene_MainMenu::MakeUI() {
 
 	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test2( fishs )")).onClicked = [this] {
 		gg.MakeScene<Test2::Scene>()->Init();
+	};
+
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test3( chain )")).onClicked = [this] {
+		gg.MakeScene<Test3::Scene>()->Init();
 	};
 
 	L.InitEnd();

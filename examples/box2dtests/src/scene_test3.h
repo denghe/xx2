@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "game.h"
 
-namespace Test2 {
+namespace Test3 {
 
 	struct Scene;
 

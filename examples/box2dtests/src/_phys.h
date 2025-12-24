@@ -4,12 +4,13 @@
 
 struct _phys {
 	using XY = xx::XY;
-	static void MakePolygon(b2BodyId const& id_, b2ShapeDef& def_, XY const* data_, size_t len_, float scale_);
+	static void MakePolygon(b2BodyId const& id_, b2ShapeDef& def_, float scale_, XY const* data_, size_t len_);
+	static void MakeCircle(b2BodyId const& id_, b2ShapeDef& def_, float scale_, float x_, float y_, float r_);
 
 	static constexpr float ptm_ratio{ 32 };		// need call b2SetLengthUnitsPerMeter(  ????  );
 
 	struct _10 {
-		static void Init(b2BodyId const& id_, float radius_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f);
 		static constexpr XY anchorpoint{ 0.5000,0.5000 };
 		struct fixture1 {
 			static constexpr float density{ 1 };
@@ -33,7 +34,7 @@ struct _phys {
 		};
 	};
 	struct _110 {
-		static void Init(b2BodyId const& id_, float radius_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f);
 		static constexpr XY anchorpoint{ 0.5000,0.5000 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -53,7 +54,7 @@ struct _phys {
 		};
 	};
 	struct _123 {
-		static void Init(b2BodyId const& id_, float radius_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f);
 		static constexpr XY anchorpoint{ 0.5000,0.5000 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -73,7 +74,7 @@ struct _phys {
 		};
 	};
 	struct _128 {
-		static void Init(b2BodyId const& id_, float radius_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f);
 		static constexpr XY anchorpoint{ 0.5000,0.5020 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -103,7 +104,7 @@ struct _phys {
 		};
 	};
 	struct _138 {
-		static void Init(b2BodyId const& id_, float radius_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f);
 		static constexpr XY anchorpoint{ 0.5020,0.5030 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -123,7 +124,7 @@ struct _phys {
 		};
 	};
 	struct _14 {
-		static void Init(b2BodyId const& id_, float radius_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f);
 		static constexpr XY anchorpoint{ 0.5010,0.5000 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -146,7 +147,7 @@ struct _phys {
 		};
 	};
 	struct _147 {
-		static void Init(b2BodyId const& id_, float radius_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f);
 		static constexpr XY anchorpoint{ 0.5010,0.5000 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -170,7 +171,7 @@ struct _phys {
 		};
 	};
 	struct _168 {
-		static void Init(b2BodyId const& id_, float radius_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f);
 		static constexpr XY anchorpoint{ 0.5011,0.5020 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -195,7 +196,7 @@ struct _phys {
 		};
 	};
 	struct _17 {
-		static void Init(b2BodyId const& id_, float radius_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f);
 		static constexpr XY anchorpoint{ 0.5000,0.5000 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -219,7 +220,7 @@ struct _phys {
 		};
 	};
 	struct _18 {
-		static void Init(b2BodyId const& id_, float radius_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f);
 		static constexpr XY anchorpoint{ 0.5008,0.5000 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -245,7 +246,7 @@ struct _phys {
 		};
 	};
 	struct _192 {
-		static void Init(b2BodyId const& id_, float radius_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f);
 		static constexpr XY anchorpoint{ 0.5012,0.5000 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -284,7 +285,7 @@ struct _phys {
 		};
 	};
 	struct _206 {
-		static void Init(b2BodyId const& id_, float radius_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f);
 		static constexpr XY anchorpoint{ 0.5000,0.5020 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -311,7 +312,7 @@ struct _phys {
 		};
 	};
 	struct _243 {
-		static void Init(b2BodyId const& id_, float radius_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f);
 		static constexpr XY anchorpoint{ 0.5010,0.5000 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -336,7 +337,7 @@ struct _phys {
 		};
 	};
 	struct _244 {
-		static void Init(b2BodyId const& id_, float radius_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f);
 		static constexpr XY anchorpoint{ 0.5009,0.5020 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -360,7 +361,7 @@ struct _phys {
 		};
 	};
 	struct _26 {
-		static void Init(b2BodyId const& id_, float radius_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f);
 		static constexpr XY anchorpoint{ 0.5011,0.5000 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -384,7 +385,7 @@ struct _phys {
 		};
 	};
 	struct _283 {
-		static void Init(b2BodyId const& id_, float radius_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f);
 		static constexpr XY anchorpoint{ 0.5000,0.5018 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -402,7 +403,7 @@ struct _phys {
 		};
 	};
 	struct _285 {
-		static void Init(b2BodyId const& id_, float radius_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f);
 		static constexpr XY anchorpoint{ 0.5000,0.5017 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -422,7 +423,7 @@ struct _phys {
 		};
 	};
 	struct _288 {
-		static void Init(b2BodyId const& id_, float radius_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f);
 		static constexpr XY anchorpoint{ 0.5010,0.5000 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -446,7 +447,7 @@ struct _phys {
 		};
 	};
 	struct _296 {
-		static void Init(b2BodyId const& id_, float radius_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f);
 		static constexpr XY anchorpoint{ 0.5000,0.5010 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -467,7 +468,7 @@ struct _phys {
 		};
 	};
 	struct _303 {
-		static void Init(b2BodyId const& id_, float radius_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f);
 		static constexpr XY anchorpoint{ 0.5000,0.5000 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -492,7 +493,7 @@ struct _phys {
 		};
 	};
 	struct _309 {
-		static void Init(b2BodyId const& id_, float radius_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f);
 		static constexpr XY anchorpoint{ 0.5000,0.5020 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -513,7 +514,7 @@ struct _phys {
 		};
 	};
 	struct _402 {
-		static void Init(b2BodyId const& id_, float radius_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f);
 		static constexpr XY anchorpoint{ 0.5010,0.5017 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -533,7 +534,7 @@ struct _phys {
 		};
 	};
 	struct _407 {
-		static void Init(b2BodyId const& id_, float radius_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f);
 		static constexpr XY anchorpoint{ 0.5015,0.5020 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -553,7 +554,7 @@ struct _phys {
 		};
 	};
 	struct _408 {
-		static void Init(b2BodyId const& id_, float radius_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f);
 		static constexpr XY anchorpoint{ 0.5012,0.5010 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -577,7 +578,7 @@ struct _phys {
 		};
 	};
 	struct _415 {
-		static void Init(b2BodyId const& id_, float radius_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f);
 		static constexpr XY anchorpoint{ 0.5000,0.5020 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -596,7 +597,7 @@ struct _phys {
 		};
 	};
 	struct _421 {
-		static void Init(b2BodyId const& id_, float radius_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f);
 		static constexpr XY anchorpoint{ 0.5000,0.5000 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -619,7 +620,7 @@ struct _phys {
 		};
 	};
 	struct _422 {
-		static void Init(b2BodyId const& id_, float radius_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f);
 		static constexpr XY anchorpoint{ 0.5010,0.5020 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -640,7 +641,7 @@ struct _phys {
 		};
 	};
 	struct _443 {
-		static void Init(b2BodyId const& id_, float radius_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f);
 		static constexpr XY anchorpoint{ 0.5009,0.5000 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -663,7 +664,7 @@ struct _phys {
 		};
 	};
 	struct _449 {
-		static void Init(b2BodyId const& id_, float radius_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f);
 		static constexpr XY anchorpoint{ 0.5012,0.5000 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -686,7 +687,7 @@ struct _phys {
 		};
 	};
 	struct _458 {
-		static void Init(b2BodyId const& id_, float radius_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f);
 		static constexpr XY anchorpoint{ 0.5010,0.5010 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -721,7 +722,7 @@ struct _phys {
 		};
 	};
 	struct _461 {
-		static void Init(b2BodyId const& id_, float radius_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f);
 		static constexpr XY anchorpoint{ 0.5014,0.5000 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -744,7 +745,7 @@ struct _phys {
 		};
 	};
 	struct _462 {
-		static void Init(b2BodyId const& id_, float radius_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f);
 		static constexpr XY anchorpoint{ 0.5010,0.5020 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -769,7 +770,7 @@ struct _phys {
 		};
 	};
 	struct _463 {
-		static void Init(b2BodyId const& id_, float radius_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f);
 		static constexpr XY anchorpoint{ 0.5009,0.5000 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -793,7 +794,7 @@ struct _phys {
 		};
 	};
 	struct _464 {
-		static void Init(b2BodyId const& id_, float radius_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f);
 		static constexpr XY anchorpoint{ 0.5013,0.5000 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -817,7 +818,7 @@ struct _phys {
 		};
 	};
 	struct _467 {
-		static void Init(b2BodyId const& id_, float radius_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f);
 		static constexpr XY anchorpoint{ 0.5000,0.5020 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -841,7 +842,7 @@ struct _phys {
 		};
 	};
 	struct _470 {
-		static void Init(b2BodyId const& id_, float radius_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f);
 		static constexpr XY anchorpoint{ 0.5010,0.5000 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -867,7 +868,7 @@ struct _phys {
 		};
 	};
 	struct _472 {
-		static void Init(b2BodyId const& id_, float radius_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f);
 		static constexpr XY anchorpoint{ 0.5000,0.5000 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -891,7 +892,7 @@ struct _phys {
 		};
 	};
 	struct _51 {
-		static void Init(b2BodyId const& id_, float radius_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f);
 		static constexpr XY anchorpoint{ 0.5000,0.5000 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -915,7 +916,7 @@ struct _phys {
 		};
 	};
 	struct _75 {
-		static void Init(b2BodyId const& id_, float radius_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f);
 		static constexpr XY anchorpoint{ 0.5010,0.5000 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -938,7 +939,7 @@ struct _phys {
 		};
 	};
 	struct _98 {
-		static void Init(b2BodyId const& id_, float radius_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f);
 		static constexpr XY anchorpoint{ 0.5000,0.5020 };
 		struct fixture1 {
 			static constexpr float density{ 2 };

@@ -5,12 +5,17 @@
 * XMLFileName.h
 
 #pragma once
-#include "pch.h"	// #include <xx_box2d.h>  using XY = xx::XY;
+#include "pch.h"
+#include <xx_box2d.h>
 
 struct XMLFileName {
+	using XY = xx::XY;
+	static void MakePolygon(b2BodyId const& id_, b2ShapeDef& def_, XY const* data_, size_t len_, float scale_);
+
 	static constexpr float ptm_ratio{ ? };
+
 	struct xxx {
-		void Init(b2BodyId const& id_, float radius_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f);
 		static constexpr XY anchorpoint{ ?,? };
 		struct fixture1 {
 			static constexpr float density{ ? };
@@ -45,22 +50,27 @@ struct XMLFileName {
 #include "pch.h"
 #include "XMLFileName.h"
 
-void ::XMLFileName::xxx::Init(b2BodyId const& id_, float radius_) {
+void ::XMLFileName::MakePolygon(b2BodyId const& id_, b2ShapeDef& def_, float scale_, XY const* data_, size_t len_) {
+	auto buf = (XY*)alloca(len_ * sizeof(XY));
+	for (int32_t i = 0; i < len_; ++i) {
+		buf[i] = data_[i] * scale_;
+	}
+	auto hull = b2ComputeHull((b2Vec2*)buf, len_);
+	auto polygon = b2MakePolygon(&hull, 1);
+	b2CreatePolygonShape(id_, &def_, &polygon);
+};
+
+void ::XMLFileName::xxx::Init(b2BodyId const& id_, float scale_) {
 	auto def = b2DefaultShapeDef();
 	// fixture1
-	{
-		def.density = ::XMLFileName::xxx::fixture1::density;
-		def.material.friction = ::XMLFileName::xxx::fixture1::friction;
-		def.material.restitution = ::XMLFileName::xxx::fixture1::restitution;
-		// todo: filter_categoryBits  filter_groupIndex  filter_maskBits  isSensor
-
-		{
-			auto hull = b2ComputeHull((b2Vec2*)::XMLFileName::xxx::polys.buf, _countof(::XMLFileName::xxx::polys.buf));
-			auto polygon = b2MakePolygon(&hull, radius_);
-			b2CreatePolygonShape(id_, &def, &polygon);
-		}
-		......
-	}
+	def.density = ::XMLFileName::xxx::fixture1::density;
+	def.material.friction = ::XMLFileName::xxx::fixture1::friction;
+	def.material.restitution = ::XMLFileName::xxx::fixture1::restitution;
+	// todo: filter_categoryBits  filter_groupIndex  filter_maskBits  isSensor
+	MakePolygon(id_, def, scale_, ::XMLFileName::xxx::fixture1::polygons1, _countof(::XMLFileName::xxx::fixture1::polygons1));
+	MakePolygon(id_, def, scale_, ::XMLFileName::xxx::fixture1::polygons2, _countof(::XMLFileName::xxx::fixture1::polygons2));
+	......
+	// fixture2
 	......
 }
 
@@ -147,13 +157,14 @@ press ENTER to continue...)#";
 
 struct {0} {{
 	using XY = xx::XY;
-	static void MakePolygon(b2BodyId const& id_, b2ShapeDef& def_, XY const* data_, size_t len_, float scale_);
+	static void MakePolygon(b2BodyId const& id_, b2ShapeDef& def_, float scale_, XY const* data_, size_t len_);
+	static void MakeCircle(b2BodyId const& id_, b2ShapeDef& def_, float scale_, float x_, float y_, float r_);
 )#", xmlName);
 		
 		xx::AppendFormat(cpp, R"#(#include "pch.h"
 #include "{0}.h"
 
-void ::_phys::MakePolygon(b2BodyId const& id_, b2ShapeDef& def_, XY const* data_, size_t len_, float scale_) {{
+XX_INLINE void ::_phys::MakePolygon(b2BodyId const& id_, b2ShapeDef& def_, float scale_, XY const* data_, size_t len_) {{
 	auto buf = (XY*)alloca(len_ * sizeof(XY));
 	for (int32_t i = 0; i < len_; ++i) {{
 		buf[i] = data_[i] * scale_;
@@ -162,6 +173,12 @@ void ::_phys::MakePolygon(b2BodyId const& id_, b2ShapeDef& def_, XY const* data_
 	auto polygon = b2MakePolygon(&hull, 1);
 	b2CreatePolygonShape(id_, &def_, &polygon);
 };
+
+XX_INLINE void ::_phys::MakeCircle(b2BodyId const& id_, b2ShapeDef& def_, float scale_, float x_, float y_, float r_) {{
+	auto circle = b2Circle{{ .center = {{x_ * scale_, y_ * scale_ }, .radius = r_ * scale_ };
+	b2CreateCircleShape(id_, &def_, &circle);
+};
+
 )#", xmlName);
 		
 		pugi::xml_document doc;
@@ -205,7 +222,7 @@ void ::_phys::MakePolygon(b2BodyId const& id_, b2ShapeDef& def_, XY const* data_
 			std::string_view anchorpoint_value = anchorpoint.text().as_string();
 			xx::AppendFormat(h, R"#(
 	struct {0} {{
-		static void Init(b2BodyId const& id_, float radius_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f);
 		static constexpr XY anchorpoint{{ {1} };)#", name, anchorpoint_value);
 
 			auto fixtures = body->find_child([](auto& node_) { return strcmp(node_.name(), "fixtures") == 0; });
@@ -267,10 +284,9 @@ void ::{0}::{1}::Init(b2BodyId const& id_, float scale_) {{
 
 				xx::AppendFormat(cpp, R"#(
 	// fixture{0}
-	{{
-		def.density = ::{1}::{2}::fixture{0}::density;
-		def.material.friction = ::{1}::{2}::fixture{0}::friction;
-		def.material.restitution = ::{1}::{2}::fixture{0}::restitution;)#"
+	def.density = ::{1}::{2}::fixture{0}::density;
+	def.material.friction = ::{1}::{2}::fixture{0}::friction;
+	def.material.restitution = ::{1}::{2}::fixture{0}::restitution;)#"
 					, j, xmlName, name);
 		// todo: filter_categoryBits  filter_groupIndex  filter_maskBits  isSensor
 
@@ -299,7 +315,7 @@ void ::{0}::{1}::Init(b2BodyId const& id_, float scale_) {{
 						xx::Append(h, "};");
 
 						xx::AppendFormat(cpp, R"#(
-		MakePolygon(id_, def, ::{1}::{2}::fixture{0}::polygons{3}, _countof(::{1}::{2}::fixture{0}::polygons{3}), scale_);)#", j, xmlName, name, i);
+	MakePolygon(id_, def, scale_, ::{1}::{2}::fixture{0}::polygons{3}, _countof(::{1}::{2}::fixture{0}::polygons{3}));)#", j, xmlName, name, i);
 
 					}
 
@@ -312,13 +328,10 @@ void ::{0}::{1}::Init(b2BodyId const& id_, float scale_) {{
 					std::string_view x = circle.attribute("x").as_string();
 					std::string_view y = circle.attribute("y").as_string();
 					xx::AppendFormat(h, R"#(
-			static constexpr float circleRXY[] {{ {0}, {1}, {2} };)#", r, x, y);
+			static constexpr float r{{ {0} }, x{{ {1} }, y{{ {2} };)#", r, x, y);
 					// todo: call MakeCircle
 					xx::AppendFormat(cpp, R"#(
-		{{
-			auto circle = b2Circle{{ .center = {{ ::{1}::{2}::fixture{0}::circleRXY[1] * scale_, ::{1}::{2}::fixture{0}::circleRXY[2] * scale_ }, .radius = ::{1}::{2}::fixture{0}::circleRXY[0] * scale_ };
-			b2CreateCircleShape(id_, &def, &circle);
-		})#", j, xmlName, name);
+	MakeCircle(id_, def, scale_, ::{1}::{2}::fixture{0}::x, ::{1}::{2}::fixture{0}::y, ::{1}::{2}::fixture{0}::r);)#", j, xmlName, name);
 				}
 				else {
 					std::cerr << "wrong fixture_type.value:" << fixture_type_value << std::endl;
@@ -327,8 +340,6 @@ void ::{0}::{1}::Init(b2BodyId const& id_, float scale_) {{
 
 				xx::Append(h, R"#(
 		};)#");
-				xx::Append(cpp, R"#(
-	})#");
 				++j;
 			}
 
