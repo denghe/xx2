@@ -2,6 +2,7 @@
 #include "pch.h"
 using XY = xx::XY;
 using XYi = xx::XYi;
+#include "_phys.h"
 
 struct Game : xx::Game<Game> {
 	static constexpr float cFps{ 120 };

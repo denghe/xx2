@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include "game.h"
 #include <box2d/box2d.h>
 #include <box2d/math_functions.h>
 #include <TaskScheduler.h>	// for multi-thread
@@ -92,7 +91,7 @@ namespace xx {
 			}
 		}
 
-		void Step(float timeStep_ = gg.cDelta, int subStepCount_ = 4) {
+		void Step(float timeStep_ = 1.f / 120.f, int subStepCount_ = 4) {
 			b2World_Step(id, timeStep_, subStepCount_);
 			taskCount = 0;
 		}

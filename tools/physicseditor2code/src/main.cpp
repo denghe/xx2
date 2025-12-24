@@ -9,9 +9,10 @@
 
 struct XMLFileName {
 	static constexpr float ptm_ratio{ ? };
-	struct {
+	struct xxx {
+		void Init(b2BodyId const& id_, float radius_ = 1.f);
 		static constexpr XY anchorpoint{ ?,? };
-		struct {
+		struct fixture1 {
 			static constexpr float density{ ? };
 			static constexpr float friction{ ? };
 			static constexpr float restitution{ ? };
@@ -22,8 +23,8 @@ struct XMLFileName {
 			static constexpr XY polygons1[] { {?,?}, {?,?}, ... };
 			static constexpr XY polygons2[] { {?,?}, {?,?}, ... };
 			......
-		} fixture1;
-		struct {
+		};
+		struct fixture2 {
 			static constexpr float density{ ? };
 			static constexpr float friction{ ? };
 			static constexpr float restitution{ ? };
@@ -32,10 +33,9 @@ struct XMLFileName {
 			static constexpr uint32_t filter_maskBits{ ? };
 			static constexpr bool isSensor{ ? };
 			static constexpr float r{ ? }, x{ ? }, y{ ? };	// CIRCLE
-		} fixture2;
+		};
 		......
-		void Init(b2BodyId const& id_, float radius_ = 1.f);
-	} xxx;
+	};
 	......
 };
 
@@ -141,10 +141,13 @@ press ENTER to continue...)#";
 		std::string h, cpp;
 		static_assert(sizeof(pugi::char_t) == 1);
 
-		xx::Append(h, R"#(#pragma once
-#include "pch.h"	// #include <xx_box2d.h>  using XY = xx::XY;
+		xx::AppendFormat(h, R"#(#pragma once
+#include "pch.h"
+#include <xx_box2d.h>
 
-struct {)#");
+struct {0} {{
+  using XY = xx::XY;
+)#", xmlName);
 		
 		xx::AppendFormat(cpp, R"#(#include "pch.h"
 #include "{0}.h"
@@ -190,14 +193,12 @@ struct {)#");
 			if (anchorpoint.empty()) { std::cerr << "can't find <anchorpoint> in <bodydef><bodies><body>'s children\n"; return __LINE__; }
 			std::string_view anchorpoint_value = anchorpoint.text().as_string();
 			xx::AppendFormat(h, R"#(
-	struct {{
-		static constexpr XY anchorpoint{{ {0} };)#", anchorpoint_value);
+	struct {0} {{
+		void Init(b2BodyId const& id_, float radius_ = 1.f);
+		static constexpr XY anchorpoint{{ {1} };)#", name, anchorpoint_value);
 
 			auto fixtures = body->find_child([](auto& node_) { return strcmp(node_.name(), "fixtures") == 0; });
 			if (fixtures.empty()) { std::cerr << "can't find <fixtures> in <bodydef><bodies><body>'s children\n"; return __LINE__; }
-
-			xx::Append(h, R"#(
-		struct {)#");
 
 			xx::AppendFormat(cpp, R"#(
 void ::{0}::{1}::Init(b2BodyId const& id_, float radius_) {{
@@ -235,6 +236,7 @@ void ::{0}::{1}::Init(b2BodyId const& id_, float radius_) {{
 				bool isSensor_value = !isSensor.empty();
 
 				xx::AppendFormat(h, R"#(
+		struct fixture{7} {{
 			static constexpr float density{{ {0} };
 			static constexpr float friction{{ {1} };
 			static constexpr float restitution{{ {2} };
@@ -249,6 +251,7 @@ void ::{0}::{1}::Init(b2BodyId const& id_, float radius_) {{
 					, filter_groupIndex_value
 					, filter_maskBits_value
 					, isSensor_value ? "true":"false"
+					, j
 				);
 
 				xx::AppendFormat(cpp, R"#(
@@ -303,11 +306,11 @@ void ::{0}::{1}::Init(b2BodyId const& id_, float radius_) {{
 					std::string_view y = circle.attribute("y").as_string();
 					// todo
 					xx::AppendFormat(h, R"#(
-			static constexpr float circleRXY[] {{ {0}, {1}, {2} })#", r, x, y);
+			static constexpr float circleRXY[] {{ {0}, {1}, {2} };)#", r, x, y);
 					xx::AppendFormat(cpp, R"#(
 		{{
 			auto circle = b2Circle{{ .center = {{ ::{1}::{2}::fixture{0}::circleRXY[1], ::{1}::{2}::fixture{0}::circleRXY[2] }, .radius = ::{1}::{2}::fixture{0}::circleRXY[0] };
-			b2CreateCircleShape(b2body, &def, &circle);
+			b2CreateCircleShape(id_, &def, &circle);
 		})#", j, xmlName, name);
 				}
 				else {
@@ -315,22 +318,22 @@ void ::{0}::{1}::Init(b2BodyId const& id_, float radius_) {{
 					return __LINE__;
 				}
 
-				xx::AppendFormat(h, R"#(
-		} fixture{0};)#", j);
+				xx::Append(h, R"#(
+		};)#");
 				xx::Append(cpp, R"#(
 	})#");
 				++j;
 			}
 
-			xx::AppendFormat(h, R"#(
-	} {0};)#", name);
+			xx::Append(h, R"#(
+	};)#");
 			xx::Append(cpp, R"#(
 })#");
 		}
 
-		xx::AppendFormat(h, R"#(
-} {0};
-)#", xmlName);
+		xx::Append(h, R"#(
+};
+)#");
 
 #if 1
 		// save to file

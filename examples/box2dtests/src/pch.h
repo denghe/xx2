@@ -4,7 +4,7 @@
 #define _XX_GAME_PCH_
 
 #include <xx_game.h>
-#include <xx_grid2d_circle.h>
 #include <xx_box2d.h>
+#include <xx_grid2d_circle.h>
 
 #endif
