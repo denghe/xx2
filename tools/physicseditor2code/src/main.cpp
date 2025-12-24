@@ -146,11 +146,22 @@ press ENTER to continue...)#";
 #include <xx_box2d.h>
 
 struct {0} {{
-  using XY = xx::XY;
+	using XY = xx::XY;
+	static void MakePolygon(b2BodyId const& id_, b2ShapeDef& def_, XY const* data_, size_t len_, float scale_);
 )#", xmlName);
 		
 		xx::AppendFormat(cpp, R"#(#include "pch.h"
 #include "{0}.h"
+
+void ::_phys::MakePolygon(b2BodyId const& id_, b2ShapeDef& def_, XY const* data_, size_t len_, float scale_) {{
+	auto buf = (XY*)alloca(len_ * sizeof(XY));
+	for (int32_t i = 0; i < len_; ++i) {{
+		buf[i] = data_[i] * scale_;
+	}
+	auto hull = b2ComputeHull((b2Vec2*)buf, len_);
+	auto polygon = b2MakePolygon(&hull, 1);
+	b2CreatePolygonShape(id_, &def_, &polygon);
+};
 )#", xmlName);
 		
 		pugi::xml_document doc;
@@ -194,14 +205,14 @@ struct {0} {{
 			std::string_view anchorpoint_value = anchorpoint.text().as_string();
 			xx::AppendFormat(h, R"#(
 	struct {0} {{
-		void Init(b2BodyId const& id_, float radius_ = 1.f);
+		static void Init(b2BodyId const& id_, float radius_ = 1.f);
 		static constexpr XY anchorpoint{{ {1} };)#", name, anchorpoint_value);
 
 			auto fixtures = body->find_child([](auto& node_) { return strcmp(node_.name(), "fixtures") == 0; });
 			if (fixtures.empty()) { std::cerr << "can't find <fixtures> in <bodydef><bodies><body>'s children\n"; return __LINE__; }
 
 			xx::AppendFormat(cpp, R"#(
-void ::{0}::{1}::Init(b2BodyId const& id_, float radius_) {{
+void ::{0}::{1}::Init(b2BodyId const& id_, float scale_) {{
 	auto def = b2DefaultShapeDef();)#", xmlName, name);
 
 			int j{1};
@@ -280,19 +291,15 @@ void ::{0}::{1}::Init(b2BodyId const& id_, float radius_) {{
 
 						std::string_view sv = polygon->text().as_string();
 						do {
-							auto x = xx::SvToNumber( xx::Trim(xx::SplitOnce(sv, ",")), 0.f) / ptm_ratio_value;
-							auto y = xx::SvToNumber( xx::Trim(xx::SplitOnce(sv, ",")), 0.f) / ptm_ratio_value;
+							auto x = xx::SvToNumber(xx::Trim(xx::SplitOnce(sv, ",")), 0.f);// / ptm_ratio_value;
+							auto y = xx::SvToNumber(xx::Trim(xx::SplitOnce(sv, ",")), 0.f);// / ptm_ratio_value;
 							xx::AppendFormat(h, "{{ {0}, {1} }, ", x, -y);	// flip y
 						} while (sv.size());
 						h.resize(h.size() - 2);	// remove last ", "
 						xx::Append(h, "};");
 
 						xx::AppendFormat(cpp, R"#(
-		{{
-			auto hull = b2ComputeHull((b2Vec2*)::{1}::{2}::fixture{0}::polygons{3}, _countof(::{1}::{2}::fixture{0}::polygons{3}));
-			auto polygon = b2MakePolygon(&hull, radius_);
-			b2CreatePolygonShape(id_, &def, &polygon);
-		})#", j, xmlName, name, i);
+		MakePolygon(id_, def, ::{1}::{2}::fixture{0}::polygons{3}, _countof(::{1}::{2}::fixture{0}::polygons{3}), scale_);)#", j, xmlName, name, i);
 
 					}
 
@@ -304,12 +311,12 @@ void ::{0}::{1}::Init(b2BodyId const& id_, float radius_) {{
 					std::string_view r = circle.attribute("r").as_string();
 					std::string_view x = circle.attribute("x").as_string();
 					std::string_view y = circle.attribute("y").as_string();
-					// todo
 					xx::AppendFormat(h, R"#(
 			static constexpr float circleRXY[] {{ {0}, {1}, {2} };)#", r, x, y);
+					// todo: call MakeCircle
 					xx::AppendFormat(cpp, R"#(
 		{{
-			auto circle = b2Circle{{ .center = {{ ::{1}::{2}::fixture{0}::circleRXY[1], ::{1}::{2}::fixture{0}::circleRXY[2] }, .radius = ::{1}::{2}::fixture{0}::circleRXY[0] };
+			auto circle = b2Circle{{ .center = {{ ::{1}::{2}::fixture{0}::circleRXY[1] * scale_, ::{1}::{2}::fixture{0}::circleRXY[2] * scale_ }, .radius = ::{1}::{2}::fixture{0}::circleRXY[0] * scale_ };
 			b2CreateCircleShape(id_, &def, &circle);
 		})#", j, xmlName, name);
 				}

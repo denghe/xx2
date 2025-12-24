@@ -10,7 +10,7 @@ namespace Test2 {
 		xx::Frame frame;
 		xx::B2Body b2body;
 		float scale{};
-		void Init(Scene* scene_, XY pos_, float scale_ = 1);
+		float Init(Scene* scene_, XY pos_, float scale_ = 1);
 		bool Update();
 		void Draw();
 	};
@@ -29,6 +29,10 @@ namespace Test2 {
 		xx::Shared<xx::Node> ui;
 		xx::Camera cam;
 		float time{}, timePool{}, timeScale{ 1 };
+
+		// todo
+		typedef void (*InitFunc)(b2BodyId const&, float);
+		xx::List<std::pair<xx::Frame, InitFunc>> frameAndFuncs;
 
 		xx::B2World b2world;
 		xx::List<xx::Shared<SceneItem1>> item1s;

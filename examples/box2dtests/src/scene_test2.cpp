@@ -4,9 +4,8 @@
 
 namespace Test2 {
 
-	void SceneItem1::Init(Scene* scene_, XY pos_, float scale_) {
+	float SceneItem1::Init(Scene* scene_, XY pos_, float scale_) {
 		scene = scene_;
-		frame = gg.fs._10;
 		scale = scale_;
 
 		auto bodyDef = b2DefaultBodyDef();
@@ -17,50 +16,10 @@ namespace Test2 {
 		bodyDef.linearVelocity = { 1000.f, 0 };
 		b2body.InitDef(scene_->b2world, bodyDef);
 
-#if 1
-		xx::List<XY> polys;
-		auto AddPoly = [&](auto polydata_, size_t len_, auto& shapeDef)->void {
-			polys.Clear();
-			for (size_t i = 0; i < len_ / 2; ++i) polys.Add(((XY*)polydata_)[i].FlipY() * scale_);
-			auto hull = b2ComputeHull((b2Vec2*)polys.buf, polys.len);
-			auto polygon = b2MakePolygon(&hull, 1);
-			b2CreatePolygonShape(b2body, &shapeDef, &polygon);
-		};
-
-		static constexpr float polygons1[] = { 44.0000, -189.0000, 68.0000, -185.0000, 97.0000, -168.0000, 134.0000, -117.0000, 154.0000, 113.0000, 83.0000, 126.0000, 31.0000, -124.0000, 29.0000, -172.0000 };
-		static constexpr float polygons2[] = { -276.0000, 108.0000, -289.0000, 75.0000, -289.0000, 48.0000, -283.0000, 13.0000, -174.0000, -66.0000, -167.0000, 61.0000, -218.0000, 105.0000, -244.0000, 116.0000 };
-		static constexpr float polygons3[] = { -153.0000, -90.0000, -152.0000, -112.0000, -130.0000, -145.0000, -113.0000, -159.0000, -77.0000, -156.0000, -51.0000, -134.0000, -36.0000, -112.0000, -121.0000, -68.0000 };
-		static constexpr float polygons4[] = { 292.0000, 6.0000, 284.0000, 28.0000, 215.0000, 84.0000, 154.0000, 113.0000, 134.0000, -117.0000, 209.0000, -89.0000, 254.0000, -60.0000, 284.0000, -13.0000 };
-		static constexpr float polygons5[] = { -147.0000, 96.0000, -146.0000, 78.0000, -124.0000, 59.0000, 83.0000, 126.0000, 43.0000, 170.0000, -37.0000, 177.0000, -138.0000, 105.0000 };
-		static constexpr float polygons6[] = { 10.0000, 189.0000, -37.0000, 177.0000, 43.0000, 170.0000 };
-		static constexpr float polygons7[] = { 286.0000, -31.0000, 284.0000, -13.0000, 254.0000, -60.0000 };
-		static constexpr float polygons8[] = { -36.0000, -112.0000, 31.0000, -124.0000, 83.0000, 126.0000, -124.0000, 59.0000, -121.0000, -68.0000 };
-		static constexpr float polygons9[] = { -267.0000, -111.0000, -247.0000, -110.0000, -223.0000, -101.0000, -174.0000, -66.0000, -283.0000, 13.0000, -292.0000, -59.0000, -281.0000, -104.0000 };
-		static constexpr float polygons10[] = { -137.0000, -63.0000, -121.0000, -68.0000, -124.0000, 59.0000, -143.0000, 54.0000 };
-		static constexpr float polygons11[] = { -174.0000, -66.0000, -137.0000, -63.0000, -143.0000, 54.0000, -167.0000, 61.0000 };
-
-		auto def = b2DefaultShapeDef();
-		def.material.restitution = 1.1f;
-		def.material.friction = 1.f;
-		//def.material.rollingResistance = 0.02f;
-		//def.density = 50.0f;
-
-		AddPoly(polygons1, _countof(polygons1), def);
-		AddPoly(polygons2, _countof(polygons2), def);
-		AddPoly(polygons3, _countof(polygons3), def);
-		AddPoly(polygons4, _countof(polygons4), def);
-		AddPoly(polygons5, _countof(polygons5), def);
-		AddPoly(polygons6, _countof(polygons6), def);
-		AddPoly(polygons7, _countof(polygons7), def);
-		AddPoly(polygons8, _countof(polygons8), def);
-		AddPoly(polygons9, _countof(polygons9), def);
-		AddPoly(polygons10, _countof(polygons10), def);
-		AddPoly(polygons11, _countof(polygons11), def);
-#else
-		auto def = b2DefaultShapeDef();
-		auto circle = b2Circle{ .center = {}, .radius = 100.f };
-		b2CreateCircleShape(b2body, &def, &circle);
-#endif
+		auto& ff = gg.rnd.NextElement(scene_->frameAndFuncs);
+		frame = ff.first;
+		ff.second(b2body, scale_);
+		return frame.uvRect.h * scale_;
 	}
 
 	bool SceneItem1::Update() {
@@ -70,11 +29,7 @@ namespace Test2 {
 
 	void SceneItem1::Draw() {
 		auto [p, r] = b2body.GetPosRadians();
-#if 1
 		gg.Quad().DrawFrame(frame, scene->cam.ToGLPos(p), scale * scene->cam.scale, r);
-#else
-		gg.Quad().DrawFrame(gg.fs.circle256, scene->cam.ToGLPos(p), scale * 100.f * 2.f / 256.f * scene->cam.scale, r);
-#endif
 	}
 
 	/***************************************************************************************/
@@ -105,7 +60,7 @@ namespace Test2 {
 		cam.Init(gg.scale, 0.3f);
 		ui.Emplace()->InitRoot(gg.scale * cUIScale);
 
-		//b2SetLengthUnitsPerMeter(1);
+		//b2SetLengthUnitsPerMeter(_phys::ptm_ratio);
 		auto def = b2DefaultWorldDef();
 		def.gravity = { 1000, 0 };
 		def.maximumLinearSpeed = 1000;
@@ -114,7 +69,52 @@ namespace Test2 {
 		//def.contactDampingRatio = 10;
 		//def.contactSpeed = 0.5;
 		b2world.InitDef(def, 1);
-		item2.Init(this, {}, 100);
+
+		frameAndFuncs.Adds({
+			{gg.fs._10, _phys::_10::Init},
+			{gg.fs._110, _phys::_110::Init},
+			{gg.fs._123, _phys::_123::Init},
+			{gg.fs._128, _phys::_128::Init},
+			{gg.fs._138, _phys::_138::Init},
+			{gg.fs._14, _phys::_14::Init},
+			{gg.fs._147, _phys::_147::Init},
+			{gg.fs._168, _phys::_168::Init},
+			{gg.fs._17, _phys::_17::Init},
+			{gg.fs._18, _phys::_18::Init},
+			{gg.fs._192, _phys::_192::Init},
+			{gg.fs._206, _phys::_206::Init},
+			{gg.fs._243, _phys::_243::Init},
+			{gg.fs._244, _phys::_244::Init},
+			{gg.fs._26, _phys::_26::Init},
+			{gg.fs._283, _phys::_283::Init},
+			{gg.fs._285, _phys::_285::Init},
+			{gg.fs._288, _phys::_288::Init},
+			{gg.fs._296, _phys::_296::Init},
+			{gg.fs._303, _phys::_303::Init},
+			{gg.fs._309, _phys::_309::Init},
+			{gg.fs._402, _phys::_402::Init},
+			{gg.fs._407, _phys::_407::Init},
+			{gg.fs._408, _phys::_408::Init},
+			{gg.fs._415, _phys::_415::Init},
+			{gg.fs._421, _phys::_421::Init},
+			{gg.fs._422, _phys::_422::Init},
+			{gg.fs._443, _phys::_443::Init},
+			{gg.fs._449, _phys::_449::Init},
+			{gg.fs._458, _phys::_458::Init},
+			{gg.fs._461, _phys::_461::Init},
+			{gg.fs._462, _phys::_462::Init},
+			{gg.fs._463, _phys::_463::Init},
+			{gg.fs._464, _phys::_464::Init},
+			{gg.fs._467, _phys::_467::Init},
+			{gg.fs._470, _phys::_470::Init},
+			{gg.fs._472, _phys::_472::Init},
+			{gg.fs._51, _phys::_51::Init},
+			{gg.fs._75, _phys::_75::Init},
+			{gg.fs._98, _phys::_98::Init},
+			// ...
+		});
+
+		item2.Init(this, {}, 200);
 	}
 
 	void Scene::Gen(int32_t num_) {
@@ -122,11 +122,11 @@ namespace Test2 {
 			XY pos;
 			pos.x = -3500;
 			pos.y = lastGenY;
-			lastGenY += 150.f;
+			auto h = item1s.Emplace().Emplace()->Init(this, pos, 0.3);
+			lastGenY += h + 10.f;
 			if (lastGenY >= 1500) {
 				lastGenY = -1500.f;
 			}
-			item1s.Emplace().Emplace()->Init(this, pos, 0.3);
 		}
 	}
 
