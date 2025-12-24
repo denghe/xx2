@@ -5,8 +5,10 @@
 * XMLFileName.h
 
 #pragma once
-#include "pch.h"
+#include "pch.h"	// #include <xx_box2d.h>  using XY = xx::XY;
+
 struct XMLFileName {
+	static constexpr float ptm_ratio{ ? };
 	struct {
 		static constexpr XY anchorpoint{ ?,? };
 		struct {
@@ -32,10 +34,9 @@ struct XMLFileName {
 			static constexpr float r{ ? }, x{ ? }, y{ ? };	// CIRCLE
 		} fixture2;
 		......
-		void Init(b2BodyId const& id_, b2ShapeDef& def_, float radius_ = 1.f);
+		void Init(b2BodyId const& id_, float radius_ = 1.f);
 	} xxx;
 	......
-	static constexpr float ptm_ratio{ ? };
 };
 
 * template
@@ -44,16 +45,21 @@ struct XMLFileName {
 #include "pch.h"
 #include "XMLFileName.h"
 
-void ::XMLFileName::xxx::Init(b2BodyId const& id_, b2ShapeDef& def_, float radius_) {
+void ::XMLFileName::xxx::Init(b2BodyId const& id_, float radius_) {
+	auto def = b2DefaultShapeDef();
 	// fixture1
 	{
-		auto hull = b2ComputeHull((b2Vec2*)::XMLFileName::xxx::polys.buf, _countof(::XMLFileName::xxx::polys.buf));
-		auto polygon = b2MakePolygon(&hull, radius_);
 		def.density = ::XMLFileName::xxx::fixture1::density;
 		def.material.friction = ::XMLFileName::xxx::fixture1::friction;
 		def.material.restitution = ::XMLFileName::xxx::fixture1::restitution;
 		// todo: filter_categoryBits  filter_groupIndex  filter_maskBits  isSensor
-		b2CreatePolygonShape(id_, &def_, &polygon);
+
+		{
+			auto hull = b2ComputeHull((b2Vec2*)::XMLFileName::xxx::polys.buf, _countof(::XMLFileName::xxx::polys.buf));
+			auto polygon = b2MakePolygon(&hull, radius_);
+			b2CreatePolygonShape(id_, &def, &polygon);
+		}
+		......
 	}
 	......
 }
@@ -127,17 +133,22 @@ press ENTER to continue...)#";
 		xx::Data fd;
 		if (int r = xx::ReadAllBytes(p, fd)) {
 			std::cerr << "ReadAllBytes failed. r = " << r << " fn = " << p << std::endl;
-			return -__LINE__;
+			return __LINE__;
 		}
 
 		std::cout << "\nhandle file: " << fullPath << std::endl;
 
-		std::string h;
+		std::string h, cpp;
 		static_assert(sizeof(pugi::char_t) == 1);
 
 		xx::Append(h, R"#(#pragma once
-#include "pch.h"
+#include "pch.h"	// #include <xx_box2d.h>  using XY = xx::XY;
+
 struct {)#");
+		
+		xx::AppendFormat(cpp, R"#(#include "pch.h"
+#include "{0}.h"
+)#", xmlName);
 		
 		pugi::xml_document doc;
 		if (auto&& r = doc.load_buffer(fd.buf, fd.len); r.status) { std::cerr << "load_buffer error : " << r.description() << std::endl; return __LINE__; }
@@ -169,8 +180,11 @@ struct {)#");
 		for (auto body = bodies_children.begin(); body != bodies_children.end(); ++body) {
 			if(strcmp(body->name(), "body")) { std::cerr << "<bodydef><bodies>'s children 's name isn't <body> ??\n"; return __LINE__; }
 			
-			std::string_view name = body->attribute("name").as_string();
+			std::string name = body->attribute("name").as_string();
 			if (!name.size()) { std::cerr << "<bodydef><bodies><body name= empty ??\n"; return __LINE__; }
+			if (name[0] >= '0' && name[0] <= '9') {
+				name = "_" + name;
+			}
 
 			auto anchorpoint = body->find_child([](auto& node_) { return strcmp(node_.name(), "anchorpoint") == 0; });
 			if (anchorpoint.empty()) { std::cerr << "can't find <anchorpoint> in <bodydef><bodies><body>'s children\n"; return __LINE__; }
@@ -185,7 +199,11 @@ struct {)#");
 			xx::Append(h, R"#(
 		struct {)#");
 
-			int j{};
+			xx::AppendFormat(cpp, R"#(
+void ::{0}::{1}::Init(b2BodyId const& id_, float radius_) {{
+	auto def = b2DefaultShapeDef();)#", xmlName, name);
+
+			int j{1};
 			auto fixtures_children = fixtures.children();
 			for (auto fixture = fixtures_children.begin(); fixture != fixtures_children.end(); ++fixture) {
 
@@ -233,6 +251,15 @@ struct {)#");
 					, isSensor_value ? "true":"false"
 				);
 
+				xx::AppendFormat(cpp, R"#(
+	// fixture{0}
+	{{
+		def.density = ::{1}::{2}::fixture{0}::density;
+		def.material.friction = ::{1}::{2}::fixture{0}::friction;
+		def.material.restitution = ::{1}::{2}::fixture{0}::restitution;)#"
+					, j, xmlName, name);
+		// todo: filter_categoryBits  filter_groupIndex  filter_maskBits  isSensor
+
 				auto fixture_type = fixture->find_child([](auto& node_) { return strcmp(node_.name(), "fixture_type") == 0; });
 				if (fixture_type.empty()) { std::cerr << "can't find <fixture_type> in <bodydef><bodies><body><fixtures><fixture>'s children\n"; return __LINE__; }
 				std::string_view fixture_type_value = fixture_type.text().as_string();
@@ -243,8 +270,10 @@ struct {)#");
 					int i{};
 					for (auto polygon = polygons_children.begin(); polygon != polygons_children.end(); ++polygon) {
 						if (strcmp(polygon->name(), "polygon")) { std::cerr << "<bodydef><bodies><body><fixtures><fixture><polygons>'s children 's name isn't <polygon> ??\n" << std::endl; return __LINE__; }
+
+						++i;
 						xx::AppendFormat(h, R"#(
-			static constexpr XY polygons{0}[] {{)#", ++i);
+			static constexpr XY polygons{0}[] {{)#", i);
 
 						std::string_view sv = polygon->text().as_string();
 						do {
@@ -254,7 +283,17 @@ struct {)#");
 						} while (sv.size());
 						h.resize(h.size() - 2);	// remove last ", "
 						xx::Append(h, "};");
+
+						xx::AppendFormat(cpp, R"#(
+		{{
+			auto hull = b2ComputeHull((b2Vec2*)::{1}::{2}::fixture{0}::polygons{3}, _countof(::{1}::{2}::fixture{0}::polygons{3}));
+			auto polygon = b2MakePolygon(&hull, radius_);
+			b2CreatePolygonShape(id_, &def, &polygon);
+		})#", j, xmlName, name, i);
+
 					}
+
+
 				}
 				else if (fixture_type_value == "CIRCLE") {
 					auto circle = fixture->find_child([](auto& node_) { return strcmp(node_.name(), "circle") == 0; });
@@ -263,39 +302,55 @@ struct {)#");
 					std::string_view x = circle.attribute("x").as_string();
 					std::string_view y = circle.attribute("y").as_string();
 					// todo
+					xx::AppendFormat(h, R"#(
+			static constexpr float circleRXY[] {{ {0}, {1}, {2} })#", r, x, y);
+					xx::AppendFormat(cpp, R"#(
+		{{
+			auto circle = b2Circle{{ .center = {{ ::{1}::{2}::fixture{0}::circleRXY[1], ::{1}::{2}::fixture{0}::circleRXY[2] }, .radius = ::{1}::{2}::fixture{0}::circleRXY[0] };
+			b2CreateCircleShape(b2body, &def, &circle);
+		})#", j, xmlName, name);
 				}
 				else {
 					std::cerr << "wrong fixture_type.value:" << fixture_type_value << std::endl;
 					return __LINE__;
 				}
+
 				xx::AppendFormat(h, R"#(
-		} fixture{0};)#", ++j);
+		} fixture{0};)#", j);
+				xx::Append(cpp, R"#(
+	})#");
+				++j;
 			}
 
-			std::string n;
-			if (name[0] >= '0' && name[0] <= '9') {
-				xx::Append(n, '_', name);
-			}
-			else {
-				xx::Append(n, name);
-			}
 			xx::AppendFormat(h, R"#(
-	} {0};)#", n);
+	} {0};)#", name);
+			xx::Append(cpp, R"#(
+})#");
 		}
 
 		xx::AppendFormat(h, R"#(
 } {0};
 )#", xmlName);
 
-#if 0
+#if 1
 		// save to file
-		auto outPath = fullPath.substr(0, fullPath.size() - 4) + ".h";
-		if (int r = xx::WriteAllBytes((std::u8string&)outPath, h.data(), h.size())) {
-			std::cerr << "write file failed! r = " << r << std::endl;
-			return -__LINE__;
+		{
+			auto outPath = fullPath.substr(0, fullPath.size() - 4) + ".h";
+			if (int r = xx::WriteAllBytes((std::u8string&)outPath, h.data(), h.size())) {
+				std::cerr << "write file failed! r = " << r << std::endl;
+				return __LINE__;
+			}
+		}
+		{
+			auto outPath = fullPath.substr(0, fullPath.size() - 4) + ".cpp";
+			if (int r = xx::WriteAllBytes((std::u8string&)outPath, cpp.data(), cpp.size())) {
+				std::cerr << "write file failed! r = " << r << std::endl;
+				return __LINE__;
+			}
 		}
 #else
 		xx::CoutN(h);
+		xx::CoutN(cpp);
 #endif
 	}
 

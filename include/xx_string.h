@@ -67,12 +67,14 @@ namespace xx {
                             }
                             goto LabEnd;
                         }
-                        else {
+                        else if (c < '0' || c > '9') {
+                            return -1;  // error
+                        } else {
                             i = i * 10 + (c - '0');
                         }
                         ++offset;
+                        goto LabLoop;
                     }
-                    goto LabLoop;
                 LabEnd:;
                 }
             }
