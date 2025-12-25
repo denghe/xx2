@@ -7,7 +7,7 @@ XX_INLINE void ::_phys::MakePolygon(b2BodyId const& id_, b2ShapeDef& def_, float
 		buf[i] = data_[i] * scale_;
 	}
 	auto hull = b2ComputeHull((b2Vec2*)buf, len_);
-	auto polygon = b2MakePolygon(&hull, 1);
+	auto polygon = b2MakePolygon(&hull, 0);
 	b2CreatePolygonShape(id_, &def_, &polygon);
 };
 

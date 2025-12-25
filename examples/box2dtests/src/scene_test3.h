@@ -9,16 +9,19 @@ namespace Test3 {
 		Scene* scene{};
 		xx::Frame frame;
 		xx::B2Body b2body;
+		int32_t indexAtContainer{-1};
 		float scale{};
+		bool isDead{};
 		float Init(Scene* scene_, XY pos_, float scale_ = 1);
 		bool Update();
 		void Draw();
+		void Dispose();	// unsafe
 	};
 
 	struct SceneItem2 {
 		Scene* scene{};
 		float radius{};
-		xx::B2Body b2body;
+		XY pos{};
 		void Init(Scene* scene_, XY pos_, float radius_);
 		bool Update();
 		void Draw();
@@ -37,6 +40,7 @@ namespace Test3 {
 		xx::B2World b2world;
 		xx::List<xx::Shared<SceneItem1>> item1s;
 		SceneItem2 item2;	// mouse
+		xx::List<SceneItem1*> tmp;	// for delete
 
 		float genTimer{};
 		float lastGenY{};

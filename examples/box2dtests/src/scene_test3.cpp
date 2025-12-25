@@ -9,6 +9,8 @@ namespace Test3 {
 	float SceneItem1::Init(Scene* scene_, XY pos_, float scale_) {
 		scene = scene_;
 		scale = scale_;
+		indexAtContainer = scene->item1s.len - 1;
+		assert(scene->item1s[indexAtContainer].pointer == this);
 
 		auto bodyDef = b2DefaultBodyDef();
 		bodyDef.type = b2_dynamicBody;
@@ -16,11 +18,13 @@ namespace Test3 {
 		bodyDef.angularDamping = 1.f;
 		//bodyDef.gravityScale = 2.f;
 		bodyDef.linearVelocity = { 1000.f, 0 };
+		bodyDef.userData = this;
 		b2body.InitDef(scene_->b2world, bodyDef);
 
 		auto& ff = gg.rnd.NextElement(scene_->frameAndFuncs);
 		frame = *ff.first;
 		ff.second(b2body, scale_);
+
 		return frame.uvRect.h * scale_;
 	}
 
@@ -34,28 +38,58 @@ namespace Test3 {
 		gg.Quad().DrawFrame(frame, scene->cam.ToGLPos(p), scale * scene->cam.scale, r);
 	}
 
+	void SceneItem1::Dispose() {
+		auto i = indexAtContainer;
+		assert(scene->item1s[i].pointer == this);
+		scene->item1s.Back()->indexAtContainer = i;
+		indexAtContainer = -1;
+		scene->item1s.SwapRemoveAt(i);
+	}
+
 	/***************************************************************************************/
 
 
 	void SceneItem2::Init(Scene* scene_, XY pos_, float radius_) {
 		scene = scene_;
 		radius = radius_;
-		b2body.InitTypePos(scene_->b2world, pos_, b2_staticBody);
-		auto def = b2DefaultShapeDef();
-		auto circle = b2Circle{ .center = {}, .radius = radius_ };
-		b2CreateCircleShape(b2body, &def, &circle);
 	}
 
 	bool SceneItem2::Update() {
-		// todo: follow mouse?
 		auto mp = scene->cam.ToLogicPos(gg.mousePos);// .FlipY();
-		b2Body_SetTransform(b2body, (b2Vec2&)mp, {1,0});
+		pos = mp;
+
+		// search mouse pose fish & delete
+
+		b2Circle circle = {
+			.center = (b2Vec2&)pos,
+			.radius = radius,
+		};
+		auto proxy = b2MakeProxy(&circle.center, 1, circle.radius);
+
+		b2World_OverlapShape(scene->b2world, &proxy, b2DefaultQueryFilter(), [](b2ShapeId shapeId, void* context)->bool {
+			auto scene = (Scene*)context;
+			auto bodyId = b2Shape_GetBody(shapeId);
+			xx::CoutN(
+				"shapeId.generation = ", shapeId.generation
+				, " shapeId.index1 = ", shapeId.index1
+				, " bodyId.generation = ", bodyId.generation
+				, " bodyId.index1 = ", bodyId.index1);
+			auto item = (SceneItem1*)b2Body_GetUserData(bodyId);
+			if (item->isDead) return true;	// 1 body N shape
+			item->isDead = true;
+			scene->tmp.Add(item);
+			return true;	// true: continue search
+		}, scene);
+
+		auto& os = scene->item1s;
+		for (auto o : scene->tmp) o->Dispose();
+		scene->tmp.Clear();
+
 		return false;
 	}
 
 	void SceneItem2::Draw() {
-		auto [p, r] = b2body.GetPosRadians();
-		gg.Quad().DrawFrame(gg.fs.circle256, scene->cam.ToGLPos(p), radius * 2.f / 256.f * scene->cam.scale, r);
+		gg.Quad().DrawFrame(gg.fs.circle256, scene->cam.ToGLPos(pos), radius * 2.f / 256.f * scene->cam.scale);
 	}
 
 	/***************************************************************************************/
@@ -157,16 +191,17 @@ namespace Test3 {
 		item2.Update();
 
 		for (auto i = item1s.len - 1; i >= 0; --i) {
-			if (item1s[i]->Update()) item1s.SwapRemoveAt(i);
+			auto& o = item1s[i];
+			if (o->Update()) o->Dispose();
 		}
 
 		b2world.Step();
 
 #if 1
 		if (genTimer < time) {
-			genTimer += 0.1;
+			genTimer += 0.2;
 			Gen(5);
-			xx::CoutN("num items = ", item1s.len);
+			//xx::CoutN("num items = ", item1s.len);
 		}
 #endif
 	}

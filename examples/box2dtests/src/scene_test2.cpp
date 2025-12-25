@@ -45,7 +45,6 @@ namespace Test2 {
 	}
 
 	bool SceneItem2::Update() {
-		// todo: follow mouse?
 		auto mp = scene->cam.ToLogicPos(gg.mousePos);// .FlipY();
 		b2Body_SetTransform(b2body, (b2Vec2&)mp, {1,0});
 		return false;
