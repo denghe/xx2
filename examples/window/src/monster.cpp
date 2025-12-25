@@ -40,8 +40,8 @@ void Monster::AnimBounce() {
 	XX_END(_2);
 }
 
-void Monster::Init(xx::Shared<xx::GLTexture> tex_) {
-	tex = std::move(tex_);
+void Monster::Init(xx::Frame tex_) {
+	frame = std::move(tex_);
 	scale = 1.f;
 }
 
@@ -57,7 +57,5 @@ void Monster::Update() {
 }
 
 void Monster::Draw() {
-	auto& t = *gg.res.heart;
-	gg.Quad().Draw(t, t.Rect(), gg.cam.ToGLPos({}), 0.5f
-		, 20.f * scale * gg.cam.scale, 0, 1, cColors[colorIndex]);
+	gg.Quad().DrawFrame(frame, gg.cam.ToGLPos({}), 20.f * scale * gg.cam.scale, 0, 1, cColors[colorIndex]);
 }

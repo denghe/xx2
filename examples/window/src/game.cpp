@@ -15,7 +15,30 @@ void Game::Init() {
 
 void Game::GLInit() {
 	// load res
-	res.heart = LoadTexture("res/heart.png");
+	res.imgs[0] = LoadTexture("res/heart.png");
+	res.imgs[1] = LoadTexture("res/1.png");
+	res.imgs[2] = LoadTexture("res/2.png");
+
+	// combine all.frames
+	xx::RectPacker tp;
+	for (int32_t i = 0; i < sizeof(res) / sizeof(xx::Frame); ++i) {
+		tp.tfs.Add((xx::TinyFrame*)&((xx::Frame*)&res)[i]);
+	}
+	tp.AutoPack();
+
+
+	auto ds = designSize / 2;
+	int idx{};
+	for (size_t i = 0; i < 30000; i++) {
+		auto& spr = sprites.Emplace();
+		spr.frame = res.imgs[idx];
+		spr.pos.x = rnd.Next(-ds.x, ds.x);
+		spr.pos.y = rnd.Next(-ds.y, ds.y);
+		++idx;
+		if (idx == res.imgs.size()) idx = 0;
+	}
+
+
 
 	// init cam
 	cam.Init(scale, 1.f, {});
@@ -34,7 +57,7 @@ void Game::GLInit() {
 	};
 
 	// init logic
-	heart.Emplace()->Init(res.heart);
+	heart.Emplace()->Init(res.imgs[0]);
 }
 
 void Game::Update() {
@@ -70,12 +93,14 @@ void Game::Update() {
 	heart->Update();
 
 	// draw
+	for (auto& spr : sprites) Quad().DrawFrame(spr.frame, cam.ToGLPos(spr.pos), cam.scale);
+
 	heart->Draw();
 	DrawNode(ui);
 }
 
 void Game::Delay() {
-#if 1
+#if 0
 	// for power saving, fps limit
 	SleepSecs(cDelta - (glfwGetTime() - time));
 #endif
