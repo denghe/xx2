@@ -71,6 +71,15 @@ void Game::GLInit() {
 	fs._75 = LoadTexture("res/75.png");
 	fs._98 = LoadTexture("res/98.png");
 
+	// combine all.frames & spines.framess
+	xx::RectPacker tp;
+	for (int32_t i = 0; i < sizeof(fs) / sizeof(xx::Frame); ++i) {
+		tp.tfs.Add(((xx::Frame*)&fs)[i]);
+	}
+	tp.AutoPack();
+	tp.Tex().SetParm(GL_LINEAR, GL_CLAMP_TO_EDGE);
+
+
 	// init first scene
 	scene.Emplace<Scene_MainMenu>()->Init();
 }

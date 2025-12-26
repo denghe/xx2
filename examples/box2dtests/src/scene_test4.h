@@ -7,10 +7,12 @@ namespace Test4 {
 
 	struct SceneItem1 {
 		Scene* scene{};
+		SceneItem1* next{};
 		xx::Frame frame;
 		xx::B2Body b2body;
 		int32_t indexAtContainer{-1};
 		float scale{};
+		float y{};
 		bool isDead{};
 		float Init(Scene* scene_, XY pos_, float scale_ = 1);
 		bool Update();
@@ -33,18 +35,21 @@ namespace Test4 {
 		xx::Camera cam;
 		float time{}, timePool{}, timeScale{ 1 };
 
-		// todo
-		typedef void (*InitFunc)(b2BodyId const&, float);
-		xx::List<std::pair<xx::Frame*, InitFunc>> frameAndFuncs;
+		xx::List<std::pair<xx::Frame*, _phys::InitFunc>> frameAndFuncs;
 
 		xx::B2World b2world;
 		xx::List<xx::Shared<SceneItem1>> item1s;
 		SceneItem2 item2;	// mouse
 		xx::List<SceneItem1*> tmp;	// for delete
+		XY mapSize{};
 
-		float genTimer{};
+		float genTimer{}, logTimer{};
 		float lastGenY{};
 		void Gen(int32_t num_);
+
+		xx::List<SceneItem1*> sortContainer;				// for draw order by Y
+		void SortContainerAdd(SceneItem1* o);
+		void SortContainerDraw();
 
 		void Init();
 		void Update() override;

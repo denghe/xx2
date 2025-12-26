@@ -23,7 +23,7 @@ namespace Test3 {
 
 		auto& ff = gg.rnd.NextElement(scene_->frameAndFuncs);
 		frame = *ff.first;
-		ff.second(b2body, scale_);
+		ff.second(b2body, scale_, nullptr, "#\0");
 
 		return frame.uvRect.h * scale_;
 	}
@@ -69,11 +69,11 @@ namespace Test3 {
 		b2World_OverlapShape(scene->b2world, &proxy, b2DefaultQueryFilter(), [](b2ShapeId shapeId, void* context)->bool {
 			auto scene = (Scene*)context;
 			auto bodyId = b2Shape_GetBody(shapeId);
-			xx::CoutN(
-				"shapeId.generation = ", shapeId.generation
-				, " shapeId.index1 = ", shapeId.index1
-				, " bodyId.generation = ", bodyId.generation
-				, " bodyId.index1 = ", bodyId.index1);
+			//xx::CoutN(
+			//	"shapeId.generation = ", shapeId.generation
+			//	, " shapeId.index1 = ", shapeId.index1
+			//	, " bodyId.generation = ", bodyId.generation
+			//	, " bodyId.index1 = ", bodyId.index1);
 			auto item = (SceneItem1*)b2Body_GetUserData(bodyId);
 			if (item->isDead) return true;	// 1 body N shape
 			item->isDead = true;

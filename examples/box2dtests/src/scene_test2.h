@@ -30,9 +30,7 @@ namespace Test2 {
 		xx::Camera cam;
 		float time{}, timePool{}, timeScale{ 1 };
 
-		// todo
-		typedef void (*InitFunc)(b2BodyId const&, float);
-		xx::List<std::pair<xx::Frame*, InitFunc>> frameAndFuncs;
+		xx::List<std::pair<xx::Frame*, _phys::InitFunc>> frameAndFuncs;
 
 		xx::B2World b2world;
 		xx::List<xx::Shared<SceneItem1>> item1s;

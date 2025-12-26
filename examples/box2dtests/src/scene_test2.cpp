@@ -18,7 +18,9 @@ namespace Test2 {
 
 		auto& ff = gg.rnd.NextElement(scene_->frameAndFuncs);
 		frame = *ff.first;
-		ff.second(b2body, scale_);
+		auto def = b2DefaultShapeDef();
+		
+		ff.second(b2body, scale_, nullptr, "\0#");
 		return frame.uvRect.h * scale_;
 	}
 
@@ -123,7 +125,7 @@ namespace Test2 {
 			XY pos;
 			pos.x = -3500;
 			pos.y = lastGenY;
-			auto h = item1s.Emplace().Emplace()->Init(this, pos, gg.rnd.Next(0.2f, 0.7f));
+			auto h = item1s.Emplace().Emplace()->Init(this, pos, gg.rnd.Next(0.3f, 0.5f));
 			lastGenY += h + 10.f;
 			if (lastGenY >= 1500) {
 				lastGenY = -1500.f;
@@ -162,7 +164,7 @@ namespace Test2 {
 #if 1
 		if (genTimer < time) {
 			genTimer += 0.1;
-			Gen(5);
+			Gen(20);
 			xx::CoutN("num items = ", item1s.len);
 		}
 #endif

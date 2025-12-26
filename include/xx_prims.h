@@ -51,6 +51,15 @@ namespace xx {
         constexpr bool operator==(HasField_XY auto const& v) const { return memcmp(this, &v, sizeof(v)) == 0; }
         constexpr bool operator!=(HasField_XY auto const& v) const { return memcmp(this, &v, sizeof(v)) != 0; }
 
+        constexpr X_Y Add(IsArithmetic auto v) const { return { T(x + v), T(y + v) }; }
+        constexpr X_Y Add(IsArithmetic auto vx, IsArithmetic auto vy) const { return { T(x + vx), T(y + vy) }; }
+        constexpr X_Y AddX(IsArithmetic auto v) const { return { T(x + v), y }; }
+        constexpr X_Y AddY(IsArithmetic auto v) const { return { x, T(y + v) }; }
+        // ...
+        constexpr X_Y FlipY() const { return { x, -y }; }
+        constexpr X_Y FlipX() const { return { -x, y }; }
+        // ...
+
         constexpr void Reset() {
 			x = {};
 			y = {};
@@ -75,16 +84,6 @@ namespace xx {
 
         constexpr bool IsOutOfEdge(HasField_XY auto const& edge) const {
             return x < 0 || y < 0 || x >= edge.x || y >= edge.y;
-        }
-
-        template<typename R = T>
-        constexpr auto FlipY() const -> X_Y<R> {
-            return { R(x), R(-y) };
-        }
-
-        template<typename R = T>
-        constexpr auto FlipX() const -> X_Y<R> {
-            return { R(-x), R(y) };
         }
 
         template<typename R = T>

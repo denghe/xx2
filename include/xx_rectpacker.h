@@ -9,9 +9,10 @@
 
 	xx::RectPacker tp;
 	for (int32_t i = 0; i < sizeof(fs) / sizeof(xx::Frame); ++i) {
-		tp.tfs.Add((xx::TinyFrame*)&((xx::Frame*)&fs)[i]);
+		tp.tfs.Add(((xx::Frame*)&fs)[i]);
 	}
 	tp.AutoPack();
+	tp.Tex().SetParm(GL_LINEAR, GL_CLAMP_TO_EDGE);
 
 */
 

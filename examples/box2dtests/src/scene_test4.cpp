@@ -15,6 +15,7 @@ namespace Test4 {
 		auto bodyDef = b2DefaultBodyDef();
 		bodyDef.type = b2_dynamicBody;
 		bodyDef.position = (b2Vec2&)pos_;
+		y = pos_.y;
 		bodyDef.angularDamping = 1.f;
 		//bodyDef.gravityScale = 2.f;
 		bodyDef.linearVelocity = { 1000.f, 0 };
@@ -23,14 +24,17 @@ namespace Test4 {
 
 		auto& ff = gg.rnd.NextElement(scene_->frameAndFuncs);
 		frame = *ff.first;
-		ff.second(b2body, scale_);
+		ff.second(b2body, scale_, nullptr, "\0#");
 
 		return frame.uvRect.h * scale_;
 	}
 
 	bool SceneItem1::Update() {
-		auto p = b2body.GetPos();
-		return (p.x > 5000 || p.x < -5000 || p.y > 3000 || p.y < -3000);
+		auto trans = b2body.GetTransform();
+		auto& p = (XY&)trans.p;
+		y = p.y;
+		b2body.SetTransform(p.AddX(10), trans.q);
+		return (p.x >= scene->mapSize.x || p.x < 0 || p.y >= scene->mapSize.y || p.y < 0);
 	}
 
 	void SceneItem1::Draw() {
@@ -69,11 +73,11 @@ namespace Test4 {
 		b2World_OverlapShape(scene->b2world, &proxy, b2DefaultQueryFilter(), [](b2ShapeId shapeId, void* context)->bool {
 			auto scene = (Scene*)context;
 			auto bodyId = b2Shape_GetBody(shapeId);
-			xx::CoutN(
-				"shapeId.generation = ", shapeId.generation
-				, " shapeId.index1 = ", shapeId.index1
-				, " bodyId.generation = ", bodyId.generation
-				, " bodyId.index1 = ", bodyId.index1);
+			//xx::CoutN(
+			//	"shapeId.generation = ", shapeId.generation
+			//	, " shapeId.index1 = ", shapeId.index1
+			//	, " bodyId.generation = ", bodyId.generation
+			//	, " bodyId.index1 = ", bodyId.index1);
 			auto item = (SceneItem1*)b2Body_GetUserData(bodyId);
 			if (item->isDead) return true;	// 1 body N shape
 			item->isDead = true;
@@ -95,7 +99,9 @@ namespace Test4 {
 	/***************************************************************************************/
 
 	void Scene::Init() {
-		cam.Init(gg.scale, 0.3f);
+		mapSize = { 5500, 3000 };
+		cam.Init(gg.scale, gg.designSize.y / mapSize.y, mapSize / 2);
+		sortContainer.Resize<true>((int32_t)mapSize.y);
 		ui.Emplace()->InitRoot(gg.scale * cUIScale);
 
 		//b2SetLengthUnitsPerMeter(_phys::ptm_ratio);
@@ -158,12 +164,12 @@ namespace Test4 {
 	void Scene::Gen(int32_t num_) {
 		for (int i = 0; i < num_; ++i) {
 			XY pos;
-			pos.x = -3500;
+			pos.x = 1;
 			pos.y = lastGenY;
-			auto h = item1s.Emplace().Emplace()->Init(this, pos, gg.rnd.Next(0.2f, 0.7f));
+			auto h = item1s.Emplace().Emplace()->Init(this, pos, gg.rnd.Next(0.2f, 0.3f));
 			lastGenY += h + 10.f;
-			if (lastGenY >= 1500) {
-				lastGenY = -1500.f;
+			if (lastGenY >= mapSize.y) {
+				lastGenY = 0;
 			}
 		}
 	}
@@ -187,21 +193,27 @@ namespace Test4 {
 
 	void Scene::FixedUpdate() {
 
-		// todo: mouse circle?
+		// mouse circle
 		item2.Update();
 
+		// fishs
 		for (auto i = item1s.len - 1; i >= 0; --i) {
 			auto& o = item1s[i];
 			if (o->Update()) o->Dispose();
 		}
 
-		b2world.Step();
+		//b2world.Step();
 
 #if 1
 		if (genTimer < time) {
-			genTimer += 0.2;
-			Gen(5);
-			//xx::CoutN("num items = ", item1s.len);
+			genTimer += 0.01;
+			Gen(20);
+		}
+#endif
+#if 1
+		if (logTimer < time) {
+			logTimer += 1.f;
+			xx::CoutN("num items = ", item1s.len);
 		}
 #endif
 	}
@@ -210,7 +222,10 @@ namespace Test4 {
 		gg.Quad().DrawTinyFrame(gg.embed.shape_dot, 0, 0.5f, gg.windowSize, 0, 1, {38,194,208,255});
 		gg.Quad().DrawFrame(gg.fs.bg_fish, { 0, -200 }, cam.scale * 3.3);
 
-		for (auto& o : item1s) o->Draw();
+		// sort order by y. map y to 0 ~ 1080 ( design size.y ). FPS 3x faster than std::sort
+		for (auto& o : item1s) SortContainerAdd(o.pointer);
+		SortContainerDraw();
+
 		item2.Draw();
 
 		gg.GLBlendFunc(gg.blendDefault);
@@ -222,4 +237,23 @@ namespace Test4 {
 		cam.SetBaseScale(gg.scale);
 	}
 
+
+
+	XX_INLINE void Scene::SortContainerAdd(SceneItem1* o) {
+		//assert(o->y >= 0.f);
+		//assert(o->y < gg.designSize.y);
+		auto& slot = sortContainer[(int32_t)o->y];
+		o->next = slot;
+		slot = o;
+	}
+
+	XX_INLINE void Scene::SortContainerDraw() {
+		for (auto o : sortContainer) {
+			while (o) {
+				o->Draw();
+				o = o->next;
+			}
+		}
+		memset(sortContainer.buf, 0, sortContainer.len * sizeof(void*));
+	}
 }

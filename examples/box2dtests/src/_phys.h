@@ -4,18 +4,19 @@
 
 struct _phys {
 	using XY = xx::XY;
+	typedef void (*InitFunc)(b2BodyId const&, float, b2ShapeDef*, const char*);
 	static void MakePolygon(b2BodyId const& id_, b2ShapeDef& def_, float scale_, XY const* data_, size_t len_);
 	static void MakeCircle(b2BodyId const& id_, b2ShapeDef& def_, float scale_, float x_, float y_, float r_);
 
 	static constexpr float ptm_ratio{ 32 };		// need call b2SetLengthUnitsPerMeter(  ????  );
 
 	struct _10 {
-		static void Init(b2BodyId const& id_, float scale_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f, b2ShapeDef* def_ = nullptr, char const* fixturesMask_ = nullptr);
 		static constexpr XY anchorpoint{ 0.5000,0.5000 };
 		struct fixture1 {
-			static constexpr float density{ 1 };
-			static constexpr float friction{ 1 };
-			static constexpr float restitution{ 1.1 };
+			static constexpr float density{ 2 };
+			static constexpr float friction{ 0 };
+			static constexpr float restitution{ 0 };
 			static constexpr uint32_t filter_categoryBits{ 1 };
 			static constexpr uint32_t filter_groupIndex{ 0 };
 			static constexpr uint32_t filter_maskBits{ 65535 };
@@ -32,9 +33,21 @@ struct _phys {
 			static constexpr XY polygons10[] {{ -137, 63 }, { -121, 68 }, { -124, -59 }, { -143, -54 }};
 			static constexpr XY polygons11[] {{ -174, 66 }, { -137, 63 }, { -143, -54 }, { -167, -61 }};
 		};
+		struct fixture2 {
+			static constexpr float density{ 2 };
+			static constexpr float friction{ 0 };
+			static constexpr float restitution{ 0 };
+			static constexpr uint32_t filter_categoryBits{ 1 };
+			static constexpr uint32_t filter_groupIndex{ 0 };
+			static constexpr uint32_t filter_maskBits{ 65535 };
+			static constexpr bool isSensor{ false };
+			static constexpr XY polygons1[] {{ 44, 189 }, { 292, -6 }, { 24, -184 }, { -119, -120 }, { -124, -59 }};
+			static constexpr XY polygons2[] {{ -115, 158 }, { -5, 120 }, { -124, -59 }, { -229, -111 }, { -289, -75 }, { -289, -48 }, { -191, 77 }};
+			static constexpr XY polygons3[] {{ -267, 111 }, { -191, 77 }, { -289, -48 }};
+		};
 	};
 	struct _110 {
-		static void Init(b2BodyId const& id_, float scale_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f, b2ShapeDef* def_ = nullptr, char const* fixturesMask_ = nullptr);
 		static constexpr XY anchorpoint{ 0.5000,0.5000 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -52,9 +65,20 @@ struct _phys {
 			static constexpr XY polygons6[] {{ -186, 34 }, { -184, 66 }, { -178, 72 }, { -140, 66 }, { -120, 50 }, { -176, -4 }};
 			static constexpr XY polygons7[] {{ -90, -36 }, { -102, -24 }, { -108, 48 }, { -50, 84 }, { -12, 96 }};
 		};
+		struct fixture2 {
+			static constexpr float density{ 2 };
+			static constexpr float friction{ 0 };
+			static constexpr float restitution{ 0 };
+			static constexpr uint32_t filter_categoryBits{ 1 };
+			static constexpr uint32_t filter_groupIndex{ 0 };
+			static constexpr uint32_t filter_maskBits{ 65535 };
+			static constexpr bool isSensor{ false };
+			static constexpr XY polygons1[] {{ -86, 64 }, { -10, 138 }, { 184, 40 }, { 22, -138 }, { -110, -28 }};
+			static constexpr XY polygons2[] {{ -178, 72 }, { -86, 64 }, { -110, -28 }, { -180, -52 }};
+		};
 	};
 	struct _123 {
-		static void Init(b2BodyId const& id_, float scale_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f, b2ShapeDef* def_ = nullptr, char const* fixturesMask_ = nullptr);
 		static constexpr XY anchorpoint{ 0.5000,0.5000 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -72,9 +96,19 @@ struct _phys {
 			static constexpr XY polygons6[] {{ 41, -131 }, { 1, -120 }, { -42, -90 }, { -71, -59 }, { -79, -32 }, { 56, -78 }, { 49, -121 }};
 			static constexpr XY polygons7[] {{ -70, 41 }, { -79, -32 }, { -82, 40 }};
 		};
+		struct fixture2 {
+			static constexpr float density{ 2 };
+			static constexpr float friction{ 0 };
+			static constexpr float restitution{ 0 };
+			static constexpr uint32_t filter_categoryBits{ 1 };
+			static constexpr uint32_t filter_groupIndex{ 0 };
+			static constexpr uint32_t filter_maskBits{ 65535 };
+			static constexpr bool isSensor{ false };
+			static constexpr XY polygons1[] {{ 46, 129 }, { 134, -0 }, { 30, -130 }, { -137, 35 }, { -137, 53 }};
+		};
 	};
 	struct _128 {
-		static void Init(b2BodyId const& id_, float scale_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f, b2ShapeDef* def_ = nullptr, char const* fixturesMask_ = nullptr);
 		static constexpr XY anchorpoint{ 0.5000,0.5020 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -102,9 +136,20 @@ struct _phys {
 			static constexpr XY polygons16[] {{ -139, -50.898 }, { -138, 49.102 }, { -135, 52.102 }, { -23, 96.102 }, { -60, -121.898 }};
 			static constexpr XY polygons17[] {{ -146, -44.898 }, { -138, 49.102 }, { -139, -50.898 }};
 		};
+		struct fixture2 {
+			static constexpr float density{ 2 };
+			static constexpr float friction{ 0 };
+			static constexpr float restitution{ 0 };
+			static constexpr uint32_t filter_categoryBits{ 1 };
+			static constexpr uint32_t filter_groupIndex{ 0 };
+			static constexpr uint32_t filter_maskBits{ 65535 };
+			static constexpr bool isSensor{ false };
+			static constexpr XY polygons1[] {{ -240, 72.102 }, { -99, 112.102 }, { -72, 112.102 }, { 49, -148.898 }, { -262, -48.898 }};
+			static constexpr XY polygons2[] {{ 49, -148.898 }, { -72, 112.102 }, { 73, 143.102 }, { 249, 43.102 }, { 262, -34.898 }};
+		};
 	};
 	struct _138 {
-		static void Init(b2BodyId const& id_, float scale_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f, b2ShapeDef* def_ = nullptr, char const* fixturesMask_ = nullptr);
 		static constexpr XY anchorpoint{ 0.5020,0.5030 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -122,9 +167,20 @@ struct _phys {
 			static constexpr XY polygons6[] {{ -120.046, -27.957 }, { -134.046, -10.957 }, { -136.046, 15.043 }, { -76.046, 48.043 }, { -77.046, -17.957 }, { -103.046, -29.957 }};
 			static constexpr XY polygons7[] {{ -118.046, 53.043 }, { -76.046, 48.043 }, { -136.046, 15.043 }, { -132.046, 36.043 }};
 		};
+		struct fixture2 {
+			static constexpr float density{ 2 };
+			static constexpr float friction{ 0 };
+			static constexpr float restitution{ 0 };
+			static constexpr uint32_t filter_categoryBits{ 1 };
+			static constexpr uint32_t filter_groupIndex{ 0 };
+			static constexpr uint32_t filter_maskBits{ 65535 };
+			static constexpr bool isSensor{ false };
+			static constexpr XY polygons1[] {{ -136.046, 15.043 }, { -51.046, 81.043 }, { -35.046, 81.043 }, { 42.954, -82.957 }, { -70.046, -58.957 }};
+			static constexpr XY polygons2[] {{ 134.954, -4.957 }, { 42.954, -82.957 }, { -35.046, 81.043 }};
+		};
 	};
 	struct _14 {
-		static void Init(b2BodyId const& id_, float scale_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f, b2ShapeDef* def_ = nullptr, char const* fixturesMask_ = nullptr);
 		static constexpr XY anchorpoint{ 0.5010,0.5000 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -145,9 +201,21 @@ struct _phys {
 			static constexpr XY polygons9[] {{ -284.131, 24 }, { -286.131, 44 }, { -175.131, 91 }};
 			static constexpr XY polygons10[] {{ 121.869, -81 }, { 108.869, 126 }, { 189.869, 113 }};
 		};
+		struct fixture2 {
+			static constexpr float density{ 2 };
+			static constexpr float friction{ 0 };
+			static constexpr float restitution{ 0 };
+			static constexpr uint32_t filter_categoryBits{ 1 };
+			static constexpr uint32_t filter_groupIndex{ 0 };
+			static constexpr uint32_t filter_maskBits{ 65535 };
+			static constexpr bool isSensor{ false };
+			static constexpr XY polygons1[] {{ 311.869, 15 }, { 46.869, -164 }, { -137.131, -20 }, { -182.131, 95 }, { 32.869, 168 }};
+			static constexpr XY polygons2[] {{ -182.131, 95 }, { -159.131, -20 }, { -309.131, -52 }, { -294.131, 148 }};
+			static constexpr XY polygons3[] {{ -182.131, 95 }, { -137.131, -20 }, { -159.131, -20 }};
+		};
 	};
 	struct _147 {
-		static void Init(b2BodyId const& id_, float scale_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f, b2ShapeDef* def_ = nullptr, char const* fixturesMask_ = nullptr);
 		static constexpr XY anchorpoint{ 0.5010,0.5000 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -169,9 +237,19 @@ struct _phys {
 			static constexpr XY polygons10[] {{ -163.837, 58 }, { -112.837, 41 }, { -158.837, 15 }, { -168.837, 48 }};
 			static constexpr XY polygons11[] {{ -106.837, -21 }, { -45.837, 75 }, { 3.163, 86 }, { -8.837, -67 }, { -51.837, -52 }};
 		};
+		struct fixture2 {
+			static constexpr float density{ 2 };
+			static constexpr float friction{ 0 };
+			static constexpr float restitution{ 0 };
+			static constexpr uint32_t filter_categoryBits{ 1 };
+			static constexpr uint32_t filter_groupIndex{ 0 };
+			static constexpr uint32_t filter_maskBits{ 65535 };
+			static constexpr bool isSensor{ false };
+			static constexpr XY polygons1[] {{ -0.837, 123 }, { 168.163, 29 }, { 168.163, 5 }, { 1.163, -107 }, { -164.837, -25 }, { -165.837, 57 }};
+		};
 	};
 	struct _168 {
-		static void Init(b2BodyId const& id_, float scale_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f, b2ShapeDef* def_ = nullptr, char const* fixturesMask_ = nullptr);
 		static constexpr XY anchorpoint{ 0.5011,0.5020 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -194,9 +272,20 @@ struct _phys {
 			static constexpr XY polygons11[] {{ -132, -43.882 }, { -139, 35.118 }, { -124, 58.118 }, { -43, 115.118 }, { -108, -74.882 }};
 			static constexpr XY polygons12[] {{ -43, 115.118 }, { 17, 126.118 }, { 111, -95.882 }};
 		};
+		struct fixture2 {
+			static constexpr float density{ 2 };
+			static constexpr float friction{ 0 };
+			static constexpr float restitution{ 0 };
+			static constexpr uint32_t filter_categoryBits{ 1 };
+			static constexpr uint32_t filter_groupIndex{ 0 };
+			static constexpr uint32_t filter_maskBits{ 65535 };
+			static constexpr bool isSensor{ false };
+			static constexpr XY polygons1[] {{ 216, 16.118 }, { -0, -153.882 }, { -26, -153.882 }, { -142, -44.882 }, { -136, 38.118 }, { -125, 112.118 }, { 37, 155.118 }};
+			static constexpr XY polygons2[] {{ -216, -71.882 }, { -215, 51.118 }, { -136, 38.118 }, { -142, -44.882 }};
+		};
 	};
 	struct _17 {
-		static void Init(b2BodyId const& id_, float scale_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f, b2ShapeDef* def_ = nullptr, char const* fixturesMask_ = nullptr);
 		static constexpr XY anchorpoint{ 0.5000,0.5000 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -218,10 +307,21 @@ struct _phys {
 			static constexpr XY polygons10[] {{ 16, 145 }, { 24, 148 }, { 124, 135 }};
 			static constexpr XY polygons11[] {{ -27, 140 }, { -163, -52 }, { -161, 61 }};
 		};
+		struct fixture2 {
+			static constexpr float density{ 2 };
+			static constexpr float friction{ 0 };
+			static constexpr float restitution{ 0 };
+			static constexpr uint32_t filter_categoryBits{ 1 };
+			static constexpr uint32_t filter_groupIndex{ 0 };
+			static constexpr uint32_t filter_maskBits{ 65535 };
+			static constexpr bool isSensor{ false };
+			static constexpr XY polygons1[] {{ 288, 27 }, { 66, -197 }, { -189, -70 }, { -172, 75 }, { -133, 145 }, { 36, 196 }};
+			static constexpr XY polygons2[] {{ -266, -93 }, { -289, -16 }, { -289, 8 }, { -250, 103 }, { -172, 75 }, { -189, -70 }};
+		};
 	};
 	struct _18 {
-		static void Init(b2BodyId const& id_, float scale_ = 1.f);
-		static constexpr XY anchorpoint{ 0.5008,0.5000 };
+		static void Init(b2BodyId const& id_, float scale_ = 1.f, b2ShapeDef* def_ = nullptr, char const* fixturesMask_ = nullptr);
+		static constexpr XY anchorpoint{ 0.5010,0.5000 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
 			static constexpr float friction{ 0 };
@@ -230,23 +330,34 @@ struct _phys {
 			static constexpr uint32_t filter_groupIndex{ 0 };
 			static constexpr uint32_t filter_maskBits{ 65535 };
 			static constexpr bool isSensor{ false };
-			static constexpr XY polygons1[] {{ 21, 206 }, { 58, 203 }, { 99, 177 }, { 128, 139 }, { 9, 142 }, { 3, 163 }, { 3, 184 }};
-			static constexpr XY polygons2[] {{ 105, -208 }, { 74, -199 }, { 171, -148 }, { 132, -195 }};
-			static constexpr XY polygons3[] {{ 315, 32 }, { 299, 19 }, { 194, 122 }, { 304, 71 }, { 318, 49 }};
-			static constexpr XY polygons4[] {{ 312, -38 }, { 224, -118 }, { 171, -148 }, { 128, 139 }, { 194, 122 }, { 299, 19 }, { 319, -3 }, { 319, -26 }};
-			static constexpr XY polygons5[] {{ -268, 117 }, { -243, 117 }, { -182, 87 }, { -179, -81 }, { -310, -59 }, { -322, -4 }, { -314, 57 }, { -288, 105 }};
-			static constexpr XY polygons6[] {{ -2, -193 }, { -23, -181 }, { -28, 137 }, { 9, 142 }, { 171, -148 }, { 22, -193 }};
-			static constexpr XY polygons7[] {{ 53, -204 }, { 22, -193 }, { 171, -148 }, { 74, -199 }};
-			static constexpr XY polygons8[] {{ -269, -110 }, { -287, -96 }, { -310, -59 }, { -179, -81 }, { -238, -114 }};
-			static constexpr XY polygons9[] {{ 128, 139 }, { 171, -148 }, { 9, 142 }};
-			static constexpr XY polygons10[] {{ -51, -178 }, { -179, -81 }, { -28, 137 }, { -23, -181 }};
-			static constexpr XY polygons11[] {{ -124, 165 }, { -94, 171 }, { -69, 167 }, { -28, 137 }, { -157, 142 }};
-			static constexpr XY polygons12[] {{ -28, 137 }, { -179, -81 }, { -182, 87 }, { -174, 117 }, { -157, 142 }};
-			static constexpr XY polygons13[] {{ -161, -123 }, { -179, -81 }, { -65, -168 }, { -115, -156 }, { -143, -141 }};
+			static constexpr XY polygons1[] {{ 20.857, 206 }, { 57.857, 203 }, { 98.857, 177 }, { 127.857, 139 }, { 8.857, 142 }, { 2.857, 163 }, { 2.857, 184 }};
+			static constexpr XY polygons2[] {{ 104.857, -208 }, { 73.857, -199 }, { 170.857, -148 }, { 131.857, -195 }};
+			static constexpr XY polygons3[] {{ 314.857, 32 }, { 298.857, 19 }, { 193.857, 122 }, { 303.857, 71 }, { 317.857, 49 }};
+			static constexpr XY polygons4[] {{ 311.857, -38 }, { 223.857, -118 }, { 170.857, -148 }, { 127.857, 139 }, { 193.857, 122 }, { 298.857, 19 }, { 318.857, -3 }, { 318.857, -26 }};
+			static constexpr XY polygons5[] {{ -268.143, 117 }, { -243.143, 117 }, { -182.143, 87 }, { -179.143, -81 }, { -310.143, -59 }, { -322.143, -4 }, { -314.143, 57 }, { -288.143, 105 }};
+			static constexpr XY polygons6[] {{ -2.143, -193 }, { -23.143, -181 }, { -28.143, 137 }, { 8.857, 142 }, { 170.857, -148 }, { 21.857, -193 }};
+			static constexpr XY polygons7[] {{ 52.857, -204 }, { 21.857, -193 }, { 170.857, -148 }, { 73.857, -199 }};
+			static constexpr XY polygons8[] {{ -269.143, -110 }, { -287.143, -96 }, { -310.143, -59 }, { -179.143, -81 }, { -238.143, -114 }};
+			static constexpr XY polygons9[] {{ 127.857, 139 }, { 170.857, -148 }, { 8.857, 142 }};
+			static constexpr XY polygons10[] {{ -51.143, -178 }, { -179.143, -81 }, { -28.143, 137 }, { -23.143, -181 }};
+			static constexpr XY polygons11[] {{ -124.143, 165 }, { -94.143, 171 }, { -69.143, 167 }, { -28.143, 137 }, { -157.143, 142 }};
+			static constexpr XY polygons12[] {{ -28.143, 137 }, { -179.143, -81 }, { -182.143, 87 }, { -174.143, 117 }, { -157.143, 142 }};
+			static constexpr XY polygons13[] {{ -161.143, -123 }, { -179.143, -81 }, { -65.143, -168 }, { -115.143, -156 }, { -143.143, -141 }};
+		};
+		struct fixture2 {
+			static constexpr float density{ 2 };
+			static constexpr float friction{ 0 };
+			static constexpr float restitution{ 0 };
+			static constexpr uint32_t filter_categoryBits{ 1 };
+			static constexpr uint32_t filter_groupIndex{ 0 };
+			static constexpr uint32_t filter_maskBits{ 65535 };
+			static constexpr bool isSensor{ false };
+			static constexpr XY polygons1[] {{ -276.143, 114 }, { 2.857, 163 }, { 284.857, 80 }, { 318.857, -26 }, { 104.857, -208 }, { -298.143, -82 }};
+			static constexpr XY polygons2[] {{ 284.857, 80 }, { 2.857, 163 }, { 2.857, 184 }};
 		};
 	};
 	struct _192 {
-		static void Init(b2BodyId const& id_, float scale_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f, b2ShapeDef* def_ = nullptr, char const* fixturesMask_ = nullptr);
 		static constexpr XY anchorpoint{ 0.5012,0.5000 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -283,9 +394,22 @@ struct _phys {
 			static constexpr XY polygons25[] {{ 0, -92 }, { -11, 84 }, { 48, -92 }, { 37, -96 }};
 			static constexpr XY polygons26[] {{ -113, 40 }, { -123, -12 }, { -119, 38 }};
 		};
+		struct fixture2 {
+			static constexpr float density{ 2 };
+			static constexpr float friction{ 0 };
+			static constexpr float restitution{ 0 };
+			static constexpr uint32_t filter_categoryBits{ 1 };
+			static constexpr uint32_t filter_groupIndex{ 0 };
+			static constexpr uint32_t filter_maskBits{ 65535 };
+			static constexpr bool isSensor{ false };
+			static constexpr XY polygons1[] {{ -126, -13 }, { -200, -24 }, { -190, 62 }, { -114, 39 }};
+			static constexpr XY polygons2[] {{ 98, -73 }, { -126, -13 }, { -114, 39 }, { 84, 140 }, { 203, 43 }, { 128, -75 }};
+			static constexpr XY polygons3[] {{ 128, -119 }, { 98, -73 }, { 128, -75 }};
+			static constexpr XY polygons4[] {{ 56, -143 }, { -86, -112 }, { -126, -13 }, { 98, -73 }};
+		};
 	};
 	struct _206 {
-		static void Init(b2BodyId const& id_, float scale_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f, b2ShapeDef* def_ = nullptr, char const* fixturesMask_ = nullptr);
 		static constexpr XY anchorpoint{ 0.5000,0.5020 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -310,9 +434,20 @@ struct _phys {
 			static constexpr XY polygons13[] {{ -185, 42.13 }, { -138, 43.13 }, { -144, -39.87 }, { -179, -36.87 }};
 			static constexpr XY polygons14[] {{ -76, -108.87 }, { -85, -99.87 }, { -125, -47.87 }, { -51, -113.87 }};
 		};
+		struct fixture2 {
+			static constexpr float density{ 2 };
+			static constexpr float friction{ 0 };
+			static constexpr float restitution{ 0 };
+			static constexpr uint32_t filter_categoryBits{ 1 };
+			static constexpr uint32_t filter_groupIndex{ 0 };
+			static constexpr uint32_t filter_maskBits{ 65535 };
+			static constexpr bool isSensor{ false };
+			static constexpr XY polygons1[] {{ 299, -0.87 }, { 14, -146.87 }, { -152, -37.87 }, { -181, 41.13 }, { 48, 155.13 }};
+			static constexpr XY polygons2[] {{ -181, 41.13 }, { -152, -37.87 }, { -268, -76.87 }, { -278, 82.13 }, { -260, 82.13 }};
+		};
 	};
 	struct _243 {
-		static void Init(b2BodyId const& id_, float scale_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f, b2ShapeDef* def_ = nullptr, char const* fixturesMask_ = nullptr);
 		static constexpr XY anchorpoint{ 0.5010,0.5000 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -335,9 +470,22 @@ struct _phys {
 			static constexpr XY polygons11[] {{ -112.055, -48 }, { 113.945, -157 }, { -67.055, -140 }, { -104.055, -89 }};
 			static constexpr XY polygons12[] {{ 23.945, 145 }, { 45.945, 146 }, { -112.055, -48 }, { -115.055, 39 }};
 		};
+		struct fixture2 {
+			static constexpr float density{ 2 };
+			static constexpr float friction{ 0 };
+			static constexpr float restitution{ 0 };
+			static constexpr uint32_t filter_categoryBits{ 1 };
+			static constexpr uint32_t filter_groupIndex{ 0 };
+			static constexpr uint32_t filter_maskBits{ 65535 };
+			static constexpr bool isSensor{ false };
+			static constexpr XY polygons1[] {{ -269.055, 112 }, { -121.055, 60 }, { -138.055, -58 }, { -227.055, -1 }};
+			static constexpr XY polygons2[] {{ -275.055, -118 }, { -227.055, -1 }, { -138.055, -58 }};
+			static constexpr XY polygons3[] {{ -121.055, 60 }, { -44.055, 176 }, { 50.945, 191 }, { 260.945, 56 }, { 216.945, -87 }, { -4.055, -191 }, { -138.055, -58 }};
+			static constexpr XY polygons4[] {{ -121.055, 60 }, { -67.055, 176 }, { -44.055, 176 }};
+		};
 	};
 	struct _244 {
-		static void Init(b2BodyId const& id_, float scale_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f, b2ShapeDef* def_ = nullptr, char const* fixturesMask_ = nullptr);
 		static constexpr XY anchorpoint{ 0.5009,0.5020 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -359,9 +507,21 @@ struct _phys {
 			static constexpr XY polygons10[] {{ 41, 117.11 }, { 82, 115.11 }, { 90, -122.89 }, { 52, -122.89 }, { -33, -99.89 }};
 			static constexpr XY polygons11[] {{ -41, 99.11 }, { -40, 107.11 }, { 41, 117.11 }};
 		};
+		struct fixture2 {
+			static constexpr float density{ 2 };
+			static constexpr float friction{ 0 };
+			static constexpr float restitution{ 0 };
+			static constexpr uint32_t filter_categoryBits{ 1 };
+			static constexpr uint32_t filter_groupIndex{ 0 };
+			static constexpr uint32_t filter_maskBits{ 65535 };
+			static constexpr bool isSensor{ false };
+			static constexpr XY polygons1[] {{ -142, 37.11 }, { -113, -44.89 }, { -270, -62.89 }, { -259, 84.11 }};
+			static constexpr XY polygons2[] {{ -47, -133.89 }, { -113, -44.89 }, { -142, 37.11 }, { -45, 146.11 }, { 118, 145.11 }, { 52, -122.89 }};
+			static constexpr XY polygons3[] {{ 118, 145.11 }, { 268, 12.11 }, { 237, -61.89 }, { 90, -122.89 }, { 52, -122.89 }};
+		};
 	};
 	struct _26 {
-		static void Init(b2BodyId const& id_, float scale_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f, b2ShapeDef* def_ = nullptr, char const* fixturesMask_ = nullptr);
 		static constexpr XY anchorpoint{ 0.5011,0.5000 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -383,9 +543,20 @@ struct _phys {
 			static constexpr XY polygons10[] {{ 100, -118 }, { -30, 102 }, { 19, 112 }, { 97, 105 }, { 167, 70 }, { 134, -107 }};
 			static constexpr XY polygons11[] {{ 169, -82 }, { 134, -107 }, { 167, 70 }, { 203, -38 }};
 		};
+		struct fixture2 {
+			static constexpr float density{ 2 };
+			static constexpr float friction{ 0 };
+			static constexpr float restitution{ 0 };
+			static constexpr uint32_t filter_categoryBits{ 1 };
+			static constexpr uint32_t filter_groupIndex{ 0 };
+			static constexpr uint32_t filter_maskBits{ 65535 };
+			static constexpr bool isSensor{ false };
+			static constexpr XY polygons1[] {{ 233, -1 }, { 61, -171 }, { -113, -34 }, { -117, 43 }, { 18, 170 }};
+			static constexpr XY polygons2[] {{ -220, -80 }, { -234, 7 }, { -234, 45 }, { -117, 43 }, { -113, -34 }};
+		};
 	};
 	struct _283 {
-		static void Init(b2BodyId const& id_, float scale_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f, b2ShapeDef* def_ = nullptr, char const* fixturesMask_ = nullptr);
 		static constexpr XY anchorpoint{ 0.5000,0.5018 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -401,9 +572,19 @@ struct _phys {
 			static constexpr XY polygons4[] {{ 157, 14 }, { 163, 2 }, { 132, -63 }};
 			static constexpr XY polygons5[] {{ -108, -35 }, { 97, -95 }, { -2, -132 }, { -36, -138 }, { -68, -135 }, { -74, -129 }};
 		};
+		struct fixture2 {
+			static constexpr float density{ 2 };
+			static constexpr float friction{ 0 };
+			static constexpr float restitution{ 0 };
+			static constexpr uint32_t filter_categoryBits{ 1 };
+			static constexpr uint32_t filter_groupIndex{ 0 };
+			static constexpr uint32_t filter_maskBits{ 65535 };
+			static constexpr bool isSensor{ false };
+			static constexpr XY polygons1[] {{ -43, 139 }, { 162, 28 }, { 116, -81 }, { -36, -138 }, { -161, -34 }, { -65, 139 }};
+		};
 	};
 	struct _285 {
-		static void Init(b2BodyId const& id_, float scale_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f, b2ShapeDef* def_ = nullptr, char const* fixturesMask_ = nullptr);
 		static constexpr XY anchorpoint{ 0.5000,0.5017 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -421,9 +602,20 @@ struct _phys {
 			static constexpr XY polygons6[] {{ -108, -33 }, { 47, 110 }, { 50, -111 }};
 			static constexpr XY polygons7[] {{ -104, 48 }, { -108, -33 }, { -116, -34 }, { -115, 45 }};
 		};
+		struct fixture2 {
+			static constexpr float density{ 2 };
+			static constexpr float friction{ 0 };
+			static constexpr float restitution{ 0 };
+			static constexpr uint32_t filter_categoryBits{ 1 };
+			static constexpr uint32_t filter_groupIndex{ 0 };
+			static constexpr uint32_t filter_maskBits{ 65535 };
+			static constexpr bool isSensor{ false };
+			static constexpr XY polygons1[] {{ -18, 148 }, { 182, -1 }, { -7, -146 }, { -183, -48 }, { -183, -25 }};
+			static constexpr XY polygons2[] {{ -174, 94 }, { -100, 63 }, { -183, -25 }};
+		};
 	};
 	struct _288 {
-		static void Init(b2BodyId const& id_, float scale_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f, b2ShapeDef* def_ = nullptr, char const* fixturesMask_ = nullptr);
 		static constexpr XY anchorpoint{ 0.5010,0.5000 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -445,9 +637,20 @@ struct _phys {
 			static constexpr XY polygons10[] {{ -46.987, 77 }, { 11.013, 91 }, { 12.013, -118 }};
 			static constexpr XY polygons11[] {{ -140.987, 43 }, { -131.987, 46 }, { -130.987, -36 }};
 		};
+		struct fixture2 {
+			static constexpr float density{ 2 };
+			static constexpr float friction{ 0 };
+			static constexpr float restitution{ 0 };
+			static constexpr uint32_t filter_categoryBits{ 1 };
+			static constexpr uint32_t filter_groupIndex{ 0 };
+			static constexpr uint32_t filter_maskBits{ 65535 };
+			static constexpr bool isSensor{ false };
+			static constexpr XY polygons1[] {{ 238.013, 37 }, { 73.013, -125 }, { -139.987, -33 }, { -205.987, 81 }, { 56.013, 124 }};
+			static constexpr XY polygons2[] {{ -205.987, 81 }, { -139.987, -33 }, { -242.987, -71 }, { -242.987, -38 }};
+		};
 	};
 	struct _296 {
-		static void Init(b2BodyId const& id_, float scale_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f, b2ShapeDef* def_ = nullptr, char const* fixturesMask_ = nullptr);
 		static constexpr XY anchorpoint{ 0.5000,0.5010 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -466,9 +669,20 @@ struct _phys {
 			static constexpr XY polygons7[] {{ -110, -27.151 }, { -109, 61.849 }, { -48, 135.849 }, { 0, 145.849 }, { 48, 145.849 }};
 			static constexpr XY polygons8[] {{ -100, 88.849 }, { -74, 119.849 }, { -48, 135.849 }, { -109, 61.849 }};
 		};
+		struct fixture2 {
+			static constexpr float density{ 2 };
+			static constexpr float friction{ 0 };
+			static constexpr float restitution{ 0 };
+			static constexpr uint32_t filter_categoryBits{ 1 };
+			static constexpr uint32_t filter_groupIndex{ 0 };
+			static constexpr uint32_t filter_maskBits{ 65535 };
+			static constexpr bool isSensor{ false };
+			static constexpr XY polygons1[] {{ 48, 145.849 }, { 110, 166.849 }, { 194, 25.849 }, { 11, -174.151 }};
+			static constexpr XY polygons2[] {{ -181, 96.849 }, { 0, 145.849 }, { 48, 145.849 }, { 11, -174.151 }, { -195, -46.151 }};
+		};
 	};
 	struct _303 {
-		static void Init(b2BodyId const& id_, float scale_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f, b2ShapeDef* def_ = nullptr, char const* fixturesMask_ = nullptr);
 		static constexpr XY anchorpoint{ 0.5000,0.5000 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -491,9 +705,20 @@ struct _phys {
 			static constexpr XY polygons11[] {{ -130, -25 }, { -152, -23 }, { -152, 34 }, { -121, 38 }};
 			static constexpr XY polygons12[] {{ -118, 41 }, { -33, 72 }, { -20, -66 }, { -40, -61 }, { -130, -25 }, { -121, 38 }};
 		};
+		struct fixture2 {
+			static constexpr float density{ 2 };
+			static constexpr float friction{ 0 };
+			static constexpr float restitution{ 0 };
+			static constexpr uint32_t filter_categoryBits{ 1 };
+			static constexpr uint32_t filter_groupIndex{ 0 };
+			static constexpr uint32_t filter_maskBits{ 65535 };
+			static constexpr bool isSensor{ false };
+			static constexpr XY polygons1[] {{ 231, 19 }, { 40, -107 }, { -233, 29 }, { -233, 43 }, { 55, 118 }};
+			static constexpr XY polygons2[] {{ -206, -57 }, { -233, 29 }, { -130, -25 }};
+		};
 	};
 	struct _309 {
-		static void Init(b2BodyId const& id_, float scale_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f, b2ShapeDef* def_ = nullptr, char const* fixturesMask_ = nullptr);
 		static constexpr XY anchorpoint{ 0.5000,0.5020 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -512,9 +737,20 @@ struct _phys {
 			static constexpr XY polygons7[] {{ -177, 78.142 }, { -158, 97.142 }, { -144, 101.142 }, { -113, 94.142 }, { -78, 62.142 }, { -164, 2.142 }, { -179, 42.142 }, { -180, 63.142 }};
 			static constexpr XY polygons8[] {{ 17, -159.858 }, { -3, -156.858 }, { -32, -128.858 }, { 71, -98.858 }, { 55, -128.858 }, { 31, -154.858 }};
 		};
+		struct fixture2 {
+			static constexpr float density{ 2 };
+			static constexpr float friction{ 0 };
+			static constexpr float restitution{ 0 };
+			static constexpr uint32_t filter_categoryBits{ 1 };
+			static constexpr uint32_t filter_groupIndex{ 0 };
+			static constexpr uint32_t filter_maskBits{ 65535 };
+			static constexpr bool isSensor{ false };
+			static constexpr XY polygons1[] {{ -70, -79.858 }, { -13, 161.142 }, { 181, 19.142 }, { 31, -154.858 }, { -70, -97.858 }};
+			static constexpr XY polygons2[] {{ -185, -64.858 }, { -181, 53.142 }, { -13, 161.142 }, { -70, -79.858 }};
+		};
 	};
 	struct _402 {
-		static void Init(b2BodyId const& id_, float scale_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f, b2ShapeDef* def_ = nullptr, char const* fixturesMask_ = nullptr);
 		static constexpr XY anchorpoint{ 0.5010,0.5017 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -532,9 +768,19 @@ struct _phys {
 			static constexpr XY polygons6[] {{ -121.839, -44 }, { -110.839, 42 }, { 57.161, -126 }, { 7.161, -140 }, { -47.839, -143 }, { -98.839, -132 }, { -124.839, -101 }};
 			static constexpr XY polygons7[] {{ -115.839, -118 }, { -124.839, -101 }, { -98.839, -132 }};
 		};
+		struct fixture2 {
+			static constexpr float density{ 2 };
+			static constexpr float friction{ 0 };
+			static constexpr float restitution{ 0 };
+			static constexpr uint32_t filter_categoryBits{ 1 };
+			static constexpr uint32_t filter_groupIndex{ 0 };
+			static constexpr uint32_t filter_maskBits{ 65535 };
+			static constexpr bool isSensor{ false };
+			static constexpr XY polygons1[] {{ 166.161, 29 }, { 120.161, -84 }, { 12.161, -139 }, { -109.839, -123 }, { -169.839, -17 }, { -169.839, 9 }, { -101.839, 107 }, { 51.161, 139 }};
+		};
 	};
 	struct _407 {
-		static void Init(b2BodyId const& id_, float scale_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f, b2ShapeDef* def_ = nullptr, char const* fixturesMask_ = nullptr);
 		static constexpr XY anchorpoint{ 0.5015,0.5020 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -552,9 +798,20 @@ struct _phys {
 			static constexpr XY polygons6[] {{ 170, 31 }, { 145, -22 }, { 121, -48 }, { 79, -70 }, { 38, 101 }, { 77, 96 }, { 116, 82 }, { 162, 54 }};
 			static constexpr XY polygons7[] {{ -102, 43 }, { -96, -27 }, { -107, 41 }};
 		};
+		struct fixture2 {
+			static constexpr float density{ 2 };
+			static constexpr float friction{ 0 };
+			static constexpr float restitution{ 0 };
+			static constexpr uint32_t filter_categoryBits{ 1 };
+			static constexpr uint32_t filter_groupIndex{ 0 };
+			static constexpr uint32_t filter_maskBits{ 65535 };
+			static constexpr bool isSensor{ false };
+			static constexpr XY polygons1[] {{ 168, 35 }, { 48, -123 }, { -88, -33 }, { -171, 28 }, { -171, 53 }, { -22, 126 }};
+			static constexpr XY polygons2[] {{ -160, -57 }, { -171, 28 }, { -88, -33 }};
+		};
 	};
 	struct _408 {
-		static void Init(b2BodyId const& id_, float scale_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f, b2ShapeDef* def_ = nullptr, char const* fixturesMask_ = nullptr);
 		static constexpr XY anchorpoint{ 0.5012,0.5010 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -576,9 +833,19 @@ struct _phys {
 			static constexpr XY polygons10[] {{ -121, -35.151 }, { -108, 43.849 }, { -92, 46.849 }, { -96, -36.151 }};
 			static constexpr XY polygons11[] {{ -96, -36.151 }, { -92, 46.849 }, { -13, 102.849 }, { 99, -115.151 }, { -95, -43.151 }};
 		};
+		struct fixture2 {
+			static constexpr float density{ 2 };
+			static constexpr float friction{ 0 };
+			static constexpr float restitution{ 0 };
+			static constexpr uint32_t filter_categoryBits{ 1 };
+			static constexpr uint32_t filter_groupIndex{ 0 };
+			static constexpr uint32_t filter_maskBits{ 65535 };
+			static constexpr bool isSensor{ false };
+			static constexpr XY polygons1[] {{ 215, -0.151 }, { 50, -172.151 }, { -216, -3.151 }, { -216, 13.849 }, { 61, 174.849 }};
+		};
 	};
 	struct _415 {
-		static void Init(b2BodyId const& id_, float scale_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f, b2ShapeDef* def_ = nullptr, char const* fixturesMask_ = nullptr);
 		static constexpr XY anchorpoint{ 0.5000,0.5020 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -595,9 +862,19 @@ struct _phys {
 			static constexpr XY polygons5[] {{ -21, 87.998 }, { -28, 99.998 }, { -27, 112.998 }, { -15, 124.998 }, { 16, 120.998 }, { 43, 94.998 }};
 			static constexpr XY polygons6[] {{ -87, -50.002 }, { -82, -22.002 }, { 51, -75.002 }, { 38, -108.002 }, { 18, -124.002 }, { -36, -110.002 }, { -72, -80.002 }};
 		};
+		struct fixture2 {
+			static constexpr float density{ 2 };
+			static constexpr float friction{ 0 };
+			static constexpr float restitution{ 0 };
+			static constexpr uint32_t filter_categoryBits{ 1 };
+			static constexpr uint32_t filter_groupIndex{ 0 };
+			static constexpr uint32_t filter_maskBits{ 65535 };
+			static constexpr bool isSensor{ false };
+			static constexpr XY polygons1[] {{ 154, 26.998 }, { 22, -123.002 }, { -155, 11.998 }, { -155, 41.998 }, { -20, 122.998 }};
+		};
 	};
 	struct _421 {
-		static void Init(b2BodyId const& id_, float scale_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f, b2ShapeDef* def_ = nullptr, char const* fixturesMask_ = nullptr);
 		static constexpr XY anchorpoint{ 0.5000,0.5000 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -618,9 +895,19 @@ struct _phys {
 			static constexpr XY polygons9[] {{ 19, 101 }, { -90, -43 }, { -100, -35 }, { -101, 44 }, { -97, 51 }, { -22, 97 }};
 			static constexpr XY polygons10[] {{ -108, 42 }, { -101, 44 }, { -100, -35 }};
 		};
+		struct fixture2 {
+			static constexpr float density{ 2 };
+			static constexpr float friction{ 0 };
+			static constexpr float restitution{ 0 };
+			static constexpr uint32_t filter_categoryBits{ 1 };
+			static constexpr uint32_t filter_groupIndex{ 0 };
+			static constexpr uint32_t filter_maskBits{ 65535 };
+			static constexpr bool isSensor{ false };
+			static constexpr XY polygons1[] {{ 191, 9 }, { 0, -139 }, { -191, -29 }, { -191, 36 }, { 41, 137 }};
+		};
 	};
 	struct _422 {
-		static void Init(b2BodyId const& id_, float scale_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f, b2ShapeDef* def_ = nullptr, char const* fixturesMask_ = nullptr);
 		static constexpr XY anchorpoint{ 0.5010,0.5020 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -639,9 +926,20 @@ struct _phys {
 			static constexpr XY polygons7[] {{ -65.853, -64.958 }, { -62.853, -40.958 }, { -25.853, -98.958 }, { -55.853, -84.958 }};
 			static constexpr XY polygons8[] {{ -62.853, -40.958 }, { -71.853, -37.958 }, { -75.853, 43.042 }, { -47.853, 77.042 }, { -16.853, 96.042 }};
 		};
+		struct fixture2 {
+			static constexpr float density{ 2 };
+			static constexpr float friction{ 0 };
+			static constexpr float restitution{ 0 };
+			static constexpr uint32_t filter_categoryBits{ 1 };
+			static constexpr uint32_t filter_groupIndex{ 0 };
+			static constexpr uint32_t filter_maskBits{ 65535 };
+			static constexpr bool isSensor{ false };
+			static constexpr XY polygons1[] {{ -78.853, 43.042 }, { -60.853, -41.958 }, { -176.853, -48.958 }, { -154.853, 71.042 }};
+			static constexpr XY polygons2[] {{ -60.853, -41.958 }, { -78.853, 43.042 }, { -5.853, 136.042 }, { 14.147, 136.042 }, { 168.147, 30.042 }, { 5.147, -132.958 }};
+		};
 	};
 	struct _443 {
-		static void Init(b2BodyId const& id_, float scale_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f, b2ShapeDef* def_ = nullptr, char const* fixturesMask_ = nullptr);
 		static constexpr XY anchorpoint{ 0.5009,0.5000 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -662,9 +960,20 @@ struct _phys {
 			static constexpr XY polygons9[] {{ -171, -31.5 }, { -154, -20.5 }, { -124, -85.5 }, { -150, -72.5 }, { -174, -42.5 }};
 			static constexpr XY polygons10[] {{ -74, 79.5 }, { -20, -110.5 }, { -124, -85.5 }, { -154, -20.5 }, { -161, 41.5 }};
 		};
+		struct fixture2 {
+			static constexpr float density{ 2 };
+			static constexpr float friction{ 0 };
+			static constexpr float restitution{ 0 };
+			static constexpr uint32_t filter_categoryBits{ 1 };
+			static constexpr uint32_t filter_groupIndex{ 0 };
+			static constexpr uint32_t filter_maskBits{ 65535 };
+			static constexpr bool isSensor{ false };
+			static constexpr XY polygons1[] {{ -274, -58.5 }, { -271, 73.5 }, { 5, 131.5 }, { -154, -20.5 }};
+			static constexpr XY polygons2[] {{ -154, -20.5 }, { 5, 131.5 }, { 266, 29.5 }, { 195, -64.5 }, { 11, -120.5 }, { -8, -120.5 }};
+		};
 	};
 	struct _449 {
-		static void Init(b2BodyId const& id_, float scale_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f, b2ShapeDef* def_ = nullptr, char const* fixturesMask_ = nullptr);
 		static constexpr XY anchorpoint{ 0.5012,0.5000 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -685,9 +994,19 @@ struct _phys {
 			static constexpr XY polygons9[] {{ 20, 82 }, { 33, -111 }, { 4, -113 }, { -2, -106 }, { -41, 75 }};
 			static constexpr XY polygons10[] {{ -41, 75 }, { -2, -106 }, { -26, -106 }, { -111, -83 }};
 		};
+		struct fixture2 {
+			static constexpr float density{ 2 };
+			static constexpr float friction{ 0 };
+			static constexpr float restitution{ 0 };
+			static constexpr uint32_t filter_categoryBits{ 1 };
+			static constexpr uint32_t filter_groupIndex{ 0 };
+			static constexpr uint32_t filter_maskBits{ 65535 };
+			static constexpr bool isSensor{ false };
+			static constexpr XY polygons1[] {{ 209, 35 }, { 195, -44 }, { 48, -116 }, { -216, -9 }, { -216, 11 }, { 27, 114 }};
+		};
 	};
 	struct _458 {
-		static void Init(b2BodyId const& id_, float scale_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f, b2ShapeDef* def_ = nullptr, char const* fixturesMask_ = nullptr);
 		static constexpr XY anchorpoint{ 0.5010,0.5010 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -720,9 +1039,21 @@ struct _phys {
 			static constexpr XY polygons21[] {{ 121, -149.143 }, { 208, -83.143 }, { 172, -127.143 }, { 150, -141.143 }};
 			static constexpr XY polygons22[] {{ -103, -121.143 }, { -131, -103.143 }, { -151, -5.143 }, { -75, -137.143 }};
 		};
+		struct fixture2 {
+			static constexpr float density{ 2 };
+			static constexpr float friction{ 0 };
+			static constexpr float restitution{ 0 };
+			static constexpr uint32_t filter_categoryBits{ 1 };
+			static constexpr uint32_t filter_groupIndex{ 0 };
+			static constexpr uint32_t filter_maskBits{ 65535 };
+			static constexpr bool isSensor{ false };
+			static constexpr XY polygons1[] {{ -236, -43.143 }, { -247, 73.857 }, { 61, 178.857 }, { -169, -8.143 }};
+			static constexpr XY polygons2[] {{ 61, 178.857 }, { 246, 26.857 }, { 240, -54.143 }, { 79, -171.143 }, { -39, -151.143 }, { -169, -8.143 }};
+			static constexpr XY polygons3[] {{ -171, -83.143 }, { -169, -8.143 }, { -39, -151.143 }, { -61, -151.143 }};
+		};
 	};
 	struct _461 {
-		static void Init(b2BodyId const& id_, float scale_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f, b2ShapeDef* def_ = nullptr, char const* fixturesMask_ = nullptr);
 		static constexpr XY anchorpoint{ 0.5014,0.5000 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -743,9 +1074,21 @@ struct _phys {
 			static constexpr XY polygons9[] {{ -38, 59 }, { -61, -28 }, { -86, -32 }};
 			static constexpr XY polygons10[] {{ 116, -56 }, { 108, 88 }, { 131, 69 }};
 		};
+		struct fixture2 {
+			static constexpr float density{ 2 };
+			static constexpr float friction{ 0 };
+			static constexpr float restitution{ 0 };
+			static constexpr uint32_t filter_categoryBits{ 1 };
+			static constexpr uint32_t filter_groupIndex{ 0 };
+			static constexpr uint32_t filter_maskBits{ 65535 };
+			static constexpr bool isSensor{ false };
+			static constexpr XY polygons1[] {{ -27, 72 }, { 29, 148 }, { 174, 22 }, { 13, -157 }};
+			static constexpr XY polygons2[] {{ -134, 89 }, { -67, 142 }, { -27, 72 }, { 13, -157 }, { -175, -24 }};
+			static constexpr XY polygons3[] {{ -134, 89 }, { -134, 111 }, { -67, 142 }};
+		};
 	};
 	struct _462 {
-		static void Init(b2BodyId const& id_, float scale_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f, b2ShapeDef* def_ = nullptr, char const* fixturesMask_ = nullptr);
 		static constexpr XY anchorpoint{ 0.5010,0.5020 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -768,9 +1111,19 @@ struct _phys {
 			static constexpr XY polygons11[] {{ 96, -139.91 }, { 79, -146.91 }, { 111, -122.91 }};
 			static constexpr XY polygons12[] {{ -140, 62.09 }, { -138, 66.09 }, { -45, 105.09 }, { -139, -22.91 }};
 		};
+		struct fixture2 {
+			static constexpr float density{ 2 };
+			static constexpr float friction{ 0 };
+			static constexpr float restitution{ 0 };
+			static constexpr uint32_t filter_categoryBits{ 1 };
+			static constexpr uint32_t filter_groupIndex{ 0 };
+			static constexpr uint32_t filter_maskBits{ 65535 };
+			static constexpr bool isSensor{ false };
+			static constexpr XY polygons1[] {{ 94, -140.91 }, { -247, 11.09 }, { -247, 42.09 }, { 70, 138.09 }, { 221, 70.09 }, { 240, -2.91 }};
+		};
 	};
 	struct _463 {
-		static void Init(b2BodyId const& id_, float scale_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f, b2ShapeDef* def_ = nullptr, char const* fixturesMask_ = nullptr);
 		static constexpr XY anchorpoint{ 0.5009,0.5000 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -792,10 +1145,22 @@ struct _phys {
 			static constexpr XY polygons10[] {{ 269, -38 }, { 262, -54 }, { 191, -84 }, { 237, -5 }};
 			static constexpr XY polygons11[] {{ -133, 54 }, { -147, -17 }, { -151, 47 }};
 		};
+		struct fixture2 {
+			static constexpr float density{ 2 };
+			static constexpr float friction{ 0 };
+			static constexpr float restitution{ 0 };
+			static constexpr uint32_t filter_categoryBits{ 1 };
+			static constexpr uint32_t filter_groupIndex{ 0 };
+			static constexpr uint32_t filter_maskBits{ 65535 };
+			static constexpr bool isSensor{ false };
+			static constexpr XY polygons1[] {{ -248, 86 }, { -180, 45 }, { 57, -139 }, { -270, 3 }};
+			static constexpr XY polygons2[] {{ 237, -5 }, { 65, 139 }, { 264, -5 }};
+			static constexpr XY polygons3[] {{ 237, -5 }, { 248, -62 }, { 57, -139 }, { -180, 45 }, { 65, 139 }};
+		};
 	};
 	struct _464 {
-		static void Init(b2BodyId const& id_, float scale_ = 1.f);
-		static constexpr XY anchorpoint{ 0.5013,0.5000 };
+		static void Init(b2BodyId const& id_, float scale_ = 1.f, b2ShapeDef* def_ = nullptr, char const* fixturesMask_ = nullptr);
+		static constexpr XY anchorpoint{ 0.5010,0.5000 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
 			static constexpr float friction{ 0 };
@@ -804,21 +1169,31 @@ struct _phys {
 			static constexpr uint32_t filter_groupIndex{ 0 };
 			static constexpr uint32_t filter_maskBits{ 65535 };
 			static constexpr bool isSensor{ false };
-			static constexpr XY polygons1[] {{ -170, -50 }, { -180, -36 }, { -187, -5 }, { -187, 30 }, { -141, 60 }, { -116, 37 }, { -115, -21 }, { -148, -49 }};
-			static constexpr XY polygons2[] {{ -106, 55 }, { -88, 80 }, { -71, 87 }, { -35, 78 }, { -97, 41 }};
-			static constexpr XY polygons3[] {{ -110, -35 }, { -100, -27 }, { -39, -70 }, { -59, -77 }, { -91, -71 }, { -112, -49 }};
-			static constexpr XY polygons4[] {{ 20, 110 }, { 30, 118 }, { 53, 115 }, { 83, 82 }, { 94, -77 }, { 20, 88 }};
-			static constexpr XY polygons5[] {{ -168, 67 }, { -141, 60 }, { -187, 30 }, { -178, 59 }};
-			static constexpr XY polygons6[] {{ -106, -21 }, { -116, 37 }, { -97, 41 }, { -100, -27 }};
-			static constexpr XY polygons7[] {{ 182, 26 }, { 186, 3 }, { 183, -13 }, { 154, -44 }, { 161, 47 }};
-			static constexpr XY polygons8[] {{ 50, -118 }, { 24, -114 }, { -13, -98 }, { -39, -70 }, { -35, 78 }, { 20, 88 }, { 94, -77 }};
-			static constexpr XY polygons9[] {{ -97, 41 }, { -35, 78 }, { -39, -70 }, { -100, -27 }};
-			static constexpr XY polygons10[] {{ 154, -44 }, { 94, -77 }, { 83, 82 }, { 135, 64 }, { 161, 47 }};
-			static constexpr XY polygons11[] {{ -106, -21 }, { -115, -21 }, { -116, 37 }};
+			static constexpr XY polygons1[] {{ -169.873, -50 }, { -179.873, -36 }, { -186.873, -5 }, { -186.873, 30 }, { -140.873, 60 }, { -115.873, 37 }, { -114.873, -21 }, { -147.873, -49 }};
+			static constexpr XY polygons2[] {{ -105.873, 55 }, { -87.873, 80 }, { -70.873, 87 }, { -34.873, 78 }, { -96.873, 41 }};
+			static constexpr XY polygons3[] {{ -109.873, -35 }, { -99.873, -27 }, { -38.873, -70 }, { -58.873, -77 }, { -90.873, -71 }, { -111.873, -49 }};
+			static constexpr XY polygons4[] {{ 20.127, 110 }, { 30.127, 118 }, { 53.127, 115 }, { 83.127, 82 }, { 94.127, -77 }, { 20.127, 88 }};
+			static constexpr XY polygons5[] {{ -167.873, 67 }, { -140.873, 60 }, { -186.873, 30 }, { -177.873, 59 }};
+			static constexpr XY polygons6[] {{ -105.873, -21 }, { -115.873, 37 }, { -96.873, 41 }, { -99.873, -27 }};
+			static constexpr XY polygons7[] {{ 182.127, 26 }, { 186.127, 3 }, { 183.127, -13 }, { 154.127, -44 }, { 161.127, 47 }};
+			static constexpr XY polygons8[] {{ 50.127, -118 }, { 24.127, -114 }, { -12.873, -98 }, { -38.873, -70 }, { -34.873, 78 }, { 20.127, 88 }, { 94.127, -77 }};
+			static constexpr XY polygons9[] {{ -96.873, 41 }, { -34.873, 78 }, { -38.873, -70 }, { -99.873, -27 }};
+			static constexpr XY polygons10[] {{ 154.127, -44 }, { 94.127, -77 }, { 83.127, 82 }, { 135.127, 64 }, { 161.127, 47 }};
+			static constexpr XY polygons11[] {{ -105.873, -21 }, { -114.873, -21 }, { -115.873, 37 }};
+		};
+		struct fixture2 {
+			static constexpr float density{ 2 };
+			static constexpr float friction{ 0 };
+			static constexpr float restitution{ 0 };
+			static constexpr uint32_t filter_categoryBits{ 1 };
+			static constexpr uint32_t filter_groupIndex{ 0 };
+			static constexpr uint32_t filter_maskBits{ 65535 };
+			static constexpr bool isSensor{ false };
+			static constexpr XY polygons1[] {{ 183.127, -13 }, { 58.127, -114 }, { -186.873, -5 }, { -186.873, 30 }, { 43.127, 117 }};
 		};
 	};
 	struct _467 {
-		static void Init(b2BodyId const& id_, float scale_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f, b2ShapeDef* def_ = nullptr, char const* fixturesMask_ = nullptr);
 		static constexpr XY anchorpoint{ 0.5000,0.5020 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -840,9 +1215,21 @@ struct _phys {
 			static constexpr XY polygons10[] {{ -116, -32.87 }, { -137, -32.87 }, { -134, 39.13 }, { -106, 51.13 }};
 			static constexpr XY polygons11[] {{ -106, 51.13 }, { -39, 91.13 }, { 7, 97.13 }, { -85, -68.87 }, { -116, -32.87 }};
 		};
+		struct fixture2 {
+			static constexpr float density{ 2 };
+			static constexpr float friction{ 0 };
+			static constexpr float restitution{ 0 };
+			static constexpr uint32_t filter_categoryBits{ 1 };
+			static constexpr uint32_t filter_groupIndex{ 0 };
+			static constexpr uint32_t filter_maskBits{ 65535 };
+			static constexpr bool isSensor{ false };
+			static constexpr XY polygons1[] {{ -214, -70.87 }, { -214, 59.13 }, { 7, 97.13 }, { -107, -40.87 }};
+			static constexpr XY polygons2[] {{ -107, -40.87 }, { 7, 97.13 }, { 50, 97.13 }, { 191, 40.13 }, { 141, -94.87 }, { -15, -152.87 }};
+			static constexpr XY polygons3[] {{ 78, 157.13 }, { 191, 40.13 }, { 50, 97.13 }};
+		};
 	};
 	struct _470 {
-		static void Init(b2BodyId const& id_, float scale_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f, b2ShapeDef* def_ = nullptr, char const* fixturesMask_ = nullptr);
 		static constexpr XY anchorpoint{ 0.5010,0.5000 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -866,9 +1253,21 @@ struct _phys {
 			static constexpr XY polygons12[] {{ 35.005, -99 }, { 22.005, -83 }, { 120.005, -76 }, { 48.005, -102 }};
 			static constexpr XY polygons13[] {{ -101.995, 42 }, { 0.005, -56 }, { -113.995, -16 }, { -110.995, 38 }};
 		};
+		struct fixture2 {
+			static constexpr float density{ 2 };
+			static constexpr float friction{ 0 };
+			static constexpr float restitution{ 0 };
+			static constexpr uint32_t filter_categoryBits{ 1 };
+			static constexpr uint32_t filter_groupIndex{ 0 };
+			static constexpr uint32_t filter_maskBits{ 65535 };
+			static constexpr bool isSensor{ false };
+			static constexpr XY polygons1[] {{ 237.005, 10 }, { 95.005, -118 }, { -242.995, -19 }, { 85.005, 119 }};
+			static constexpr XY polygons2[] {{ -226.995, 64 }, { -139.995, 38 }, { -242.995, -19 }};
+			static constexpr XY polygons3[] {{ -242.995, -19 }, { -139.995, 38 }, { -110.995, 38 }};
+		};
 	};
 	struct _472 {
-		static void Init(b2BodyId const& id_, float scale_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f, b2ShapeDef* def_ = nullptr, char const* fixturesMask_ = nullptr);
 		static constexpr XY anchorpoint{ 0.5000,0.5000 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -890,9 +1289,20 @@ struct _phys {
 			static constexpr XY polygons10[] {{ -24, -51 }, { -62, -74 }, { -75, -72 }, { -110, -50 }};
 			static constexpr XY polygons11[] {{ 28, 66 }, { 26, -56 }, { -24, -51 }, { -48, 57 }};
 		};
+		struct fixture2 {
+			static constexpr float density{ 2 };
+			static constexpr float friction{ 0 };
+			static constexpr float restitution{ 0 };
+			static constexpr uint32_t filter_categoryBits{ 1 };
+			static constexpr uint32_t filter_groupIndex{ 0 };
+			static constexpr uint32_t filter_maskBits{ 65535 };
+			static constexpr bool isSensor{ false };
+			static constexpr XY polygons1[] {{ -256, -60 }, { -242, 58 }, { 28, 66 }, { -140, -29 }};
+			static constexpr XY polygons2[] {{ 258, 12 }, { 92, -95 }, { -140, -29 }, { 28, 66 }, { 72, 66 }};
+		};
 	};
 	struct _51 {
-		static void Init(b2BodyId const& id_, float scale_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f, b2ShapeDef* def_ = nullptr, char const* fixturesMask_ = nullptr);
 		static constexpr XY anchorpoint{ 0.5000,0.5000 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -914,9 +1324,21 @@ struct _phys {
 			static constexpr XY polygons10[] {{ 166, 25 }, { 160, -51 }, { 117, 82 }, { 143, 58 }};
 			static constexpr XY polygons11[] {{ -168, 53 }, { -201, 23 }, { -183, 52 }};
 		};
+		struct fixture2 {
+			static constexpr float density{ 2 };
+			static constexpr float friction{ 0 };
+			static constexpr float restitution{ 0 };
+			static constexpr uint32_t filter_categoryBits{ 1 };
+			static constexpr uint32_t filter_groupIndex{ 0 };
+			static constexpr uint32_t filter_maskBits{ 65535 };
+			static constexpr bool isSensor{ false };
+			static constexpr XY polygons1[] {{ -207, -31 }, { -97, 118 }, { -1, 113 }, { 67, -148 }, { -60, -144 }};
+			static constexpr XY polygons2[] {{ 22, 113 }, { 77, 147 }, { 208, 1 }, { 67, -148 }};
+			static constexpr XY polygons3[] {{ 67, -148 }, { -1, 113 }, { 22, 113 }};
+		};
 	};
 	struct _75 {
-		static void Init(b2BodyId const& id_, float scale_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f, b2ShapeDef* def_ = nullptr, char const* fixturesMask_ = nullptr);
 		static constexpr XY anchorpoint{ 0.5010,0.5000 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -937,9 +1359,22 @@ struct _phys {
 			static constexpr XY polygons9[] {{ -155.051, -41 }, { -151.051, 62 }, { -131.051, 78 }, { -29.051, 135 }, { -89.051, -97 }};
 			static constexpr XY polygons10[] {{ 272.949, 10 }, { 265.949, -3 }, { 148.949, -122 }, { 112.949, -138 }, { 62.949, -146 }, { 115.949, 135 }, { 190.949, 112 }, { 268.949, 38 }};
 		};
+		struct fixture2 {
+			static constexpr float density{ 2 };
+			static constexpr float friction{ 0 };
+			static constexpr float restitution{ 0 };
+			static constexpr uint32_t filter_categoryBits{ 1 };
+			static constexpr uint32_t filter_groupIndex{ 0 };
+			static constexpr uint32_t filter_maskBits{ 65535 };
+			static constexpr bool isSensor{ false };
+			static constexpr XY polygons1[] {{ -169.051, 58 }, { -139.051, -51 }, { -250.051, -85 }, { -273.051, 66 }};
+			static constexpr XY polygons2[] {{ 266.949, 70 }, { 176.949, -100 }, { 62.949, -146 }, { 41.949, -146 }, { -139.051, -51 }, { -102.051, 157 }, { 44.949, 182 }};
+			static constexpr XY polygons3[] {{ -43.051, -181 }, { -139.051, -51 }, { 41.949, -146 }};
+			static constexpr XY polygons4[] {{ -169.051, 58 }, { -102.051, 157 }, { -139.051, -51 }};
+		};
 	};
 	struct _98 {
-		static void Init(b2BodyId const& id_, float scale_ = 1.f);
+		static void Init(b2BodyId const& id_, float scale_ = 1.f, b2ShapeDef* def_ = nullptr, char const* fixturesMask_ = nullptr);
 		static constexpr XY anchorpoint{ 0.5000,0.5020 };
 		struct fixture1 {
 			static constexpr float density{ 2 };
@@ -958,6 +1393,18 @@ struct _phys {
 			static constexpr XY polygons7[] {{ -66, -57.038 }, { -56, -31.038 }, { 10, 73.962 }, { 21, 75.962 }, { 71, -69.038 }, { 42, -108.038 }, { 5, -110.038 }, { -55, -71.038 }};
 			static constexpr XY polygons8[] {{ 24, -115.038 }, { 5, -110.038 }, { 42, -108.038 }};
 			static constexpr XY polygons9[] {{ -56, -31.038 }, { -69, -25.038 }, { -55, 43.962 }, { 10, 73.962 }};
+		};
+		struct fixture2 {
+			static constexpr float density{ 2 };
+			static constexpr float friction{ 0 };
+			static constexpr float restitution{ 0 };
+			static constexpr uint32_t filter_categoryBits{ 1 };
+			static constexpr uint32_t filter_groupIndex{ 0 };
+			static constexpr uint32_t filter_maskBits{ 65535 };
+			static constexpr bool isSensor{ false };
+			static constexpr XY polygons1[] {{ -142, 78.962 }, { -71, 35.962 }, { -69, -25.038 }, { -137, -71.038 }};
+			static constexpr XY polygons2[] {{ 20, 82.962 }, { 160, 38.962 }, { 144, -37.038 }, { 7, -110.038 }, { -69, -25.038 }, { -71, 35.962 }};
+			static constexpr XY polygons3[] {{ 20, 82.962 }, { 20, 96.962 }, { 160, 38.962 }};
 		};
 	};
 };

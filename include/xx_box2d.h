@@ -156,6 +156,25 @@ namespace xx {
 			auto tran = GetTransform();
 			return { tran.p, b2Rot_GetAngle(tran.q) };
 		}
+
+		XX_INLINE void SetTransform(XY pos_, float radians_) {
+			b2Body_SetTransform(id, (b2Vec2&)pos_, b2MakeRot(radians_));
+		}
+
+		XX_INLINE void SetTransform(XY pos_, b2Rot rot_) {
+			b2Body_SetTransform(id, (b2Vec2&)pos_, rot_);
+		}
+
+		XX_INLINE void SetTransform(b2Transform const& tran_) {
+			b2Body_SetTransform(id, tran_.p, tran_.q);
+		}
+
+		//XX_INLINE void SetPos(XY pos_) {
+		//	auto trans = b2Body_GetTransform(id);
+		//	b2Body_SetTransform(id, (b2Vec2&)pos_, trans.q);
+		//}
+
+		// ...
 	};
 
 	struct B2Shape : B2Id<b2ShapeId> {
