@@ -11,15 +11,17 @@ namespace G {
 		xx::Camera cam;
 		float time{}, timePool{}, timeScale{ 1 };
 
+		XY mapSize{};
 		xx::B2World b2world;
 		xx::List<xx::Shared<Fish>> fishs;
 		xx::Shared<Circle> circle;	// mouse
+		xx::List<Fish*> tmp;				// for delete
 
 		float genTimer{};
-		float lastGenY{};
+		float lastGenY{500};
 		void Gen(int32_t num_);
 
-		xx::List<Fish*> tmp;				// for draw order by Y & deleter
+		xx::List<Fish*> sortContainer;		// for draw order by Y
 		void SortContainerAdd(Fish* o);
 		void SortContainerDraw();
 

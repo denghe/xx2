@@ -5,11 +5,9 @@
 namespace G {
 
 	void Scene::Init() {
-		// todo
-		//mapSize = { 5500, 3000 };
-		//cam.Init(gg.scale, gg.designSize.y / mapSize.y, mapSize / 2);
-		//sortContainer.Resize<true>((int32_t)mapSize.y);
-		cam.Init(gg.scale, 0.3f);
+		mapSize = { 10000, 4000 };
+		cam.Init(gg.scale, gg.designSize.y / mapSize.y, mapSize / 2);
+		sortContainer.Resize<true>((int32_t)mapSize.y);
 		ui.Emplace()->InitRoot(gg.scale * cUIScale);
 
 		// world
@@ -31,7 +29,7 @@ namespace G {
 			auto bodyId = b2CreateBody(b2world, &bodyDef);
 
 			// ground chain
-			static constexpr b2Vec2 points[] { { -4000,-2000 }, { -4000,2000 }, { 4000,2000 }, { 4000,-2000 } };
+			b2Vec2 points[] { { 0,0 }, { 0,mapSize.y }, { mapSize.x,mapSize.y }, { mapSize.x,0 } };
 			b2ChainDef chainDef = b2DefaultChainDef();
 			chainDef.points = points;
 			chainDef.count = _countof(points);
@@ -40,7 +38,7 @@ namespace G {
 			auto chainId = b2CreateChain(bodyId, &chainDef);
 			//xx::CoutN(chainId.index1);
 
-			b2Polygon box = b2MakeOffsetBox(100.f, 2000.f, { 3950.0f, 0.f }, b2Rot_identity);
+			b2Polygon box = b2MakeOffsetBox(100.f, mapSize.y / 2.f, { mapSize.x - 100.f, mapSize.y / 2.f }, b2Rot_identity);
 			b2ShapeDef shapeDef = b2DefaultShapeDef();
 			shapeDef.isSensor = true;
 			shapeDef.enableSensorEvents = true;
@@ -56,12 +54,12 @@ namespace G {
 	void Scene::Gen(int32_t num_) {
 		for (int i = 0; i < num_; ++i) {
 			XY pos;
-			pos.x = -3500;
+			pos.x = 500;
 			pos.y = lastGenY;
 			auto h = fishs.Emplace().Emplace()->Init(this, pos, gg.rnd.Next(0.3f, 0.5f));
 			lastGenY += h + 10.f;
-			if (lastGenY >= 1500) {
-				lastGenY = -1500.f;
+			if (lastGenY >= mapSize.y - 500) {
+				lastGenY = 500;
 			}
 		}
 	}
@@ -131,18 +129,18 @@ namespace G {
 
 
 	XX_INLINE void Scene::SortContainerAdd(Fish* o) {
-		auto& slot = tmp[(int32_t)o->y];
+		auto& slot = sortContainer[(int32_t)o->y];
 		o->next = slot;
 		slot = o;
 	}
 
 	XX_INLINE void Scene::SortContainerDraw() {
-		for (auto o : tmp) {
+		for (auto o : sortContainer) {
 			while (o) {
 				o->Draw();
 				o = o->next;
 			}
 		}
-		memset(tmp.buf, 0, tmp.len * sizeof(void*));
+		memset(sortContainer.buf, 0, sortContainer.len * sizeof(void*));
 	}
 }

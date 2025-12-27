@@ -32,7 +32,8 @@ namespace G {
 	bool Fish::Update() {
 		auto p = b2body.GetPos();
 		y = p.y;
-		return (p.x > 5000 || p.x < -5000 || p.y > 3000 || p.y < -3000);
+		return false;
+		//return (p.x > 5000 || p.x < -5000 || p.y > 3000 || p.y < -3000);
 	}
 
 	void Fish::Draw() {
