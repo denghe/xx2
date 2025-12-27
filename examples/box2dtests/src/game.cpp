@@ -71,6 +71,51 @@ void Game::GLInit() {
 	fs._75 = LoadTexture("res/75.png");
 	fs._98 = LoadTexture("res/98.png");
 
+	fis.Adds({
+		{&gg.fs._10, _phys::_10::Init},
+		{&gg.fs._110, _phys::_110::Init},
+		{&gg.fs._123, _phys::_123::Init},
+		{&gg.fs._128, _phys::_128::Init},
+		{&gg.fs._138, _phys::_138::Init},
+		{&gg.fs._14, _phys::_14::Init},
+		{&gg.fs._147, _phys::_147::Init},
+		{&gg.fs._168, _phys::_168::Init},
+		{&gg.fs._17, _phys::_17::Init},
+		{&gg.fs._18, _phys::_18::Init},
+		{&gg.fs._192, _phys::_192::Init},
+		{&gg.fs._206, _phys::_206::Init},
+		{&gg.fs._243, _phys::_243::Init},
+		{&gg.fs._244, _phys::_244::Init},
+		{&gg.fs._26, _phys::_26::Init},
+		{&gg.fs._283, _phys::_283::Init},
+		{&gg.fs._285, _phys::_285::Init},
+		{&gg.fs._288, _phys::_288::Init},
+		{&gg.fs._296, _phys::_296::Init},
+		{&gg.fs._303, _phys::_303::Init},
+		{&gg.fs._309, _phys::_309::Init},
+		{&gg.fs._402, _phys::_402::Init},
+		{&gg.fs._407, _phys::_407::Init},
+		{&gg.fs._408, _phys::_408::Init},
+		{&gg.fs._415, _phys::_415::Init},
+		{&gg.fs._421, _phys::_421::Init},
+		{&gg.fs._422, _phys::_422::Init},
+		{&gg.fs._443, _phys::_443::Init},
+		{&gg.fs._449, _phys::_449::Init},
+		{&gg.fs._458, _phys::_458::Init},
+		{&gg.fs._461, _phys::_461::Init},
+		{&gg.fs._462, _phys::_462::Init},
+		{&gg.fs._463, _phys::_463::Init},
+		{&gg.fs._464, _phys::_464::Init},
+		{&gg.fs._467, _phys::_467::Init},
+		{&gg.fs._470, _phys::_470::Init},
+		{&gg.fs._472, _phys::_472::Init},
+		{&gg.fs._51, _phys::_51::Init},
+		{&gg.fs._75, _phys::_75::Init},
+		{&gg.fs._98, _phys::_98::Init},
+		// ...
+	});
+
+
 	// combine all.frames & spines.framess
 	xx::RectPacker tp;
 	for (int32_t i = 0; i < sizeof(fs) / sizeof(xx::Frame); ++i) {

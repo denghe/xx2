@@ -24,7 +24,7 @@ namespace Test4 {
 
 		auto& ff = gg.rnd.NextElement(scene_->frameAndFuncs);
 		frame = *ff.first;
-		ff.second(b2body, scale_, nullptr, "\0#");
+		ff.second(b2body, scale_, {}, {});
 
 		return frame.uvRect.h * scale_;
 	}
@@ -207,7 +207,7 @@ namespace Test4 {
 #if 1
 		if (genTimer < time) {
 			genTimer += 0.01;
-			Gen(20);
+			Gen(10);
 		}
 #endif
 #if 1

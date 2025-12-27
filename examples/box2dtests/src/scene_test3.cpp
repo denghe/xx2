@@ -23,7 +23,7 @@ namespace Test3 {
 
 		auto& ff = gg.rnd.NextElement(scene_->frameAndFuncs);
 		frame = *ff.first;
-		ff.second(b2body, scale_, nullptr, "#\0");
+		ff.second(b2body, scale_, {}, {});
 
 		return frame.uvRect.h * scale_;
 	}

@@ -72,6 +72,9 @@ struct Game : xx::Game<Game> {
 		xx::Frame _98;
 	} fs;
 
+	xx::List<std::pair<xx::Frame*, _phys::InitFunc>> fis;
+
+
 	void Init();
 	void GLInit();
 	void Update();

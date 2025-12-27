@@ -1,4 +1,5 @@
 ﻿#include "pch.h"
+#include "g.h"
 #include "scene_mainmenu.h"
 #include "scene_test1.h"
 #include "scene_test2.h"
