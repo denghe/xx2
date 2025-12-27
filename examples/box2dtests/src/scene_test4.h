@@ -35,8 +35,6 @@ namespace Test4 {
 		xx::Camera cam;
 		float time{}, timePool{}, timeScale{ 1 };
 
-		xx::List<std::pair<xx::Frame*, _phys::InitFunc>> frameAndFuncs;
-
 		xx::B2World b2world;
 		xx::List<xx::Shared<SceneItem1>> item1s;
 		SceneItem2 item2;	// mouse

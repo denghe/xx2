@@ -4,168 +4,152 @@
 
 namespace Test3 {
 
-	// todo
-
-	float SceneItem1::Init(Scene* scene_, XY pos_, float scale_) {
+	void Wood1::Init(Scene* scene_, XY pos_, float scale_) {
 		scene = scene_;
+		pos = pos_;
+		y = pos.y;
 		scale = scale_;
-		indexAtContainer = scene->item1s.len - 1;
-		assert(scene->item1s[indexAtContainer].pointer == this);
-
-		auto bodyDef = b2DefaultBodyDef();
-		bodyDef.type = b2_dynamicBody;
-		bodyDef.position = (b2Vec2&)pos_;
-		bodyDef.angularDamping = 1.f;
-		//bodyDef.gravityScale = 2.f;
-		bodyDef.linearVelocity = { 1000.f, 0 };
-		bodyDef.userData = this;
-		b2body.InitDef(scene_->b2world, bodyDef);
-
-		auto& ff = gg.rnd.NextElement(scene_->frameAndFuncs);
-		frame = *ff.first;
-		ff.second(b2body, scale_, {}, {});
-
-		return frame.uvRect.h * scale_;
+		radians = {};
 	}
 
-	bool SceneItem1::Update() {
-		auto p = b2body.GetPos();
-		return (p.x > 5000 || p.x < -5000 || p.y > 3000 || p.y < -3000);
+	void Wood1::ShakeA() {
+		XX_BEGIN(_1);
+		{
+			auto r = gg.rnd.Next(M_PI * 2);
+			cos = std::cosf(r) * scale * 0.5f;
+			sin = std::sinf(r) * scale * 0.5f;
+		}
+		for (i = 0; i < _countof(cDistances); ++i) {
+			offset.x = cos * cDistances[i];
+			offset.y = sin * cDistances[i];
+			XX_YIELD(_1);
+		}
+		shaking = false;
+		offset = {};
+		radians = 0;
+		XX_END(_1);
 	}
 
-	void SceneItem1::Draw() {
-		auto [p, r] = b2body.GetPosRadians();
-		gg.Quad().DrawFrame(frame, scene->cam.ToGLPos(p), scale * scene->cam.scale, r);
+	void Wood1::ShakeB() {
+		XX_BEGIN(_2);
+		for (j = 0; j < _countof(cDistances); ++j) {
+			radians = cDistances[j] * 0.029f;
+			XX_YIELD(_2);
+		}
+		shaking = false;
+		XX_END(_2);
 	}
 
-	void SceneItem1::Dispose() {
-		auto i = indexAtContainer;
-		assert(scene->item1s[i].pointer == this);
-		scene->item1s.Back()->indexAtContainer = i;
-		indexAtContainer = -1;
-		scene->item1s.SwapRemoveAt(i);
+	bool Wood1::Update() {
+		if (gg.mouse[GLFW_MOUSE_BUTTON_1](0.1)) {
+			shaking = true;
+			offset = {};
+			radians = 0;
+			_1 = _2 = 0;
+			scene->woods.Emplace().Emplace()->Init(scene, pos, scale);
+		}
+
+		if (shaking) {
+			ShakeA();
+			ShakeB();
+		}
+
+		return false;
+	}
+
+	void Wood1::Draw() {
+		// todo: shadow ?
+		gg.Quad().DrawFrame(gg.fs.wood1, scene->cam.ToGLPos(pos + offset)
+			, scale * scene->cam.scale, radians);
 	}
 
 	/***************************************************************************************/
 
 
-	void SceneItem2::Init(Scene* scene_, XY pos_, float radius_) {
+	void Wood2::Init(Scene* scene_, XY pos_, float scale_) {
 		scene = scene_;
-		radius = radius_;
+		pos = pos_;
+		y = pos.y;
+		scale = scale_;
+		indexAtContainer = scene->woods.len - 1;
+		assert(scene->woods[indexAtContainer].pointer == this);
 	}
 
-	bool SceneItem2::Update() {
-		auto mp = scene->cam.ToLogicPos(gg.mousePos);// .FlipY();
-		pos = mp;
-
-		// search mouse pose fish & delete
-
-		b2Circle circle = {
-			.center = (b2Vec2&)pos,
-			.radius = radius,
+	void Wood2::Anim() {
+		static constexpr float cD{ 1.2f };
+		static constexpr float cDistances[]{
+			cD + .9f,cD + .8f,cD + .7f,cD + .6f,cD + .5f,cD + .4f,cD + .3f,cD + .2f,cD + .1f,cD + .0f,
+			cD - .1f,cD - .2f,cD - .3f,cD - .4f,cD - .5f,cD - .6f,cD - .7f,cD - .8f,cD - .9f,cD - 1.f,
+			cD - 1.1f, cD - 1.15f, cD - 1.175f, cD - 1.19f, 0
 		};
-		auto proxy = b2MakeProxy(&circle.center, 1, circle.radius);
+		static constexpr float cIdleYMaxOffset{ 2.f };
+		static constexpr float cIdleYStep{ cIdleYMaxOffset / (gg.cFps * 0.58f) };
 
-		b2World_OverlapShape(scene->b2world, &proxy, b2DefaultQueryFilter(), [](b2ShapeId shapeId, void* context)->bool {
-			auto scene = (Scene*)context;
-			auto bodyId = b2Shape_GetBody(shapeId);
-			//xx::CoutN(
-			//	"shapeId.generation = ", shapeId.generation
-			//	, " shapeId.index1 = ", shapeId.index1
-			//	, " bodyId.generation = ", bodyId.generation
-			//	, " bodyId.index1 = ", bodyId.index1);
-			auto item = (SceneItem1*)b2Body_GetUserData(bodyId);
-			if (item->isDead) return true;	// 1 body N shape
-			item->isDead = true;
-			scene->tmp.Add(item);
-			return true;	// true: continue search
-		}, scene);
+		XX_BEGIN(_1);
+		{
+			auto r = gg.rnd.Next(M_PI * 2);
+			cos = std::cosf(r) * scale;
+			sin = std::sinf(r) * scale;
+		}
+		for (i = 0; i < _countof(cDistances); ++i) {
+			offset.x += cos * cDistances[i];
+			offset.y += sin * cDistances[i];
+			y = pos.y + offset.y;
+			XX_YIELD(_1);
+		}
+		ready = true;
+		pos += offset;
+		y = pos.y;
+		scene->grid.Add(indexAtGrid, this);
+		offset = {};
+		// idle
+		while (true) {
+			for (; offset.y < cIdleYMaxOffset * scale; offset.y += cIdleYStep * scale) {
+				XX_YIELD(_1);
+			}
+			for (; offset.y > 0.f; offset.y -= cIdleYStep * scale) {
+				XX_YIELD(_1);
+			}
+		}
+		XX_END(_1);
+	}
 
-		auto& os = scene->item1s;
-		for (auto o : scene->tmp) o->Dispose();
-		scene->tmp.Clear();
-
+	bool Wood2::Update() {
+		Anim();
+		if (ready) {
+			// todo: phys simu
+			scene->grid.Update(indexAtGrid, this);
+		}
 		return false;
 	}
 
-	void SceneItem2::Draw() {
-		gg.Quad().DrawFrame(gg.fs.circle256, scene->cam.ToGLPos(pos), radius * 2.f / 256.f * scene->cam.scale);
+	void Wood2::Draw() {
+		// todo: shadow ?
+		gg.Quad().DrawFrame(gg.fs.wood2, scene->cam.ToGLPos(pos + offset), scale * scene->cam.scale);
+	}
+
+	void Wood2::Dispose() {
+		if (indexAtGrid > -1) {
+			scene->grid.Remove(indexAtGrid, this);
+			indexAtGrid = -1;
+		}
+		auto i = indexAtContainer;
+		assert(scene->woods[i].pointer == this);
+		scene->woods.Back()->indexAtContainer = i;
+		indexAtContainer = -1;
+		scene->woods.SwapRemoveAt(i);
 	}
 
 	/***************************************************************************************/
 
 	void Scene::Init() {
-		cam.Init(gg.scale, 0.3f);
+		mapSize = 2000;
+		cam.Init(gg.scale, gg.designSize.y / mapSize.y, mapSize / 2);
+		sortContainer.Resize<true>((int32_t)mapSize.y);
+		grid.Init(130, mapSize.y / 130 + 1, mapSize.x / 130 + 1);
+		wood1.Init(this, cam.original, 10);
+
 		ui.Emplace()->InitRoot(gg.scale * cUIScale);
-
-		//b2SetLengthUnitsPerMeter(_phys::ptm_ratio);
-		auto def = b2DefaultWorldDef();
-		def.gravity = { 1000, 0 };
-		def.maximumLinearSpeed = 1000;
-		//def.restitutionThreshold = 5.f;
-		//def.contactHertz = 240;
-		//def.contactDampingRatio = 10;
-		//def.contactSpeed = 0.5;
-		b2world.InitDef(def, 1);
-
-		frameAndFuncs.Adds({
-			{&gg.fs._10, _phys::_10::Init},
-			{&gg.fs._110, _phys::_110::Init},
-			{&gg.fs._123, _phys::_123::Init},
-			{&gg.fs._128, _phys::_128::Init},
-			{&gg.fs._138, _phys::_138::Init},
-			{&gg.fs._14, _phys::_14::Init},
-			{&gg.fs._147, _phys::_147::Init},
-			{&gg.fs._168, _phys::_168::Init},
-			{&gg.fs._17, _phys::_17::Init},
-			{&gg.fs._18, _phys::_18::Init},
-			{&gg.fs._192, _phys::_192::Init},
-			{&gg.fs._206, _phys::_206::Init},
-			{&gg.fs._243, _phys::_243::Init},
-			{&gg.fs._244, _phys::_244::Init},
-			{&gg.fs._26, _phys::_26::Init},
-			{&gg.fs._283, _phys::_283::Init},
-			{&gg.fs._285, _phys::_285::Init},
-			{&gg.fs._288, _phys::_288::Init},
-			{&gg.fs._296, _phys::_296::Init},
-			{&gg.fs._303, _phys::_303::Init},
-			{&gg.fs._309, _phys::_309::Init},
-			{&gg.fs._402, _phys::_402::Init},
-			{&gg.fs._407, _phys::_407::Init},
-			{&gg.fs._408, _phys::_408::Init},
-			{&gg.fs._415, _phys::_415::Init},
-			{&gg.fs._421, _phys::_421::Init},
-			{&gg.fs._422, _phys::_422::Init},
-			{&gg.fs._443, _phys::_443::Init},
-			{&gg.fs._449, _phys::_449::Init},
-			{&gg.fs._458, _phys::_458::Init},
-			{&gg.fs._461, _phys::_461::Init},
-			{&gg.fs._462, _phys::_462::Init},
-			{&gg.fs._463, _phys::_463::Init},
-			{&gg.fs._464, _phys::_464::Init},
-			{&gg.fs._467, _phys::_467::Init},
-			{&gg.fs._470, _phys::_470::Init},
-			{&gg.fs._472, _phys::_472::Init},
-			{&gg.fs._51, _phys::_51::Init},
-			{&gg.fs._75, _phys::_75::Init},
-			{&gg.fs._98, _phys::_98::Init},
-			// ...
-		});
-
-		item2.Init(this, {}, 200);
-	}
-
-	void Scene::Gen(int32_t num_) {
-		for (int i = 0; i < num_; ++i) {
-			XY pos;
-			pos.x = -3500;
-			pos.y = lastGenY;
-			auto h = item1s.Emplace().Emplace()->Init(this, pos, gg.rnd.Next(0.2f, 0.7f));
-			lastGenY += h + 10.f;
-			if (lastGenY >= 1500) {
-				lastGenY = -1500.f;
-			}
-		}
 	}
 
 	void Scene::Update() {
@@ -186,32 +170,21 @@ namespace Test3 {
 	}
 
 	void Scene::FixedUpdate() {
+		wood1.Update();
 
-		// todo: mouse circle?
-		item2.Update();
-
-		for (auto i = item1s.len - 1; i >= 0; --i) {
-			auto& o = item1s[i];
+		for (auto i = woods.len - 1; i >= 0; --i) {
+			auto& o = woods[i];
 			if (o->Update()) o->Dispose();
 		}
-
-		b2world.Step();
-
-#if 1
-		if (genTimer < time) {
-			genTimer += 0.2;
-			Gen(5);
-			//xx::CoutN("num items = ", item1s.len);
-		}
-#endif
 	}
 
 	void Scene::Draw() {
-		gg.Quad().DrawTinyFrame(gg.embed.shape_dot, 0, 0.5f, gg.windowSize, 0, 1, {38,194,208,255});
-		gg.Quad().DrawFrame(gg.fs.bg_fish, { 0, -200 }, cam.scale * 3.3);
+		gg.Quad().DrawTinyFrame(gg.embed.shape_dot, 0, 0.5f, gg.windowSize, 0, 1, {0x81,0xbd,0x57,255});
 
-		for (auto& o : item1s) o->Draw();
-		item2.Draw();
+		// sort order by y. map y to 0 ~ 1080 ( design size.y ). FPS 3x faster than std::sort
+		for (auto& o : woods) SortContainerAdd(o.pointer);
+		SortContainerAdd(&wood1);
+		SortContainerDraw();
 
 		gg.GLBlendFunc(gg.blendDefault);
 		gg.DrawNode(ui);
@@ -222,4 +195,21 @@ namespace Test3 {
 		cam.SetBaseScale(gg.scale);
 	}
 
+
+
+	XX_INLINE void Scene::SortContainerAdd(SceneItem* o) {
+		auto& slot = sortContainer[(int32_t)o->y];
+		o->next = slot;
+		slot = o;
+	}
+
+	XX_INLINE void Scene::SortContainerDraw() {
+		for (auto o : sortContainer) {
+			while (o) {
+				o->Draw();
+				o = o->next;
+			}
+		}
+		memset(sortContainer.buf, 0, sortContainer.len * sizeof(void*));
+	}
 }

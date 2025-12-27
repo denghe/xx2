@@ -7,7 +7,7 @@ namespace G {
 		scene = scene_;
 		scale = scale_;
 		indexAtContainer = scene->fishs.len - 1;
-		assert(scene->item1s[indexAtContainer].pointer == this);
+		assert(scene->fishs[indexAtContainer].pointer == this);
 
 		auto bodyDef = b2DefaultBodyDef();
 		bodyDef.type = b2_dynamicBody;
@@ -42,7 +42,7 @@ namespace G {
 
 	void Fish::Dispose() {
 		auto i = indexAtContainer;
-		assert(scene->item1s[i].pointer == this);
+		assert(scene->fishs[i].pointer == this);
 		scene->fishs.Back()->indexAtContainer = i;
 		indexAtContainer = -1;
 		scene->fishs.SwapRemoveAt(i);

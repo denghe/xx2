@@ -5,26 +5,43 @@ namespace Test3 {
 
 	struct Scene;
 
-	struct SceneItem1 {
+	struct SceneItem {
 		Scene* scene{};
-		xx::Frame frame;
-		xx::B2Body b2body;
-		int32_t indexAtContainer{-1};
-		float scale{};
-		bool isDead{};
-		float Init(Scene* scene_, XY pos_, float scale_ = 1);
+		SceneItem* next{};
+		XY pos{};
+		float y{};
+		float scale{}, radians{};
+		int32_t indexAtContainer{ -1 };
+		virtual bool Update() { return false; }
+		virtual void Draw() {};
+	};
+
+	struct Wood1 : SceneItem {
+		static constexpr float cDistances[]{ 1, 2, 3, 2, 1, 0, -1, -2, -1, 0, 1, 0 };
+		XY offset{};
+		float cos{}, sin{};
+		int32_t i{}, j{};
+		int32_t _1{}, _2{};
+		bool shaking{};
+		void ShakeA();
+		void ShakeB();
+		void Init(Scene* scene_, XY pos_, float scale_ = 1);
+		bool Update();
+		void Draw();
+	};
+
+	struct Wood2 : SceneItem {
+		int32_t indexAtGrid{ -1 };
+		XY offset{};
+		float cos{}, sin{};
+		int32_t i{};
+		int32_t _1{};
+		bool ready{};
+		void Anim();
+		void Init(Scene* scene_, XY pos_, float scale_ = 1);
 		bool Update();
 		void Draw();
 		void Dispose();	// unsafe
-	};
-
-	struct SceneItem2 {
-		Scene* scene{};
-		float radius{};
-		XY pos{};
-		void Init(Scene* scene_, XY pos_, float radius_);
-		bool Update();
-		void Draw();
 	};
 
 	struct Scene : xx::SceneBase {
@@ -33,16 +50,14 @@ namespace Test3 {
 		xx::Camera cam;
 		float time{}, timePool{}, timeScale{ 1 };
 
-		xx::List<std::pair<xx::Frame*, _phys::InitFunc>> frameAndFuncs;
+		XY mapSize{};
+		xx::Grid2dCircle<SceneItem*> grid;
+		Wood1 wood1;
+		xx::List<xx::Shared<Wood2>> woods;
 
-		xx::B2World b2world;
-		xx::List<xx::Shared<SceneItem1>> item1s;
-		SceneItem2 item2;	// mouse
-		xx::List<SceneItem1*> tmp;	// for delete
-
-		float genTimer{};
-		float lastGenY{};
-		void Gen(int32_t num_);
+		xx::List<SceneItem*> sortContainer;				// for draw order by Y
+		void SortContainerAdd(SceneItem* o);
+		void SortContainerDraw();
 
 		void Init();
 		void Update() override;

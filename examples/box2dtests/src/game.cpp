@@ -10,7 +10,7 @@ int32_t main() {
 
 void Game::Init() {
 	DisableIME();
-	title = "examples_miner";
+	title = "examples_box2dtests";
 }
 
 void Game::GLInit() {
@@ -29,6 +29,10 @@ void Game::GLInit() {
 	// begin load res
 	fs.circle256 = LoadTexture("res/circle256.png");
 	fs.bg_fish = LoadTexture("res/bg_fish.png");
+	fs.wood1 = LoadTexture("res/wood1.png");
+	fs.wood1.anchor = { 0.5f, 0.2f };
+	fs.wood2 = LoadTexture("res/wood2.png");
+	fs.wood2.anchor = { 0.5f, 0.1f };
 
 	fs._10 = LoadTexture("res/10.png");
 	fs._110 = LoadTexture("res/110.png");
@@ -122,7 +126,7 @@ void Game::GLInit() {
 		tp.tfs.Add(((xx::Frame*)&fs)[i]);
 	}
 	tp.AutoPack();
-	tp.Tex().SetParm(GL_LINEAR, GL_CLAMP_TO_EDGE);
+	//tp.Tex().SetParm(GL_LINEAR, GL_CLAMP_TO_EDGE);
 
 
 	// init first scene

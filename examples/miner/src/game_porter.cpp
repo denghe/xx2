@@ -27,7 +27,7 @@ void Porter::Draw() {
 	auto screenMinY = gg.size_2.y;
 	for (auto& o : stackedRocks) {
 		auto p = o.CalcDrawPos(this);
-		if (p.y > screenMinY)
+		if (p.y > screenMinY * c.scale)
 			break;
 		o.Draw(scene, p);
 	}

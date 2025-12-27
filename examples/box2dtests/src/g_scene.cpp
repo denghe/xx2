@@ -5,6 +5,10 @@
 namespace G {
 
 	void Scene::Init() {
+		// todo
+		//mapSize = { 5500, 3000 };
+		//cam.Init(gg.scale, gg.designSize.y / mapSize.y, mapSize / 2);
+		//sortContainer.Resize<true>((int32_t)mapSize.y);
 		cam.Init(gg.scale, 0.3f);
 		ui.Emplace()->InitRoot(gg.scale * cUIScale);
 
@@ -111,7 +115,9 @@ namespace G {
 		gg.Quad().DrawTinyFrame(gg.embed.shape_dot, 0, 0.5f, gg.windowSize, 0, 1, {38,194,208,255});
 		gg.Quad().DrawFrame(gg.fs.bg_fish, { 0, -200 }, cam.scale * 3.3);
 
-		for (auto& o : fishs) o->Draw();
+		// sort order by y. map y to 0 ~ 1080 ( design size.y ). FPS 3x faster than std::sort
+		for (auto& o : fishs) SortContainerAdd(o.pointer);
+		SortContainerDraw();
 		circle->Draw();
 
 		gg.GLBlendFunc(gg.blendDefault);

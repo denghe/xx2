@@ -29,6 +29,8 @@ struct Game : xx::Game<Game> {
 	struct {
 		xx::Frame circle256;
 		xx::Frame bg_fish;
+		xx::Frame wood1;
+		xx::Frame wood2;
 
 		xx::Frame _10;
 		xx::Frame _110;
