@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "game.h"
-#include "scene.h"
+#include "g.h"
 
 namespace Test2 {
 
