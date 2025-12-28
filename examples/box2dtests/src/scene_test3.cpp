@@ -4,7 +4,41 @@
 
 namespace Test3 {
 
-	void Wood1::Init(Scene* scene_, XY pos_, float scale_) {
+	void Wall::Init(Scene* scene_, XY pos_, float radius_) {
+		scene = scene_;
+		pos = pos_;
+		y = pos.y;
+		scale = radius_ / 128.f;
+		radians = {};
+		indexAtContainer = scene->walls.len - 1;
+		assert(scene->walls[indexAtContainer].pointer == this);
+		scene->gridBuildings.Add(indexAtGrid, this);
+	}
+
+	void Wall::Draw() {
+		gg.Quad().DrawFrame(gg.fs.circle256, scene->cam.ToGLPos(pos)
+			, scale * scene->cam.scale, radians);
+	}
+
+	void Wall::Dispose() {
+		auto i = indexAtContainer;
+		assert(scene->walls[i].pointer == this);
+		scene->walls.Back()->indexAtContainer = i;
+		indexAtContainer = -1;
+		scene->walls.SwapRemoveAt(i);
+	}
+
+	Wall::~Wall() {
+		if (indexAtGrid > -1) {
+			scene->gridBuildings.Remove(indexAtGrid, this);
+			indexAtGrid = -1;
+		}
+	}
+
+	/***************************************************************************************/
+	/***************************************************************************************/
+
+	void WoodFactor::Init(Scene* scene_, XY pos_, float scale_) {
 		scene = scene_;
 		pos = pos_;
 		y = pos.y;
@@ -12,7 +46,7 @@ namespace Test3 {
 		radians = {};
 	}
 
-	void Wood1::ShakeA() {
+	void WoodFactor::ShakeA() {
 		XX_BEGIN(_1);
 		{
 			auto r = gg.rnd.Next(M_PI * 2);
@@ -30,7 +64,7 @@ namespace Test3 {
 		XX_END(_1);
 	}
 
-	void Wood1::ShakeB() {
+	void WoodFactor::ShakeB() {
 		XX_BEGIN(_2);
 		for (j = 0; j < _countof(cDistances); ++j) {
 			radians = cDistances[j] * 0.029f;
@@ -40,13 +74,16 @@ namespace Test3 {
 		XX_END(_2);
 	}
 
-	bool Wood1::Update() {
-		if (gg.mouse[GLFW_MOUSE_BUTTON_1](0.1)) {
-			shaking = true;
-			offset = {};
-			radians = 0;
-			_1 = _2 = 0;
-			scene->woods.Emplace().Emplace()->Init(scene, pos, scale);
+	bool WoodFactor::Update() {
+		if (gg.mouse[GLFW_MOUSE_BUTTON_1]) {
+			if (nextGenTime <= scene->time) {
+				nextGenTime = scene->time + 0.01f;
+				shaking = true;
+				offset = {};
+				radians = 0;
+				_1 = _2 = 0;
+				scene->woods.Emplace().Emplace()->Init(scene, pos, scale);
+			}
 		}
 
 		if (shaking) {
@@ -57,16 +94,32 @@ namespace Test3 {
 		return false;
 	}
 
-	void Wood1::Draw() {
+	void WoodFactor::Draw() {
 		// todo: shadow ?
 		gg.Quad().DrawFrame(gg.fs.wood1, scene->cam.ToGLPos(pos + offset)
 			, scale * scene->cam.scale, radians);
 	}
 
+	void WoodFactor::Dispose() {
+		auto i = indexAtContainer;
+		assert(scene->factories[i].pointer == this);
+		scene->factories.Back()->indexAtContainer = i;
+		indexAtContainer = -1;
+		scene->factories.SwapRemoveAt(i);
+	}
+
+	WoodFactor::~WoodFactor() {
+		if (indexAtGrid > -1) {
+			scene->gridBuildings.Remove(indexAtGrid, this);
+			indexAtGrid = -1;
+		}
+	}
+
+	/***************************************************************************************/
 	/***************************************************************************************/
 
 
-	void Wood2::Init(Scene* scene_, XY pos_, float scale_) {
+	void Wood::Init(Scene* scene_, XY pos_, float scale_) {
 		scene = scene_;
 		pos = pos_;
 		y = pos.y;
@@ -75,7 +128,7 @@ namespace Test3 {
 		assert(scene->woods[indexAtContainer].pointer == this);
 	}
 
-	void Wood2::Anim() {
+	void Wood::Anim() {
 		static constexpr float cD{ 1.2f };
 		static constexpr float cDistances[]{
 			cD + .9f,cD + .8f,cD + .7f,cD + .6f,cD + .5f,cD + .4f,cD + .3f,cD + .2f,cD + .1f,cD + .0f,
@@ -100,7 +153,7 @@ namespace Test3 {
 		ready = true;
 		pos += offset;
 		y = pos.y;
-		scene->grid.Add(indexAtGrid, this);
+		scene->gridMaterials.Add(indexAtGrid, this);
 		offset = {};
 		// idle
 		while (true) {
@@ -114,25 +167,21 @@ namespace Test3 {
 		XX_END(_1);
 	}
 
-	bool Wood2::Update() {
+	bool Wood::Update() {
 		Anim();
 		if (ready) {
 			// todo: phys simu
-			scene->grid.Update(indexAtGrid, this);
+			scene->gridMaterials.Update(indexAtGrid, this);
 		}
 		return false;
 	}
 
-	void Wood2::Draw() {
+	void Wood::Draw() {
 		// todo: shadow ?
 		gg.Quad().DrawFrame(gg.fs.wood2, scene->cam.ToGLPos(pos + offset), scale * scene->cam.scale);
 	}
 
-	void Wood2::Dispose() {
-		if (indexAtGrid > -1) {
-			scene->grid.Remove(indexAtGrid, this);
-			indexAtGrid = -1;
-		}
+	void Wood::Dispose() {
 		auto i = indexAtContainer;
 		assert(scene->woods[i].pointer == this);
 		scene->woods.Back()->indexAtContainer = i;
@@ -140,14 +189,51 @@ namespace Test3 {
 		scene->woods.SwapRemoveAt(i);
 	}
 
+	Wood::~Wood() {
+		if (indexAtGrid > -1) {
+			scene->gridMaterials.Remove(indexAtGrid, this);
+			indexAtGrid = -1;
+		}
+	}
+
+	/***************************************************************************************/
 	/***************************************************************************************/
 
 	void Scene::Init() {
-		mapSize = 2000;
+		static constexpr XYi cWallMapSize{ 15, 15 };
+		static constexpr float cWallRadius{ 200.f };
+		mapSize = cWallRadius * (cWallMapSize + 1);
 		cam.Init(gg.scale, gg.designSize.y / mapSize.y, mapSize / 2);
 		sortContainer.Resize<true>((int32_t)mapSize.y);
-		grid.Init(130, mapSize.y / 130 + 1, mapSize.x / 130 + 1);
-		wood1.Init(this, cam.original, 10);
+
+		gridMaterials.Init(130, mapSize.y / 130 + 1, mapSize.x / 130 + 1);
+		gridBuildings.Init(400, mapSize.y / 400 + 1, mapSize.x / 400 + 1);
+
+		factories.Emplace().Emplace()->Init(this, cam.original + XY{ 400, 400 }, 10);
+		factories.Emplace().Emplace()->Init(this, cam.original + XY{ -400, 400 }, 10);
+		factories.Emplace().Emplace()->Init(this, cam.original + XY{ 400, -400 }, 10);
+		factories.Emplace().Emplace()->Init(this, cam.original + XY{ -400, -400 }, 10);
+
+		for (int32_t x = 0; x < cWallMapSize.x; ++x) {
+			walls.Emplace().Emplace()->Init(this, {
+				cWallRadius + x * cWallRadius
+				, cWallRadius + 0 * cWallRadius
+			}, cWallRadius);
+			walls.Emplace().Emplace()->Init(this, {
+				cWallRadius + x * cWallRadius
+				, cWallRadius + (cWallMapSize.y - 1) * cWallRadius
+			}, cWallRadius);
+		}
+		for (int32_t y = 1; y < cWallMapSize.y - 1; ++y) {
+			walls.Emplace().Emplace()->Init(this, {
+				cWallRadius + 0 * cWallRadius
+				, cWallRadius + y * cWallRadius
+			}, cWallRadius);
+			walls.Emplace().Emplace()->Init(this, {
+				cWallRadius + (cWallMapSize.x - 1) * cWallRadius
+				, cWallRadius + y * cWallRadius
+			}, cWallRadius);
+		}
 
 		ui.Emplace()->InitRoot(gg.scale * cUIScale);
 	}
@@ -170,7 +256,7 @@ namespace Test3 {
 	}
 
 	void Scene::FixedUpdate() {
-		wood1.Update();
+		for (auto& o : factories) o->Update();
 
 		for (auto i = woods.len - 1; i >= 0; --i) {
 			auto& o = woods[i];
@@ -182,8 +268,9 @@ namespace Test3 {
 		gg.Quad().DrawTinyFrame(gg.embed.shape_dot, 0, 0.5f, gg.windowSize, 0, 1, {0x81,0xbd,0x57,255});
 
 		// sort order by y. map y to 0 ~ 1080 ( design size.y ). FPS 3x faster than std::sort
+		for (auto& o : walls) SortContainerAdd(o.pointer);
+		for (auto& o : factories) SortContainerAdd(o.pointer);
 		for (auto& o : woods) SortContainerAdd(o.pointer);
-		SortContainerAdd(&wood1);
 		SortContainerDraw();
 
 		gg.GLBlendFunc(gg.blendDefault);
