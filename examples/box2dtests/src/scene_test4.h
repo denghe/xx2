@@ -5,28 +5,65 @@ namespace Test4 {
 
 	struct Scene;
 
-	struct SceneItem1 {
+	struct SceneItem {
 		Scene* scene{};
-		SceneItem1* next{};
-		xx::Frame frame;
-		xx::B2Body b2body;
-		int32_t indexAtContainer{-1};
-		float scale{};
+		SceneItem* next{};
+		XY pos{};
 		float y{};
-		bool isDead{};
-		float Init(Scene* scene_, XY pos_, float scale_ = 1);
-		bool Update();
-		void Draw();
-		void Dispose();	// unsafe
+		float scale{}, radians{}, radius{};
+		int32_t indexAtContainer{ -1 };
+		int32_t indexAtGrid{ -1 };
+		virtual bool Update() { return false; }
+		virtual void Draw() {};
+		virtual ~SceneItem() {};
 	};
 
-	struct SceneItem2 {
-		Scene* scene{};
-		float radius{};
+	struct Wall : SceneItem {
+		static constexpr float cRadius{ 200.f };
+		void Init(Scene* scene_, XY pos_);
+		void Draw() override;
+		void Dispose();	// unsafe
+		~Wall() override;
+	};
+
+	struct WoodFactor : SceneItem {
+		static constexpr float cRadius{ 150.f };
+		static constexpr float cDistances[]{ 1, 2, 3, 2, 1, 0, -1, -2, -1, 0, 1, 0 };
+		XY offset{};
+		float cos{}, sin{};
+		int32_t i{}, j{};
+		int32_t _1{}, _2{};
+		float nextGenTime{};
+		bool shaking{};
+		void ShakeA();
+		void ShakeB();
+		void Init(Scene* scene_, XY pos_);
+		bool Update() override;
+		void Draw() override;
+		void Dispose();	// unsafe
+		~WoodFactor() override;
+	};
+
+	struct Wood : SceneItem {
+		static constexpr float cRadius{ 65.f };
+		XY offset{}, inc{};
+		float cos{}, sin{};
+		int32_t i{};
+		int32_t _1{};
+		bool ready{};
+		void Anim();
+		void Init(Scene* scene_, XY pos_);
+		void PreUpdate();
+		bool Update() override;
+		void Draw() override;
+		void Dispose();	// unsafe
+		~Wood() override;
+	};
+
+	struct GridCache {
 		XY pos{};
-		void Init(Scene* scene_, XY pos_, float radius_);
-		bool Update();
-		void Draw();
+		float radius{};
+		void operator=(SceneItem* p);
 	};
 
 	struct Scene : xx::SceneBase {
@@ -35,18 +72,15 @@ namespace Test4 {
 		xx::Camera cam;
 		float time{}, timePool{}, timeScale{ 1 };
 
-		xx::B2World b2world;
-		xx::List<xx::Shared<SceneItem1>> item1s;
-		SceneItem2 item2;	// mouse
-		xx::List<SceneItem1*> tmp;	// for delete
 		XY mapSize{};
+		xx::Grid2dCircle<SceneItem*, GridCache> gridBuildings;	// for factory & wall
+		xx::Grid2dCircle<SceneItem*, GridCache> gridMaterials;	// for woods, ...
+		xx::List<xx::Shared<Wall>> walls;
+		xx::List<xx::Shared<WoodFactor>> factories;
+		xx::List<xx::Shared<Wood>> woods;			// life cycle < grid
 
-		float genTimer{}, logTimer{};
-		float lastGenY{};
-		void Gen(int32_t num_);
-
-		xx::List<SceneItem1*> sortContainer;				// for draw order by Y
-		void SortContainerAdd(SceneItem1* o);
+		xx::List<SceneItem*> sortContainer;			// for draw order by Y
+		void SortContainerAdd(SceneItem* o);
 		void SortContainerDraw();
 
 		void Init();

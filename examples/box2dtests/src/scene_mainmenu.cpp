@@ -35,11 +35,11 @@ void Scene_MainMenu::MakeUI() {
 		gg.MakeScene<Test2::Scene>()->Init();
 	};
 
-	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test3( cut wood anim )")).onClicked = [this] {
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test3( cut wood )")).onClicked = [this] {
 		gg.MakeScene<Test3::Scene>()->Init();
 	};
 
-	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test4( todo )")).onClicked = [this] {
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test4( cut wood )")).onClicked = [this] {
 		gg.MakeScene<Test4::Scene>()->Init();
 	};
 
