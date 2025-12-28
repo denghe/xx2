@@ -30,7 +30,7 @@ void Game::GLInit() {
 	fs.circle256 = LoadTexture("res/circle256.png");
 	fs.bg_fish = LoadTexture("res/bg_fish.png");
 	fs.wood1 = LoadTexture("res/wood1.png");
-	fs.wood1.anchor = { 0.5f, 0.2f };
+	fs.wood1.anchor = { 0.5f, 0.25f };
 	fs.wood2 = LoadTexture("res/wood2.png");
 	fs.wood2.anchor = { 0.5f, 0.1f };
 

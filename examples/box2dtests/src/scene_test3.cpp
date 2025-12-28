@@ -81,7 +81,7 @@ namespace Test3 {
 
 	bool WoodFactor::Update() {
 		if (gg.mouse[GLFW_MOUSE_BUTTON_1]) {
-			if (scene->woods.len < 20000) {				// todo
+			if (scene->woods.len < 30000) {				// todo
 				if (nextGenTime <= scene->time) {
 					nextGenTime = scene->time + 0.01f;
 					shaking = true;
@@ -265,7 +265,7 @@ namespace Test3 {
 	/***************************************************************************************/
 
 	void Scene::Init() {
-		static constexpr XYi cWallMapSize{ 50, 50 };
+		static constexpr XYi cWallMapSize{ 90, 50 };
 		mapSize = Wall::cRadius * (cWallMapSize + 1);
 		cam.Init(gg.scale, gg.designSize.y / mapSize.y, mapSize / 2);
 		sortContainer.Resize<true>((int32_t)mapSize.y);
@@ -273,10 +273,10 @@ namespace Test3 {
 		gridMaterials.Init(130, mapSize.y / 130 + 1, mapSize.x / 130 + 1);
 		gridBuildings.Init(Wall::cRadius * 2, mapSize.y / (Wall::cRadius * 2) + 1, mapSize.x / (Wall::cRadius * 2) + 1);
 
-		static constexpr float cFactoryDistance{ 800.f };
-		static constexpr float cFactoryCRHalfNums{ 3 };
-		for (int32_t x = -cFactoryDistance * cFactoryCRHalfNums; x < cFactoryDistance * cFactoryCRHalfNums; x += cFactoryDistance) {
-			for (int32_t y = -cFactoryDistance * cFactoryCRHalfNums; y < cFactoryDistance * cFactoryCRHalfNums; y += cFactoryDistance) {
+		static constexpr float cFactoryDistance{ 1200.f };
+		static constexpr XY cFactoryCRHalfNums{ 6, 3 };
+		for (int32_t x = -cFactoryDistance * cFactoryCRHalfNums.x; x < cFactoryDistance * cFactoryCRHalfNums.x; x += cFactoryDistance) {
+			for (int32_t y = -cFactoryDistance * cFactoryCRHalfNums.y; y < cFactoryDistance * cFactoryCRHalfNums.y; y += cFactoryDistance) {
 				factories.Emplace().Emplace()->Init(this, cam.original + XY{ x, y } + cFactoryDistance * 0.5f);
 			}
 		}
