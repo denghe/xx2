@@ -19,13 +19,15 @@ namespace Test3 {
 	};
 
 	struct Wall : SceneItem {
-		void Init(Scene* scene_, XY pos_, float radius_);
+		static constexpr float cRadius{ 200.f };
+		void Init(Scene* scene_, XY pos_);
 		void Draw() override;
 		void Dispose();	// unsafe
 		~Wall() override;
 	};
 
 	struct WoodFactor : SceneItem {
+		static constexpr float cRadius{ 150.f };
 		static constexpr float cDistances[]{ 1, 2, 3, 2, 1, 0, -1, -2, -1, 0, 1, 0 };
 		XY offset{};
 		float cos{}, sin{};
@@ -35,7 +37,7 @@ namespace Test3 {
 		bool shaking{};
 		void ShakeA();
 		void ShakeB();
-		void Init(Scene* scene_, XY pos_, float scale_ = 1);
+		void Init(Scene* scene_, XY pos_);
 		bool Update() override;
 		void Draw() override;
 		void Dispose();	// unsafe
@@ -43,17 +45,25 @@ namespace Test3 {
 	};
 
 	struct Wood : SceneItem {
-		XY offset{};
+		static constexpr float cRadius{ 65.f };
+		XY offset{}, inc{};
 		float cos{}, sin{};
 		int32_t i{};
 		int32_t _1{};
 		bool ready{};
 		void Anim();
-		void Init(Scene* scene_, XY pos_, float scale_ = 1);
+		void Init(Scene* scene_, XY pos_);
+		void PreUpdate();
 		bool Update() override;
 		void Draw() override;
 		void Dispose();	// unsafe
 		~Wood() override;
+	};
+
+	struct GridCache {
+		XY pos{};
+		float radius{};
+		void operator=(SceneItem* p);
 	};
 
 	struct Scene : xx::SceneBase {
@@ -63,8 +73,8 @@ namespace Test3 {
 		float time{}, timePool{}, timeScale{ 1 };
 
 		XY mapSize{};
-		xx::Grid2dCircle<SceneItem*> gridBuildings;	// for factory & wall
-		xx::Grid2dCircle<SceneItem*> gridMaterials;	// for woods, ...
+		xx::Grid2dCircle<SceneItem*, GridCache> gridBuildings;	// for factory & wall
+		xx::Grid2dCircle<SceneItem*, GridCache> gridMaterials;	// for woods, ...
 		xx::List<xx::Shared<Wall>> walls;
 		xx::List<xx::Shared<WoodFactor>> factories;
 		xx::List<xx::Shared<Wood>> woods;			// life cycle < grid
