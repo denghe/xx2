@@ -5,6 +5,7 @@
 namespace Test4 {
 
 	void Wall::Init(Scene* scene_, XY pos_) {
+		typeId = cTypeId;
 		scene = scene_;
 		pos = pos_;
 		y = pos.y;
@@ -39,6 +40,71 @@ namespace Test4 {
 	/***************************************************************************************/
 	/***************************************************************************************/
 
+	XY Box::PivotOffset() {
+		auto scale = cRadius / gg.fs.wood3.uvRect.w;
+		auto size = gg.fs.wood3.Size() * scale;
+		auto center = size * 0.5f;
+		auto pivot = size * gg.fs.wood3.anchor;
+		return center - pivot;
+	}
+
+	void Box::Init(Scene* scene_, XY pos_) {
+		typeId = cTypeId;
+		scene = scene_;
+		pos = pos_;
+		y = pos.y;
+		radius = cRadius;
+		scale = radius * 2.f / gg.fs.wood3.uvRect.w;
+		radians = {};
+		indexAtContainer = scene->factories.len - 1;
+		assert(scene->factories[indexAtContainer].pointer == this);
+		scene->gridBuildings.Add(indexAtGrid, this);
+	}
+
+	bool Box::Update() {
+		if (nextEffectTime <= scene->time) {
+			nextEffectTime = scene->time + 0.01f;
+
+			// auto collect ground materials
+			auto cri = scene->gridMaterials.PosToCRIndex(pos);
+			static constexpr float cCollectRange{ cRadius * 2 };
+			scene->gridMaterials.ForeachByRange(cri.y, cri.x, cRadius * 3, gg.sgrdd, [&](decltype(scene->gridMaterials)::Node& node, float range)
+				->void {
+					auto d = pos - node.cache.pos;
+					auto mag2 = d.x * d.x + d.y * d.y;
+					static constexpr float rr = cCollectRange * cCollectRange;
+					if (mag2 >= rr || mag2 <= 0.0001f) return;	// not cross?
+					flyingWoods.Emplace().Emplace()->Init(this, node.value);
+					node.value->Dispose();
+				});
+
+			shaking = true;
+			offset = {};
+			radians = 0;
+			_1 = _2 = 0;
+		}
+
+		if (shaking) {
+			ShakeA();
+			ShakeB();
+		}
+
+		for (auto i = flyingWoods.len - 1; i >= 0; --i) {
+			auto& o = flyingWoods[i];
+			if (o->Update()) o->Dispose();
+		}
+
+		return false;
+	}
+
+	void Box::Draw() {
+		gg.Quad().DrawFrame(gg.fs.wood3, scene->cam.ToGLPos(pos + offset)
+			, scale * scene->cam.scale, radians);
+	}
+
+	/***************************************************************************************/
+	/***************************************************************************************/
+
 	XY WoodFactor::PivotOffset() {
 		auto scale = cRadius / gg.fs.wood1.uvRect.w;
 		auto size = gg.fs.wood1.Size() * scale;
@@ -48,6 +114,7 @@ namespace Test4 {
 	}
 
 	void WoodFactor::Init(Scene* scene_, XY pos_) {
+		typeId = cTypeId;
 		scene = scene_;
 		pos = pos_;
 		y = pos.y;
@@ -90,8 +157,8 @@ namespace Test4 {
 	bool WoodFactor::Update() {
 		if (gg.mouse[GLFW_MOUSE_BUTTON_1]) {
 			if (scene->woods.len < 30000) {				// todo
-				if (nextGenTime <= scene->time) {
-					nextGenTime = scene->time + 0.01f;
+				if (nextEffectTime <= scene->time) {
+					nextEffectTime = scene->time + 0.01f;
 					shaking = true;
 					offset = {};
 					radians = 0;
@@ -110,7 +177,6 @@ namespace Test4 {
 	}
 
 	void WoodFactor::Draw() {
-		// todo: shadow ?
 		gg.Quad().DrawFrame(gg.fs.wood1, scene->cam.ToGLPos(pos + offset)
 			, scale * scene->cam.scale, radians);
 	}
@@ -135,6 +201,7 @@ namespace Test4 {
 
 
 	void Wood::Init(Scene* scene_, XY pos_) {
+		typeId = cTypeId;
 		scene = scene_;
 		pos = pos_;
 		y = pos.y;
@@ -243,7 +310,6 @@ namespace Test4 {
 	}
 
 	void Wood::Draw() {
-		// todo: shadow ?
 		gg.Quad().DrawFrame(gg.fs.wood2, scene->cam.ToGLPos(pos + offset), scale * scene->cam.scale);
 	}
 
@@ -261,6 +327,54 @@ namespace Test4 {
 			indexAtGrid = -1;
 		}
 	}
+
+	/***************************************************************************************/
+	/***************************************************************************************/
+
+	void FlyingWood::Init(Box* owner_, SceneItem* tar_) {
+		typeId = cTypeId;
+		owner = owner_;
+		scene = tar_->scene;
+		pos = tar_->pos;
+		y = pos.y;
+		radius = tar_->radius;
+		radians = tar_->radians;
+		scale = tar_->scale;
+		indexAtContainer = owner_->flyingWoods.len - 1;
+		assert(owner_->flyingWoods[indexAtContainer].pointer == this);
+
+		auto d = owner_->pos - tar_->pos;
+		auto mag2 = d.x * d.x + d.y * d.y;
+		if (mag2 > 0.0001f) {
+			auto mag = std::sqrtf(mag2);
+			auto norm = d / mag;
+			inc = norm * cSpeed;
+			numSteps = int32_t(mag / cSpeed);
+		}
+	}
+
+	bool FlyingWood::Update() {
+		if (--numSteps >= 0) {
+			pos += inc;
+			y = pos.y;
+			--numSteps;
+			return false;
+		}
+		return true;
+	}
+
+	void FlyingWood::Draw() {
+		gg.Quad().DrawFrame(gg.fs.wood2, scene->cam.ToGLPos(pos), scale * scene->cam.scale);
+	}
+
+	void FlyingWood::Dispose() {
+		auto i = indexAtContainer;
+		assert(owner->flyingWoods[i].pointer == this);
+		owner->flyingWoods.Back()->indexAtContainer = i;
+		indexAtContainer = -1;
+		owner->flyingWoods.SwapRemoveAt(i);
+	}
+
 
 	/***************************************************************************************/
 	/***************************************************************************************/
@@ -304,7 +418,11 @@ namespace Test4 {
 	}
 
 	void Scene::GenFactory(int32_t x_, int32_t y_) {
-		factories.Emplace().Emplace()->Init(this, XY{ x_, y_ } * cCellSize + cHalfCellSize + WoodFactor::PivotOffset());
+		factories.Emplace().Emplace<WoodFactor>()->Init(this, XY{ x_, y_ } * cCellSize + cHalfCellSize + WoodFactor::PivotOffset());
+	}
+
+	void Scene::GenBox(int32_t x_, int32_t y_) {
+		factories.Emplace().Emplace<Box>()->Init(this, XY{ x_, y_ } * cCellSize + cHalfCellSize + Box::PivotOffset());
 	}
 
 	void Scene::Init() {
@@ -314,8 +432,8 @@ namespace Test4 {
 		// []F.              []
 		// []F.              []
 		// [][][][][][][][]  []
-		// []                []
-		// []                []
+		// []B.              []
+		// []B.              []
 		// [][][][][][][][][][]
 
 		static constexpr XYi cWallMapSize{ 10, 7 };
@@ -334,6 +452,9 @@ namespace Test4 {
 
 		GenFactory(1, 1);
 		GenFactory(1, 2);
+
+		GenBox(1, 4);
+		GenBox(1, 5);
 	}
 
 	void Scene::Update() {
@@ -368,7 +489,14 @@ namespace Test4 {
 
 		// sort order by y. map y to 0 ~ 1080 ( design size.y ). FPS 3x faster than std::sort
 		for (auto& o : walls) SortContainerAdd(o.pointer);
-		for (auto& o : factories) SortContainerAdd(o.pointer);
+		for (auto& o : factories) {
+			SortContainerAdd(o.pointer);
+			if (o->typeId == Box::cTypeId) {
+				for (auto& p : ((Box*)o.pointer)->flyingWoods) {
+					SortContainerAdd(p.pointer);
+				}
+			}
+		}
 		for (auto& o : woods) SortContainerAdd(o.pointer);
 		SortContainerDraw();
 

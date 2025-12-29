@@ -15,7 +15,7 @@ namespace xx {
 	template <typename T, typename C>
 	struct Grid2dCacheNode {
 		int32_t next, prev;		// nodes index
-		int32_t bucketsIndex;	// used by. -1 mean not use
+		int32_t bucketsIndex;	// -1 mean not use
 		C cache;				// only support pod value
 		T value;				// pointer?
 	};

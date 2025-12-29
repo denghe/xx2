@@ -6,8 +6,10 @@ namespace Test4 {
 	struct Scene;
 
 	struct SceneItem {
+		static constexpr int32_t cTypeId{};
 		Scene* scene{};
 		SceneItem* next{};
+		int32_t typeId{};	// fill by Init: typeId = cTypeId
 		XY pos{};
 		float y{};
 		float scale{}, radians{}, radius{};
@@ -15,10 +17,12 @@ namespace Test4 {
 		int32_t indexAtGrid{ -1 };
 		virtual bool Update() { return false; }
 		virtual void Draw() {};
+		virtual void Dispose() {};	// unsafe: container.swapRemove( this )
 		virtual ~SceneItem() {};
 	};
 
 	struct Wall : SceneItem {
+		static constexpr int32_t cTypeId{__LINE__};
 		static constexpr float cRadius{ 200.f };
 		void Init(Scene* scene_, XY pos_);
 		void Draw() override;
@@ -27,6 +31,7 @@ namespace Test4 {
 	};
 
 	struct WoodFactor : SceneItem {
+		static constexpr int32_t cTypeId{ __LINE__ };
 		static constexpr float cRadius{ 170.f };
 		static constexpr float cDistances[]{ 1, 2, 3, 2, 1, 0, -1, -2, -1, 0, 1, 0 };
 		static XY PivotOffset();	// center - pivot
@@ -34,18 +39,19 @@ namespace Test4 {
 		float cos{}, sin{};
 		int32_t i{}, j{};
 		int32_t _1{}, _2{};
-		float nextGenTime{};
+		float nextEffectTime{};
 		bool shaking{};
 		void ShakeA();
 		void ShakeB();
 		void Init(Scene* scene_, XY pos_);
 		bool Update() override;
 		void Draw() override;
-		void Dispose();	// unsafe
+		void Dispose() override;
 		~WoodFactor() override;
 	};
 
 	struct Wood : SceneItem {
+		static constexpr int32_t cTypeId{ __LINE__ };
 		static constexpr float cRadius{ 65.f };
 		XY offset{}, inc{};
 		float cos{}, sin{};
@@ -57,8 +63,32 @@ namespace Test4 {
 		void PreUpdate();
 		bool Update() override;
 		void Draw() override;
-		void Dispose();	// unsafe
+		void Dispose() override;
 		~Wood() override;
+	};
+
+	struct Box;
+	struct FlyingWood : SceneItem {
+		static constexpr int32_t cTypeId{ __LINE__ };
+		static constexpr float cRadius{ 65.f };
+		static constexpr float cSpeed{ 1500.f / gg.cFps };
+		Box* owner{};
+		XY inc{};
+		int32_t numSteps{};
+		int32_t _1{};
+		void Init(Box* owner_, SceneItem* tar_);
+		bool Update() override;
+		void Draw() override;
+		void Dispose() override;
+	};
+
+	struct Box : WoodFactor {
+		static constexpr int32_t cTypeId{ __LINE__ };
+		static XY PivotOffset();	// center - pivot
+		xx::List<xx::Shared<FlyingWood>> flyingWoods;
+		void Init(Scene* scene_, XY pos_);
+		bool Update() override;
+		void Draw() override;
 	};
 
 	struct GridCache {
@@ -87,6 +117,7 @@ namespace Test4 {
 		void GenWallHorizontal(int32_t xFrom_, int32_t xTo_, int32_t y_, bool leftOverflow_ = false, bool rightOverflow_ = false);
 		void GenWallVertical(int32_t x_, int32_t yFrom_, int32_t yTo_, bool topOverflow_ = false, bool bottomOverflow_ = false);
 		void GenFactory(int32_t x_, int32_t y_);
+		void GenBox(int32_t x_, int32_t y_);
 
 		xx::List<SceneItem*> sortContainer;			// for draw order by Y
 		void SortContainerAdd(SceneItem* o_);
