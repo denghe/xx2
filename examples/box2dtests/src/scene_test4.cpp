@@ -39,6 +39,14 @@ namespace Test4 {
 	/***************************************************************************************/
 	/***************************************************************************************/
 
+	XY WoodFactor::PivotOffset() {
+		auto scale = cRadius / gg.fs.wood1.uvRect.w;
+		auto size = gg.fs.wood1.Size() * scale;
+		auto center = size * 0.5f;
+		auto pivot = size * gg.fs.wood1.anchor;
+		return center - pivot;
+	}
+
 	void WoodFactor::Init(Scene* scene_, XY pos_) {
 		scene = scene_;
 		pos = pos_;
@@ -177,7 +185,7 @@ namespace Test4 {
 
 	void Wood::PreUpdate() {
 		if (!ready) return;
-		static constexpr float cSpeed{ 1000.f / gg.cFps };
+		static constexpr float cSpeed{ 5.f };
 		auto& cache = scene->gridMaterials.NodeAt(indexAtGrid).cache;
 		auto cri = scene->gridMaterials.PosToCRIndex(cache.pos);
 		auto limit{ 3 };
@@ -221,6 +229,7 @@ namespace Test4 {
 				}
 			});
 	}
+
 	bool Wood::Update() {
 		Anim();
 		if (!ready) return false;
@@ -264,45 +273,67 @@ namespace Test4 {
 	/***************************************************************************************/
 	/***************************************************************************************/
 
+	void Scene::GenWallHorizontal(int32_t xFrom_, int32_t xTo_, int32_t y_, bool leftOverflow_, bool rightOverflow_) {
+		for (int32_t x = xFrom_; x <= xTo_; ++x) {
+			walls.Emplace().Emplace()->Init(this, XY{ x, y_ } * cCellSize + cHalfCellSize);
+		}
+		for (int32_t x = xFrom_; x < xTo_; ++x) {
+			walls.Emplace().Emplace()->Init(this, XY{ x, y_ } * cCellSize + XY{ cCellSize, cHalfCellSize });
+		}
+		if (leftOverflow_) {
+			walls.Emplace().Emplace()->Init(this, XY{ xFrom_, y_ } * cCellSize + XY{ 0, cHalfCellSize });
+		}
+		if (rightOverflow_) {
+			walls.Emplace().Emplace()->Init(this, XY{ xTo_, y_ } * cCellSize + XY{ cCellSize, cHalfCellSize });
+		}
+	}
+
+	void Scene::GenWallVertical(int32_t x_, int32_t yFrom_, int32_t yTo_, bool topOverflow_, bool bottomOverflow_) {
+		for (int32_t y = yFrom_; y <= yTo_; ++y) {
+			walls.Emplace().Emplace()->Init(this, XY{ x_, y } * cCellSize + cHalfCellSize);
+		}
+		for (int32_t y = yFrom_; y < yTo_; ++y) {
+			walls.Emplace().Emplace()->Init(this, XY{ x_, y } * cCellSize + XY{ cHalfCellSize, cCellSize });
+		}
+		if (topOverflow_) {
+			walls.Emplace().Emplace()->Init(this, XY{ x_, yFrom_ } * cCellSize + XY{ cHalfCellSize, 0 });
+		}
+		if (bottomOverflow_) {
+			walls.Emplace().Emplace()->Init(this, XY{ x_, yTo_ } * cCellSize + XY{ cHalfCellSize, cCellSize });
+		}
+	}
+
+	void Scene::GenFactory(int32_t x_, int32_t y_) {
+		factories.Emplace().Emplace()->Init(this, XY{ x_, y_ } * cCellSize + cHalfCellSize + WoodFactor::PivotOffset());
+	}
+
 	void Scene::Init() {
-		static constexpr XYi cWallMapSize{ 90, 50 };
-		mapSize = Wall::cRadius * (cWallMapSize + 1);
+		ui.Emplace()->InitRoot(gg.scale * cUIScale);
+
+		// [][][][][][][][][][]
+		// []F.              []
+		// []F.              []
+		// [][][][][][][][]  []
+		// []                []
+		// []                []
+		// [][][][][][][][][][]
+
+		static constexpr XYi cWallMapSize{ 10, 7 };
+		mapSize = cCellSize * cWallMapSize;
 		cam.Init(gg.scale, gg.designSize.y / mapSize.y, mapSize / 2);
 		sortContainer.Resize<true>((int32_t)mapSize.y);
 
-		gridMaterials.Init(130, mapSize.y / 130 + 1, mapSize.x / 130 + 1);
-		gridBuildings.Init(Wall::cRadius * 2, mapSize.y / (Wall::cRadius * 2) + 1, mapSize.x / (Wall::cRadius * 2) + 1);
+		gridBuildings.Init(cCellSize, mapSize.y / (cCellSize) + 1, mapSize.x / (cCellSize) + 1);
+		gridMaterials.Init(cItemSize, mapSize.y / cItemSize + 1, mapSize.x / cItemSize + 1);
 
-		static constexpr float cFactoryDistance{ 1200.f };
-		static constexpr XY cFactoryCRHalfNums{ 6, 3 };
-		for (int32_t x = -cFactoryDistance * cFactoryCRHalfNums.x; x < cFactoryDistance * cFactoryCRHalfNums.x; x += cFactoryDistance) {
-			for (int32_t y = -cFactoryDistance * cFactoryCRHalfNums.y; y < cFactoryDistance * cFactoryCRHalfNums.y; y += cFactoryDistance) {
-				factories.Emplace().Emplace()->Init(this, cam.original + XY{ x, y } + cFactoryDistance * 0.5f);
-			}
-		}
+		GenWallHorizontal(0, cWallMapSize.x - 1, 0);
+		GenWallHorizontal(1, cWallMapSize.x - 3, cWallMapSize.y / 2, true);
+		GenWallHorizontal(0, cWallMapSize.x - 1, cWallMapSize.y - 1);
+		GenWallVertical(0, 1, cWallMapSize.y - 2, true, true);
+		GenWallVertical(cWallMapSize.x - 1, 1, cWallMapSize.y - 2, true, true);
 
-		for (int32_t x = 0; x < cWallMapSize.x; ++x) {
-			walls.Emplace().Emplace()->Init(this, {
-				Wall::cRadius + x * Wall::cRadius
-				, Wall::cRadius + 0 * Wall::cRadius
-				});
-			walls.Emplace().Emplace()->Init(this, {
-				Wall::cRadius + x * Wall::cRadius
-				, Wall::cRadius + (cWallMapSize.y - 1) * Wall::cRadius
-				});
-		}
-		for (int32_t y = 1; y < cWallMapSize.y - 1; ++y) {
-			walls.Emplace().Emplace()->Init(this, {
-				Wall::cRadius + 0 * Wall::cRadius
-				, Wall::cRadius + y * Wall::cRadius
-				});
-			walls.Emplace().Emplace()->Init(this, {
-				Wall::cRadius + (cWallMapSize.x - 1) * Wall::cRadius
-				, Wall::cRadius + y * Wall::cRadius
-				});
-		}
-
-		ui.Emplace()->InitRoot(gg.scale * cUIScale);
+		GenFactory(1, 1);
+		GenFactory(1, 2);
 	}
 
 	void Scene::Update() {
@@ -352,10 +383,10 @@ namespace Test4 {
 
 
 
-	XX_INLINE void Scene::SortContainerAdd(SceneItem* o) {
-		auto& slot = sortContainer[(int32_t)o->y];
-		o->next = slot;
-		slot = o;
+	XX_INLINE void Scene::SortContainerAdd(SceneItem* o_) {
+		auto& slot = sortContainer[(int32_t)o_->y];
+		o_->next = slot;
+		slot = o_;
 	}
 
 	XX_INLINE void Scene::SortContainerDraw() {

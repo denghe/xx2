@@ -27,8 +27,9 @@ namespace Test4 {
 	};
 
 	struct WoodFactor : SceneItem {
-		static constexpr float cRadius{ 150.f };
+		static constexpr float cRadius{ 170.f };
 		static constexpr float cDistances[]{ 1, 2, 3, 2, 1, 0, -1, -2, -1, 0, 1, 0 };
+		static XY PivotOffset();	// center - pivot
 		XY offset{};
 		float cos{}, sin{};
 		int32_t i{}, j{};
@@ -72,6 +73,10 @@ namespace Test4 {
 		xx::Camera cam;
 		float time{}, timePool{}, timeScale{ 1 };
 
+		static constexpr float cHalfCellSize{ Wall::cRadius };
+		static constexpr float cCellSize{ cHalfCellSize * 2.f };
+		static constexpr float cItemSize{ Wood::cRadius * 2.f };
+
 		XY mapSize{};
 		xx::Grid2dCircle<SceneItem*, GridCache> gridBuildings;	// for factory & wall
 		xx::Grid2dCircle<SceneItem*, GridCache> gridMaterials;	// for woods, ...
@@ -79,8 +84,12 @@ namespace Test4 {
 		xx::List<xx::Shared<WoodFactor>> factories;
 		xx::List<xx::Shared<Wood>> woods;			// life cycle < grid
 
+		void GenWallHorizontal(int32_t xFrom_, int32_t xTo_, int32_t y_, bool leftOverflow_ = false, bool rightOverflow_ = false);
+		void GenWallVertical(int32_t x_, int32_t yFrom_, int32_t yTo_, bool topOverflow_ = false, bool bottomOverflow_ = false);
+		void GenFactory(int32_t x_, int32_t y_);
+
 		xx::List<SceneItem*> sortContainer;			// for draw order by Y
-		void SortContainerAdd(SceneItem* o);
+		void SortContainerAdd(SceneItem* o_);
 		void SortContainerDraw();
 
 		void Init();
