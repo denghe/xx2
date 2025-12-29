@@ -63,7 +63,7 @@ namespace Test4 {
 
 	bool Box::Update() {
 		if (nextEffectTime <= scene->time) {
-			nextEffectTime = scene->time + 0.01f;
+			nextEffectTime = scene->time + 0.1f;
 
 			// auto collect ground materials
 			auto cri = scene->gridMaterials.PosToCRIndex(pos);
