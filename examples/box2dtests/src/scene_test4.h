@@ -4,6 +4,7 @@
 namespace Test4 {
 
 	struct Scene : ::G2::Scene {
+		void Init();
 	};
 
 }

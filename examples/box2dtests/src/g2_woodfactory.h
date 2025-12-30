@@ -5,8 +5,6 @@ namespace G2 {
 
 	struct WoodFactory : SceneItem {
 		static constexpr int32_t cTypeId{ __LINE__ };
-		static constexpr float cRadius{ 170.f };
-		static constexpr float cDistances[]{ 1, 2, 3, 2, 1, 0, -1, -2, -1, 0, 1, 0 };
 		static XY PivotOffset();	// center - pivot
 		XY offset{};
 		float cos{}, sin{};

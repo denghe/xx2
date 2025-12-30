@@ -1,6 +1,5 @@
 ﻿#include "pch.h"
 #include "g.h"
-#include "scene_mainmenu.h"
 
 namespace G {
 

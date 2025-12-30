@@ -4,10 +4,24 @@
 namespace G2 {
 	static constexpr float cWallRadius{ 200.f };
 	static constexpr float cWoodRadius{ 65.f };
+	static constexpr float cFactoryRadius{ 170.f };
+	static constexpr float cFlyingWoodSpeed{ 1500.f / gg.cFps };
+
 	static constexpr float cHalfCellSize{ cWallRadius };
 	static constexpr float cCellSize{ cHalfCellSize * 2.f };
 	static constexpr float cItemSize{ cWoodRadius * 2.f };
 	static constexpr float cUIScale{ 0.5f };
+
+	static constexpr float cDistances12[]{ 1, 2, 3, 2, 1, 0, -1, -2, -1, 0, 1, 0 };
+	static constexpr float cD{ 1.2f };
+	static constexpr float cDistances25[]{
+		cD + .9f,cD + .8f,cD + .7f,cD + .6f,cD + .5f,cD + .4f,cD + .3f,cD + .2f,cD + .1f,cD + .0f,
+		cD - .1f,cD - .2f,cD - .3f,cD - .4f,cD - .5f,cD - .6f,cD - .7f,cD - .8f,cD - .9f,cD - 1.f,
+		cD - 1.1f, cD - 1.15f, cD - 1.175f, cD - 1.19f, 0
+	};
+	static constexpr float cIdleYMaxOffset{ 2.f };
+	static constexpr float cIdleYStep{ cIdleYMaxOffset / (gg.cFps * 0.58f) };
+
 
 	struct Scene;
 
@@ -57,9 +71,8 @@ namespace G2 {
 		void SortContainerAdd(SceneItem* o_);
 		void SortContainerDraw();
 
-		void Init();
 		void Update() override;
-		void FixedUpdate();
+		virtual void FixedUpdate();
 		void Draw() override;
 		void OnResize(bool modeChanged_) override;
 	};

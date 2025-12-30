@@ -4,7 +4,7 @@
 namespace G2 {
 
 	XY WoodFactory::PivotOffset() {
-		auto scale = cRadius / gg.fs.wood1.uvRect.w;
+		auto scale = cFactoryRadius / gg.fs.wood1.uvRect.w;
 		auto size = gg.fs.wood1.Size() * scale;
 		auto center = size * 0.5f;
 		auto pivot = size * gg.fs.wood1.anchor;
@@ -16,7 +16,7 @@ namespace G2 {
 		scene = scene_;
 		pos = pos_;
 		y = pos.y;
-		radius = cRadius;
+		radius = cFactoryRadius;
 		scale = radius * 2.f / gg.fs.wood1.uvRect.w;
 		radians = {};
 		indexAtContainer = scene->factories.len - 1;
@@ -31,9 +31,9 @@ namespace G2 {
 			cos = std::cosf(r) * scale * 0.5f;
 			sin = std::sinf(r) * scale * 0.5f;
 		}
-		for (i = 0; i < _countof(cDistances); ++i) {
-			offset.x = cos * cDistances[i];
-			offset.y = sin * cDistances[i];
+		for (i = 0; i < _countof(cDistances12); ++i) {
+			offset.x = cos * cDistances12[i];
+			offset.y = sin * cDistances12[i];
 			XX_YIELD(_1);
 		}
 		shaking = false;
@@ -44,8 +44,8 @@ namespace G2 {
 
 	void WoodFactory::ShakeB() {
 		XX_BEGIN(_2);
-		for (j = 0; j < _countof(cDistances); ++j) {
-			radians = cDistances[j] * 0.029f;
+		for (j = 0; j < _countof(cDistances12); ++j) {
+			radians = cDistances12[j] * 0.029f;
 			XX_YIELD(_2);
 		}
 		shaking = false;

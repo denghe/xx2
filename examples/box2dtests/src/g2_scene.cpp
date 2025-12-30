@@ -49,38 +49,6 @@ namespace G2 {
 		factories.Emplace().Emplace<Box>()->Init(this, XY{ x_, y_ } * cCellSize + cHalfCellSize + Box::PivotOffset());
 	}
 
-	void Scene::Init() {
-		ui.Emplace()->InitRoot(gg.scale * cUIScale);
-
-		// [][][][][][][][][][]
-		// []F.              []
-		// []F.              []
-		// [][][][][][][][]  []
-		// []B.              []
-		// []B.              []
-		// [][][][][][][][][][]
-
-		static constexpr XYi cWallMapSize{ 10, 7 };
-		mapSize = cCellSize * cWallMapSize;
-		cam.Init(gg.scale, gg.designSize.y / mapSize.y, mapSize / 2);
-		sortContainer.Resize<true>((int32_t)mapSize.y);
-
-		gridBuildings.Init(cCellSize, mapSize.y / (cCellSize) + 1, mapSize.x / (cCellSize) + 1);
-		gridMaterials.Init(cItemSize, mapSize.y / cItemSize + 1, mapSize.x / cItemSize + 1);
-
-		GenWallHorizontal(0, cWallMapSize.x - 1, 0);
-		GenWallHorizontal(1, cWallMapSize.x - 3, cWallMapSize.y / 2, true);
-		GenWallHorizontal(0, cWallMapSize.x - 1, cWallMapSize.y - 1);
-		GenWallVertical(0, 1, cWallMapSize.y - 2, true, true);
-		GenWallVertical(cWallMapSize.x - 1, 1, cWallMapSize.y - 2, true, true);
-
-		GenFactory(1, 1);
-		GenFactory(1, 2);
-
-		GenBox(1, 4);
-		GenBox(1, 5);
-	}
-
 	void Scene::Update() {
 		// handle inputs
 		if (gg.keyboard[GLFW_KEY_ESCAPE](0.2f)) {

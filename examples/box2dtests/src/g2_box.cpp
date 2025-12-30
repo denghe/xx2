@@ -4,7 +4,7 @@
 namespace G2 {
 
 	XY Box::PivotOffset() {
-		auto scale = cRadius / gg.fs.wood3.uvRect.w;
+		auto scale = cFactoryRadius / gg.fs.wood3.uvRect.w;
 		auto size = gg.fs.wood3.Size() * scale;
 		auto center = size * 0.5f;
 		auto pivot = size * gg.fs.wood3.anchor;
@@ -16,7 +16,7 @@ namespace G2 {
 		scene = scene_;
 		pos = pos_;
 		y = pos.y;
-		radius = cRadius;
+		radius = cFactoryRadius;
 		scale = radius * 2.f / gg.fs.wood3.uvRect.w;
 		radians = {};
 		indexAtContainer = scene->factories.len - 1;
@@ -30,7 +30,7 @@ namespace G2 {
 
 			// auto collect ground materials
 			auto cri = scene->gridMaterials.PosToCRIndex(pos);
-			static constexpr float cCollectRange{ cRadius * 2 };
+			static constexpr float cCollectRange{ cFactoryRadius * 2 };
 			scene->gridMaterials.ForeachByRange(cri.y, cri.x, cCollectRange + 64, gg.sgrdd, [&](decltype(scene->gridMaterials)::Node& node, float range)
 				->void {
 					auto d = pos - node.cache.pos;

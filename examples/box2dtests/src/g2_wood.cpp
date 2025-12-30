@@ -15,14 +15,6 @@ namespace G2 {
 	}
 
 	void Wood::Anim() {
-		static constexpr float cD{ 1.2f };
-		static constexpr float cDistances[]{
-			cD + .9f,cD + .8f,cD + .7f,cD + .6f,cD + .5f,cD + .4f,cD + .3f,cD + .2f,cD + .1f,cD + .0f,
-			cD - .1f,cD - .2f,cD - .3f,cD - .4f,cD - .5f,cD - .6f,cD - .7f,cD - .8f,cD - .9f,cD - 1.f,
-			cD - 1.1f, cD - 1.15f, cD - 1.175f, cD - 1.19f, 0
-		};
-		static constexpr float cIdleYMaxOffset{ 2.f };
-		static constexpr float cIdleYStep{ cIdleYMaxOffset / (gg.cFps * 0.58f) };
 
 		XX_BEGIN(_1);
 		{
@@ -30,9 +22,9 @@ namespace G2 {
 			cos = std::cosf(r) * scale;
 			sin = std::sinf(r) * scale;
 		}
-		for (i = 0; i < _countof(cDistances); ++i) {
-			offset.x += cos * cDistances[i];
-			offset.y += sin * cDistances[i];
+		for (i = 0; i < _countof(cDistances25); ++i) {
+			offset.x += cos * cDistances25[i];
+			offset.y += sin * cDistances25[i];
 			y = pos.y + offset.y;
 			XX_YIELD(_1);
 		}

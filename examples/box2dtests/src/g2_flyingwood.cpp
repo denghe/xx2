@@ -20,8 +20,8 @@ namespace G2 {
 		if (mag2 > 0.0001f) {
 			auto mag = std::sqrtf(mag2);
 			auto norm = d / mag;
-			inc = norm * cSpeed;
-			numSteps = int32_t(mag / cSpeed);
+			inc = norm * cFlyingWoodSpeed;
+			numSteps = int32_t(mag / cFlyingWoodSpeed);
 		}
 	}
 
