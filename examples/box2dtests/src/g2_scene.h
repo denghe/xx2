@@ -55,7 +55,7 @@ namespace G2 {
 		xx::Camera cam;
 		float time{}, timePool{}, timeScale{ 1 };
 
-		XY mapSize{};
+		XY mapSize{};	// mapSize = cCellSize * numColumnRows;
 		xx::Grid2dCircle<SceneItem*, GridCache> gridBuildings;	// for factory & wall
 		xx::Grid2dCircle<SceneItem*, GridCache> gridMaterials;	// for woods, ...
 		xx::List<xx::Shared<Wall>> walls;
