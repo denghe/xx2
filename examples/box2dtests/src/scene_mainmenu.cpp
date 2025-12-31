@@ -19,7 +19,8 @@ void Scene_MainMenu::MakeUI() {
 	ui.Emplace()->InitRoot(gg.scale);
 	auto C = ui->Make<xx::Node>();
 	xx::Layouter L;
-	L.InitBegin(C, 2, gg.p7 + XY{ 30, 0 }, { 0, 1 }, gg.designSize.x - 60)
+	auto hds = gg.designSize * 0.5f;
+	L.InitBegin(C, 2, {-hds.x + 30, hds.y }, { 0, 1 }, gg.designSize.x - 60)
 		.HAlign(xx::HAligns::Center)
 		.LeftMargin(cMargin)
 		.DefaultLineHeight(cLineHeight);
