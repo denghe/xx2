@@ -19,6 +19,8 @@ void Game::GLInit() {
 	ui->Make<xx::Label>()->Init(2, p9, a9, 32.f)("ESC: back   [: show/hide Info   ]:on/off FPS limit");
 	uiFPS = ui->Make<xx::Label>();
 	uiFPS->Init(2, p7, a7, 32.f)("");
+	uiText = ui->Make<xx::Label>();
+	uiText->Init(2, p8, a8, 32.f)("");
 
 	// hide hardware mouse
 	//SetMousePointerVisible(false);
@@ -151,10 +153,16 @@ void Game::Update() {
 	if (!minimized) {
 		scene->Draw();
 	}
-	if (oldScene) oldScene.Reset();
+	if (oldScene) {
+		uiText->SetText("");
+		oldScene.Reset();
+	}
 
 	// draw ui
-	uiFPS->SetText(fpsVal);
+	auto c = uiColorFlag ? xx::RGBA8_Red : xx::RGBA8_Blue;
+	uiColorFlag = !uiColorFlag;
+	uiFPS->SetText(fpsVal).SetColor(c);
+	uiText->SetColor(c);
 	gg.GLBlendFunc(gg.blendDefault);
 	gg.DrawNode(ui);
 	

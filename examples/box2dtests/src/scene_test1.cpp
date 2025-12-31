@@ -140,6 +140,7 @@ namespace Test1 {
 		for (auto& o : item1s) o->Draw();
 		for (auto& o : item2s) o->Draw();
 
+		gg.uiText->SetText(xx::ToString("count = ", item1s.len + item2s.len));
 		gg.GLBlendFunc(gg.blendDefault);
 		gg.DrawNode(ui);
 	}

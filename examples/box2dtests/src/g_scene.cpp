@@ -117,6 +117,7 @@ namespace G {
 		SortContainerDraw();
 		circle->Draw();
 
+		gg.uiText->SetText(xx::ToString("count = ", fishs.len));
 		gg.GLBlendFunc(gg.blendDefault);
 		gg.DrawNode(ui);
 	}

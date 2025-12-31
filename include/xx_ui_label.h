@@ -30,6 +30,11 @@ namespace xx {
 			return *this;
 		}
 
+		Label& SetColor(RGBA8 color_) {
+			color = color_;
+			return *this;
+		}
+
 		Label& SetFont(Shared<BMFont> bmf_) {
 			bmf = std::move(bmf_);
 			baseScale = fontSize / bmf->fontSize;

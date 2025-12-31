@@ -12,6 +12,8 @@ struct Game : xx::Game<Game> {
 	std::string fpsVal;
 	xx::Shared<xx::Node> ui;
 	xx::Weak<xx::Label> uiFPS;
+	xx::Weak<xx::Label> uiText;
+	bool uiColorFlag{};
 
 	xx::Shared<xx::SceneBase> scene, oldScene;	// oldScene: delay remove( after draw )
 	template<typename T>
