@@ -118,9 +118,9 @@ namespace Test5 {
 		cam.Init(gg.scale, gg.designSize.y / mapSize.y, mapSize / 2);
 		sortContainer.Resize<true>((int32_t)mapSize.y);
 
-		dropFromPos = { 200, gg.designSize.y * 0.5f + 250.f };
+		dropFromPos = { 700, mapSize.y - 300.f };
 		dropFromRangeRadius = 100.f;
-		dropToPos = { gg.designSize.x - 500, gg.designSize.y * 0.5f };
+		dropToPos = { mapSize.x - 1100, mapSize.y - 600.f };
 		dropToRangeRadius = 400.f;
 		dropToRangeRadiusSafe = 300.f;
 
@@ -159,7 +159,7 @@ namespace Test5 {
 		// gen
 		if (gg.keyboard[GLFW_KEY_SPACE](0.2f)) {
 			genSpeed *= 2.f;
-			if (genSpeed >= 500.f) genSpeed = 500.f;
+			if (genSpeed >= 200.f) genSpeed = 200.f;
 		}
 
 		genPool += genSpeed;
@@ -184,7 +184,7 @@ namespace Test5 {
 		for (auto& o : vortexItems) SortContainerAdd(o.pointer);
 		SortContainerDraw();
 
-		gg.uiText->SetText(xx::ToString("num droppingItems = ", droppingItems.len));
+		gg.uiText->SetText(xx::ToString("num items = ", droppingItems.len + vortexItems.len));
 		gg.GLBlendFunc(gg.blendDefault);
 		gg.DrawNode(ui);
 	}
