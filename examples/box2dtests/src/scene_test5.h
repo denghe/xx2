@@ -22,14 +22,17 @@ namespace Test5 {
 		virtual ~SceneItem() {};
 	};
 
+	struct Vortex {
+		// todo
+	};
+
 	struct DroppingItem : SceneItem {
 		static constexpr int32_t cTypeId{ __LINE__ };
 		static constexpr float cSpeed{ 600.f / gg.cFps };
 		xx::Frame frame;
-		xx::FromTo<XY> dropPos{};
 		XY inc{};
 		int32_t numSteps{}, step{};
-		float maxYOffset{}, yOffset{}, scale2{};
+		float maxYOffset{}, yOffset{}, scale2{}, scale2Ratio{};
 		void Init(Scene* scene_, float radius_);
 		bool Update() override;
 		void Draw() override;
@@ -43,7 +46,7 @@ namespace Test5 {
 
 		XY mapSize{};
 		XY dropFrom{}, dropTo{};
-		float dropFromRangeRadius{}, dropToRangeRadius{};
+		float dropFromRangeRadius{}, dropToRangeRadius{}, dropToRangeRadiusSafe{};
 		float genSpeed{}, genPool{};
 		xx::List<xx::Shared<DroppingItem>> droppingItems;
 

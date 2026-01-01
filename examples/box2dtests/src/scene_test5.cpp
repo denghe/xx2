@@ -13,17 +13,18 @@ namespace Test5 {
 		indexAtContainer = scene->droppingItems.len - 1;
 		assert(scene->droppingItems[indexAtContainer].pointer == this);
 
-		dropPos.from = scene->dropFrom + xx::GetRndPosDoughnut(gg.rnd, scene->dropFromRangeRadius);
-		dropPos.to = scene->dropTo + xx::GetRndPosDoughnut(gg.rnd, scene->dropToRangeRadius);
-		auto d = dropPos.to - dropPos.from;
+		auto posFrom = scene->dropFrom + xx::GetRndPosDoughnut(gg.rnd, scene->dropFromRangeRadius);
+		auto posTo = scene->dropTo + xx::GetRndPosDoughnut(gg.rnd, scene->dropToRangeRadius, scene->dropToRangeRadiusSafe);
+		auto d = posTo - posFrom;
 		auto mag2 = d.x * d.x + d.y * d.y;
 		auto mag = std::sqrtf(mag2);
 		if (mag >= cSpeed) {
 			numSteps = mag / cSpeed;
 			inc = d / mag * cSpeed;
-			maxYOffset = mag / (float(M_SQRT2) * 2.f);
+			maxYOffset = mag / (float(M_SQRT2) * 2.f) * 2.f;
+			scale2Ratio = maxYOffset >= 1000.f ? 1.f : maxYOffset / 1000.f;
 		}
-		pos = dropPos.from;
+		pos = posFrom;
 		y = pos.y;
 		scale2 = 1.f;
 	}
@@ -33,7 +34,7 @@ namespace Test5 {
 			auto x = (float)step / numSteps;					// normalize
 			x = x * float(M_SQRT2) * 2 - float(M_SQRT2);		// map to -1.41 ~ +1.41
 			auto v = -0.5 * x * x + 1;							// calc parabola y
-			scale2 = 1.f + 0.5f * v;							// make scale effect
+			scale2 = 1.f + v * scale2Ratio;						// make scale effect
 			yOffset = -v * maxYOffset;							// map y to max val
 			pos += inc;
 			y = pos.y;
@@ -69,6 +70,7 @@ namespace Test5 {
 		dropFromRangeRadius = 100.f;
 		dropTo = { mapSize.x - 500, mapSize.y * 0.5f };
 		dropToRangeRadius = 400.f;
+		dropToRangeRadiusSafe = 300.f;
 
 		genSpeed = 0.1f;
 	}
