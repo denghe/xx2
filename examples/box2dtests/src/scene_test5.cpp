@@ -13,8 +13,8 @@ namespace Test5 {
 		indexAtContainer = scene->droppingItems.len - 1;
 		assert(scene->droppingItems[indexAtContainer].pointer == this);
 
-		auto posFrom = scene->dropFrom + xx::GetRndPosDoughnut(gg.rnd, scene->dropFromRangeRadius);
-		auto posTo = scene->dropTo + xx::GetRndPosDoughnut(gg.rnd, scene->dropToRangeRadius, scene->dropToRangeRadiusSafe);
+		auto posFrom = scene->dropFromPos + xx::GetRndPosDoughnut(gg.rnd, scene->dropFromRangeRadius);
+		auto posTo = scene->dropToPos + xx::GetRndPosDoughnut(gg.rnd, scene->dropToRangeRadius, scene->dropToRangeRadiusSafe);
 		auto d = posTo - posFrom;
 		auto mag2 = d.x * d.x + d.y * d.y;
 		auto mag = std::sqrtf(mag2);
@@ -49,6 +49,8 @@ namespace Test5 {
 	}
 
 	void DroppingItem::Dispose() {
+		scene->vortexItems.Emplace().Emplace()->Init(this);
+
 		auto i = indexAtContainer;
 		assert(scene->droppingItems[i].pointer == this);
 		scene->droppingItems.Back()->indexAtContainer = i;
@@ -59,20 +61,70 @@ namespace Test5 {
 	/***************************************************************************************************/
 	/***************************************************************************************************/
 
+	void VortexItem::Init(DroppingItem* tar_) {
+		typeId = cTypeId;
+		scene = tar_->scene;
+		frame = tar_->frame;
+		radius = tar_->radius;
+		scale = tar_->scale;
+		indexAtContainer = scene->vortexItems.len - 1;
+		assert(scene->vortexItems[indexAtContainer].pointer == this);
+
+		pos = tar_->pos;
+		y = pos.y;
+		center = scene->dropToPos;
+		auto v = pos - center;
+		angle = std::atan2f(v.y, v.x);
+		angleSpeed = float(M_PI) * 2.f / 3.f / gg.cFps;
+		angleAccel = angleSpeed / 100.f;
+		maxDistance = distance = std::sqrtf(v.x * v.x + v.y * v.y);
+		distanceReduceStep = distance / (gg.cFps * 5.f);
+		scale2 = 1.f;
+	}
+
+	bool VortexItem::Update() {
+		if (distance >= distanceReduceStep) {
+			XY inc{ std::cosf(angle),std::sinf(angle) };
+			pos = center + inc * distance;
+			y = pos.y;
+			distance -= distanceReduceStep;
+			scale2 = 0.2f + distance / maxDistance * 0.8f;
+			angle += angleSpeed;
+			angleSpeed += angleAccel;
+			return false;
+		}
+		return true;
+	}
+
+	void VortexItem::Draw() {
+		gg.Quad().DrawFrame(frame, scene->cam.ToGLPos(pos), scale * scale2 * scene->cam.scale);
+	}
+
+	void VortexItem::Dispose() {
+		auto i = indexAtContainer;
+		assert(scene->vortexItems[i].pointer == this);
+		scene->vortexItems.Back()->indexAtContainer = i;
+		indexAtContainer = -1;
+		scene->vortexItems.SwapRemoveAt(i);
+	}
+
+	/***************************************************************************************************/
+	/***************************************************************************************************/
+
 	void Scene::Init() {
 		ui.Emplace()->InitRoot(gg.scale * cUIScale);
 
-		mapSize = gg.designSize;
+		mapSize = gg.designSize * 2.f;
 		cam.Init(gg.scale, gg.designSize.y / mapSize.y, mapSize / 2);
 		sortContainer.Resize<true>((int32_t)mapSize.y);
 
-		dropFrom = { 200, mapSize.y * 0.5f + 250.f };
+		dropFromPos = { 200, gg.designSize.y * 0.5f + 250.f };
 		dropFromRangeRadius = 100.f;
-		dropTo = { mapSize.x - 500, mapSize.y * 0.5f };
+		dropToPos = { gg.designSize.x - 500, gg.designSize.y * 0.5f };
 		dropToRangeRadius = 400.f;
 		dropToRangeRadiusSafe = 300.f;
 
-		genSpeed = 0.1f;
+		genSpeed = 0.01f;
 	}
 
 	void Scene::Update() {
@@ -93,11 +145,17 @@ namespace Test5 {
 	}
 
 	void Scene::FixedUpdate() {
+		for (auto i = vortexItems.len - 1; i >= 0; --i) {
+			auto& o = vortexItems[i];
+			if (o->Update()) o->Dispose();
+		}
+
 		for (auto i = droppingItems.len - 1; i >= 0; --i) {
 			auto& o = droppingItems[i];
 			if (o->Update()) o->Dispose();
 		}
 
+#if 1
 		// gen
 		if (gg.keyboard[GLFW_KEY_SPACE](0.2f)) {
 			genSpeed *= 2.f;
@@ -109,15 +167,21 @@ namespace Test5 {
 			genPool -= 1.f;
 			droppingItems.Emplace().Emplace()->Init(this, 64.f);
 		}
+#else
+		if (gg.keyboard[GLFW_KEY_SPACE](0.2f)) {
+			droppingItems.Emplace().Emplace()->Init(this, 64.f);
+		}
+#endif
 	}
 
 	void Scene::Draw() {
 		gg.Quad().DrawTinyFrame(gg.embed.shape_dot, 0, 0.5f, gg.windowSize, 0, 1, { 0x81,0xbd,0x57,255 });
-		gg.Quad().DrawFrame(gg.fs.circle256, cam.ToGLPos(dropFrom), dropFromRangeRadius * 2.f / 256.f * cam.scale);
-		gg.Quad().DrawFrame(gg.fs.circle256, cam.ToGLPos(dropTo), dropToRangeRadius * 2.f / 256.f * cam.scale);
+		gg.Quad().DrawFrame(gg.fs.circle256, cam.ToGLPos(dropFromPos), dropFromRangeRadius * 2.f / 256.f * cam.scale);
+		gg.Quad().DrawFrame(gg.fs.circle256, cam.ToGLPos(dropToPos), dropToRangeRadius * 2.f / 256.f * cam.scale);
 
 		// sort order by y. map y to 0 ~ 1080 ( design size.y ). FPS 3x faster than std::sort
 		for (auto& o : droppingItems) SortContainerAdd(o.pointer);
+		for (auto& o : vortexItems) SortContainerAdd(o.pointer);
 		SortContainerDraw();
 
 		gg.uiText->SetText(xx::ToString("num droppingItems = ", droppingItems.len));

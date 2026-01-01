@@ -39,16 +39,28 @@ namespace Test5 {
 		void Dispose() override;
 	};
 
+	struct VortexItem : SceneItem {
+		static constexpr int32_t cTypeId{ __LINE__ };
+		xx::Frame frame;
+		XY center{};
+		float angle{}, angleSpeed{}, angleAccel{}, distance{}, distanceReduceStep{}, maxDistance{}, scale2{};
+		void Init(DroppingItem* tar_);
+		bool Update() override;
+		void Draw() override;
+		void Dispose() override;
+	};
+
 	struct Scene : xx::SceneBase {
 		xx::Shared<xx::Node> ui;
 		xx::Camera cam;
 		float time{}, timePool{}, timeScale{ 1 };
 
 		XY mapSize{};
-		XY dropFrom{}, dropTo{};
+		XY dropFromPos{}, dropToPos{};
 		float dropFromRangeRadius{}, dropToRangeRadius{}, dropToRangeRadiusSafe{};
 		float genSpeed{}, genPool{};
 		xx::List<xx::Shared<DroppingItem>> droppingItems;
+		xx::List<xx::Shared<VortexItem>> vortexItems;
 
 		xx::List<SceneItem*> sortContainer;			// for draw order by Y
 		void SortContainerAdd(SceneItem* o_);
