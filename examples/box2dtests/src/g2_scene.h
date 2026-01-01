@@ -2,6 +2,8 @@
 #include "game.h"
 
 namespace G2 {
+	static constexpr float cUIScale{ 0.5f };
+
 	static constexpr float cWallRadius{ 200.f };
 	static constexpr float cWoodRadius{ 65.f };
 	static constexpr float cFactoryRadius{ 170.f };
@@ -10,7 +12,6 @@ namespace G2 {
 	static constexpr float cHalfCellSize{ cWallRadius };
 	static constexpr float cCellSize{ cHalfCellSize * 2.f };
 	static constexpr float cItemSize{ cWoodRadius * 2.f };
-	static constexpr float cUIScale{ 0.5f };
 
 	static constexpr float cDistances12[]{ 1, 2, 3, 2, 1, 0, -1, -2, -1, 0, 1, 0 };
 	static constexpr float cD{ 1.2f };

@@ -45,7 +45,7 @@ namespace xx {
     }
 
 
-    XX_INLINE static XY GetRndPosDoughnut(Rnd& rnd_, float maxRadius_, float safeRadius_, float radiansFrom_ = -M_PI, float radiansTo_ = M_PI) {
+    XX_INLINE static XY GetRndPosDoughnut(Rnd& rnd_, float maxRadius_, float safeRadius_ = 0.f, float radiansFrom_ = -M_PI, float radiansTo_ = M_PI) {
         auto len = maxRadius_ - safeRadius_;
         auto len_radius = len / maxRadius_;
         auto safeRadius_radius = safeRadius_ / maxRadius_;

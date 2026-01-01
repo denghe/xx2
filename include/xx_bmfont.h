@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include "xx_gamebase.h"
-#include "xx_frame.h"
 
 namespace xx {
 

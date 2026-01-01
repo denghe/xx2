@@ -5,6 +5,7 @@
 #include "scene_test2.h"
 #include "scene_test3.h"
 #include "scene_test4.h"
+#include "scene_test5.h"
 
 void Scene_MainMenu::Init() {
 	MakeUI();
@@ -42,6 +43,10 @@ void Scene_MainMenu::MakeUI() {
 
 	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test4( cut wood -> box )")).onClicked = [this] {
 		gg.MakeScene<Test4::Scene>()->Init();
+	};
+
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test5( drop effect )")).onClicked = [this] {
+		gg.MakeScene<Test5::Scene>()->Init();
 	};
 
 	L.InitEnd();
