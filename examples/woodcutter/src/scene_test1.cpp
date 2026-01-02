@@ -48,67 +48,44 @@ namespace Test1 {
 	void Tree::_Idle() {
 		XX_BEGIN(_1);
 		if (gg.rnd.Next<bool>()) goto LabTurnRight;
-	LabTurnLeft:
-		frameIndex -= frameInc;
-		if (frameIndex < frameIndexMin) {
-			frameIndex = frameIndexMin;
-			goto LabTurnRight;
+		for (; frameIndex >= frameIndexMin; frameIndex -= frameInc) {
+			XX_YIELD(_1);
 		}
-		XX_YIELD(_1);
-		goto LabTurnLeft;
+		frameIndex = frameIndexMin;
 	LabTurnRight:
-		frameIndex += frameInc;
-		if (frameIndex >= frameIndexMax) {
-			frameIndex = frameIndexMax - 0.0001f;
-			goto LabTurnLeft;
-			return;
+		for (; frameIndex < frameIndexMax; frameIndex += frameInc) {
+			XX_YIELD(_1);
 		}
-		XX_YIELD(_1);
-		goto LabTurnRight;
+		frameIndex = frameIndexMax - 0.0001f;
+		XX_YIELD_TO_BEGIN(_1);
 		XX_END(_1);
 	}
 
 	void Tree::_TurnLeft() {
 		XX_BEGIN(_1);
-	LabTurnLeft:
-		frameIndex -= frameInc;
-		if (frameIndex < frameIndexMin) {
-			frameIndex = frameIndexMin;
-			goto LabTurnRight;
+		for (; frameIndex >= frameIndexMin; frameIndex -= frameInc) {
+			XX_YIELD(_1);
 		}
-		XX_YIELD(_1);
-		goto LabTurnLeft;
-	LabTurnRight:
-		frameIndex += frameInc;
-		if (frameIndex >= frameIndexMax) {
-			frameIndex = frameIndexMax - 0.0001f;
-			Idle();
-			return;
+		frameIndex = frameIndexMin;
+		for (; frameIndex < frameIndexMax; frameIndex += frameInc) {
+			XX_YIELD(_1);
 		}
-		XX_YIELD(_1);
-		goto LabTurnRight;
+		Idle();
+		return;
 		XX_END(_1);
 	}
 
 	void Tree::_TurnRight() {
 		XX_BEGIN(_1);
-	LabTurnRight:
-		frameIndex += frameInc;
-		if (frameIndex >= frameIndexMax) {
-			frameIndex = frameIndexMax - 0.0001f;
-			goto LabTurnLeft;
+		for (; frameIndex < frameIndexMax; frameIndex += frameInc) {
+			XX_YIELD(_1);
 		}
-		XX_YIELD(_1);
-		goto LabTurnRight;
-	LabTurnLeft:
-		frameIndex -= frameInc;
-		if (frameIndex < frameIndexMin) {
-			frameIndex = frameIndexMin;
-			Idle();
-			return;
+		frameIndex = frameIndexMax - 0.0001f;
+		for (; frameIndex >= frameIndexMin; frameIndex -= frameInc) {
+			XX_YIELD(_1);
 		}
-		XX_YIELD(_1);
-		goto LabTurnLeft;
+		Idle();
+		return;
 		XX_END(_1);
 	}
 
