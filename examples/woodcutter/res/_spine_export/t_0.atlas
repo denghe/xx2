@@ -1,0 +1,13 @@
+
+t_0.png
+size: 124,148
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+t_0
+  rotate: false
+  xy: 0, 0
+  size: 124, 148
+  orig: 124, 148
+  offset: 0, 0
+  index: -1

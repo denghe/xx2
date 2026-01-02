@@ -1,0 +1,13 @@
+
+t_3.png
+size: 180,212
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+t_3
+  rotate: false
+  xy: 0, 0
+  size: 177, 210
+  orig: 177, 210
+  offset: 0, 0
+  index: -1
