@@ -7,67 +7,65 @@ namespace Test1 {
 	void Tree::Init(Scene* scene_, int32_t treeTypeId_, XY pos_) {
 		scene = scene_;
 		typeId = cTypeId;
+		treeTypeId = treeTypeId_;
 		pos = pos_;
 		y = pos_.y;
-
-		auto& fs = gg.treeIdles[treeTypeId_];
-		frames = fs.buf;
-		framesLen = fs.len;
 		Idle();
 	}
 
 	void Tree::Idle() {
 		state = 0;
 		_1 = 0;
-		auto mid = framesLen * 0.5f;
-		auto idleRange = framesLen * 0.03f;
-		frameIndexMin = mid - idleRange;
-		frameIndexMax = mid + idleRange;
-		frameIndex = gg.rnd.Next(frameIndexMin, frameIndexMax);
-		frameInc = (frameIndexMax - frameIndexMin) / (gg.cFps * 1.f);
+		auto& fs = gg.treeIdles[treeTypeId];
+		frames = fs.buf;
+		framesLen = fs.len;
+		frameIndex = gg.rnd.Next<float>(0, framesLen);
+		frameInc = framesLen / (gg.cFps * 1.f);
 	}
 
 	void Tree::TurnLeft() {
 		state = 1;
 		_1 = 0;
-		frameIndexMin = 0.f;
-		frameIndexMax = framesLen * 0.5f;
-		frameIndex = frameIndexMax;
-		frameInc = (frameIndexMax - frameIndexMin) / (gg.cFps * 0.1f);
+		auto& fs = gg.treeTurnLefts[treeTypeId];
+		frames = fs.buf;
+		framesLen = fs.len;
+		frameIndex = framesLen - 0.0001f;
+		frameInc = framesLen / (gg.cFps * 0.1f);
 	}
 
 	void Tree::TurnRight() {
 		state = 2;
 		_1 = 0;
-		frameIndexMin = framesLen * 0.5f;
-		frameIndexMax = framesLen;
-		frameIndex = frameIndexMin;
-		frameInc = (frameIndexMax - frameIndexMin) / (gg.cFps * 0.1f);
+		auto& fs = gg.treeTurnRights[treeTypeId];
+		frames = fs.buf;
+		framesLen = fs.len;
+		frameIndex = 0.f;
+		frameInc = framesLen / (gg.cFps * 0.1f);
 	}
 
 	void Tree::_Idle() {
 		XX_BEGIN(_1);
 		if (gg.rnd.Next<bool>()) goto LabTurnRight;
-		for (; frameIndex >= frameIndexMin; frameIndex -= frameInc) {
+		for (; frameIndex >= 0.f; frameIndex -= frameInc) {
 			XX_YIELD(_1);
 		}
-		frameIndex = frameIndexMin;
+		frameIndex = 0.f;
 	LabTurnRight:
-		for (; frameIndex < frameIndexMax; frameIndex += frameInc) {
+		for (; frameIndex < framesLen; frameIndex += frameInc) {
 			XX_YIELD(_1);
 		}
-		frameIndex = frameIndexMax - 0.0001f;
+		frameIndex = framesLen - 0.0001f;
 		XX_YIELD_TO_BEGIN(_1);
 		XX_END(_1);
 	}
 
 	void Tree::_TurnLeft() {
 		XX_BEGIN(_1);
-		for (; frameIndex >= frameIndexMin; frameIndex -= frameInc) {
+		for (; frameIndex >= 0.f; frameIndex -= frameInc) {
 			XX_YIELD(_1);
 		}
-		frameIndex = frameIndexMin;
-		for (; frameIndex < frameIndexMax; frameIndex += frameInc) {
+		frameIndex = 0.f;
+		for (; frameIndex < framesLen; frameIndex += frameInc) {
 			XX_YIELD(_1);
 		}
 		Idle();
@@ -77,11 +75,11 @@ namespace Test1 {
 
 	void Tree::_TurnRight() {
 		XX_BEGIN(_1);
-		for (; frameIndex < frameIndexMax; frameIndex += frameInc) {
+		for (; frameIndex < framesLen; frameIndex += frameInc) {
 			XX_YIELD(_1);
 		}
-		frameIndex = frameIndexMax - 0.0001f;
-		for (; frameIndex >= frameIndexMin; frameIndex -= frameInc) {
+		frameIndex = framesLen - 0.0001f;
+		for (; frameIndex >= 0.f; frameIndex -= frameInc) {
 			XX_YIELD(_1);
 		}
 		Idle();
@@ -209,7 +207,7 @@ namespace Test1 {
 
 	void Scene::Draw() {
 		// bg
-		gg.Quad().DrawTinyFrame(gg._pics.bg_[0], 0, 0.5f);
+		gg.Quad().DrawTinyFrame(gg._pics.bg_[0], 0, 0.5f, cam.scale);
 
 		for (auto& o : trees) SortContainerAdd(o.pointer);
 		SortContainerDraw();

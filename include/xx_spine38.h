@@ -116,10 +116,10 @@ namespace xx {
 	}
 
 	inline SpinePlayer& SpinePlayer::Update(float delta) {
+		skeleton.updateWorldTransform();
 		skeleton.update(delta * timeScale);
 		animationState.update(delta * timeScale);
 		animationState.apply(skeleton);
-		skeleton.updateWorldTransform();
 		return *this;
 	}
 
@@ -470,7 +470,10 @@ namespace xx {
 
 	inline spine::Atlas* SpineEnv::AddAtlas(std::string_view atlasFileName) {
 		auto r = atlass.emplace(atlasFileName, std::make_unique<spine::Atlas>(atlasFileName, &gSpineEnv.textureLoader));
-		if (!r.second) return nullptr;
+		if (!r.second) {
+			assert(false);	// duplicate load ?
+			return nullptr;
+		}
 		return r.first->second.get();
 	}
 
@@ -481,7 +484,10 @@ namespace xx {
 		auto sd = parser.readSkeletonDataFile(skeletonFileName);
 		assert(sd);
 		auto r = skeletonDatas.emplace(skeletonFileName, sd);
-		if (!r.second) return nullptr;
+		if (!r.second) {
+			assert(false);	// duplicate load ?
+			return nullptr;
+		}
 		return r.first->second.get();
 	}
 

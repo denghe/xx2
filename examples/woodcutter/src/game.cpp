@@ -33,43 +33,43 @@ void Game::GLInit() {
 	_mask_bg_1.Fill(LoadFileData("res/_mask_bg_1.png"));
 
 	// load spines
-	{
-		auto LoadSpineToFrames = [](std::string filePrefix, std::string animName
-			, xx::List<xx::Frame>& outFrames, xx::List<xx::SpineEventData>& outEventDatas
-			, XY size_, XY offset_, XY drawScale_, float frameDelta_) {
-			xx::Shared<xx::GLTexture> t;
-			spine::SkeletonData* s{};
-			xx::gSpineEnv.Load(filePrefix, s, t);
-			auto a = s->findAnimation(animName.c_str());
-			xx::SpineToFrames(outFrames, outEventDatas, s, a, size_, offset_, drawScale_, frameDelta_);
-		};
-		LoadSpineToFrames("res/_spine_export/t_0", "idle", treeIdles.Emplace(), spineEventDatas
-				, { 90 + 90, 5 + 150 }, { 90, 5 }, 1.f, gg.cDelta * 0.5f);
-		LoadSpineToFrames("res/_spine_export/t_1", "idle", treeIdles.Emplace(), spineEventDatas
-				, { 95 + 95, 5 + 175 }, { 95, 5 }, 1.f, gg.cDelta * 0.5f);
-		LoadSpineToFrames("res/_spine_export/t_2", "idle", treeIdles.Emplace(), spineEventDatas
-				, { 130 + 130, 5 + 190 }, { 130, 5 }, 1.f, gg.cDelta * 0.5f);
-		LoadSpineToFrames("res/_spine_export/t_3", "idle", treeIdles.Emplace(), spineEventDatas
-			, { 150 + 150, 5 + 215 }, { 150, 5 }, 1.f, gg.cDelta * 0.5f);
-		LoadSpineToFrames("res/_spine_export/t_4", "idle", treeIdles.Emplace(), spineEventDatas
-			, { 155 + 155, 30 + 190 }, { 155, 30 }, 1.f, gg.cDelta * 0.5f);
-		LoadSpineToFrames("res/_spine_export/t_5", "idle", treeIdles.Emplace(), spineEventDatas
-			, { 140 + 140, 30 + 185 }, { 140, 30 }, 1.f, gg.cDelta * 0.5f);
-		LoadSpineToFrames("res/_spine_export/t_6", "idle", treeIdles.Emplace(), spineEventDatas
-			, { 125 + 125, 40 + 155 }, { 125, 40 }, 1.f, gg.cDelta * 0.5f);
+	xx::LoadSpineToFrames("res/_spine_export/t_0", "idle", treeIdles.Emplace(), spineEventDatas, 1.f, 1.f / 360, 0.46666f, 0.53333f);
+	xx::LoadSpineToFrames("res/_spine_export/t_1", "idle", treeIdles.Emplace(), spineEventDatas, 1.f, 1.f / 360, 0.46666f, 0.53333f);
+	xx::LoadSpineToFrames("res/_spine_export/t_2", "idle", treeIdles.Emplace(), spineEventDatas, 1.f, 1.f / 360, 0.46666f, 0.53333f);
+	xx::LoadSpineToFrames("res/_spine_export/t_3", "idle", treeIdles.Emplace(), spineEventDatas, 1.f, 1.f / 360, 0.46666f, 0.53333f);
+	xx::LoadSpineToFrames("res/_spine_export/t_4", "idle", treeIdles.Emplace(), spineEventDatas, 1.f, 1.f / 360, 0.46666f, 0.53333f);
+	xx::LoadSpineToFrames("res/_spine_export/t_5", "idle", treeIdles.Emplace(), spineEventDatas, 1.f, 1.f / 360, 0.46666f, 0.53333f);
+	xx::LoadSpineToFrames("res/_spine_export/t_6", "idle", treeIdles.Emplace(), spineEventDatas, 1.f, 1.f / 360, 0.46666f, 0.53333f);
 
-		// combine all.frames & spines.framess
-		xx::RectPacker tp;
-		for (int32_t i = 0; i < sizeof(_pics) / sizeof(xx::Frame); ++i) {
-			tp.tfs.Add(((xx::Frame*)&_pics)[i]);
-		}
-		for (auto& fs : treeIdles) for (auto& f : fs) tp.tfs.Add(f);
-		tp.AutoPack();
-		tp.Tex().SetParm(GL_LINEAR, GL_CLAMP_TO_EDGE);
+	xx::LoadSpineToFrames("res/_spine_export/t_0", "idle", treeTurnLefts.Emplace(), spineEventDatas, 1.f, 1.f / 30, 0, 0.5f);
+	xx::LoadSpineToFrames("res/_spine_export/t_1", "idle", treeTurnLefts.Emplace(), spineEventDatas, 1.f, 1.f / 30, 0, 0.5f);
+	xx::LoadSpineToFrames("res/_spine_export/t_2", "idle", treeTurnLefts.Emplace(), spineEventDatas, 1.f, 1.f / 30, 0, 0.5f);
+	xx::LoadSpineToFrames("res/_spine_export/t_3", "idle", treeTurnLefts.Emplace(), spineEventDatas, 1.f, 1.f / 30, 0, 0.5f);
+	xx::LoadSpineToFrames("res/_spine_export/t_4", "idle", treeTurnLefts.Emplace(), spineEventDatas, 1.f, 1.f / 30, 0, 0.5f);
+	xx::LoadSpineToFrames("res/_spine_export/t_5", "idle", treeTurnLefts.Emplace(), spineEventDatas, 1.f, 1.f / 30, 0, 0.5f);
+	xx::LoadSpineToFrames("res/_spine_export/t_6", "idle", treeTurnLefts.Emplace(), spineEventDatas, 1.f, 1.f / 30, 0, 0.5f);
 
-		// clean up
-		xx::gSpineEnv.Clear();
+	xx::LoadSpineToFrames("res/_spine_export/t_0", "idle", treeTurnRights.Emplace(), spineEventDatas, 1.f, 1.f / 30, 0.5f);
+	xx::LoadSpineToFrames("res/_spine_export/t_1", "idle", treeTurnRights.Emplace(), spineEventDatas, 1.f, 1.f / 30, 0.5f);
+	xx::LoadSpineToFrames("res/_spine_export/t_2", "idle", treeTurnRights.Emplace(), spineEventDatas, 1.f, 1.f / 30, 0.5f);
+	xx::LoadSpineToFrames("res/_spine_export/t_3", "idle", treeTurnRights.Emplace(), spineEventDatas, 1.f, 1.f / 30, 0.5f);
+	xx::LoadSpineToFrames("res/_spine_export/t_4", "idle", treeTurnRights.Emplace(), spineEventDatas, 1.f, 1.f / 30, 0.5f);
+	xx::LoadSpineToFrames("res/_spine_export/t_5", "idle", treeTurnRights.Emplace(), spineEventDatas, 1.f, 1.f / 30, 0.5f);
+	xx::LoadSpineToFrames("res/_spine_export/t_6", "idle", treeTurnRights.Emplace(), spineEventDatas, 1.f, 1.f / 30, 0.5f);
+
+	xx::gSpineEnv.Clear();	// clean up
+
+
+	// combine all.frames & spines.framess
+	xx::RectPacker tp;
+	for (int32_t i = 0; i < sizeof(_pics) / sizeof(xx::Frame); ++i) {
+		tp.tfs.Add(((xx::Frame*)&_pics)[i]);
 	}
+	for (auto& fs : treeIdles) for (auto& f : fs) tp.tfs.Add(f);
+	for (auto& fs : treeTurnLefts) for (auto& f : fs) tp.tfs.Add(f);
+	for (auto& fs : treeTurnRights) for (auto& f : fs) tp.tfs.Add(f);
+	tp.AutoPack();
+	tp.Tex().SetParm(GL_LINEAR, GL_CLAMP_TO_EDGE);
 
 	// init first scene
 	scene.Emplace<Scene_MainMenu>()->Init();

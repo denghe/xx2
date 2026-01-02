@@ -20,9 +20,10 @@ namespace Test1 {
 	struct Tree : SceneItem {
 		static constexpr int32_t cTypeId{ __LINE__ };
 		xx::Frame* frames{};
-		int32_t framesLen{}, frameIndexMin{}, frameIndexMax{};
+		int32_t framesLen{};
 		float frameIndex{};
 		float frameInc{};
+		int32_t treeTypeId{};
 
 		int32_t state{};	// 0: idle  1: turn left   2: turn right
 		int32_t _1{};

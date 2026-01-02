@@ -45,6 +45,15 @@ void Scene_MainMenu::Update() {
 }
 
 void Scene_MainMenu::Draw() {
+	//auto&& t = *gg._pics.a_[0].tex;
+	//gg.Quad().Draw(t, t, 0, 0.5f, 0.1f * gg.scale);
+
+	for (int i = 0; i < 7; ++i) {
+		gg.Quad().DrawFrame(gg.treeIdles[i][0], XY{ -300, -500 + i * 150.f } * gg.scale, gg.scale);
+		gg.Quad().DrawFrame(gg.treeTurnLefts[i][0], XY{ 0, -500 + i * 150.f } * gg.scale, gg.scale);
+		gg.Quad().DrawFrame(gg.treeTurnRights[i][0], XY{ 300, -500 + i * 150.f } * gg.scale, gg.scale);
+	}
+
 	gg.DrawNode(ui);
 }
 
