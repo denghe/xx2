@@ -204,7 +204,7 @@ struct {0} {{
 
 			if (circles.Empty()) continue;
 			xx::Append(h, R"#(
-	static constexpr std::array<Circle, )#", circles.len, "> ", name, " {");
+	static constexpr std::array<Circle, )#", circles.len, "> ", name, " { Circle");
 			for (auto& c : circles) {
 				xx::Append(h, "{{ ", c.x, ", ", c.y, " }, ", c.r, "}, ");
 			}

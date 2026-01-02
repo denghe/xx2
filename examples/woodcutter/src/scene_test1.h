@@ -3,41 +3,51 @@
 
 namespace Test1 {
 
-	struct Rock {
-		xx::Frame f;
-		XY pos{}, fixedPos{};
+	struct Scene;
+
+	struct SceneItem {
+		static constexpr int32_t cTypeId{ /* __LINE__ */ };
+		Scene* scene{};
+		SceneItem* next{};
+		int32_t typeId{};
+		float y{};
+		XY pos{};
+		virtual bool Update() { return {}; }
+		virtual void Draw() {}
+		virtual ~SceneItem() {}
+	};
+
+	struct Tree : SceneItem {
+		static constexpr int32_t cTypeId{ __LINE__ };
+		xx::Frame* frames{};
+		int32_t framesLen{}, frameIndexMin{}, frameIndexMax{};
+		float frameIndex{};
+		float frameInc{};
+
+		int32_t state{};	// 0: idle  1: turn left   2: turn right
+		int32_t _1{};
+
+		void Idle();
+		void TurnLeft();
+		void TurnRight();
+
+		void _Idle();
+		void _TurnLeft();
+		void _TurnRight();
+
+		void Init(Scene* scene_, int32_t treeTypeId_, XY pos_);
+		bool Update() override;
+		void Draw() override;
 	};
 
 	struct Scene : xx::SceneBase {
-		static constexpr float cUIScale{ 0.5f };
 		xx::Shared<xx::Node> ui;
 		xx::Camera cam;
 		float time{}, timePool{}, timeScale{ 1 };
 
-		static constexpr xx::FromTo<XYi> cGridSizeRange{ {0, 0}, { 160 * 5, 30 * 5 } };
-		XYi cGridSize{ 16 * 5, 3 * 5 };
-		xx::Shared<xx::Slider> uiGridSizeY;
-		xx::Shared<xx::Slider> uiGridSizeX;
-
-		static constexpr xx::FromTo<float> cRocksScaleRange{ 0, 1 };
-		float cRocksScale{ 0.4f };
-		xx::Shared<xx::Slider> uiRocksScale;
-
-		xx::FromTo<int32_t> cRocksCountRange{ 0, cGridSize.x * cGridSize.y };
-		int32_t cRocksCount{ 1200 };
-		xx::Shared<xx::Slider> uiRocksCount;
-
-		// todo: random offset range set
-		bool cEnableRandomOffset{};
-		xx::Shared<xx::CheckBox> uiEnableRandomOffset;
-
-		xx::List<XY> rocksFixedPosPool;			// life cycle: must upon rocks
-		xx::List<xx::Shared<Rock>> rocks;
-
-		void GenRocksFixedPosPool();
-		void GenRocks();
-		void SetRandomOffset();
-		void GenAll();
+		XY mapSize{}, mapCenterPos{};
+		xx::List<XY> fixedPosPool;
+		xx::List<xx::Shared<Tree>> trees;
 
 		void MakeUI();
 		void Init();
@@ -45,6 +55,13 @@ namespace Test1 {
 		void FixedUpdate();
 		void Draw() override;
 		void OnResize(bool modeChanged_) override;
+
+		/***********************************************/
+		// for draw order by Y
+		xx::List<SceneItem*> sortContainer;
+		void SortContainerAdd(SceneItem* o);
+		void SortContainerDraw();
+		/***********************************************/
 	};
 
 }

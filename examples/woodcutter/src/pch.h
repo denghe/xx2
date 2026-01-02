@@ -5,6 +5,5 @@
 
 #include <xx_game.h>
 #include <xx_grid2d_circle.h>
-#include "shader_grass.h"
 
 #endif

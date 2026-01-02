@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "pch.h"
-#include "all.h"
+#include "_phys.h"
+#include "_pics.h"
 using XY = xx::XY;
 using XYi = xx::XYi;
 
@@ -34,41 +35,10 @@ struct Game : xx::Game<Game> {
 		return (xx::Shared<T>&)scene;
 	}
 
-	// for bg
-	xx::Shader_Grass shaderGrass;
-	XX_INLINE xx::Shader_Grass& Grass() { return ShaderBegin(shaderGrass); }
-
-	all all;
-	std::array<std::array<xx::Frame, sizeof(all::rock_0_) / sizeof(xx::Frame)>, 9>& all_rocks_();	// ref to all.rocks_?.  rock_?_?
-
-	struct {
-		std::array<char, 6> miner1_atk_{};
-		std::array<char, 28> miner2_atk_{};
-		std::array<char, 10> miner3_atk_{};
-		std::array<char, 6> miner4_atk_{};
-	} cd;	// collision detect
-
-	std::array<MinerConfig, 4> mcs;
-
-	struct {
-		xx::Shared<xx::SoundSource>
-			pickaxe, rockbreak, pop
-			, miner1_atk
-			, miner2_atk
-			, miner3_atk
-			, miner4_atk;
-	} ss;
-
-	struct {
-		xx::STBImage bg1a;
-		xx::STBImage minecart_3;
-	} stbi;
-
-	struct {
-		xx::List<xx::List<xx::Frame>> idles;	// grass
-		xx::List<xx::List<xx::Frame>> attacks;	// creatures
-		xx::List<xx::SpineEventData> eventDatas;
-	} spines;
+	_pics _pics;
+	xx::STBImage _mask_bg_1;
+	xx::List<xx::List<xx::Frame>> treeIdles;	// t_0 ~ t_6
+	xx::List<xx::SpineEventData> spineEventDatas;
 
 	// runtime vars
 	xx::Rnd rnd;

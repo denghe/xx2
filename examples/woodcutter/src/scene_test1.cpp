@@ -4,171 +4,197 @@
 
 namespace Test1 {
 
+	void Tree::Init(Scene* scene_, int32_t treeTypeId_, XY pos_) {
+		scene = scene_;
+		typeId = cTypeId;
+		pos = pos_;
+		y = pos_.y;
+
+		auto& fs = gg.treeIdles[treeTypeId_];
+		frames = fs.buf;
+		framesLen = fs.len;
+		Idle();
+	}
+
+	void Tree::Idle() {
+		state = 0;
+		_1 = 0;
+		auto mid = framesLen * 0.5f;
+		auto idleRange = framesLen * 0.03f;
+		frameIndexMin = mid - idleRange;
+		frameIndexMax = mid + idleRange;
+		frameIndex = gg.rnd.Next(frameIndexMin, frameIndexMax);
+		frameInc = (frameIndexMax - frameIndexMin) / (gg.cFps * 1.f);
+	}
+
+	void Tree::TurnLeft() {
+		state = 1;
+		_1 = 0;
+		frameIndexMin = 0.f;
+		frameIndexMax = framesLen * 0.5f;
+		frameIndex = frameIndexMax;
+		frameInc = (frameIndexMax - frameIndexMin) / (gg.cFps * 0.1f);
+	}
+
+	void Tree::TurnRight() {
+		state = 2;
+		_1 = 0;
+		frameIndexMin = framesLen * 0.5f;
+		frameIndexMax = framesLen;
+		frameIndex = frameIndexMin;
+		frameInc = (frameIndexMax - frameIndexMin) / (gg.cFps * 0.1f);
+	}
+
+	void Tree::_Idle() {
+		XX_BEGIN(_1);
+		if (gg.rnd.Next<bool>()) goto LabTurnRight;
+	LabTurnLeft:
+		frameIndex -= frameInc;
+		if (frameIndex < frameIndexMin) {
+			frameIndex = frameIndexMin;
+			goto LabTurnRight;
+		}
+		XX_YIELD(_1);
+		goto LabTurnLeft;
+	LabTurnRight:
+		frameIndex += frameInc;
+		if (frameIndex >= frameIndexMax) {
+			frameIndex = frameIndexMax - 0.0001f;
+			goto LabTurnLeft;
+			return;
+		}
+		XX_YIELD(_1);
+		goto LabTurnRight;
+		XX_END(_1);
+	}
+
+	void Tree::_TurnLeft() {
+		XX_BEGIN(_1);
+	LabTurnLeft:
+		frameIndex -= frameInc;
+		if (frameIndex < frameIndexMin) {
+			frameIndex = frameIndexMin;
+			goto LabTurnRight;
+		}
+		XX_YIELD(_1);
+		goto LabTurnLeft;
+	LabTurnRight:
+		frameIndex += frameInc;
+		if (frameIndex >= frameIndexMax) {
+			frameIndex = frameIndexMax - 0.0001f;
+			Idle();
+			return;
+		}
+		XX_YIELD(_1);
+		goto LabTurnRight;
+		XX_END(_1);
+	}
+
+	void Tree::_TurnRight() {
+		XX_BEGIN(_1);
+	LabTurnRight:
+		frameIndex += frameInc;
+		if (frameIndex >= frameIndexMax) {
+			frameIndex = frameIndexMax - 0.0001f;
+			goto LabTurnLeft;
+		}
+		XX_YIELD(_1);
+		goto LabTurnRight;
+	LabTurnLeft:
+		frameIndex -= frameInc;
+		if (frameIndex < frameIndexMin) {
+			frameIndex = frameIndexMin;
+			Idle();
+			return;
+		}
+		XX_YIELD(_1);
+		goto LabTurnLeft;
+		XX_END(_1);
+	}
+
+	bool Tree::Update() {
+		if (state == 0) _Idle();
+		else if (state == 1) _TurnLeft();
+		else if(state == 2) _TurnRight();
+		return false;
+	}
+
+	void Tree::Draw() {
+		auto& f = frames[(int32_t)frameIndex];
+		//auto& f = gg._pics.s_[1];
+		gg.Quad().DrawFrame(f, scene->cam.ToGLPos(pos), scene->cam.scale);
+	}
+	
+
+	/***********************************************************************************/
+	/***********************************************************************************/
+
 	void Scene::Init() {
-		cam.Init(gg.scale, 1.f, gg.designSize / 2);
 		MakeUI();
-		GenAll();
-	}
 
-	void Scene::MakeUI() {
-		ui.Emplace()->InitRoot(gg.scale * cUIScale);
+		auto logicScale_ = 1.f;
+		mapSize = gg.designSize / logicScale_;
+		mapCenterPos = mapSize * 0.5f;
+		cam.Init(gg.scale, logicScale_, mapCenterPos);
+		sortContainer.Resize<true>((int32_t)mapSize.y + 1);
 
-		static constexpr float cSliderWidths[]{ 600, 1000, 240 };
-		static constexpr float cMargin{ 5 };
-		static constexpr float cLineHeight{ 100 };
-		static constexpr XY cItemSize{ cSliderWidths[0] + cSliderWidths[1] + cSliderWidths[2], cLineHeight - cMargin };
-		auto fontSize = cItemSize.y - gg.embed.cfg_s9bN->paddings.TopBottom();
-		auto anchor = gg.a7;
-		auto offset = gg.p7 * 2 + XY{ cMargin, -cMargin };
+		// gen rock pos using image filter
+		auto& img = gg._mask_bg_1;
+		//y = pos.y + gg._mask_bg_1.h;
+		assert(img.comp == 4);
+		auto s = 1.f;// / (gg.designSize / img.Size());
 
-		/*************************************************************************************************/
-		//offset.y -= cLineHeight;
-		uiGridSizeY = ui->Make<xx::Slider>();
-		uiGridSizeY->callbackWhenBlockMoving = true;
-		uiGridSizeY->valueToString = [](double v)->std::string {
-			return xx::ToString(cGridSizeRange.from.y + (uint32_t(v * (cGridSizeRange.to.y - cGridSizeRange.from.y))));
-			};
-		uiGridSizeY->Init(2, offset, anchor, cItemSize.y, cSliderWidths[0], cSliderWidths[1], cSliderWidths[2]
-			, (double)cGridSize.y / (cGridSizeRange.to.y - cGridSizeRange.from.y))("row count");
-		uiGridSizeY->onChanged = [this](double v) {
-			cGridSize.y = int32_t(v * (cGridSizeRange.to.y - cGridSizeRange.from.y));
-			GenAll();
-			};
+		float density{ 1 };
+		XYi cGridSize{ 35 * density, 18 * density };
+		auto treeScale = 0.6f / density;
+		auto treeMargin = img.Size() / cGridSize;
+		auto treeMarginOffsetRange = { treeMargin.x / 6, treeMargin.y / 10 };
 
-		/*************************************************************************************************/
-		offset.y -= cLineHeight;
-		uiGridSizeX = ui->Make<xx::Slider>();
-		uiGridSizeX->callbackWhenBlockMoving = true;
-		uiGridSizeX->valueToString = [](double v)->std::string {
-			return xx::ToString(cGridSizeRange.from.x + (uint32_t(v * (cGridSizeRange.to.x - cGridSizeRange.from.x))));
-			};
-		uiGridSizeX->Init(2, offset, anchor, cItemSize.y, cSliderWidths[0], cSliderWidths[1], cSliderWidths[2]
-			, (double)cGridSize.x / (cGridSizeRange.to.x - cGridSizeRange.from.x))("column count");
-		uiGridSizeX->onChanged = [this](double v) {
-			cGridSize.x = int32_t(v * (cGridSizeRange.to.x - cGridSizeRange.from.x));
-			GenAll();
-			};
+		auto cellSize = (int32_t)std::ceilf(std::max(treeMargin.x, treeMargin.y));
+		auto numCRs = img.Size().As<int32_t>() / cellSize + 1;
 
-		/*************************************************************************************************/
-		offset.y -= cLineHeight;
-		uiRocksScale = ui->Make<xx::Slider>();
-		uiRocksScale->callbackWhenBlockMoving = true;
-		uiRocksScale->valueToString = [](double v)->std::string {
-			char buf[32];
-			snprintf(buf, 32, "%.2f", cRocksScaleRange.from + v * (cRocksScaleRange.to - cRocksScaleRange.from));
-			return buf;
-			};
-		uiRocksScale->Init(2, offset, anchor, cItemSize.y, cSliderWidths[0], cSliderWidths[1], cSliderWidths[2]
-			, (double)cRocksScale / (cRocksScaleRange.to - cRocksScaleRange.from))("rocks scale");
-		uiRocksScale->onChanged = [this](double v) {
-			cRocksScale = v * (cRocksScaleRange.to - cRocksScaleRange.from);
-			};
-
-		/*************************************************************************************************/
-		offset.y -= cLineHeight;
-		uiRocksCount = ui->Make<xx::Slider>();
-		uiRocksCount->callbackWhenBlockMoving = true;
-		uiRocksCount->valueToString = [this](double v)->std::string {
-			return xx::ToString(cRocksCountRange.from + (uint32_t(v * (cRocksCountRange.to - cRocksCountRange.from))));
-			};
-		uiRocksCount->Init(2, offset, anchor, cItemSize.y, cSliderWidths[0], cSliderWidths[1], cSliderWidths[2]
-			, (double)cRocksCount / (cRocksCountRange.to - cRocksCountRange.from))("rocks count");
-		uiRocksCount->onChanged = [this](double v) {
-			cRocksCount = int32_t(v * (cRocksCountRange.to - cRocksCountRange.from));
-			GenRocks();
-			};
-
-		/*************************************************************************************************/
-		offset.y -= cLineHeight;
-		uiEnableRandomOffset = ui->Make<xx::CheckBox>();
-		uiEnableRandomOffset->Init(2, offset, anchor, cItemSize, cEnableRandomOffset)("enable random offset");
-		uiEnableRandomOffset->onValueChanged = [this](bool v)->void {
-			cEnableRandomOffset = v;
-			SetRandomOffset();
-			};
-
-		/*************************************************************************************************/
-
-		ui->SetAlphaRecursive(0.7f);
-	}
-
-	void Scene::GenRocksFixedPosPool() {
-		XY step{ gg.designSize / cGridSize };
-		XY basePoss[]{ { step.x / 2, step.y / 2 }, { step.x / 2, step.y } };
+		XY minXY{ std::numeric_limits<float>::max() };
+		XY maxXY{ std::numeric_limits<float>::min() };
+		XY basePoss[]{ 
+			{ treeMargin.x * 0.5f, treeMargin.y * 0.25f }, 
+			{ treeMargin.x * 0.5f, treeMargin.y * 0.75f }
+		};
 		for (int y = 0; y < cGridSize.y; ++y) {
 			for (int x = 0; x < cGridSize.x; ++x) {
 				auto& basePos = basePoss[x & 1];
-				rocksFixedPosPool.Emplace(basePos.x + step.x * x, basePos.y + step.y * y);
+				XY pos{ basePos.x + treeMargin.x * x, basePos.y + treeMargin.y * y };
+				auto ipos = (pos * s).As<int32_t>();
+				// filte by img
+				auto cidx = ipos.y * img.w + ipos.x;
+				if (img.At(cidx).a) {
+					fixedPosPool.Emplace(pos);
+					if (pos.x > maxXY.x) maxXY.x = pos.x;
+					if (pos.x < minXY.x) minXY.x = pos.x;
+					if (pos.y > maxXY.y) maxXY.y = pos.y;
+					if (pos.y < minXY.y) minXY.y = pos.y;
+				}
 			}
 		}
+
+#if 0
+		for (size_t i = 0; i < 10; i++) {
+			//XY pos{
+			//	gg.rnd.Next(-300.f, 300.f)
+			//	, gg.rnd.Next(-200.f, 200.f)
+			//};
+			auto pos = gg.rnd.NextElement(fixedPosPool);
+			trees.Emplace().Emplace()->Init(this, gg.rnd.Next(7), pos);
+		}
+#else
+		for (auto& p : fixedPosPool) {
+			trees.Emplace().Emplace()->Init(this, gg.rnd.Next(7), p);
+		}
+#endif
 	}
 
-	void Scene::GenRocks() {
-		auto len = rocks.len;
-		auto d = cRocksCount - len;
-		if (d > 0) {
-			XY step{ gg.designSize / cGridSize };
-			XY offsetRange{ step / 3 };
-			for (int i = 0; i < d; ++i) {
-				auto& rock = rocks.Emplace().Emplace();
-				auto i1 = gg.rnd.Next<int32_t>(0, gg.all_rocks_().size());
-				static constexpr int32_t cIdxs[]{ 1,3,4 };
-				auto i2 = cIdxs[gg.rnd.Next<int32_t>(3)];
-				rock->f = gg.all_rocks_()[i1][i2];
-
-				auto fpIdx = gg.rnd.Next<int32_t>(rocksFixedPosPool.len);
-				rock->fixedPos = rocksFixedPosPool[fpIdx];
-				rocksFixedPosPool.SwapRemoveAt(fpIdx);
-				rock->pos = rock->fixedPos;
-			}
-		}
-		else {	// d is negative
-			for (int i = d; i < 0; ++i) {
-				auto idx = gg.rnd.Next<int32_t>(rocks.len);
-				rocksFixedPosPool.Emplace(rocks[idx]->fixedPos);
-				rocks.SwapRemoveAt(idx);
-			}
-		}
-		std::sort(rocks.buf, rocks.buf + rocks.len, [](auto& a, auto& b)->bool {
-			return a->pos.y < b->pos.y;
-			});
-	}
-
-	void Scene::SetRandomOffset() {
-		if (cEnableRandomOffset) {
-			XY step{ gg.designSize / cGridSize };
-			XY offsetRange{ step / 3 };
-			for (auto& rock : rocks) {
-				XY posOffset{
-					gg.rnd.Next<float>(-offsetRange.x, offsetRange.x),
-					gg.rnd.Next<float>(-offsetRange.y, offsetRange.y)
-				};
-				rock->pos = rock->fixedPos + posOffset;
-			}
-		}
-		else {
-			for (auto& rock : rocks) {
-				rock->pos = rock->fixedPos;
-			}
-		}
-	}
-
-	void Scene::GenAll() {
-		rocks.Clear();
-		rocksFixedPosPool.Clear();
-		cRocksCountRange.to = cGridSize.x * cGridSize.y;
-		cRocksCount = std::min(cRocksCount, cRocksCountRange.to);
-		if (cRocksCountRange.to > 0) {
-			uiRocksCount->SetValue((double)cRocksCount / (cRocksCountRange.to - cRocksCountRange.from));
-			uiRocksCount->ApplyValue();
-			GenRocksFixedPosPool();
-			GenRocks();
-		}
-		else {
-			uiRocksCount->SetValue(0);
-			uiRocksCount->ApplyValue();
-		}
-		SetRandomOffset();
+	void Scene::MakeUI() {
+		ui.Emplace()->InitRoot(gg.scale);
+		// todo
 	}
 
 	void Scene::Update() {
@@ -189,26 +215,53 @@ namespace Test1 {
 	}
 
 	void Scene::FixedUpdate() {
+
+		if (gg.mouse[GLFW_MOUSE_BUTTON_1](0.2f)) {
+			for (auto& o : trees) o->TurnLeft();
+		}
+		if (gg.mouse[GLFW_MOUSE_BUTTON_2](0.2f)) {
+			for (auto& o : trees) o->TurnRight();
+		}
+
+		for (auto i = trees.len - 1; i >= 0; --i) {
+			if (trees[i]->Update()) {
+				trees.SwapRemoveAt(i);
+			}
+		}
 	}
 
 	void Scene::Draw() {
-#if 0
-		{
-			auto& f = *gg.res.pickaxe_[0];
-			gg.Quad().Draw(f, f, 0, f, cam.scale);
-		}
-#endif
-		for (auto& rock : rocks) {
-			gg.Quad().DrawFrame(rock->f, cam.ToGLPos(rock->pos), cRocksScale * cam.scale);
-		}
+		// bg
+		gg.Quad().DrawTinyFrame(gg._pics.bg_[0], 0, 0.5f);
+
+		for (auto& o : trees) SortContainerAdd(o.pointer);
+		SortContainerDraw();
 
 		gg.GLBlendFunc(gg.blendDefault);
 		gg.DrawNode(ui);
 	}
 
 	void Scene::OnResize(bool modeChanged_) {
-		ui->Resize(gg.scale * cUIScale);
+		ui->Resize(gg.scale);
 		cam.SetBaseScale(gg.scale);
+	}
+
+	/***********************************************************************************/
+	/***********************************************************************************/
+
+	XX_INLINE void Scene::SortContainerAdd(SceneItem* o) {
+		auto& slot = sortContainer[(int32_t)o->y];
+		o->next = slot;
+		slot = o;
+	}
+	XX_INLINE void Scene::SortContainerDraw() {
+		for (auto o : sortContainer) {
+			while (o) {
+				o->Draw();
+				o = o->next;
+			}
+		}
+		memset(sortContainer.buf, 0, sortContainer.len * sizeof(void*));
 	}
 
 }
