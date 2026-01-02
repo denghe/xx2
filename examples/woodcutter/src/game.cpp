@@ -70,6 +70,7 @@ void Game::GLInit() {
 	for (auto& fs : treeTurnRights) for (auto& f : fs) tp.tfs.Add(f);
 	tp.AutoPack();
 	tp.Tex().SetParm(GL_LINEAR, GL_CLAMP_TO_EDGE);
+	xx::CoutN(tp.Tex().size);
 
 	// init first scene
 	scene.Emplace<Scene_MainMenu>()->Init();
