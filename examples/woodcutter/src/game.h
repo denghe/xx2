@@ -37,9 +37,10 @@ struct Game : xx::Game<Game> {
 
 	_pics _pics;
 	xx::STBImage _mask_bg_1;
-	xx::List<xx::List<xx::Frame>> treeIdles;		// t_0 ~ t_6
-	xx::List<xx::List<xx::Frame>> treeTurnLefts;	// t_0 ~ t_6
-	xx::List<xx::List<xx::Frame>> treeTurnRights;	// t_0 ~ t_6
+	xx::List<xx::List<xx::Frame>> treeIdles;
+	xx::List<xx::List<xx::Frame>> treeTurns;
+	xx::List<xx::List<_phys::Circle>> treeCollisionDatas;
+	xx::List<_phys::Circle> axeCollisionData;
 	xx::List<xx::SpineEventData> spineEventDatas;
 
 	// runtime vars

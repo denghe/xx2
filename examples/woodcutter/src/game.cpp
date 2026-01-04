@@ -21,7 +21,7 @@ void Game::GLInit() {
 	uiFPS->Init(2, p7, a7, 32.f)("");
 
 	// hide hardware mouse
-	SetMousePointerVisible(false);
+	//SetMousePointerVisible(false);
 
 	// init basedata
 	sgrdd.Init(64, 64);
@@ -32,30 +32,22 @@ void Game::GLInit() {
 	// load file data( for memory scan )
 	_mask_bg_1.Fill(LoadFileData("res/_mask_bg_1.png"));
 
-	// load spines
-	xx::LoadSpineToFrames("res/_spine_export/t_0", "idle", treeIdles.Emplace(), spineEventDatas, 1.f, 1.f / 360, 0.46666f, 0.53333f);
-	xx::LoadSpineToFrames("res/_spine_export/t_1", "idle", treeIdles.Emplace(), spineEventDatas, 1.f, 1.f / 360, 0.46666f, 0.53333f);
+	// load spines( known issue: some delay & time duration maybe curse spine draw position.y issue )
+	xx::LoadSpineToFrames("res/_spine_export/t_0", "idle", treeIdles.Emplace(), spineEventDatas, 1.f, 1.f / 360, 0.45f, 0.54f);	// issuefix
+	xx::LoadSpineToFrames("res/_spine_export/t_1", "idle", treeIdles.Emplace(), spineEventDatas, 1.f, 1.f / 360, 0.46f, 0.54f);	// issuefix
 	xx::LoadSpineToFrames("res/_spine_export/t_2", "idle", treeIdles.Emplace(), spineEventDatas, 1.f, 1.f / 360, 0.46666f, 0.53333f);
 	xx::LoadSpineToFrames("res/_spine_export/t_3", "idle", treeIdles.Emplace(), spineEventDatas, 1.f, 1.f / 360, 0.46666f, 0.53333f);
 	xx::LoadSpineToFrames("res/_spine_export/t_4", "idle", treeIdles.Emplace(), spineEventDatas, 1.f, 1.f / 360, 0.46666f, 0.53333f);
 	xx::LoadSpineToFrames("res/_spine_export/t_5", "idle", treeIdles.Emplace(), spineEventDatas, 1.f, 1.f / 360, 0.46666f, 0.53333f);
 	xx::LoadSpineToFrames("res/_spine_export/t_6", "idle", treeIdles.Emplace(), spineEventDatas, 1.f, 1.f / 360, 0.46666f, 0.53333f);
 
-	xx::LoadSpineToFrames("res/_spine_export/t_0", "idle", treeTurnLefts.Emplace(), spineEventDatas, 1.f, 1.f / 30, 0, 0.5f);
-	xx::LoadSpineToFrames("res/_spine_export/t_1", "idle", treeTurnLefts.Emplace(), spineEventDatas, 1.f, 1.f / 30, 0, 0.5f);
-	xx::LoadSpineToFrames("res/_spine_export/t_2", "idle", treeTurnLefts.Emplace(), spineEventDatas, 1.f, 1.f / 30, 0, 0.5f);
-	xx::LoadSpineToFrames("res/_spine_export/t_3", "idle", treeTurnLefts.Emplace(), spineEventDatas, 1.f, 1.f / 30, 0, 0.5f);
-	xx::LoadSpineToFrames("res/_spine_export/t_4", "idle", treeTurnLefts.Emplace(), spineEventDatas, 1.f, 1.f / 30, 0, 0.5f);
-	xx::LoadSpineToFrames("res/_spine_export/t_5", "idle", treeTurnLefts.Emplace(), spineEventDatas, 1.f, 1.f / 30, 0, 0.5f);
-	xx::LoadSpineToFrames("res/_spine_export/t_6", "idle", treeTurnLefts.Emplace(), spineEventDatas, 1.f, 1.f / 30, 0, 0.5f);
-
-	xx::LoadSpineToFrames("res/_spine_export/t_0", "idle", treeTurnRights.Emplace(), spineEventDatas, 1.f, 1.f / 30, 0.5f);
-	xx::LoadSpineToFrames("res/_spine_export/t_1", "idle", treeTurnRights.Emplace(), spineEventDatas, 1.f, 1.f / 30, 0.5f);
-	xx::LoadSpineToFrames("res/_spine_export/t_2", "idle", treeTurnRights.Emplace(), spineEventDatas, 1.f, 1.f / 30, 0.5f);
-	xx::LoadSpineToFrames("res/_spine_export/t_3", "idle", treeTurnRights.Emplace(), spineEventDatas, 1.f, 1.f / 30, 0.5f);
-	xx::LoadSpineToFrames("res/_spine_export/t_4", "idle", treeTurnRights.Emplace(), spineEventDatas, 1.f, 1.f / 30, 0.5f);
-	xx::LoadSpineToFrames("res/_spine_export/t_5", "idle", treeTurnRights.Emplace(), spineEventDatas, 1.f, 1.f / 30, 0.5f);
-	xx::LoadSpineToFrames("res/_spine_export/t_6", "idle", treeTurnRights.Emplace(), spineEventDatas, 1.f, 1.f / 30, 0.5f);
+	xx::LoadSpineToFrames("res/_spine_export/t_0", "idle", treeTurns.Emplace(), spineEventDatas, 1.f, 1.f / 31);	// issuefix
+	xx::LoadSpineToFrames("res/_spine_export/t_1", "idle", treeTurns.Emplace(), spineEventDatas, 1.f, 1.f / 30);
+	xx::LoadSpineToFrames("res/_spine_export/t_2", "idle", treeTurns.Emplace(), spineEventDatas, 1.f, 1.f / 30);
+	xx::LoadSpineToFrames("res/_spine_export/t_3", "idle", treeTurns.Emplace(), spineEventDatas, 1.f, 1.f / 30);
+	xx::LoadSpineToFrames("res/_spine_export/t_4", "idle", treeTurns.Emplace(), spineEventDatas, 1.f, 1.f / 30);
+	xx::LoadSpineToFrames("res/_spine_export/t_5", "idle", treeTurns.Emplace(), spineEventDatas, 1.f, 1.f / 30);
+	xx::LoadSpineToFrames("res/_spine_export/t_6", "idle", treeTurns.Emplace(), spineEventDatas, 1.f, 1.f / 30);
 
 	xx::gSpineEnv.Clear();	// clean up
 
@@ -66,11 +58,28 @@ void Game::GLInit() {
 		tp.tfs.Add(((xx::Frame*)&_pics)[i]);
 	}
 	for (auto& fs : treeIdles) for (auto& f : fs) tp.tfs.Add(f);
-	for (auto& fs : treeTurnLefts) for (auto& f : fs) tp.tfs.Add(f);
-	for (auto& fs : treeTurnRights) for (auto& f : fs) tp.tfs.Add(f);
+	for (auto& fs : treeTurns) for (auto& f : fs) tp.tfs.Add(f);
 	tp.AutoPack();
 	tp.Tex().SetParm(GL_LINEAR, GL_CLAMP_TO_EDGE);
 	xx::CoutN(tp.Tex().size);
+
+
+	// prepare collision detection data for trees
+	auto FillCDs = [this](xx::Frame& f, xx::List<_phys::Circle>& cs, auto&& cd, XY of = {}) {
+		auto fs = f.Size();
+		auto offset = fs * 0.5f - fs * f.anchor;
+		for (auto& c : cd) cs.Emplace((c.pos + offset + of).FlipY(), c.r);
+	};
+	FillCDs(_pics.t_[0], treeCollisionDatas.Emplace(), _phys::t_0, { 0, -2 });
+	FillCDs(_pics.t_[1], treeCollisionDatas.Emplace(), _phys::t_1, { 0, -5 });
+	FillCDs(_pics.t_[2], treeCollisionDatas.Emplace(), _phys::t_2, { 0, -5 });
+	FillCDs(_pics.t_[3], treeCollisionDatas.Emplace(), _phys::t_3, { 0, -3 });
+	FillCDs(_pics.t_[4], treeCollisionDatas.Emplace(), _phys::t_4, { 0, -8 });
+	FillCDs(_pics.t_[5], treeCollisionDatas.Emplace(), _phys::t_5, { 0, -13 });
+	FillCDs(_pics.t_[6], treeCollisionDatas.Emplace(), _phys::t_6, { 0, -10 });
+
+	FillCDs(_pics.a_[0], axeCollisionData, _phys::a_1);
+
 
 	// init first scene
 	scene.Emplace<Scene_MainMenu>()->Init();
@@ -81,7 +90,7 @@ void Game::Update() {
 	// handle inputs
 	if (gg.keyboard[GLFW_KEY_LEFT_BRACKET](0.2f)) {
 		isShowInfo = !isShowInfo;
-		xx::CoutN("show fps: ", isShowInfo ? "ON":"OFF");
+		xx::CoutN("show fps: ", isShowInfo ? "ON" : "OFF");
 	}
 	if (gg.keyboard[GLFW_KEY_RIGHT_BRACKET](0.2f)) {
 		isLimitFPS = !isLimitFPS;
@@ -98,7 +107,7 @@ void Game::Update() {
 		gg.DrawNode(ui);
 
 		// draw mouse pointer
-		Quad().DrawFrame(_pics.a_[0], mousePos);
+		//Quad().DrawFrame(_pics.a_[0], mousePos);
 	}
 	if (oldScene) oldScene.Reset();
 }

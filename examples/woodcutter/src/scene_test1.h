@@ -19,22 +19,30 @@ namespace Test1 {
 
 	struct Tree : SceneItem {
 		static constexpr int32_t cTypeId{ __LINE__ };
+		_phys::Circle const* collisionData{};
 		xx::Frame* frames{};
 		int32_t framesLen{};
+		int32_t collisionDataLen{};
 		float frameIndex{};
 		float frameInc{};
 		int32_t treeTypeId{};
 
-		int32_t state{};	// 0: idle  1: turn left   2: turn right
-		int32_t _1{};
+		// todo: store last hit info avoid hit every frame
 
-		void Idle();
-		void TurnLeft();
-		void TurnRight();
+		char state{};	// 0: idle  1: turn left   2: turn right
+		char needWhite{};
+		int32_t _1{}, _2{};
+		float colorplus{};
+
+		void Idle(bool fromTurn_ = false);
+		void Turn(bool isLeft_);
+		void White();
+		bool Hit();	// return true: dead
 
 		void _Idle();
 		void _TurnLeft();
 		void _TurnRight();
+		void _White();
 
 		void Init(Scene* scene_, int32_t treeTypeId_, XY pos_);
 		bool Update() override;
@@ -49,6 +57,7 @@ namespace Test1 {
 		XY mapSize{}, mapCenterPos{};
 		xx::List<XY> fixedPosPool;
 		xx::List<xx::Shared<Tree>> trees;
+		bool lastMouseDirection{};	// false: left
 
 		void MakeUI();
 		void Init();

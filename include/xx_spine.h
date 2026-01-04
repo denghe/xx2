@@ -83,10 +83,7 @@ namespace xx {
 		auto stepY = texSize / numRows;
 		XY origin{ -texSize / 2 };
 
-		//while (timeBegin_ >= frameDelta_) {
-		//	timeBegin_ -= frameDelta_;
-		//	sp.Update(frameDelta_);
-		//}
+		sp.SetPosition(0);
 		sp.Update(timeBegin_);
 
 		// fill tex & outFrames

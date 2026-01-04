@@ -10,38 +10,67 @@ namespace Test1 {
 		treeTypeId = treeTypeId_;
 		pos = pos_;
 		y = pos_.y;
-		Idle();
+		colorplus = 1.f;
+		auto& cd = gg.treeCollisionDatas[treeTypeId_];
+		collisionData = cd.buf;
+		collisionDataLen = cd.len;
+		Idle();	// will init frames*
 	}
 
-	void Tree::Idle() {
-		state = 0;
-		_1 = 0;
+	void Tree::Idle(bool fromTurn_) {
 		auto& fs = gg.treeIdles[treeTypeId];
 		frames = fs.buf;
 		framesLen = fs.len;
-		frameIndex = gg.rnd.Next<float>(0, framesLen);
 		frameInc = framesLen / (gg.cFps * 1.f);
+		if (fromTurn_) {
+			frameIndex = framesLen * 0.5f;
+		}
+		else {
+			frameIndex = gg.rnd.Next<float>(0, framesLen);
+		}
+		state = 0;
+		_1 = 0;
 	}
 
-	void Tree::TurnLeft() {
-		state = 1;
+	void Tree::Turn(bool isLeft_) {
+		if (state == 0) {
+			auto& fs = gg.treeTurns[treeTypeId];
+			frames = fs.buf;
+			framesLen = fs.len;
+			frameInc = framesLen / (gg.cFps * (1.f / 6.f));
+			frameIndex = framesLen * 0.5f;
+		}
+		if (isLeft_) state = 1;
+		else state = 2;
 		_1 = 0;
-		auto& fs = gg.treeTurnLefts[treeTypeId];
-		frames = fs.buf;
-		framesLen = fs.len;
-		frameIndex = framesLen - 0.0001f;
-		frameInc = framesLen / (gg.cFps * 0.1f);
 	}
 
-	void Tree::TurnRight() {
-		state = 2;
-		_1 = 0;
-		auto& fs = gg.treeTurnRights[treeTypeId];
-		frames = fs.buf;
-		framesLen = fs.len;
-		frameIndex = 0.f;
-		frameInc = framesLen / (gg.cFps * 0.1f);
+	void Tree::White() {
+		needWhite = true;
+		_2 = 0;
 	}
+
+	bool Tree::Hit() {
+		// todo: collision detection
+		auto mp = scene->cam.ToLogicPos(gg.mousePos);
+		for (auto& a : gg.axeCollisionData) {
+			for (int32_t i = 0; i < collisionDataLen; ++i) {
+				auto& b = collisionData[i];
+				auto ap = a.pos + mp;
+				auto bp = b.pos + pos;
+				auto d = ap - bp;
+				auto rr = a.r + b.r;
+				if (d.x * d.x + d.y * d.y < rr * rr) goto LabHit;
+			}
+		}
+		return false;
+	LabHit:
+		// todo: hp check  is dead  return true
+		White();
+		Turn(gg.rnd.Next<bool>());
+		return false;
+	}
+
 
 	void Tree::_Idle() {
 		XX_BEGIN(_1);
@@ -65,10 +94,10 @@ namespace Test1 {
 			XX_YIELD(_1);
 		}
 		frameIndex = 0.f;
-		for (; frameIndex < framesLen; frameIndex += frameInc) {
+		for (; frameIndex < framesLen * 0.5f; frameIndex += frameInc) {
 			XX_YIELD(_1);
 		}
-		Idle();
+		Idle(true);
 		return;
 		XX_END(_1);
 	}
@@ -79,27 +108,45 @@ namespace Test1 {
 			XX_YIELD(_1);
 		}
 		frameIndex = framesLen - 0.0001f;
-		for (; frameIndex >= 0.f; frameIndex -= frameInc) {
+		for (; frameIndex >= framesLen * 0.5f; frameIndex -= frameInc) {
 			XX_YIELD(_1);
 		}
-		Idle();
+		Idle(true);
 		return;
 		XX_END(_1);
+	}
+
+	void Tree::_White() {
+		// gradually change whilte 1/12 seconds
+		static constexpr float cColorplusMax{ 10.f };
+		static constexpr float cDuration{ 1.f / 12.f };
+		static constexpr float cStep{ (cColorplusMax - 1.f) / (gg.cFps * cDuration) * 2.f };
+		XX_BEGIN(_2);
+		for (colorplus = 1.f; colorplus < cColorplusMax; colorplus += cStep) {
+			XX_YIELD(_2);
+		}
+		for (colorplus = cColorplusMax; colorplus > 1.f; colorplus -= cStep) {
+			XX_YIELD(_2);
+		}
+		colorplus = 1.f;
+		needWhite = false;
+		XX_END(_2);
 	}
 
 	bool Tree::Update() {
 		if (state == 0) _Idle();
 		else if (state == 1) _TurnLeft();
-		else if(state == 2) _TurnRight();
+		else if (state == 2) _TurnRight();
+		if (needWhite) _White();
 		return false;
 	}
 
 	void Tree::Draw() {
 		auto& f = frames[(int32_t)frameIndex];
 		//auto& f = gg._pics.s_[1];
-		gg.Quad().DrawFrame(f, scene->cam.ToGLPos(pos), scene->cam.scale);
+		gg.Quad().DrawFrame(f, scene->cam.ToGLPos(pos), scene->cam.scale, 0, colorplus);
 	}
-	
+
 
 	/***********************************************************************************/
 	/***********************************************************************************/
@@ -130,8 +177,8 @@ namespace Test1 {
 
 		XY minXY{ std::numeric_limits<float>::max() };
 		XY maxXY{ std::numeric_limits<float>::min() };
-		XY basePoss[]{ 
-			{ treeMargin.x * 0.5f, treeMargin.y * 0.25f }, 
+		XY basePoss[]{
+			{ treeMargin.x * 0.5f, treeMargin.y * 0.25f },
 			{ treeMargin.x * 0.5f, treeMargin.y * 0.75f }
 		};
 		for (int y = 0; y < cGridSize.y; ++y) {
@@ -151,15 +198,14 @@ namespace Test1 {
 			}
 		}
 
-#if 0
-		for (size_t i = 0; i < 10; i++) {
-			//XY pos{
-			//	gg.rnd.Next(-300.f, 300.f)
-			//	, gg.rnd.Next(-200.f, 200.f)
-			//};
-			auto pos = gg.rnd.NextElement(fixedPosPool);
-			trees.Emplace().Emplace()->Init(this, gg.rnd.Next(7), pos);
-		}
+#if 1
+		trees.Emplace().Emplace()->Init(this, 0, mapSize * 0.5f + XY{-400, 50.f});
+		trees.Emplace().Emplace()->Init(this, 1, mapSize * 0.5f + XY{-250, 50.f});
+		trees.Emplace().Emplace()->Init(this, 2, mapSize * 0.5f + XY{-100, 50.f});
+		trees.Emplace().Emplace()->Init(this, 3, mapSize * 0.5f + XY{50, 50.f});
+		trees.Emplace().Emplace()->Init(this, 4, mapSize * 0.5f + XY{200, 50.f});
+		trees.Emplace().Emplace()->Init(this, 5, mapSize * 0.5f + XY{350, 50.f});
+		trees.Emplace().Emplace()->Init(this, 6, mapSize * 0.5f + XY{0, 300.f});
 #else
 		for (auto& p : fixedPosPool) {
 			trees.Emplace().Emplace()->Init(this, gg.rnd.Next(7), p);
@@ -192,10 +238,13 @@ namespace Test1 {
 	void Scene::FixedUpdate() {
 
 		if (gg.mouse[GLFW_MOUSE_BUTTON_1](0.2f)) {
-			for (auto& o : trees) o->TurnLeft();
+			for (auto& o : trees) o->Turn(true);
 		}
 		if (gg.mouse[GLFW_MOUSE_BUTTON_2](0.2f)) {
-			for (auto& o : trees) o->TurnRight();
+			for (auto& o : trees) o->Turn(false);
+		}
+		if (gg.keyboard[GLFW_KEY_SPACE]) {
+			for (auto& o : trees) o->Hit();
 		}
 
 		for (auto i = trees.len - 1; i >= 0; --i) {
@@ -211,6 +260,25 @@ namespace Test1 {
 
 		for (auto& o : trees) SortContainerAdd(o.pointer);
 		SortContainerDraw();
+
+		{
+			auto& f = gg._pics.s_[1];
+			for (auto& o : trees) {
+				for (int32_t i = 0; i < o->collisionDataLen; ++i) {
+					auto& c = o->collisionData[i];
+					gg.Quad().DrawFrame(f, cam.ToGLPos(c.pos + o->pos), c.r / f.uvRect.w * 2.f * cam.scale);
+				}
+			}
+		}
+
+		gg.Quad().DrawFrame(gg._pics.a_[0], gg.mousePos, cam.scale);
+		{
+			auto mp = cam.ToLogicPos(gg.mousePos);
+			auto& f = gg._pics.s_[1];
+			for (auto& c : gg.axeCollisionData) {
+				gg.Quad().DrawFrame(f, cam.ToGLPos(c.pos + mp), c.r / f.uvRect.w * 2.f * cam.scale);
+			}
+		}
 
 		gg.GLBlendFunc(gg.blendDefault);
 		gg.DrawNode(ui);
