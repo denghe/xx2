@@ -51,12 +51,14 @@ namespace Test1 {
 	}
 
 	bool Tree::Hit() {
-		// todo: collision detection
+		// collision detection
 		auto mp = scene->cam.ToLogicPos(gg.mousePos);
+		int32_t flipX{ 1 };
+		if (scene->mouseDirectionIsRight) flipX = -1;
 		for (auto& a : gg.axeCollisionData) {
+			auto ap = XY{ a.pos.x * flipX, a.pos.y } + mp;
 			for (int32_t i = 0; i < collisionDataLen; ++i) {
 				auto& b = collisionData[i];
-				auto ap = a.pos + mp;
 				auto bp = b.pos + pos;
 				auto d = ap - bp;
 				auto rr = a.r + b.r;
@@ -65,9 +67,11 @@ namespace Test1 {
 		}
 		return false;
 	LabHit:
+		if (lastMouseVersionNumber == scene->mouseVersionNumber) return false;
 		// todo: hp check  is dead  return true
+		lastMouseVersionNumber = scene->mouseVersionNumber;
 		White();
-		Turn(gg.rnd.Next<bool>());
+		Turn(pos.x < scene->currentMousePos.x);
 		return false;
 	}
 
@@ -159,6 +163,7 @@ namespace Test1 {
 		mapCenterPos = mapSize * 0.5f;
 		cam.Init(gg.scale, logicScale_, mapCenterPos);
 		sortContainer.Resize<true>((int32_t)mapSize.y + 1);
+		lastMousePos = currentMousePos = cam.ToLogicPos(gg.mousePos);
 
 		// gen rock pos using image filter
 		auto& img = gg._mask_bg_1;
@@ -219,6 +224,21 @@ namespace Test1 {
 	}
 
 	void Scene::Update() {
+		currentMousePos = cam.ToLogicPos(gg.mousePos);
+		if (currentMousePos.x > lastMousePos.x) {
+			if (!mouseDirectionIsRight) {
+				++mouseVersionNumber;
+				mouseDirectionIsRight = true;
+			}
+		}
+		else if (currentMousePos.x < lastMousePos.x) {
+			if (mouseDirectionIsRight) {
+				++mouseVersionNumber;
+				mouseDirectionIsRight = false;
+			}
+		}
+		lastMousePos = cam.ToLogicPos(gg.mousePos);
+
 		// handle inputs
 		if (gg.keyboard[GLFW_KEY_ESCAPE](0.2f)) {
 			gg.MakeScene<Scene_MainMenu>()->Init();
@@ -236,16 +256,14 @@ namespace Test1 {
 	}
 
 	void Scene::FixedUpdate() {
-
 		if (gg.mouse[GLFW_MOUSE_BUTTON_1](0.2f)) {
 			for (auto& o : trees) o->Turn(true);
 		}
 		if (gg.mouse[GLFW_MOUSE_BUTTON_2](0.2f)) {
 			for (auto& o : trees) o->Turn(false);
 		}
-		if (gg.keyboard[GLFW_KEY_SPACE]) {
-			for (auto& o : trees) o->Hit();
-		}
+
+		for (auto& o : trees) o->Hit();
 
 		for (auto i = trees.len - 1; i >= 0; --i) {
 			if (trees[i]->Update()) {
@@ -261,23 +279,33 @@ namespace Test1 {
 		for (auto& o : trees) SortContainerAdd(o.pointer);
 		SortContainerDraw();
 
-		{
-			auto& f = gg._pics.s_[1];
-			for (auto& o : trees) {
-				for (int32_t i = 0; i < o->collisionDataLen; ++i) {
-					auto& c = o->collisionData[i];
-					gg.Quad().DrawFrame(f, cam.ToGLPos(c.pos + o->pos), c.r / f.uvRect.w * 2.f * cam.scale);
+		if (gg.keyboard[GLFW_KEY_SPACE]) {
+			{
+				auto& f = gg._pics.s_[1];
+				for (auto& o : trees) {
+					for (int32_t i = 0; i < o->collisionDataLen; ++i) {
+						auto& c = o->collisionData[i];
+						gg.Quad().DrawFrame(f, cam.ToGLPos(c.pos + o->pos), c.r / f.uvRect.w * 2.f * cam.scale, 0, 1, { 255,255,255,127 });
+					}
+				}
+			}
+			{
+				XY cs{ cam.scale };
+				if (mouseDirectionIsRight) cs.x = -cs.x;
+				gg.Quad().DrawFrame(gg._pics.a_[0], gg.mousePos, cs);
+				auto mp = cam.ToLogicPos(gg.mousePos);
+				auto& f = gg._pics.s_[1];
+				for (auto& c : gg.axeCollisionData) {
+					auto cp{ c.pos };
+					if (mouseDirectionIsRight) cp.x = -cp.x;
+					gg.Quad().DrawFrame(f, cam.ToGLPos(cp + mp), c.r / f.uvRect.w * 2.f * cs, 0, 1, { 255,255,255,127 });
 				}
 			}
 		}
-
-		gg.Quad().DrawFrame(gg._pics.a_[0], gg.mousePos, cam.scale);
-		{
-			auto mp = cam.ToLogicPos(gg.mousePos);
-			auto& f = gg._pics.s_[1];
-			for (auto& c : gg.axeCollisionData) {
-				gg.Quad().DrawFrame(f, cam.ToGLPos(c.pos + mp), c.r / f.uvRect.w * 2.f * cam.scale);
-			}
+		else {
+			XY cs{ cam.scale };
+			if (mouseDirectionIsRight) cs.x = -cs.x;
+			gg.Quad().DrawFrame(gg._pics.a_[0], gg.mousePos, cs);
 		}
 
 		gg.GLBlendFunc(gg.blendDefault);

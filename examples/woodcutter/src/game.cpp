@@ -70,13 +70,13 @@ void Game::GLInit() {
 		auto offset = fs * 0.5f - fs * f.anchor;
 		for (auto& c : cd) cs.Emplace((c.pos + offset + of).FlipY(), c.r);
 	};
-	FillCDs(_pics.t_[0], treeCollisionDatas.Emplace(), _phys::t_0, { 0, -2 });
-	FillCDs(_pics.t_[1], treeCollisionDatas.Emplace(), _phys::t_1, { 0, -5 });
-	FillCDs(_pics.t_[2], treeCollisionDatas.Emplace(), _phys::t_2, { 0, -5 });
-	FillCDs(_pics.t_[3], treeCollisionDatas.Emplace(), _phys::t_3, { 0, -3 });
-	FillCDs(_pics.t_[4], treeCollisionDatas.Emplace(), _phys::t_4, { 0, -8 });
-	FillCDs(_pics.t_[5], treeCollisionDatas.Emplace(), _phys::t_5, { 0, -13 });
-	FillCDs(_pics.t_[6], treeCollisionDatas.Emplace(), _phys::t_6, { 0, -10 });
+	FillCDs(_pics.t_[0], treeCollisionDatas.Emplace(), _phys::t_0, { 0, -3 });
+	FillCDs(_pics.t_[1], treeCollisionDatas.Emplace(), _phys::t_1, { 0, -6 });
+	FillCDs(_pics.t_[2], treeCollisionDatas.Emplace(), _phys::t_2, { 0, -7 });
+	FillCDs(_pics.t_[3], treeCollisionDatas.Emplace(), _phys::t_3, { 0, -4 });
+	FillCDs(_pics.t_[4], treeCollisionDatas.Emplace(), _phys::t_4, { 0, -9 });
+	FillCDs(_pics.t_[5], treeCollisionDatas.Emplace(), _phys::t_5, { 0, -14 });
+	FillCDs(_pics.t_[6], treeCollisionDatas.Emplace(), _phys::t_6, { 0, -12 });
 
 	FillCDs(_pics.a_[0], axeCollisionData, _phys::a_1);
 

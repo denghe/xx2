@@ -26,8 +26,7 @@ namespace Test1 {
 		float frameIndex{};
 		float frameInc{};
 		int32_t treeTypeId{};
-
-		// todo: store last hit info avoid hit every frame
+		int32_t lastMouseVersionNumber{};
 
 		char state{};	// 0: idle  1: turn left   2: turn right
 		char needWhite{};
@@ -57,7 +56,9 @@ namespace Test1 {
 		XY mapSize{}, mapCenterPos{};
 		xx::List<XY> fixedPosPool;
 		xx::List<xx::Shared<Tree>> trees;
-		bool lastMouseDirection{};	// false: left
+		XY currentMousePos{}, lastMousePos{};	// logic value
+		bool mouseDirectionIsRight{};
+		int32_t mouseVersionNumber{1};	// auto inc when direction is changed
 
 		void MakeUI();
 		void Init();
