@@ -23,8 +23,44 @@ void Scene_MainMenu::MakeUI() {
 	L.Append(C->Make<xx::Label>()->Init(2, 0, 0, fontSize * 2)("woodcutter tests"));
 	L.EndLine();
 
-	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test1")).onClicked = [this] {
-		gg.MakeScene<Test1::Scene>()->Init();
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test1( 1 )")).onClicked = [this] {
+		gg.MakeScene<Test1::Scene>()->Init(1.1, 4, 0.2);
+	};
+
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test1( 2x2 )")).onClicked = [this] {
+		gg.MakeScene<Test1::Scene>()->Init(1.15, 2, 0.3);
+	};
+
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test1( 3x3 )")).onClicked = [this] {
+		gg.MakeScene<Test1::Scene>()->Init(1.2, 1.2, 0.4);
+	};
+
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test1( 4x4 )")).onClicked = [this] {
+		gg.MakeScene<Test1::Scene>()->Init(1.25, 1, 0.5);
+	};
+
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test1( 5x5 )")).onClicked = [this] {
+		gg.MakeScene<Test1::Scene>()->Init(1.3, 0.8, 0.63);
+	};
+
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test1( 6x6 )")).onClicked = [this] {
+		gg.MakeScene<Test1::Scene>()->Init(1.35, 0.7, 0.72);
+	};
+
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test1( 7x7 )")).onClicked = [this] {
+		gg.MakeScene<Test1::Scene>()->Init(1.4, 0.6, 0.9);
+	};
+
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test1( 8x8 )")).onClicked = [this] {
+		gg.MakeScene<Test1::Scene>()->Init(1.4, 0.5, 1);
+	};
+
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test1( 9x9 )")).onClicked = [this] {
+		gg.MakeScene<Test1::Scene>()->Init(1.4, 0.4, 1.15);
+	};
+
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test1( NxN )")).onClicked = [this] {
+		gg.MakeScene<Test1::Scene>()->Init(1.4, 0.1, 5);
 	};
 
 
@@ -45,14 +81,10 @@ void Scene_MainMenu::Update() {
 }
 
 void Scene_MainMenu::Draw() {
+#if 0
 	auto&& t = *gg._pics.a_[0].tex;
 	gg.Quad().Draw(t, t, 0, 0.5f, gg.designSize.y / t.size.y * gg.scale);
-
-	//for (int i = 0; i < 7; ++i) {
-	//	gg.Quad().DrawFrame(gg.treeIdles[i][0], XY{ -300, -500 + i * 150.f } * gg.scale, gg.scale);
-	//	gg.Quad().DrawFrame(gg.treeTurnLefts[i][0], XY{ 0, -500 + i * 150.f } * gg.scale, gg.scale);
-	//	gg.Quad().DrawFrame(gg.treeTurnRights[i][0], XY{ 300, -500 + i * 150.f } * gg.scale, gg.scale);
-	//}
+#endif
 
 	gg.DrawNode(ui);
 }

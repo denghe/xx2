@@ -53,15 +53,18 @@ namespace Test1 {
 		xx::Camera cam;
 		float time{}, timePool{}, timeScale{ 1 };
 
-		XY mapSize{}, mapCenterPos{};
+		XY mapSize{}, mapCenterPos{}, treeMarginOffsetRange{};
+		float bgScale{}, treeScale{};
 		xx::List<XY> fixedPosPool;
 		xx::List<xx::Shared<Tree>> trees;
 		XY currentMousePos{}, lastMousePos{};	// logic value
 		bool mouseDirectionIsRight{};
 		int32_t mouseVersionNumber{1};	// auto inc when direction is changed
 
+		void FillFixedPosPool(float density_);
+
 		void MakeUI();
-		void Init();
+		void Init(float bgScale_ = 1.f, float treeScale_ = 1.f, float density_ = 1.f);
 		void Update() override;
 		void FixedUpdate();
 		void Draw() override;

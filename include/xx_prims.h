@@ -58,6 +58,8 @@ namespace xx {
         // ...
         constexpr X_Y FlipY() const { return { x, -y }; }
         constexpr X_Y FlipX() const { return { -x, y }; }
+        constexpr X_Y OneMinusX() const { return { T{1} - x, y }; }
+        constexpr X_Y OneMinusY() const { return { x, T{1} - y }; }
         // ...
 
         constexpr void Reset() {

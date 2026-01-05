@@ -51,6 +51,7 @@ namespace Test1 {
 	}
 
 	bool Tree::Hit() {
+		// todo: use treeScale
 		// collision detection
 		auto mp = scene->cam.ToLogicPos(gg.mousePos);
 		int32_t flipX{ 1 };
@@ -59,9 +60,9 @@ namespace Test1 {
 			auto ap = XY{ a.pos.x * flipX, a.pos.y } + mp;
 			for (int32_t i = 0; i < collisionDataLen; ++i) {
 				auto& b = collisionData[i];
-				auto bp = b.pos + pos;
+				auto bp = b.pos * scene->treeScale + pos;
 				auto d = ap - bp;
-				auto rr = a.r + b.r;
+				auto rr = a.r + b.r * scene->treeScale;
 				if (d.x * d.x + d.y * d.y < rr * rr) goto LabHit;
 			}
 		}
@@ -146,40 +147,23 @@ namespace Test1 {
 	}
 
 	void Tree::Draw() {
-		auto& f = frames[(int32_t)frameIndex];
 		//auto& f = gg._pics.s_[1];
-		gg.Quad().DrawFrame(f, scene->cam.ToGLPos(pos), scene->cam.scale, 0, colorplus);
+		auto& f = frames[(int32_t)frameIndex];
+		gg.Quad().DrawFrame(f, scene->cam.ToGLPos(pos), scene->cam.scale * scene->treeScale, 0, colorplus);
 	}
 
 
 	/***********************************************************************************/
 	/***********************************************************************************/
 
-	void Scene::Init() {
-		MakeUI();
-
-		auto logicScale_ = 1.f;
-		mapSize = gg.designSize / logicScale_;
-		mapCenterPos = mapSize * 0.5f;
-		cam.Init(gg.scale, logicScale_, mapCenterPos);
-		sortContainer.Resize<true>((int32_t)mapSize.y + 1);
-		lastMousePos = currentMousePos = cam.ToLogicPos(gg.mousePos);
-
-		// gen rock pos using image filter
+	void Scene::FillFixedPosPool(float density_) {
+		// fill fixedPosPool with image filter
 		auto& img = gg._mask_bg_1;
-		//y = pos.y + gg._mask_bg_1.h;
 		assert(img.comp == 4);
-		auto s = 1.f;// / (gg.designSize / img.Size());
-
-		float density{ 1 };
-		XYi cGridSize{ 35 * density, 18 * density };
-		auto treeScale = 0.6f / density;
-		auto treeMargin = img.Size() / cGridSize;
-		auto treeMarginOffsetRange = { treeMargin.x / 6, treeMargin.y / 10 };
-
-		auto cellSize = (int32_t)std::ceilf(std::max(treeMargin.x, treeMargin.y));
-		auto numCRs = img.Size().As<int32_t>() / cellSize + 1;
-
+		auto siz = img.Size();
+		XYi cGridSize{ 35 * density_, 18 * density_ };
+		auto treeMargin = siz / cGridSize;
+		treeMarginOffsetRange = treeMargin / 5;
 		XY minXY{ std::numeric_limits<float>::max() };
 		XY maxXY{ std::numeric_limits<float>::min() };
 		XY basePoss[]{
@@ -190,8 +174,7 @@ namespace Test1 {
 			for (int x = 0; x < cGridSize.x; ++x) {
 				auto& basePos = basePoss[x & 1];
 				XY pos{ basePos.x + treeMargin.x * x, basePos.y + treeMargin.y * y };
-				auto ipos = (pos * s).As<int32_t>();
-				// filte by img
+				auto ipos = pos.As<int32_t>();
 				auto cidx = ipos.y * img.w + ipos.x;
 				if (img.At(cidx).a) {
 					fixedPosPool.Emplace(pos);
@@ -202,18 +185,40 @@ namespace Test1 {
 				}
 			}
 		}
+		// align center
+		auto fix = siz * gg._pics.bg_[0].anchor.OneMinusY() + (maxXY - minXY) / 2 - maxXY;
+		for (auto& p : fixedPosPool) p += fix;
+	}
 
-#if 1
-		trees.Emplace().Emplace()->Init(this, 0, mapSize * 0.5f + XY{-400, 50.f});
-		trees.Emplace().Emplace()->Init(this, 1, mapSize * 0.5f + XY{-250, 50.f});
-		trees.Emplace().Emplace()->Init(this, 2, mapSize * 0.5f + XY{-100, 50.f});
-		trees.Emplace().Emplace()->Init(this, 3, mapSize * 0.5f + XY{50, 50.f});
-		trees.Emplace().Emplace()->Init(this, 4, mapSize * 0.5f + XY{200, 50.f});
-		trees.Emplace().Emplace()->Init(this, 5, mapSize * 0.5f + XY{350, 50.f});
-		trees.Emplace().Emplace()->Init(this, 6, mapSize * 0.5f + XY{0, 300.f});
+	void Scene::Init(float bgScale_, float treeScale_, float density_) {
+		MakeUI();
+
+		bgScale = bgScale_;
+		treeScale = treeScale_;
+		auto& bg = gg._pics.bg_[0];
+		mapSize = bg.Size() * bgScale;
+		mapCenterPos = mapSize * bg.anchor.OneMinusY();
+		cam.Init(gg.scale, bgScale, mapCenterPos);
+		sortContainer.Resize<true>((int32_t)mapSize.y + 1);
+		lastMousePos = currentMousePos = cam.ToLogicPos(gg.mousePos);
+
+#if 0
+		//trees.Emplace().Emplace()->Init(this, 0, mapCenterPos + XY{-400, 50.f});
+		//trees.Emplace().Emplace()->Init(this, 1, mapCenterPos + XY{-250, 50.f});
+		//trees.Emplace().Emplace()->Init(this, 2, mapCenterPos + XY{-100, 50.f});
+		//trees.Emplace().Emplace()->Init(this, 3, mapCenterPos + XY{50, 50.f});
+		//trees.Emplace().Emplace()->Init(this, 4, mapCenterPos + XY{200, 50.f});
+		//trees.Emplace().Emplace()->Init(this, 5, mapCenterPos + XY{350, 50.f});
+		//trees.Emplace().Emplace()->Init(this, 6, mapCenterPos + XY{0, 300.f});
+		trees.Emplace().Emplace()->Init(this, 6, mapCenterPos + XY{0, 0.f});
 #else
+		FillFixedPosPool(density_);
 		for (auto& p : fixedPosPool) {
-			trees.Emplace().Emplace()->Init(this, gg.rnd.Next(7), p);
+			XY pos{ 
+				p.x + gg.rnd.Next(-treeMarginOffsetRange.x, treeMarginOffsetRange.x),
+				p.y + gg.rnd.Next(-treeMarginOffsetRange.y, treeMarginOffsetRange.y)
+			};
+			trees.Emplace().Emplace()->Init(this, gg.rnd.Next(7), pos * bgScale);
 		}
 #endif
 	}
@@ -257,10 +262,7 @@ namespace Test1 {
 
 	void Scene::FixedUpdate() {
 		if (gg.mouse[GLFW_MOUSE_BUTTON_1](0.2f)) {
-			for (auto& o : trees) o->Turn(true);
-		}
-		if (gg.mouse[GLFW_MOUSE_BUTTON_2](0.2f)) {
-			for (auto& o : trees) o->Turn(false);
+			++mouseVersionNumber;
 		}
 
 		for (auto& o : trees) o->Hit();
@@ -274,7 +276,9 @@ namespace Test1 {
 
 	void Scene::Draw() {
 		// bg
-		gg.Quad().DrawTinyFrame(gg._pics.bg_[0], 0, 0.5f, cam.scale);
+		gg.Quad().DrawFrame(gg._pics.bg_[0], cam.ToGLPos(mapCenterPos), cam.scale * bgScale);
+
+		// todo: small grass
 
 		for (auto& o : trees) SortContainerAdd(o.pointer);
 		SortContainerDraw();
@@ -285,7 +289,7 @@ namespace Test1 {
 				for (auto& o : trees) {
 					for (int32_t i = 0; i < o->collisionDataLen; ++i) {
 						auto& c = o->collisionData[i];
-						gg.Quad().DrawFrame(f, cam.ToGLPos(c.pos + o->pos), c.r / f.uvRect.w * 2.f * cam.scale, 0, 1, { 255,255,255,127 });
+						gg.Quad().DrawFrame(f, cam.ToGLPos(c.pos * treeScale + o->pos), c.r / f.uvRect.w * 2.f * cam.scale * treeScale, 0, 1, { 255,255,255,127 });
 					}
 				}
 			}
