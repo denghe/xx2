@@ -4,6 +4,8 @@
 
 namespace Test1 {
 
+	// todo: sound
+
 	void Tree::Init(Scene* scene_, int32_t treeTypeId_, XY pos_) {
 		scene = scene_;
 		typeId = cTypeId;
@@ -51,7 +53,6 @@ namespace Test1 {
 	}
 
 	bool Tree::Hit() {
-		// todo: use treeScale
 		// collision detection
 		auto mp = scene->cam.ToLogicPos(gg.mousePos);
 		int32_t flipX{ 1 };
