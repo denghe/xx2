@@ -47,5 +47,5 @@ struct pics {
 	xx::Frame wood2;
 	xx::Frame wood3;
 
-	void Load(std::string rootPath_);
+	void Load(std::string picFN_, bool generateMipmap_ = true);
 };

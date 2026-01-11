@@ -29,7 +29,7 @@ void Game::GLInit() {
 	sgrdd.Init(64, 64);
 
 	// begin load res
-	pics.Load("res/pics.pkm.zst");
+	pics.Load("res/pics.pvr.zst", false);
 
 	fis.Adds({
 		{&pics._10, _phys::_10::Init},

@@ -301,30 +301,62 @@ namespace xx {
 			}
 		}
 
-		// pkm ( do not support MACOS )
-		else if (buf.starts_with("PKM 20"sv)) {
-			auto p = (uint8_t*)buf.data();
-			uint16_t format = (p[6] << 8) | p[7];				// 1 ETC2_RGB_NO_MIPMAPS, 3 ETC2_RGBA_NO_MIPMAPS
-			uint16_t encodedWidth = (p[8] << 8) | p[9];			// 4 align width
-			uint16_t encodedHeight = (p[10] << 8) | p[11];		// 4 align height
-			uint16_t width = (p[12] << 8) | p[13];				// width
-			uint16_t height = (p[14] << 8) | p[15];				// height
-			assert(width > 0 && height > 0 && encodedWidth >= width && encodedWidth - width < 4 && encodedHeight >= height && encodedHeight - height < 4);
-			if (format == 1) {
-				assert(buf.size() == 16 + encodedWidth * encodedHeight / 2);
-			}
-			else if (format == 3) {
-				assert(buf.size() == 16 + encodedWidth * encodedHeight);
-				glPixelStorei(GL_UNPACK_ALIGNMENT, 8 - 4 * (width & 0x1));
-			}
-			else {
-				CoutN("unsppported PKM 20 format. only support ETC2_RGB_NO_MIPMAPS & ETC2_RGBA_NO_MIPMAPS. fn = ", fullPath);
-				assert(false);
-			}
+		// pvr3 with Etc2_RGBA
+		// todo: soft decompress for MACOS
+		/* https://github.com/wolfpld/etcpak.git
+		* BlockData.cpp / WritePvrHeader
+	uint32_t* dst;
+	*dst++ = 0x03525650;  // version				// PVR\x3
+    *dst++ = 0;           // flags
+    switch( type ) {      // pixelformat[0]
+    case CodecType::Etc2_RGB:        *dst++ = 22;        break;
+    case CodecType::Etc2_RGBA:        *dst++ = 23;        break;
+    case CodecType::Etc2_R11:        *dst++ = 25;        break;
+    case CodecType::Etc2_RG11:        *dst++ = 26;        break;
+		........
+    }
+    *dst++ = 0;           // pixelformat[1]
+    *dst++ = 0;           // colourspace
+    *dst++ = 0;           // channel type
+    *dst++ = size.y;      // height
+    *dst++ = size.x;      // width
+    *dst++ = 1;           // depth
+    *dst++ = 1;           // num surfs
+    *dst++ = 1;           // num faces
+    *dst++ = levels;      // mipmap count
+    *dst++ = 0;           // metadata size
+
+		*/
+		else if (buf.starts_with("PVR\x3"sv)) {
+			auto p = (uint32_t*)buf.data();
+			++p;				// version
+			assert(*p == 0);	// flags
+			auto format = *++p;		// GL_COMPRESSED_RGB8_ETC2: 0x9274
+			assert(format == 23);	// GL_COMPRESSED_RGBA8_ETC2_EAC: 0x9278
+			p += 3;				// pixelformat[1], colourspace, channel type
+			auto height = *++p;
+			auto width = *++p;
+			p += 3;				// depth, num surfs, num faces
+			auto levels = *++p;
+			++p;				// metadata size
+			++p;
+			//auto dataLen = buf.size() - ((char*)p - buf.data());
+			auto dataLen = width * height;
+			auto ptr = (char*)p;
+
+			//glPixelStorei(GL_UNPACK_ALIGNMENT, 8 - 4 * (width & 0x1));
 			auto id = GLTexture::MakeTex();
-			glCompressedTexImage2D(GL_TEXTURE_2D, 0, format == 3 ? /*GL_COMPRESSED_RGBA8_ETC2_EAC*/0x9278
-				: /*GL_COMPRESSED_RGB8_ETC2*/0x9274, (GLsizei)width, (GLsizei)height, 0, (GLsizei)(buf.size() - 16), p + 16);
-			glActiveTexture(GL_TEXTURE0);
+			for (uint32_t i = 0; i < levels; ++i) {
+				glCompressedTexImage2D(GL_TEXTURE_2D, (GLint)i, 0x9278, (GLsizei)width, (GLsizei)height, 0, (GLsizei)dataLen, ptr);
+				CheckGLError();
+				ptr += dataLen;
+				assert(ptr <= buf.data() + buf.size());
+				dataLen /= 4;
+				width /= 2;
+				height /= 2;
+				if (width < 4 || height < 4) break;
+			}
+			//glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, 0);
 			CheckGLError();
 			return { id, {width, height}/*, fullPath*/ };

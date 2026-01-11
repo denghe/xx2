@@ -1,9 +1,9 @@
 #include "pch.h"
 #include "game.h"
 #include "pics.h"
-void pics::Load(std::string picFN_) {
+void pics::Load(std::string picFN_, bool generateMipmap_) {
 	auto t = gg.LoadTexture(picFN_);
-	t->TryGenerateMipmap();
+	if (generateMipmap_) t->TryGenerateMipmap();
 
 	this->_10 = { t, 625, 742, 584, 378, { 0.5, 0.5 } };
 	this->_14 = { t, 2856, 435, 631, 336, { 0.5, 0.5 } };
