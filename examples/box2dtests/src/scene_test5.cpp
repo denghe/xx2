@@ -7,7 +7,7 @@ namespace Test5 {
 	void DroppingItem::Init(Scene* scene_, float radius_) {
 		typeId = cTypeId;
 		scene = scene_;
-		frame = gg.rnd.NextElement(gg.fs.fishs);
+		frame = *gg.rnd.NextElement(gg.fis).first;
 		radius = radius_;
 		scale = radius * 2.f / frame.uvRect.w;
 		indexAtContainer = scene->droppingItems.len - 1;
@@ -176,8 +176,8 @@ namespace Test5 {
 
 	void Scene::Draw() {
 		gg.Quad().DrawTinyFrame(gg.embed.shape_dot, 0, 0.5f, gg.windowSize, 0, 1, { 0x81,0xbd,0x57,255 });
-		gg.Quad().DrawFrame(gg.fs.circle256, cam.ToGLPos(dropFromPos), dropFromRangeRadius * 2.f / 256.f * cam.scale);
-		gg.Quad().DrawFrame(gg.fs.circle256, cam.ToGLPos(dropToPos), dropToRangeRadius * 2.f / 256.f * cam.scale);
+		gg.Quad().DrawFrame(gg.pics.circle256, cam.ToGLPos(dropFromPos), dropFromRangeRadius * 2.f / 256.f * cam.scale);
+		gg.Quad().DrawFrame(gg.pics.circle256, cam.ToGLPos(dropToPos), dropToRangeRadius * 2.f / 256.f * cam.scale);
 
 		// sort order by y. map y to 0 ~ 1080 ( design size.y ). FPS 3x faster than std::sort
 		for (auto& o : droppingItems) SortContainerAdd(o.pointer);
@@ -185,7 +185,7 @@ namespace Test5 {
 		SortContainerDraw();
 
 		gg.uiText->SetText(xx::ToString("num items = ", droppingItems.len + vortexItems.len));
-		gg.GLBlendFunc(gg.blendDefault);
+		gg.SetBlendPremultipliedAlpha(false);
 		gg.DrawNode(ui);
 	}
 

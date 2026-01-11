@@ -66,6 +66,7 @@ void Scene_MainMenu::Update() {
 }
 
 void Scene_MainMenu::Draw() {
+	gg.SetBlendPremultipliedAlpha(false);
 	gg.DrawNode(ui);
 }
 

@@ -4,10 +4,10 @@
 namespace G2 {
 
 	XY WoodFactory::PivotOffset() {
-		auto scale = cFactoryRadius / gg.fs.wood1.uvRect.w;
-		auto size = gg.fs.wood1.Size() * scale;
+		auto scale = cFactoryRadius / gg.pics.wood1.uvRect.w;
+		auto size = gg.pics.wood1.Size() * scale;
 		auto center = size * 0.5f;
-		auto pivot = size * gg.fs.wood1.anchor;
+		auto pivot = size * gg.pics.wood1.anchor;
 		return center - pivot;
 	}
 
@@ -17,7 +17,7 @@ namespace G2 {
 		pos = pos_;
 		y = pos.y;
 		radius = cFactoryRadius;
-		scale = radius * 2.f / gg.fs.wood1.uvRect.w;
+		scale = radius * 2.f / gg.pics.wood1.uvRect.w;
 		radians = {};
 		indexAtContainer = scene->factories.len - 1;
 		assert(scene->factories[indexAtContainer].pointer == this);
@@ -75,7 +75,7 @@ namespace G2 {
 	}
 
 	void WoodFactory::Draw() {
-		gg.Quad().DrawFrame(gg.fs.wood1, scene->cam.ToGLPos(pos + offset)
+		gg.Quad().DrawFrame(gg.pics.wood1, scene->cam.ToGLPos(pos + offset)
 			, scale * scene->cam.scale, radians);
 	}
 

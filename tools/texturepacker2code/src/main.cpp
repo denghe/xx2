@@ -175,15 +175,18 @@ press ENTER to continue...)#";
 
 		std::string code, tmp;
 
-		for (auto&& k : keys) {
+		for (auto k : keys) {
 			if (keyGroups.contains(k))
 				continue;
+			if (k[0] >= '0' && k[0] <= '9') k = '_' + k;
 			xx::Append(tmp, R"#(
 	xx::Frame )#", k, R"#(;)#");
 		}
 		for (auto&& kv : keyGroups) {
+			auto k = kv.first;
+			if (k[0] >= '0' && k[0] <= '9') k = '_' + k;
 			xx::Append(tmp, R"#(
-	std::array<xx::Frame, )#", kv.second.size(), R"#(> )#", kv.first, R"#(_;)#");
+	std::array<xx::Frame, )#", kv.second.size(), R"#(> )#", k, R"#(_;)#");
 		}
 
 		xx::Append(code, R"#(#pragma once
@@ -204,7 +207,7 @@ struct )#", structName, R"#( {)#", tmp, R"#(
 		code.clear();
 		tmp.clear();
 
-		for (auto&& k : keys) {
+		for (auto k : keys) {
 			auto f = &tp.frames[0];
 			for (auto& o : tp.frames) {
 				if (o.name == k) {
@@ -214,12 +217,14 @@ struct )#", structName, R"#( {)#", tmp, R"#(
 			}
 			xx::XY anchor{ 0.5f };
 			if (f->anchor.has_value()) anchor = *f->anchor;
+			if (k[0] >= '0' && k[0] <= '9') k = '_' + k;
 			xx::Append(tmp, R"#(
 	this->)#", k, " = { t, ", f->textureRect.x, ", ", f->textureRect.y, ", ", f->textureRect.width, ", ", f->textureRect.height, ", { ", anchor.x, ", ", anchor.y, " } };");
 		}
 
 		for (auto&& kv : keyGroups) {
-			auto& k = kv.first;
+			auto k = kv.first;
+			if (k[0] >= '0' && k[0] <= '9') k = '_' + k;
 			auto& names = kv.second;
 			for(int i = 0; i < names.size(); ++i) {
 				auto name = k + "_" + names[i];
@@ -240,8 +245,8 @@ struct )#", structName, R"#( {)#", tmp, R"#(
 		xx::Append(code, R"#(#include "pch.h"
 #include "game.h"
 #include ")#", structName, R"#(.h"
-void )#", structName, R"#(::Load(std::string rootPath_) {
-	auto t = gg.LoadTexture(rootPath_ + ")#", structName, R"#(.png");
+void )#", structName, R"#(::Load(std::string picFN_) {
+	auto t = gg.LoadTexture(picFN_);
 	t->TryGenerateMipmap();
 )#", tmp, R"#(
 };

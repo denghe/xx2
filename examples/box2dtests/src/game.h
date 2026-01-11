@@ -3,6 +3,7 @@
 using XY = xx::XY;
 using XYi = xx::XYi;
 #include "_phys.h"
+#include "pics.h"
 
 struct Game : xx::Game<Game> {
 	static constexpr float cFps{ 120 };
@@ -28,15 +29,7 @@ struct Game : xx::Game<Game> {
 	xx::SpaceGridRingDiffuseData sgrdd;
 	// ...
 
-	struct {
-		xx::Frame circle256;
-		xx::Frame bg_fish;
-		xx::Frame wood1;
-		xx::Frame wood2;
-		xx::Frame wood3;
-
-		std::array<xx::Frame, 40> fishs;
-	} fs;
+	pics pics;
 
 	xx::List<std::pair<xx::Frame*, _phys::InitFunc>> fis;
 

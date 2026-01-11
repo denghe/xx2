@@ -9,7 +9,7 @@ namespace G2 {
 		pos = pos_;
 		y = pos.y;
 		radius = cWallRadius;
-		scale = radius * 2.f / gg.fs.circle256.uvRect.w;
+		scale = radius * 2.f / gg.pics.circle256.uvRect.w;
 		radians = {};
 		indexAtContainer = scene->walls.len - 1;
 		assert(scene->walls[indexAtContainer].pointer == this);
@@ -17,7 +17,7 @@ namespace G2 {
 	}
 
 	void Wall::Draw() {
-		gg.Quad().DrawFrame(gg.fs.circle256, scene->cam.ToGLPos(pos)
+		gg.Quad().DrawFrame(gg.pics.circle256, scene->cam.ToGLPos(pos)
 			, scale * scene->cam.scale, radians);
 	}
 

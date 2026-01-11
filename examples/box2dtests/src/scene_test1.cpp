@@ -73,7 +73,7 @@ namespace Test1 {
 
 	void SceneItem2::Draw() {
 		auto [p, r] = b2body.GetPosRadians();
-		gg.Quad().DrawFrame(gg.fs.circle256, scene->cam.ToGLPos(p), radius * 2.f / 256.f * scale * scene->cam.scale, r);
+		gg.Quad().DrawFrame(gg.pics.circle256, scene->cam.ToGLPos(p), radius * 2.f / 256.f * scale * scene->cam.scale, r);
 	}
 
 	/***************************************************************************************/
@@ -141,7 +141,7 @@ namespace Test1 {
 		for (auto& o : item2s) o->Draw();
 
 		gg.uiText->SetText(xx::ToString("count = ", item1s.len + item2s.len));
-		gg.GLBlendFunc(gg.blendDefault);
+		gg.SetBlendPremultipliedAlpha(false);
 		gg.DrawNode(ui);
 	}
 

@@ -36,7 +36,7 @@ namespace G2 {
 	}
 
 	void FlyingWood::Draw() {
-		gg.Quad().DrawFrame(gg.fs.wood2, scene->cam.ToGLPos(pos), scale * scene->cam.scale);
+		gg.Quad().DrawFrame(gg.pics.wood2, scene->cam.ToGLPos(pos), scale * scene->cam.scale);
 	}
 
 	void FlyingWood::Dispose() {

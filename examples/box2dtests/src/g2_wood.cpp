@@ -9,7 +9,7 @@ namespace G2 {
 		pos = pos_;
 		y = pos.y;
 		radius = cWoodRadius;
-		scale = radius * 2.f / gg.fs.wood2.uvRect.w;
+		scale = radius * 2.f / gg.pics.wood2.uvRect.w;
 		indexAtContainer = scene->woods.len - 1;
 		assert(scene->woods[indexAtContainer].pointer == this);
 	}
@@ -105,7 +105,7 @@ namespace G2 {
 	}
 
 	void Wood::Draw() {
-		gg.Quad().DrawFrame(gg.fs.wood2, scene->cam.ToGLPos(pos + offset), scale * scene->cam.scale);
+		gg.Quad().DrawFrame(gg.pics.wood2, scene->cam.ToGLPos(pos + offset), scale * scene->cam.scale);
 	}
 
 	void Wood::Dispose() {

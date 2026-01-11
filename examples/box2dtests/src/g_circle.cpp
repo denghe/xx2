@@ -20,7 +20,7 @@ namespace G {
 
 	void Circle::Draw() {
 		auto [p, r] = b2body.GetPosRadians();
-		gg.Quad().DrawFrame(gg.fs.circle256, scene->cam.ToGLPos(p), radius * 2.f / 256.f * scene->cam.scale, r);
+		gg.Quad().DrawFrame(gg.pics.circle256, scene->cam.ToGLPos(p), radius * 2.f / 256.f * scene->cam.scale, r);
 	}
 
 }

@@ -166,6 +166,25 @@ namespace xx {
 			glBlendEquation(blendDefault[2]);
 		}
 
+
+		void SetBlendPremultipliedAlpha(bool e_) {
+			if (e_) {
+				GLBlendFunc({GL_ONE, GL_ONE_MINUS_SRC_ALPHA, GL_FUNC_ADD});
+			}
+			else {
+				GLBlendFunc({ GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_FUNC_ADD });
+			}
+		}
+
+		void SetDefaultBlendPremultipliedAlpha(bool e_) {
+			if (e_) {
+				blendDefault = { GL_ONE, GL_ONE_MINUS_SRC_ALPHA, GL_FUNC_ADD };
+			}
+			else {
+				blendDefault = { GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_FUNC_ADD };
+			}
+		}
+
 		template<typename ST>
 		XX_INLINE ST& ShaderBegin(ST& s) {
 			if (shader != &s) {
