@@ -33,6 +33,7 @@ namespace xx {
             if (std::string_view((char*)d.buf, 3) != "BMF"sv) return __LINE__; // throw std::logic_error(ToString("bad BMFont format. fn = ", p));
             if (d[3] != 3) return __LINE__; // throw std::logic_error(ToString("BMFont only support version 3. fn = ", p));
             if (auto r = Init(d, std::move(p)); r) return r;
+            return 0;
         }
 
         // load font & texture from memory
