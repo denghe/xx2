@@ -10,6 +10,9 @@ void Monster::ChangeColor() {
 
 void Monster::ChangeAnim() {
 	animIndex++;
+	scale = 1.f;
+	_1 = 0;
+	_2 = 0;
 	if (animIndex >= cAnimCount) {
 		animIndex = 0;
 	}

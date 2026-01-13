@@ -43,6 +43,10 @@ void Game::GLInit() {
 	sound.SetGlobalVolume(masterVolume);
 }
 
+void Game::Update() {
+	task();
+}
+
 xx::Task<> Game::Task() {
 	// begin load res
 

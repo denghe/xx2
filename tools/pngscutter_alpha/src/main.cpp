@@ -1,4 +1,5 @@
 ﻿#include "pch.h"
+#include <iostream>
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb_image_write.h>
 
@@ -33,8 +34,12 @@ press ENTER to continue...)#";
 		auto outNamePrefix = f.fileName.substr(0, f.fileName.size() - 4) + "_cutalpha_";
 
 		auto d = xx::ReadAllBytes(f.fullpath);
+		if (!d.len) {
+			xx::CoutN(" read file failed! ", f.fullpath);
+			return __LINE__;
+		}
 		xx::STBImage img;
-		img.Fill(d.first.get(), d.second);
+		img.Fill(d);
 		if (img.comp != 4) {
 			xx::CoutN(f.fileName, " have no ALPHA channel! ignore!");
 			continue;

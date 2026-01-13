@@ -1,4 +1,5 @@
 ﻿#include <pch.h>
+#include <iostream>
 
 /*
 * template
@@ -145,9 +146,9 @@ press ENTER to continue...)#";
 		auto fullPath = xx::U8AsString(std::filesystem::absolute(p).u8string());
 		auto xmlName = fileName.substr(0, fileName.size() - 4);
 
-		xx::Data fd;
-		if (int r = xx::ReadAllBytes(p, fd)) {
-			std::cerr << "ReadAllBytes failed. r = " << r << " fn = " << p << std::endl;
+		auto fd = xx::ReadAllBytes(p);
+		if (!fd) {
+			std::cerr << "ReadAllBytes failed: " << p << std::endl;
 			return __LINE__;
 		}
 

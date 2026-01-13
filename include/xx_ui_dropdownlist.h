@@ -1,6 +1,6 @@
 ﻿#pragma once
-#include "xx_ui_background.h"
-#include "xx_ui_imagebutton.h"
+#include "xx_ui_label.h"
+#include "xx_ui_button.h"
 
 namespace xx {
 
@@ -20,6 +20,7 @@ namespace xx {
 		virtual int32_t Update() override;
 	};
 
+
 	struct DropDownList : Button {
 		static constexpr int32_t cTypeId{ 15 };
 		Weak<Label> label;
@@ -28,137 +29,23 @@ namespace xx {
 		Shared<Scale9Config> cfgBG;	// for popup
 		List<std::u32string> items;
 		int32_t selectedIndex{};
-		std::function<void(int32_t)> onSelectedIndexChanged = [](int32_t idx) { CoutN("DropDownList selectedIndex = ", idx); };
+		std::function<void(int32_t)> onSelectedIndexChanged = [](int32_t idx) { printf("DropDownList selectedIndex = %d\n", idx); };
 
 		// init step 1/2
 		DropDownList& InitBegin(int32_t z_, XY position_, XY anchor_, XY fixedSize_
-			, Shared<Scale9Config> cfgNormal_ = GameBase_ui::GetInstance()->embed.cfg_s9bN
-			, Shared<Scale9Config> cfgHighlight_ = GameBase_ui::GetInstance()->embed.cfg_s9bH
-			, Shared<Scale9Config> cfgBG_ = GameBase_ui::GetInstance()->embed.cfg_s9bg
-			, TinyFrame icon_ = GameBase_ui::GetInstance()->embed.ui_dropdownlist_icon
-			, TinyFrame itemHead_ = GameBase_ui::GetInstance()->embed.ui_dropdownlist_head) {
-			assert(typeId == cTypeId);
-			focused = false;
-			z = z_;
-			position = position_;
-			anchor = anchor_;
-			size = fixedSize_;
-			cfgNormal = std::move(cfgNormal_);
-			cfgHighlight = std::move(cfgHighlight_);
-			cfgBG = std::move(cfgBG_);
-			icon = std::move(icon_);
-			itemHead = std::move(itemHead_);
-			FillTrans();
-			return *this;
-		}
-
+			, Shared<Scale9Config> cfgNormal_ = GameBase::instance->embed.cfg_s9bN
+			, Shared<Scale9Config> cfgHighlight_ = GameBase::instance->embed.cfg_s9bH
+			, Shared<Scale9Config> cfgBG_ = GameBase::instance->embed.cfg_s9bg
+			, TinyFrame icon_ = GameBase::instance->embed.ui_dropdownlist_icon
+			, TinyFrame itemHead_ = GameBase::instance->embed.ui_dropdownlist_head);
 		// init step 2/2
 		// need items.Add(...
-		void InitEnd(int32_t selectedIndex_ = 0) {
-			selectedIndex = selectedIndex_;
-			totalSize = { size.x, size.y * items.len };
-			auto& cfg = GetCfg();
-			auto fontSize = size.y - cfg->paddings.TopBottom();
-			label = Make<Label>();
-			label->Init(z + 1, cfg->paddings.LeftBottom(), 0, fontSize)(items[selectedIndex]);
-			
-			XY imgSize{ size.y - cfg->paddings.TopBottom() };
-			XY imgPos{ size.x - cfg->paddings.right, cfg->paddings.bottom };
-			Make<Image>()->Init(z + 2, imgPos, {1, 0}, icon, imgSize);
+		void InitEnd(int32_t selectedIndex_ = 0);
 
-			Make<Scale9>()->Init(z, 0, 0, size, cfg);
-
-			onClicked = [w = WeakFromThis(this)] {
-				assert(w);
-				w->PopList();
-			};
-		}
-
-		void SetSelectedIndex(int32_t selectedIndex_) {
-			selectedIndex = selectedIndex_;
-			label->SetText(items[selectedIndex]);
-		}
-
-		void PopList() {
-			auto itemsBorder = Make<Scale9>();
-			itemsBorder->Init(z + 1000, 0, { 0, 1 }, totalSize, cfgBG);
-			itemsBorder->inParentArea = false;
-
-			auto itemsContent = Make<Node>();
-			itemsContent->Init(z + 1001, 0, { 0, 1 }, 1, totalSize);
-			itemsContent->inParentArea = false;
-
-			for (int32_t i = 0; i < items.len; ++i) {
-				itemsContent->Make<DropDownListItem>()->Init(z + 1001
-					, WeakFromThis(this), i, false);
-			}
-
-			auto itemsBG = Make<Background>();
-			itemsBG->Init(z + 999, itemsContent).onOutsideClicked = [this] {
-				children.Resize(3);
-			};
-		}
-
-		void ItemCommit(int32_t idx_) {
-			At<Background>(5).onOutsideClicked();	// unsafe
-			if (selectedIndex != idx_) {
-				selectedIndex = idx_;
-				label->SetText(items[idx_]);
-				onSelectedIndexChanged(idx_);
-			}
-		}
-
-		void ApplyCfg() override {
-			At<Scale9>(2).Init(z, 0, 0, size, GetCfg());
-		}
+		void SetSelectedIndex(int32_t selectedIndex_);
+		void PopList();
+		void ItemCommit(int32_t idx_);
+		void ApplyCfg() override;
 	};
 
-	inline void DropDownListItem::Init(int32_t z_, Weak<DropDownList> owner_, int32_t idx_, bool highLight_) {
-		assert(typeId == cTypeId);
-		z = z_;
-		owner = std::move(owner_);
-		idx = idx_;
-		highLight = highLight_;
-		size = owner->size;
-		position = { 0, owner->totalSize.y - size.y * idx_ };
-		anchor = { 0, 1 };
-		FillTrans();
-
-		auto& cfg = owner->GetCfg();
-		auto imgSize = XY{ size.y - cfg->paddings.TopBottom() };
-		auto imgColor = idx_ == owner->selectedIndex ? RGBA8_Green : RGBA8_White;
-		Make<Image>()->Init(z, cfg->paddings.LeftBottom(), 0, owner->itemHead, imgSize, true, {}, imgColor);
-
-		Make<Label>()->Init(z, cfg->paddings.LeftBottom() + XY{ imgSize.x, 0 }, 0, size.y - cfg->paddings.TopBottom())(owner->items[idx_]);
-	}
-
-	inline void DropDownListItem::SetHighLight(bool b) {
-		if (highLight == b) return;
-		highLight = b;
-		auto& label = At<Label>(1);
-		if (b) label.color = RGBA8{ 200, 100, 100, 255 };
-		else label.color = RGBA8_White;
-	}
-
-	inline int32_t DropDownListItem::OnMouseDown(int32_t btnId_) {
-		assert(owner);
-		owner->ItemCommit(idx);
-		return 1;
-	}
-
-	inline int32_t DropDownListItem::OnMouseMove() {
-		if (!highLight) {
-			SetHighLight(true);
-			TryRegisterAutoUpdate();
-		}
-		return 1;
-	}
-
-	inline int32_t DropDownListItem::Update() {
-		if (!MousePosInArea()) {
-			SetHighLight(false);
-			return 1;
-		}
-		return 0;
-	}
 }

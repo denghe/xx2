@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "pch.h"
-using XY = xx::XY;
-using XYi = xx::XYi;
+#include "shader_grass.h"
+#include <xx_grid2d_circle.h>
 
 struct SpineRes1 {
 	xx::Shared<xx::GLTexture> tex;
@@ -9,7 +9,7 @@ struct SpineRes1 {
 	spine::Animation* idle{};
 };
 
-struct Game : xx::Game<Game> {
+struct Game : xx::GameBase {
 	static constexpr float cFps{ 120 };
 	static constexpr float cDelta{ 1.f / cFps };
 	static constexpr float cMaxDelta{ 0.1f };
@@ -63,11 +63,11 @@ struct Game : xx::Game<Game> {
 	xx::SpaceGridRingDiffuseData sgrdd;
 	// ...
 
-	void Init();
-	void GLInit();
-	void Update();
-	void Delay();
-	void Stat();
-	void OnResize(bool modeChanged_);
+	void Init() override;
+	void GLInit() override;
+	void Update() override;
+	void Delay() override;
+	void Stat() override;
+	void OnResize(bool modeChanged_) override;
 };
 extern Game gg;

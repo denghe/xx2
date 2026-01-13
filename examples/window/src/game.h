@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include "pch.h"
-using XY = xx::XY;
 
 struct Sprite {
 	xx::Frame frame;
@@ -8,7 +7,7 @@ struct Sprite {
 };
 
 struct Monster;
-struct Game : xx::Game<Game> {
+struct Game : xx::GameBase {
 	static constexpr float cFps{ 120 };
 	static constexpr float cDelta{ 1.f / cFps };
 
@@ -22,11 +21,11 @@ struct Game : xx::Game<Game> {
 	xx::Rnd rnd;
 	xx::List<Sprite> sprites;
 
-	void Init();
-	void GLInit();
-	void Update();
-	void Delay();
-	void Stat();
-	void OnResize(bool modeChanged_);
+	void Init() override;
+	void GLInit() override;
+	void Update() override;
+	void Delay() override;
+	void Stat() override;
+	void OnResize(bool modeChanged_) override;
 };
 extern Game gg;

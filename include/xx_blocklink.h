@@ -91,28 +91,28 @@ namespace xx {
 			return *this;
 		}
 
-		XX_INLINE Node<T>& RefNode() const {
+		Node<T>& RefNode() const {
 			return (Node<T>&)*container_of(pointer, Node<T>, value);
 		}
 
-		XX_INLINE bool Exists() const {
+		bool Exists() const {
 			return pointer && version < -2 && version == RefNode().version;
 		}
-		XX_INLINE operator bool() const {
+		operator bool() const {
 			return Exists();
 		}
 
-		XX_INLINE T* GetPointer() const {
+		T* GetPointer() const {
 			if (Exists()) return (T*)pointer;
 			else return nullptr;
 		}
 
-		XX_INLINE T& operator()() const {
+		T& operator()() const {
 			assert(Exists());
 			return (T&)*pointer;
 		}
 
-		XX_INLINE void Reset() {
+		void Reset() {
 			pointer = {};
 			version = -2;
 		}
@@ -143,44 +143,44 @@ namespace xx {
 			Set(owner_, u);
 		}
 
-		XX_INLINE BlockLinkHolder& Set(OT& owner_, T const& v) {
+		BlockLinkHolder& Set(OT& owner_, T const& v) {
 			owner = &owner_;
 			weak = v;
 			return *this;
 		}
 
-		XX_INLINE BlockLinkHolder& Set(OT& owner_, WT const& w) {
+		BlockLinkHolder& Set(OT& owner_, WT const& w) {
 			owner = &owner_;
 			weak = w;
 			return *this;
 		}
 
-		XX_INLINE BlockLinkHolder& Set(OT& owner_) {
+		BlockLinkHolder& Set(OT& owner_) {
 			owner = &owner_;
 			return *this;
 		}
 
-		XX_INLINE BlockLinkHolder& Set(T const& v) {
+		BlockLinkHolder& Set(T const& v) {
 			assert(owner);
 			weak = v;
 			return *this;
 		}
 
-		XX_INLINE BlockLinkHolder& Set(WT const& w) {
+		BlockLinkHolder& Set(WT const& w) {
 			assert(owner);
 			weak = w;
 			return *this;
 		}
 
-		XX_INLINE void Reset() {
+		void Reset() {
 			owner = {};
 		}
 
-		XX_INLINE bool Exists() const noexcept {
+		bool Exists() const noexcept {
 			return owner && weak.Exists();
 		}
 
-		XX_INLINE T& operator()() const {
+		T& operator()() const {
 			assert(Exists());
 			return weak();
 		}
@@ -342,7 +342,7 @@ namespace xx {
 			}
 		}
 
-		XX_INLINE void Reserve(int32_t newCap) {
+		void Reserve(int32_t newCap) {
 			if (newCap < this->cap) return;
 			auto n = ((uint32_t&)newCap + 63u) >> 6;
 			for (uint32_t i = 0; i < n; ++i) {
@@ -350,15 +350,15 @@ namespace xx {
 			}
 		}
 
-		XX_INLINE int32_t Count() const {
+		int32_t Count() const {
 			return this->len - this->freeCount;
 		}
 
-		XX_INLINE bool Empty() const {
+		bool Empty() const {
 			return this->len == this->freeCount;
 		}
 
-		XX_INLINE Node<T>* TryGet(BlockLinkVI const& vi) const {
+		Node<T>* TryGet(BlockLinkVI const& vi) const {
 			if (vi.version >= -2 || vi.index < 0 || vi.index >= this->len) return nullptr;
 			auto& o = RefNode(vi.index);
 			return o.version == vi.version ? (Node<T>*)&o : nullptr;
@@ -408,19 +408,19 @@ namespace xx {
 
 	protected:
 
-		XX_INLINE int32_t GenVersion() {
+		int32_t GenVersion() {
 			if (--this->version >= -1) {
 				this->version = -3;				// -2 is "default / empty"
 			}
 			return this->version;
 		}
 
-		XX_INLINE Block& RefBlock(int32_t index) const {
+		Block& RefBlock(int32_t index) const {
 			assert(index >= 0 && index < this->cap);
 			return *(Block*)this->blocks[(uint32_t&)index >> 6];
 		}
 
-		XX_INLINE Node<T>& RefNode(int32_t index) const {
+		Node<T>& RefNode(int32_t index) const {
 			auto& block = RefBlock(index);
 			auto& node = block.buf[index & 0b111111];
 			assert(node.index == index);
@@ -428,7 +428,7 @@ namespace xx {
 		}
 
 		template<bool value = true>
-		XX_INLINE void FlagSet(int32_t index) requires enableFlags {
+		void FlagSet(int32_t index) requires enableFlags {
 			auto& block = RefBlock(index);
 			auto bit = uint64_t(1) << (index & 0b111111);
 			if constexpr (value) {
@@ -440,7 +440,7 @@ namespace xx {
 			}
 		}
 
-		XX_INLINE void Reserve() {
+		void Reserve() {
 			auto len = this->blocks.len;
 			this->cap += 64;
 			auto b = (Block*)this->blocks.Emplace((Block*)new MyAlignedStorage<Block>());
@@ -456,7 +456,7 @@ namespace xx {
 		}
 
 		template<bool useDeleter = false>
-		XX_INLINE void Free(Node<T>& o, void(*deleter)(void*) = {}) {
+		void Free(Node<T>& o, void(*deleter)(void*) = {}) {
 			auto index = o.index;
 			if constexpr (useDeleter) {
 				deleter(&o.value);
@@ -489,7 +489,7 @@ namespace xx {
 		}
 
 		template<bool appendToTail = true, typename...Args>
-		XX_INLINE Node<T>& EmplaceCore(Args&&... args) {
+		Node<T>& EmplaceCore(Args&&... args) {
 			int32_t index;
 			if (this->freeCount > 0) {
 				index = this->freeHead;

@@ -1,93 +1,44 @@
 ﻿#pragma once
-#include "xx_time.h"
-//#include "xx_fx64.h"
+#include "xx_list.h"
 
 namespace xx {
-
+	
     // reference from https://github.com/Reputeless/Xoshiro-cpp
     struct Rnd {
         std::array<uint32_t, 4> state;
 
-        Rnd() {
-            SetSeed(NowEpoch10m());
-        }
+        Rnd();
         Rnd(Rnd const&) = default;
         Rnd& operator=(Rnd const&) = default;
 
-        void SetSeed(uint64_t seed) {
-            auto calc = [&]()->uint64_t {
-                auto z = (seed += 0x9e3779b97f4a7c15);
-                z = (z ^ (z >> 30)) * 0xbf58476d1ce4e5b9;
-                z = (z ^ (z >> 27)) * 0x94d049bb133111eb;
-                return z ^ (z >> 31);
-                };
-            auto v = calc();
-            memcpy(&state[0], &v, 8);
-            v = calc();
-            memcpy(&state[2], &v, 8);
-        }
-
-        uint32_t Get() {
-            auto rotl = [](uint32_t x, int s)->uint32_t {
-                return (x << s) | (x >> (32 - s));
-                };
-            auto result = rotl(state[1] * 5, 7) * 9;
-            auto t = state[1] << 9;
-            state[2] ^= state[0];
-            state[3] ^= state[1];
-            state[1] ^= state[2];
-            state[0] ^= state[3];
-            state[2] ^= t;
-            state[3] = rotl(state[3], 11);
-            return result;
-        }
-
-        void NextBytes(void* buf, size_t len) {
-            uint32_t v{};
-            size_t i{};
-            auto e = len & (std::numeric_limits<size_t>().max() - 3);
-            for (; i < e; i += 4) {
-                v = Get();
-                memcpy((char*)buf + i, &v, 4);
-            }
-            if (i < len) {
-                v = Get();
-                memcpy((char*)buf + i, &v, len - i);
-            }
-        }
-
-        std::string NextWord(size_t siz = 0, std::string_view chars = "abcdefghijklmnopqrstuvwxyz"sv) {
-            assert(chars.size() < 256);
-            if (!siz) {
-                siz = Next(2, 10);
-            }
-            std::string s;
-            s.resize(siz);
-            NextBytes(s.data(), siz);
-            for (auto& c : s) {
-                c = chars[c % chars.size()];
-            }
-            return s;
-        }
+        void SetSeed(uint64_t seed);
+        uint32_t Get();
+        void NextBytes(void* buf, size_t len);
+        std::string NextWord(size_t siz = 0, std::string_view chars = "abcdefghijklmnopqrstuvwxyz"sv);
 
         template<typename V = int32_t, class = std::enable_if_t<std::is_arithmetic_v<V>>>
         V Next() {
             if constexpr (std::is_same_v<bool, std::decay_t<V>>) {
                 return Get() >= std::numeric_limits<uint32_t>::max() / 2;
-            } else if constexpr (std::is_integral_v<V>) {
+            }
+            else if constexpr (std::is_integral_v<V>) {
                 std::make_unsigned_t<V> v;
                 if constexpr (sizeof(V) <= 4) {
                     v = (V)Get();
-                } else {
+                }
+                else {
                     v = (V)(Get() | ((uint64_t)Get() << 32));
                 }
                 if constexpr (std::is_signed_v<V>) {
                     return (V)(v & std::numeric_limits<V>::max());
-                } else return (V)v;
-            } else if constexpr (std::is_floating_point_v<V>) {
+                }
+                else return (V)v;
+            }
+            else if constexpr (std::is_floating_point_v<V>) {
                 if constexpr (sizeof(V) == 4) {
                     return (float)(double(Get()) / 0xFFFFFFFFu);
-                } else if constexpr (sizeof(V) == 8) {
+                }
+                else if constexpr (sizeof(V) == 8) {
                     constexpr auto max53 = (1ull << 53) - 1;
                     auto v = ((uint64_t)Get() << 32) | Get();
                     return double(v & max53) / max53;
@@ -102,7 +53,8 @@ namespace xx {
             assert(from < to);
             if constexpr (std::is_floating_point_v<V>) {
                 return from + Next<V>() * (to - from);
-            } else {
+            }
+            else {
                 return from + Next<V>() % (to - from/* + 1*/);
             }
         }
@@ -115,7 +67,8 @@ namespace xx {
             }
             if constexpr (std::is_floating_point_v<V>) {
                 return from + Next<V>() * (to - from);
-            } else {
+            }
+            else {
                 return from + Next<V>() % (to - from/* + 1*/);
             }
         }
@@ -134,11 +87,8 @@ namespace xx {
         V NextRadians() {
             if constexpr (std::is_floating_point_v<V>) {
                 return (V)Next<float>(-M_PI, M_PI);
-            //} else if constexpr (std::is_base_of_v<FX64, V>) {
-            //    FX64 v;
-            //    v.value = Next<int32_t>((int32_t)FX64_PI_DIV_10_NEG.value, (int32_t)FX64_PI_DIV_10.value);
-            //    return v * FX64_10;
-            } else {
+            }
+            else {
                 static_assert((ptrdiff_t)sizeof(V) < 0, "unsupported type");
             }
 
@@ -158,20 +108,5 @@ namespace xx {
             return container[idx];
         }
     };
-
-
-
-    template<typename T>
-    struct DataFuncs<T, std::enable_if_t<std::is_base_of_v<Rnd, T>>> {
-        static constexpr size_t siz = sizeof(Rnd::state);
-        template<bool needReserve = true>
-        static inline void Write(Data& d, T const& in) {
-            d.WriteFixedArray<needReserve>(&in.state[0], in.state.size());
-        }
-        static inline int Read(Data_r& d, T& out) {
-            return d.ReadFixedArray(&out.state[0], out.state.size());
-        }
-    };
-
 
 }

@@ -117,7 +117,7 @@ void Game::GLInit() {
 			, XY size_, XY offset_, XY drawScale_, float frameDelta_) {
 			xx::Shared<xx::GLTexture> t;
 			spine::SkeletonData* s{};
-			xx::gSpineEnv.Load(filePrefix, s, t);
+			xx::gSpineEnv.Load(false, filePrefix, s, t);
 			auto a = s->findAnimation(animName.c_str());
 			xx::SpineToFrames(outFrames, outEventDatas, s, a, size_, offset_, drawScale_, frameDelta_);
 		};

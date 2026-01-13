@@ -1,11 +1,11 @@
 ﻿#pragma once
 #include "pch.h"
+#include <xx_task.h>
 #include "_i18n.h"
 #include "sav.h"
 using namespace i18n;
-using XY = xx::XY;
 
-struct Game : xx::Game<Game>, Sav {
+struct Game : xx::GameBase, Sav {
 	static constexpr float cFps{ 120 };
 	static constexpr float cDelta{ 1.f / cFps };
 	static constexpr float cMaxDelta{ 0.1f };
@@ -60,7 +60,7 @@ struct Game : xx::Game<Game>, Sav {
 	} fs;
 
 	struct {
-		xx::Shared<xx::SoundSource>
+		xx::Shared<SoLoud::Wav>
 			explosion
 		;
 	} ss;
@@ -70,11 +70,13 @@ struct Game : xx::Game<Game>, Sav {
 	xx::Rnd rnd;
 	// ...
 
-	void Init();
-	void GLInit();
+	void Init() override;
+	void GLInit() override;
+	void Update() override;
+	xx::Task<> task = Task();
 	xx::Task<> Task();
-	void Delay();
-	void Stat();
-	void OnResize(bool modeChanged_);
+	void Delay() override;
+	void Stat() override;
+	void OnResize(bool modeChanged_) override;
 };
 extern Game gg;

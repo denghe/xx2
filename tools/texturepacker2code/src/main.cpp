@@ -1,4 +1,5 @@
 ﻿#include <pch.h>
+#include <iostream>
 
 /*
 * template
@@ -94,10 +95,10 @@ press ENTER to continue...)#";
 		auto [iter, success] = plists.emplace(plistName, std::vector<std::string>{});
 		assert(success);
 
-		xx::Data fd;
-		if (int r = xx::ReadAllBytes(p, fd)) {
-			std::cerr << "ReadAllBytes failed. r = " << r << " fn = " << p << std::endl;
-			return -__LINE__;
+		auto fd = xx::ReadAllBytes(p);
+		if (!fd) {
+			std::cerr << "ReadAllBytes failed: " << p << std::endl;
+			return __LINE__;
 		}
 
 		auto&& rtv = tps.emplace(plistName, xx::TexturePackerReader::Plist{});
@@ -105,7 +106,7 @@ press ENTER to continue...)#";
 		auto& tp = rtv.first->second;
 		if (int r = tp.Load(fd)) {
 			std::cerr << "tp.Load failed. r = " << r << " fn = " << p << std::endl;
-			return -__LINE__;
+			return __LINE__;
 		}
 
 		std::cout << "\nhandle file: " << p << std::endl;
@@ -113,11 +114,11 @@ press ENTER to continue...)#";
 		// check file info
 		if (tp.metadata.size.width != tp.metadata.size.height) {
 			std::cerr << "**************************** bad file size( width == height ): " << p << std::endl;
-			return -__LINE__;
+			return __LINE__;
 		}
 		if (!xx::IsPowerOfTwo(tp.metadata.size.width)) {
 			std::cerr << "**************************** bad file size( width & height should be 2^n ): " << p << std::endl;
-			return -__LINE__;
+			return __LINE__;
 		}
 
 		for (auto& f : tp.frames) {
@@ -128,7 +129,7 @@ press ENTER to continue...)#";
 					std::cerr << "**************************** bad key name( can't contain ' ' or '.' ): " << f.name
 						<< "\n**************************** in plist: " << plistName
 						<< std::endl;
-					return -__LINE__;
+					return __LINE__;
 				}
 			}
 
@@ -137,7 +138,7 @@ press ENTER to continue...)#";
 					<< "\n**************************** in plist: " << iter->second
 					<< "\n**************************** and plist " << plistName
 					<< std::endl;
-				return -__LINE__;
+				return __LINE__;
 			}
 			iter->second.push_back(f.name);
 		}
@@ -200,7 +201,7 @@ struct )#", structName, R"#( {)#", tmp, R"#(
 		auto fn = structName + ".h";
 		if (int r = xx::WriteAllBytes((std::u8string&)fn, code.data(), code.size())) {
 			std::cerr << "write file failed! r = " << r << std::endl;
-			return -__LINE__;
+			return __LINE__;
 		}
 
 		// todo: cpp
@@ -255,7 +256,7 @@ void )#", structName, R"#(::Load(std::string picFN_, bool generateMipmap_) {
 		fn = structName + ".cpp";
 		if (int r = xx::WriteAllBytes((std::u8string&)fn, code.data(), code.size())) {
 			std::cerr << "write file failed! r = " << r << std::endl;
-			return -__LINE__;
+			return __LINE__;
 		}
 	}
 

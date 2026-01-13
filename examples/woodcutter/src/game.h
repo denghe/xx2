@@ -2,15 +2,14 @@
 #include "pch.h"
 #include "_phys.h"
 #include "_pics.h"
-using XY = xx::XY;
-using XYi = xx::XYi;
+#include <xx_grid2d_circle.h>
 
 struct MinerConfig {
 	float animFPS, resRadius, moveSpeed, attackRange;
 	int32_t fsLens[3]; // aIdleLen, aMoveLen, aAtkLen;
 	xx::Frame* fss[3];	// aIdle, * aMove, * aAtk;
 	char* cd;	// for atk. share aAtkLen
-	xx::Weak<xx::SoundSource> ss;
+	xx::Weak<SoLoud::Wav> ss;
 };
 
 struct SpineFrameConfig {
@@ -18,7 +17,7 @@ struct SpineFrameConfig {
 	float scale{}, delta{};
 };
 
-struct Game : xx::Game<Game> {
+struct Game : xx::GameBase {
 	static constexpr float cFps{ 120 };
 	static constexpr float cDelta{ 1.f / cFps };
 	static constexpr float cMaxDelta{ 0.1f };
@@ -48,12 +47,12 @@ struct Game : xx::Game<Game> {
 	xx::SpaceGridRingDiffuseData sgrdd;
 	// ...
 
-	void Init();
-	void GLInit();
-	void Update();
-	void Delay();
-	void Stat();
-	void OnResize(bool modeChanged_);
-	void OnFocus(bool focused_);
+	void Init() override;
+	void GLInit() override;
+	void Update() override;
+	void Delay() override;
+	void Stat() override;
+	void OnResize(bool modeChanged_) override;
+	void OnFocus(bool focused_) override;
 };
 extern Game gg;

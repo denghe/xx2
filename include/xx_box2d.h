@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "xx_prims.h"
 #include <box2d/box2d.h>
 #include <box2d/math_functions.h>
 #include <TaskScheduler.h>	// for multi-thread
@@ -18,7 +19,7 @@ namespace xx {
 		B2Id(T id_) : id(id_) {} // unsafe: for easy use
 		operator T const& () const { return id; }
 
-		XX_INLINE bool IsNull() const {
+		bool IsNull() const {
 			auto p = (int32_t*)&id;
 			if constexpr (sizeof(id) == 4) if (p[0]) return false;
 			if constexpr (sizeof(id) == 8) if (p[0] || p[1]) return false;
@@ -26,7 +27,7 @@ namespace xx {
 		}
 
 		// unsafe
-		XX_INLINE void ZeroMem() {
+		void ZeroMem() {
 			assert(!IsNull());
 			auto p = (int32_t*)&id;
 			if constexpr (sizeof(id) == 4) p[0] = 0;
@@ -35,7 +36,7 @@ namespace xx {
 
 		// unsafe
 		template<bool B = false>
-		XX_INLINE void Destroy() {
+		void Destroy() {
 			static_assert(sizeof(b2WorldId) <= 8 && sizeof(b2BodyId) <= 8 && sizeof(b2ShapeId) <= 8
 				&& sizeof(b2JointId) <= 8 && sizeof(b2ChainId) <= 8);
 			if constexpr (std::is_same_v<T, b2WorldId>) b2DestroyWorld(id);
@@ -46,7 +47,7 @@ namespace xx {
 		}
 
 		template<bool B = false>
-		XX_INLINE void Reset() {
+		void Reset() {
 			if (!IsNull()) {
 				Destroy<B>();
 				ZeroMem();
@@ -75,7 +76,7 @@ namespace xx {
 		B2Task tasks[64];
 		int taskCount{};
 
-		XX_INLINE void InitDef(b2WorldDef const& b2worlddef_, int workerCount_ = 8) {
+		void InitDef(b2WorldDef const& b2worlddef_, int workerCount_ = 8) {
 			assert(IsNull());
 			if (workerCount_ > 1) {
 				taskScheduler.Initialize(workerCount_);
@@ -129,13 +130,13 @@ namespace xx {
 	struct B2Body : B2Id<b2BodyId> {
 		using B2Id<b2BodyId>::B2Id; 
 
-		XX_INLINE void InitDef(B2World const& b2World_, b2BodyDef const& b2bodydef_) {
+		void InitDef(B2World const& b2World_, b2BodyDef const& b2bodydef_) {
 			assert(IsNull());
 			assert(!b2World_.IsNull());
 			id = b2CreateBody(b2World_, &b2bodydef_);
 		}
 
-		XX_INLINE B2Body& InitTypePos(B2World const& b2World_, XY pos_, b2BodyType type_ = b2_staticBody) {
+		B2Body& InitTypePos(B2World const& b2World_, XY pos_, b2BodyType type_ = b2_staticBody) {
 			auto def = b2DefaultBodyDef();
 			def.type = type_;
 			def.position = (b2Vec2&)pos_;
@@ -144,32 +145,32 @@ namespace xx {
 		}
 		// ...
 
-		XX_INLINE b2Transform GetTransform() const {
+		b2Transform GetTransform() const {
 			return b2Body_GetTransform(id);
 		}
 
-		XX_INLINE XY GetPos() const {
+		XY GetPos() const {
 			return b2Body_GetTransform(id).p;
 		}
 
-		XX_INLINE std::pair<XY, float> GetPosRadians() const {
+		std::pair<XY, float> GetPosRadians() const {
 			auto tran = GetTransform();
 			return { tran.p, b2Rot_GetAngle(tran.q) };
 		}
 
-		XX_INLINE void SetTransform(XY pos_, float radians_) {
+		void SetTransform(XY pos_, float radians_) {
 			b2Body_SetTransform(id, (b2Vec2&)pos_, b2MakeRot(radians_));
 		}
 
-		XX_INLINE void SetTransform(XY pos_, b2Rot rot_) {
+		void SetTransform(XY pos_, b2Rot rot_) {
 			b2Body_SetTransform(id, (b2Vec2&)pos_, rot_);
 		}
 
-		XX_INLINE void SetTransform(b2Transform const& tran_) {
+		void SetTransform(b2Transform const& tran_) {
 			b2Body_SetTransform(id, tran_.p, tran_.q);
 		}
 
-		//XX_INLINE void SetPos(XY pos_) {
+		//void SetPos(XY pos_) {
 		//	auto trans = b2Body_GetTransform(id);
 		//	b2Body_SetTransform(id, (b2Vec2&)pos_, trans.q);
 		//}
@@ -180,20 +181,20 @@ namespace xx {
 	struct B2Shape : B2Id<b2ShapeId> {
 		using B2Id<b2ShapeId>::B2Id;
 
-		XX_INLINE void InitDefPolygon(B2Body const& b2body_, b2Polygon const& b2polygon_
+		void InitDefPolygon(B2Body const& b2body_, b2Polygon const& b2polygon_
 			, b2ShapeDef const& b2shapedef_ = b2DefaultShapeDef()) {
 			assert(!b2body_.IsNull());
 			Reset();
 			id = b2CreatePolygonShape(b2body_, &b2shapedef_, &b2polygon_);
 		}
 
-		XX_INLINE void InitBox(B2Body const& b2body_, XY halfSize_
+		void InitBox(B2Body const& b2body_, XY halfSize_
 			, b2ShapeDef const& b2shapedef_ = b2DefaultShapeDef()) {
 			auto b2polygon = b2MakeBox(halfSize_.x, halfSize_.y);
 			InitDefPolygon(b2body_, b2polygon, b2shapedef_);
 		}
 
-		XX_INLINE void InitCircle(B2Body const& b2body_, XY center_, float radius_
+		void InitCircle(B2Body const& b2body_, XY center_, float radius_
 			, b2ShapeDef const& b2shapedef_ = b2DefaultShapeDef()) {
 			Reset();
 			auto circle = b2Circle{ .center = (b2Vec2&)center_, .radius = radius_ };

@@ -14,9 +14,9 @@ namespace xx {
 		double value{}, valueBak{};	// 0 ~ 1
 		bool blockMoving{};
 
-		std::function<void(double)> onChanged = [](double v) { CoutN("Slider changed. v = ", v); };
+		std::function<void(double)> onChanged = [](double v) { printf("Slider changed. v = %f\n", v); };
 		std::function<std::string(double)> valueToString = [](double v)->std::string {
-			return ToString(int32_t(v * 100));
+			return std::to_string(int32_t(v * 100));
 		};
 
 		// InitBegin + set value/ToSting + InitEnd
@@ -24,43 +24,11 @@ namespace xx {
 			, float height_
 			, float widthTxtLeft_, float widthBar_, float widthTxtRight_
 			, double value_
-			, Shared<Scale9Config> cfgNormal_ = GameBase_ui::GetInstance()->embed.cfg_s9bN
-			, Shared<Scale9Config> cfgHighlight_ = GameBase_ui::GetInstance()->embed.cfg_s9bH
-			, Shared<Scale9Config> cfgBar_ = GameBase_ui::GetInstance()->embed.cfg_sbar
-			, Shared<Scale9Config> cfgBlock_ = GameBase_ui::GetInstance()->embed.cfg_sblock
-		)
-		{
-			assert(children.Empty());
-			assert(typeId == cTypeId);
-			focused = false;
-			z = z_;
-			position = position_;
-			anchor = anchor_;
-			cfgNormal = std::move(cfgNormal_);
-			cfgHighlight = std::move(cfgHighlight_);
-			cfgBar = std::move(cfgBar_);
-			cfgBlock = std::move(cfgBlock_);
-			height = height_;
-			widthTxtLeft = widthTxtLeft_;
-			widthBar = widthBar_;
-			widthTxtRight = widthTxtRight_;
-			blockMoving = false;
-			value = valueBak = value_;
-			assert(value >= 0 && value <= 1);
-			size = { widthTxtLeft + widthBar + widthTxtRight, height };
-			FillTrans();
-
-			auto& cfg = GetCfg();
-			auto fontSize = size.y - cfg->paddings.TopBottom();
-			Make<Label>()->Init(z + 1, cfg->paddings.LeftBottom(), 0, fontSize);
-			Make<Scale9>();
-			Make<Scale9>();
-			Make<Label>()->Init(z + 1, { size.x - cfg->paddings.right,  cfg->paddings.bottom }, { 1, 0 }, fontSize);
-			Make<Scale9>();
-			ApplyValue();
-			ApplyCfg();
-			return *this;
-		}
+			, Shared<Scale9Config> cfgNormal_ = GameBase::instance->embed.cfg_s9bN
+			, Shared<Scale9Config> cfgHighlight_ = GameBase::instance->embed.cfg_s9bH
+			, Shared<Scale9Config> cfgBar_ = GameBase::instance->embed.cfg_sbar
+			, Shared<Scale9Config> cfgBlock_ = GameBase::instance->embed.cfg_sblock
+		);
 
 		template<typename S>
 		Slider& operator()(S const& txtLeft_) {
@@ -68,94 +36,14 @@ namespace xx {
 			return *this;
 		}
 
-		void ApplyCfg() override {
-			At<Scale9>(4).Init(z, 0, 0, size, GetCfg());
-		}
-
-		Slider& SetValue(double v) {
-			value = valueBak = v;
-			return *this;
-		}
-
-		void ApplyValue() {
-			assert(value >= 0 && value <= 1);
-
-			auto& cfg = GetCfg();
-
-			auto barMinWidth = float(cfgBar->center.x + cfgBar->center.w) * cfgBar->textureScale.x + 1;
-			XY barSize{ std::max(widthBar * (float)value, barMinWidth), (height - cfg->paddings.TopBottom()) * 0.33f };
-			XY barPos{ widthTxtLeft, (height - barSize.y) * 0.5f };
-			At<Scale9>(1).Init(z + 1, barPos, 0, barSize, cfgBar);
-
-			XY blockSize{ barSize.y * 2.f };
-			XY blockPos{ widthTxtLeft + widthBar * value - blockSize.x * 0.5f, (height - blockSize.y) * 0.5f };
-			At<Scale9>(2).Init(z + 2, blockPos, 0, blockSize, cfgBlock);
-
-			auto txtRight = valueToString(value);
-			At<Label>(3)(txtRight);
-		}
-
-		void DragEnd() {
-			if (!blockMoving) return;
-			blockMoving = false;
-			if (valueBak != value) {
-				onChanged(value);
-				valueBak = value;
-			}
-		}
-
+		void ApplyCfg() override;
+		Slider& SetValue(double v);
+		void ApplyValue();
+		void DragEnd();
 		// todo: enable disable
-
-		virtual int32_t OnMouseDown(int32_t btnId_) override {
-			if (!enabled) return 0;
-			if (btnId_ != GLFW_MOUSE_BUTTON_LEFT) return 0;
-			auto mx = GameBase::instance->mousePos.x;
-			auto x1 = worldMinXY.x + widthTxtLeft * worldScale.x;
-			auto x2 = worldMinXY.x + (widthTxtLeft + widthBar) * worldScale.x;
-			assert(worldMaxXY.x > x1);
-			assert(worldMaxXY.x > x2);
-			if (mx <= x1) {
-				value = 0;
-			}
-			else if (mx >= x2) {
-				value = 1;
-			}
-			else {
-				value = (mx - x1) / (x2 - x1);
-			}
-			ApplyValue();
-			blockMoving = true;
-			return 1;
-		}
-
-		int32_t OnMouseMove() override {
-			if (!enabled) return 0;
-			if (!focused) {
-				SetFocus();
-				TryRegisterAutoUpdate();
-			}
-			if (blockMoving) {
-				OnMouseDown(GLFW_MOUSE_BUTTON_LEFT);
-			}
-			return 1;
-		}
-
-		int32_t Update() override {
-			auto g = GameBase::instance;
-			if (g->uiHandler.TryGetPointer() != this || !MousePosInArea()) {
-				LostFocus();
-				DragEnd();
-				return 1;
-			}
-			if (!g->mouse[GLFW_MOUSE_BUTTON_LEFT]) {
-				DragEnd();
-			} else if (callbackWhenBlockMoving && blockMoving && valueBak != value) {
-				onChanged(value);
-				valueBak = value;
-				ApplyValue();
-			}
-			return 0;
-		}
+		virtual int32_t OnMouseDown(int32_t btnId_) override;
+		int32_t OnMouseMove() override;
+		int32_t Update() override;
 
 	};
 }

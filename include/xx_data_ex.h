@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "xx_data_shared.h"
+#include "xx_data.h"
 #include "xx_ptr.h"
 #include "xx_list.h"
 
@@ -71,7 +71,7 @@ struct XXXXXXXXXXX : ParentType {
             memset(pids.data(), 0, sizeof(uint16_t) * pids.size());
         }
 
-		XX_INLINE bool IsBaseOf(uint16_t baseTypeId, uint16_t typeId) noexcept {
+		bool IsBaseOf(uint16_t baseTypeId, uint16_t typeId) noexcept {
 			for (; typeId != baseTypeId; typeId = pids[typeId]) {
 				if (!typeId || typeId == pids[typeId]) return false;
 			}
@@ -79,20 +79,20 @@ struct XXXXXXXXXXX : ParentType {
 		}
 
 		template<typename BT>
-		XX_INLINE bool IsBaseOf(uint16_t typeId) noexcept {
+		bool IsBaseOf(uint16_t typeId) noexcept {
 			static_assert(std::is_base_of_v<SerdeBase, BT>);
 			return IsBaseOf(BT::cTypeId, typeId);
 		}
 
 		template<typename BT, typename T>
-		XX_INLINE bool IsBaseOf() noexcept {
+		bool IsBaseOf() noexcept {
 			static_assert(std::is_base_of_v<SerdeBase, T>);
 			static_assert(std::is_base_of_v<SerdeBase, BT>);
 			return IsBaseOf(BT::cTypeId, T::cTypeId);
 		}
 
 		template<typename T>
-        XX_INLINE void Register() {
+        void Register() {
 			static_assert(std::is_base_of_v<SerdeBase, T>);
             assert(!fs[T::cTypeId]);
 			pids[T::cTypeId] = T::cParentTypeId;
@@ -100,39 +100,27 @@ struct XXXXXXXXXXX : ParentType {
 		}
 
         template<typename T = SerdeBase>
-        XX_INLINE Shared<T> MakeShared(uint16_t const& typeId) {
+        Shared<T> MakeShared(uint16_t const& typeId) {
             static_assert(std::is_base_of_v<SerdeBase, T>);
             if (!typeId || !fs[typeId] || !IsBaseOf<T>(typeId)) return nullptr;
 			return fs[typeId]().Cast<T>();
 		}
 
-        XX_INLINE DataEx MakeDataEx() {
+        DataEx MakeDataEx() {
             DataEx d;
             d.si = this;
             return d;
         }
 
-        template<typename M>
-        XX_INLINE DataShared MakeDataShared(M&& msg) {
-            auto d = MakeDataEx();
-            d.Write(std::forward<M>(msg));
-            return std::move(d);
-        }
-
-        template<typename M>
-        XX_INLINE DataShared MakeDataShared() {
-            return MakeDataShared(::xx::MakeShared<M>());
-        }
-
         template<typename D>
-        XX_INLINE DataEx_r MakeDataEx_r(D&& d) {
+        DataEx_r MakeDataEx_r(D&& d) {
             DataEx_r dr(std::forward<D>(d));
             dr.si = this;
             return dr;
         }
 
         template<typename M>
-        XX_INLINE Shared<M> MakeMessage(DataShared const& ds) {
+        Shared<M> MakeMessage(Span ds) {
             auto dr = MakeDataEx_r(ds);
             Shared<M> msg;
             if (auto r = dr.Read(msg))
@@ -143,16 +131,16 @@ struct XXXXXXXXXXX : ParentType {
         }
     };
 
-    XX_INLINE uint16_t ReadVarUint16(void* buf, size_t offset, size_t len) {
+    uint16_t ReadVarUint16(void* buf, size_t offset, size_t len) {
         auto u = ((uint8_t*)buf)[offset] & 0x7Fu;
         if ((((uint8_t*)buf)[offset] & 0x80u) == 0) return u;
         if (offset + 1 >= len) return 0;
         return u | ((((uint8_t*)buf)[offset + 1] & 0x7Fu) << 7);
     }
 
-    XX_INLINE uint16_t ReadTypeId(DataShared const& ds) {
-        auto buf = ds.GetBuf();
-        auto len = ds.GetLen();
+    uint16_t ReadTypeId(Span ds) {
+        auto buf = ds.buf;
+        auto len = ds.len;
         if (len < 2 || buf[0] != 1) return 0;
         return ReadVarUint16(buf, 1, len);
     }

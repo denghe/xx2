@@ -2,6 +2,7 @@
 #include "xx_time.h"
 #include "xx_blocklink.h"
 #include "xx_ptr.h"
+#include <coroutine>
 
 namespace xx {
     struct YieldType {

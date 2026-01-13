@@ -1,354 +1,173 @@
 ﻿#pragma once
-#include "xx_gamebase.h"
-#include "xx_math.h"
+#include "xx_list.h"
+#include "xx_ptr.h"
+#include "xx_affine.h"
+#include "xx_frame.h"
 
 namespace xx {
 
-	// for rich label
-	enum class VAligns : uint8_t {
-		Top,
-		Center,
-		Bottom
-	};
-	enum class HAligns : uint8_t {
-		Left,
-		Center,
-		Right
-	};
-	struct MouseEventHandlerNode;
+    // for rich label
+    enum class VAligns : uint8_t {
+        Top,
+        Center,
+        Bottom
+    };
 
-	struct alignas(8) Node {
-		static constexpr int32_t cTypeId{};							// need set typeId in Init
+    enum class HAligns : uint8_t {
+        Left,
+        Center,
+        Right
+    };
 
-		List<Shared<Node>> children;
-		Weak<Node> parent;											// fill by Make
-		Weak<Node> scissor;											// fill by scroll view MakeContent
 
-        XX_INLINE SimpleAffineTransform& trans(){ return (SimpleAffineTransform&)worldScale; }
+    // for ui config
+    struct Scale9Config {
+        TinyFrame frame;
+        XY textureScale{ 3, 3 };
+        UVRect center{ 2, 2, 2, 2 };
+        RGBA8 color{ RGBA8_White };
+        Paddings paddings{ 20, 40, 20, 40 };
+    };
+
+    struct alignas(8) Node {
+        static constexpr int32_t cTypeId{};							// need set typeId in Init
+
+        List<Shared<Node>> children;
+        Weak<Node> parent;											// fill by Make
+        Weak<Node> scissor;											// fill by scroll view MakeContent
+
+        SimpleAffineTransform& trans() { return (SimpleAffineTransform&)worldScale; }
         XY worldScale, worldMinXY;
-        XX_INLINE SimpleAffineTransform const& trans() const { return (SimpleAffineTransform&)worldScale; }
+        SimpleAffineTransform const& trans() const { return (SimpleAffineTransform&)worldScale; }
 
-		XY position{}, anchor{ 0.5, 0.5 }, scale{ 1, 1 }, size{};
-		XY worldMaxXY{}, worldSize{};								// boundingBox. world coordinate. fill by FillTrans()
+        XY position{}, anchor{ 0.5, 0.5 }, scale{ 1, 1 }, size{};
+        XY worldMaxXY{}, worldSize{};								// boundingBox. world coordinate. fill by FillTrans()
 
-		int32_t typeId{};											// fill by Make( need fill it by other makers )
-		int32_t indexAtParentChildren{-1};							// children[idx] == this
-		int32_t z{};												// global z for event priority or batch combine
-		float alpha{ 1 };											// for some logic & draw
-		bool inParentArea{ true };									// for child cut check. dropdownlist = false
-		bool visible{ true };										// false: do not draw
-		bool enabled{ true };										// false: do not callback & colorplus = 0.5f
-		bool selected{ false };										// draw: always highlight
-		bool focused{ false };										// true: highlight
-		bool escHandler{ false };									// true for FindTopESCHandler
-		VAligns valign{ VAligns::Center };							// only for ui_layouter
-		// ...
+        int32_t typeId{};											// fill by Make( need fill it by other makers )
+        int32_t indexAtParentChildren{ -1 };							// children[idx] == this
+        int32_t z{};												// global z for event priority or batch combine
+        float alpha{ 1 };											// for some logic & draw
+        bool inParentArea{ true };									// for child cut check. dropdownlist = false
+        bool visible{ true };										// false: do not draw
+        bool enabled{ true };										// false: do not callback & colorplus = 0.5f
+        bool selected{ false };										// draw: always highlight
+        bool focused{ false };										// true: highlight
+        bool escHandler{ false };									// true for FindTopESCHandler
+        VAligns valign{ VAligns::Center };							// only for ui_layouter
+        // ...
 
-		XX_INLINE XY ToLocalPos(XY worldPos_) {
-			return trans().MakeInvert()(worldPos_);
-		}
-		XX_INLINE XY ToParentLocalPos(XY worldPos_) {
-			return parent->trans().MakeInvert()(worldPos_);
-		}
+        XY ToLocalPos(XY worldPos_);
+        XY ToParentLocalPos(XY worldPos_);
+        XY GetScaledSize() const;
 
-		XX_INLINE XY GetScaledSize() const {
-			return scale * size;
-		}
+        // for init
+        void FillTrans();
 
-		// for init
-		XX_INLINE void FillTrans() {
-			if (parent) {
-				trans() = SimpleAffineTransform::MakePosScaleAnchorSize(position, scale, anchor * size).MakeConcat(parent->trans());
-			} else {
-				trans().PosScaleAnchorSize(position, scale, anchor * size);
-			}
+        // for draw FillZNodes
+        bool IsVisible() const;
+        bool PosInArea(XY pos_) const;
+        bool PosInScissor(XY pos_) const;
 
-			worldMaxXY = trans()(size);
-			worldSize = worldMaxXY - worldMinXY;
+        // for update
+        void FillTransRecursive();
+        void SetVisibleRecursive(bool visible_);
+        void SetEnabledRecursive(bool enabled_);
+        void SetAlphaRecursive(float alpha_);
+        void SetScissorRecursive(Weak<Node> scissor_);
 
-			TransUpdate();
-		}
+        template<typename Derived>
+        Derived& InitDerived(int32_t z_ = 0, XY position_ = {}, XY anchor_ = {}, XY scale_ = { 1,1 }, XY size_ = {}) {
+            assert(typeId == Derived::cTypeId);
+            z = z_;
+            position = position_;
+            anchor = anchor_;
+            scale = scale_;
+            size = size_;
+            FillTrans();
+            return (Derived&)*this;
+        }
 
-		// for draw FillZNodes
-		XX_INLINE bool IsVisible() const {
-			if (!visible) return false;
-			if (scissor && !IsIntersect_BoxBoxF(worldMinXY, worldMaxXY, scissor->worldMinXY, scissor->worldMaxXY)) return false;
-			if (inParentArea && parent) return IsIntersect_BoxBoxF(worldMinXY, worldMaxXY, parent->worldMinXY, parent->worldMaxXY);
-			return IsIntersect_BoxBoxF(worldMinXY, worldMaxXY, GameBase::instance->worldMinXY, GameBase::instance->worldMaxXY);
-		}
+        Node& Init(int32_t z_ = 0, XY position_ = {}, XY anchor_ = {}, XY scale_ = { 1,1 }, XY size_ = {});
 
-		XX_INLINE bool PosInArea(XY pos_) const {
-			if (scissor && !IsIntersect_BoxPointF(scissor->worldMinXY, scissor->worldMaxXY, pos_)) return false;
-			return IsIntersect_BoxPointF(worldMinXY, worldMaxXY, pos_);
-		}
+        // for ui root node only
+        Node& InitRoot(XY scale_);
 
-		XX_INLINE bool PosInScissor(XY pos_) const {
-			if (!scissor) return true;
-			return IsIntersect_BoxPointF(scissor->worldMinXY, scissor->worldMaxXY, pos_);
-		}
+        // unsafe: return value will failure when children resize if use "auto& rtv = 
+        template<typename T, typename = std::enable_if_t<std::is_base_of_v<Node, T>>>
+        Shared<T>& Add(Shared<T> c) {
+            assert(c);
+            assert(!c->parent);
+            c->typeId = T::cTypeId;
+            c->parent = WeakFromThis(this);
+            c->indexAtParentChildren = children.len;
+            c->scissor = scissor;
+            c->inParentArea = !size.IsZeroSimple();
+            return (Shared<T>&)children.Emplace(std::move(c));
+        }
 
-		// for update
-		void FillTransRecursive() {
-			FillTrans();
-			for (auto& c : children) {
-				c->FillTransRecursive();
-			}
-		};
+        // unsafe: return value will failure when children resize if use "auto& rtv = 
+        template<typename T, typename = std::enable_if_t<std::is_base_of_v<Node, T>>>
+        Shared<T>& Make() {
+            return Add(MakeShared<T>());
+        }
 
-		void SetVisibleRecursive(bool visible_) {
-			visible = visible_;
-			for (auto& c : children) {
-				c->SetVisibleRecursive(visible_);
-			}
-		}
+        template<typename T, typename = std::enable_if_t<std::is_base_of_v<Node, T>>>
+        T& At(int32_t idx_) {
+            assert(children[idx_]->typeId == T::cTypeId);
+            return *(T*)children[idx_].pointer;
+        }
 
-		void SetEnabledRecursive(bool enabled_) {
-			enabled = enabled_;
-			for (auto& c : children) {
-				c->SetEnabledRecursive(enabled_);
-			}
-		}
+        void SetToUIHandler(bool handle);
+        void SwapRemove();
+        void Clear();
+        void FindTopESCHandler(Node * &out, int32_t & minZ);
 
-		void SetAlphaRecursive(float alpha_) {
-			alpha = alpha_;
-			for (auto& c : children) {
-				c->SetAlphaRecursive(alpha_);
-			}
-		}
+        // recursive find TOP ESC handler
+        // null: not found
+        Node* FindTopESCHandler();
+        virtual void HandleESC();								// maybe need override
+        void TryRegisterAutoUpdate();
 
-		void SetScissorRecursive(Weak<Node> scissor_) {
-			scissor = scissor_;
-			for (auto& c : children) {
-				c->SetScissorRecursive(scissor_);
-			}
-		}
+        virtual int32_t Update() { return 0; };					// return !0 mean unregister auto update
+        virtual void TransUpdate() {};
+        virtual void Draw() {};									// draw current node only ( do not contain children )
+        virtual ~Node() {};
 
-		template<typename Derived>
-		XX_INLINE Derived& InitDerived(int32_t z_ = 0, XY position_ = {}, XY anchor_ = {}, XY scale_ = { 1,1 }, XY size_ = {}) {
-			assert(typeId == Derived::cTypeId);
-			z = z_;
-			position = position_;
-			anchor = anchor_;
-			scale = scale_;
-			size = size_;
-			FillTrans();
-			return (Derived&)*this;
-		}
+        void Resize(XY scale_);
+        void Resize(XY position_, XY scale_);
+        Node* FindFirstTypeId(int32_t typeId_);
 
-		XX_INLINE Node& Init(int32_t z_ = 0, XY position_ = {}, XY anchor_ = {}, XY scale_ = { 1,1 }, XY size_ = {}) {
-			return InitDerived<Node>(z_, position_, anchor_, scale_, size_);
-		}
-
-		// for ui root node only
-		XX_INLINE Node& InitRoot(XY scale_) {
-			return Init(0, 0, 0, scale_);
-		}
-
-		// warning: return value will failure when children resize if use "auto& rtv = 
-		template<typename T, typename = std::enable_if_t<std::is_base_of_v<Node, T>>>
-		XX_INLINE Shared<T>& Add(Shared<T> c) {
-			assert(c);
-			assert(!c->parent);
-			c->typeId = T::cTypeId;
-			c->parent = WeakFromThis(this);
-			c->indexAtParentChildren = children.len;
-			c->scissor = scissor;
-			c->inParentArea = !size.IsZeroSimple();
-			return (Shared<T>&)children.Emplace(std::move(c));
-		}
-
-		// warning: return value will failure when children resize if use "auto& rtv = 
-		template<typename T, typename = std::enable_if_t<std::is_base_of_v<Node, T>>>
-		XX_INLINE Shared<T>& Make() {
-			return Add(MakeShared<T>());
-		}
-
-		template<typename T, typename = std::enable_if_t<std::is_base_of_v<Node, T>>>
-		XX_INLINE T& At(int32_t idx_) {
-			assert(children[idx_]->typeId == T::cTypeId);
-			return *(T*)children[idx_].pointer;
-		}
-
-		XX_INLINE void SetToUIHandler(bool handle) {
-			auto& h = GameBase::instance->uiHandler;
-			if (handle) {
-				h = WeakFromThis((MouseEventHandlerNode*)this);
-			}
-			else {
-				if ((Node*)h.TryGetPointer() == this) {
-					h.Reset();
-				}
-			}
-		}
-
-		void SwapRemove() {
-			assert(parent);
-			assert(parent->children[indexAtParentChildren].pointer == this);
-			auto i = parent->children.Back()->indexAtParentChildren = indexAtParentChildren;
-			indexAtParentChildren = -1;
-			auto p = parent.GetPointer();
-			parent.Reset();
-			p->children.SwapRemoveAt(i);
-		}
-
-		XX_INLINE void Clear() {
-			for (auto i = children.len - 1; i >= 0; --i) {
-				children[i]->SwapRemove();
-			}
-		}
-
-		void FindTopESCHandler(Node*& out, int32_t& minZ) {
-			if (escHandler && z > minZ) {
-				out = this;
-				minZ = z;
-			}
-			for (auto& c : children) {
-				c->FindTopESCHandler(out, minZ);
-			}
-		}
-
-		// recursive find TOP ESC handler
-		// null: not found
-		Node* FindTopESCHandler() {
-			Node* n{};
-			auto minZ = std::numeric_limits<int32_t>::min();
-			FindTopESCHandler(n, minZ);
-			return n;
-		}
-
-		virtual void HandleESC() {								// maybe need override
-			SwapRemove();
-		}
-
-		void TryRegisterAutoUpdate() {
-			auto& c = GameBase::instance->uiAutoUpdates;
-			auto w = WeakFromThis(this);
-			for (int32_t i = 0, e = c.len; i < e; ++i) {
-				if (c[i].h == w.h) return;
-			}
-			c.Emplace(std::move(w));
-		}
-
-		virtual int32_t Update() { return 0; };					// return !0 mean unregister auto update
-		virtual void TransUpdate() {};
-		virtual void Draw() {};									// draw current node only ( do not contain children )
-		virtual ~Node() {};
+        template<typename T>
+        T* FindFirstType() {
+            return (T*)FindFirstTypeId(T::cTypeId);
+        }
+    };
 
 
-		void Resize(XY scale_) {
-			scale = scale_;
-			FillTransRecursive();
-		}
+    struct MouseEventHandlerNode : Node {
+        int32_t indexAtUiGrid{ -1 };
 
-		void Resize(XY position_, XY scale_) {
-			position = position_;
-			scale = scale_;
-			FillTransRecursive();
-		}
+        virtual int32_t OnMouseDown(int32_t btnId_) { return 0; };	// return 1: swallow
+        virtual int32_t OnMouseMove() { return 0; };
+        bool MousePosInArea() const;
+        virtual void TransUpdate() override;
+        ~MouseEventHandlerNode();
+    };
 
-		XX_INLINE Node* FindFirstTypeId(int32_t typeId_) {
-			if (this->typeId == typeId_) return this;
-			for (int32_t i = 0; i < children.len; ++i) {
-				if (children[i]->typeId == typeId_) {
-					return children[i].pointer;
-				}
-			}
-			return {};
-		}
+    struct ZNode {
+        decltype(Node::z) z;
+        Node* n;
+        Node* operator->() { return n; }
+        inline static bool LessThanComparer(ZNode const& a, ZNode const& b) {
+            return a.z < b.z;
+        }
+        inline static bool GreaterThanComparer(ZNode const& a, ZNode const& b) {
+            return a.z > b.z;
+        }
+    };
 
-		template<typename T>
-		T* FindFirstType() {
-			return (T*)FindFirstTypeId(T::cTypeId);
-		}
-	};
+    void FillZNodes(List<ZNode>& zns, Node* n, bool skipScissorContent = true);
 
-	/**********************************************************************************************/
-	/**********************************************************************************************/
+    void OrderByZDrawAndClear(List<ZNode>& zns);
 
-	struct ZNode {
-		decltype(Node::z) z;
-		Node* n;
-		XX_INLINE Node* operator->() { return n; }
-		XX_INLINE static bool LessThanComparer(ZNode const& a, ZNode const& b) {
-			return a.z < b.z;
-		}
-		XX_INLINE static bool GreaterThanComparer(ZNode const& a, ZNode const& b) {
-			return a.z > b.z;
-		}
-	};
-
-	template<bool skipScissorContent = true>
-	inline void FillZNodes(List<ZNode>& zns, Node* n) {
-		assert(n);
-		if constexpr (skipScissorContent) {
-			if (n->scissor && n->scissor == n->parent) return;
-		}
-		if ((n->size.x > 0.f || n->size.y > 0.f) && n->IsVisible()) {
-			zns.Emplace(n->z, n);
-		}
-		for (auto& c : n->children) {
-			FillZNodes(zns, c);
-		}
-	}
-
-	inline void OrderByZDrawAndClear(List<ZNode>& zns) {
-		std::sort(zns.buf, zns.buf + zns.len, ZNode::LessThanComparer);	// draw small z first
-		for (auto& zn : zns) {
-			zn->Draw();
-		}
-		zns.Clear();
-	}
-
-	template<typename T>
-	struct StringFuncs<T, std::enable_if_t<std::is_base_of_v<Node, T>>> {
-		static inline void Append(std::string& s, Node const& in) {
-			::xx::Append(s, "{ trans = ", in.trans()
-				, ", position = ", in.position
-				, ", scale = ", in.scale
-				, ", anchor = ", in.anchor
-				, ", size = ", in.size
-				, " }"
-			);
-		}
-	};
-
-	struct MouseEventHandlerNode : Node {
-		int32_t indexAtUiGrid{ -1 };
-
-		virtual int32_t OnMouseDown(int32_t btnId_) { return 0; };	// return 1: swallow
-		virtual int32_t OnMouseMove() { return 0; };
-		//virtual void OnMouseUp(int32_t btnId_) {};
-
-		XX_INLINE bool MousePosInArea() const {		// virtual ?
-			return PosInArea(GameBase::instance->mousePos);
-		}
-
-		virtual void TransUpdate() override {
-			auto& g = GameBase::instance->uiGrid;
-			auto w2 = g.worldSize * 0.5f;
-			FromTo<XY> aabb{ worldMinXY + w2, worldMaxXY + w2 };
-
-			if (g.TryLimitAABB(aabb)) {
-				if (indexAtUiGrid != -1) {
-					g.Update(indexAtUiGrid, aabb);
-				}
-				else {
-					indexAtUiGrid = g.Add(aabb, this);
-				}
-			}
-			else {
-				if (indexAtUiGrid != -1) {
-					g.Remove(indexAtUiGrid);
-					indexAtUiGrid = -1;
-				}
-			}
-		}
-
-		~MouseEventHandlerNode() {
-			if (indexAtUiGrid != -1) {
-				GameBase::instance->uiGrid.Remove(indexAtUiGrid);
-				indexAtUiGrid = -1;
-			}
-		}
-	};
 }

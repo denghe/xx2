@@ -1,11 +1,9 @@
 ﻿#pragma once
 #include "pch.h"
-using XY = xx::XY;
-using XYi = xx::XYi;
 #include "_phys.h"
 #include "pics.h"
 
-struct Game : xx::Game<Game> {
+struct Game : xx::GameBase {
 	static constexpr float cFps{ 120 };
 	static constexpr float cDelta{ 1.f / cFps };
 	static constexpr float cMaxDelta{ 0.1f };
@@ -34,12 +32,12 @@ struct Game : xx::Game<Game> {
 	xx::List<std::pair<xx::Frame*, _phys::InitFunc>> fis;
 
 
-	void Init();
-	void GLInit();
-	void Update();
-	void Delay();
-	void Stat();
-	void OnResize(bool modeChanged_);
-	void OnFocus(bool focused_);
+	void Init() override;
+	void GLInit() override;
+	void Update() override;
+	void Delay() override;
+	void Stat() override;
+	void OnResize(bool modeChanged_) override;
+	void OnFocus(bool focused_) override;
 };
 extern Game gg;

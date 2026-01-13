@@ -1,15 +1,15 @@
 ﻿#pragma once
 #include "pch.h"
+#include <xx_grid2d_circle.h>
+#include "shader_grass.h"
 #include "all.h"
-using XY = xx::XY;
-using XYi = xx::XYi;
 
 struct MinerConfig {
 	float animFPS, resRadius, moveSpeed, attackRange;
 	int32_t fsLens[3]; // aIdleLen, aMoveLen, aAtkLen;
 	xx::Frame* fss[3];	// aIdle, * aMove, * aAtk;
 	char* cd;	// for atk. share aAtkLen
-	xx::Weak<xx::SoundSource> ss;
+	xx::Weak<SoLoud::Wav> ss;
 };
 
 struct SpineFrameConfig {
@@ -17,7 +17,7 @@ struct SpineFrameConfig {
 	float scale{}, delta{};
 };
 
-struct Game : xx::Game<Game> {
+struct Game : xx::GameBase {
 	static constexpr float cFps{ 120 };
 	static constexpr float cDelta{ 1.f / cFps };
 	static constexpr float cMaxDelta{ 0.1f };
@@ -36,7 +36,7 @@ struct Game : xx::Game<Game> {
 
 	// for bg
 	xx::Shader_Grass shaderGrass;
-	XX_INLINE xx::Shader_Grass& Grass() { return ShaderBegin(shaderGrass); }
+	xx::Shader_Grass& Grass() { return ShaderBegin(shaderGrass); }
 
 	all all;
 	std::array<std::array<xx::Frame, sizeof(all::rock_0_) / sizeof(xx::Frame)>, 9>& all_rocks_();	// ref to all.rocks_?.  rock_?_?
@@ -51,7 +51,7 @@ struct Game : xx::Game<Game> {
 	std::array<MinerConfig, 4> mcs;
 
 	struct {
-		xx::Shared<xx::SoundSource>
+		xx::Shared<SoLoud::Wav>
 			pickaxe, rockbreak, pop
 			, miner1_atk
 			, miner2_atk
@@ -75,12 +75,12 @@ struct Game : xx::Game<Game> {
 	xx::SpaceGridRingDiffuseData sgrdd;
 	// ...
 
-	void Init();
-	void GLInit();
-	void Update();
-	void Delay();
-	void Stat();
-	void OnResize(bool modeChanged_);
-	void OnFocus(bool focused_);
+	void Init() override;
+	void GLInit() override;
+	void Update() override;
+	void Delay() override;
+	void Stat() override;
+	void OnResize(bool modeChanged_) override;
+	void OnFocus(bool focused_) override;
 };
 extern Game gg;

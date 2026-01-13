@@ -1,436 +1,265 @@
 ﻿#pragma once
-#include "xx_task.h"
-#include "xx_shader.h"
-#include "xx_file.h"
-#include "xx_zstd.h"
-#include "xx_grid2d_aabb.h"
+#include "xx_gl.h"
+#include "xx_grid2daabb.h"
+#include "xx_shader_quad.h"
+#include "xx_shader_quad_light.h"
+#include "xx_shader_spine.h"
+#include "xx_shader_texvert.h"
+#include "xx_node.h"
+#include "xx_bmfont.h"
 #include "xx_input.h"
 #include "xx_sound.h"
-#ifdef WIN32
-#pragma comment (lib ,"imm32.lib")
-#endif
 
 namespace xx {
 
-	struct Node;
+    struct GameBase {
+        inline static struct GameBase* instance{};
 
-	// engine base code
-	struct alignas(8) GameBase {
-		inline static struct GameBase* instance{};
-		GameBase(GameBase const&) = delete;
-		GameBase& operator=(GameBase const&) = delete;
-		GameBase() {
-			instance = this;
-		}
+        GameBase(GameBase const&) = delete;
+        GameBase& operator=(GameBase const&) = delete;
+        GameBase() {
+            instance = this;
+        }
+        virtual ~GameBase();
 
-		std::string title{ "game" };						// window title string( user can init )
-		static constexpr XY minSize{ 384, 216 };			// for glfwSetWindowSizeLimits
-		XY designSize{ 1920, 1080 };						// design resolution( user can init )
-		XY windowSize{ designSize };						// physics resolution( user can init )
-		XY worldMinXY{}, worldMaxXY{};						// for node( worldMinXY = -windowSize / 2,  worldMaxXY = windowSize / 2 );
-		XY size{}, size_2{};								// actual design size
-		/*
-				 screen anchor points
-		   ┌───────────────────────────────┐
-		   │ 7             8             9 │
-		   │                               │
-		   │                               │
-		   │ 4             5             6 │
-		   │                               │
-		   │                               │
-		   │ 1             2             3 │
-		   └───────────────────────────────┘
-		*/
-		static constexpr XY a7{ 0, 1 }, a8{ 0.5, 1 }, a9{ 1, 1 };
-		static constexpr XY a4{ 0, 0.5f }, a5{ 0.5, 0.5f }, a6{ 1, 0.5f };
-		static constexpr XY a1{ 0, 0 }, a2{ 0.5, 0 }, a3{ 1, 0 };
-		XY p7{}, p8{}, p9{};
-		XY p4{}, p5{}, p6{};
-		XY p1{}, p2{}, p3{};
-		float scale{};										// base scale. actual design size * base scale = physics resolution
-		float flipY{ 1 };									// -1: flip  for ogl frame buffer
+        // user need override
+        virtual void Init() {}
+        virtual void GLInit() {}
+        virtual void Update() {}
+        virtual void Delay() {}
+        virtual void Stat() {}
+        virtual void OnResize(bool modeChanged_) {}
+        virtual void OnFocus(bool focused_) {}
 
-		RGBA8 clearColor{};									// for glClearColor
-		std::array<uint32_t, 3> blendDefault{ GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_FUNC_ADD };
-		std::array<uint32_t, 3> blend{ blendDefault };
 
-		double time{}, delta{};								// usually for ui logic
-		int32_t drawVerts{}, drawCall{}, drawFPS{};			// counters
-		float drawFPSTimePool{};							// for count drawFPS
+        static constexpr XY minSize{ 384, 216 };			// for glfwSetWindowSizeLimits
+        std::string title{ "game" };						// window title string( user can init )
+        XY designSize{ 1920, 1080 };						// design resolution( user can init )
+        XY windowSize{ designSize };						// physics resolution( user can init )
+        XY worldMinXY{}, worldMaxXY{};						// for node( worldMinXY = -windowSize / 2,  worldMaxXY = windowSize / 2 );
+        XY size{}, size_2{};								// actual design size
+        float scale{};										// base scale. actual design size * base scale = physics resolution
+        float flipY{ 1 };									// -1: flip  for ogl frame buffer
 
-		float masterVolume{ 1.f }							// global sound settings
-			, audioVolume{ 1.f }
-			, musicVolume{ 0.5f };
+        /*
+         screen anchor points
+   ┌───────────────────────────────┐
+   │ 7             8             9 │
+   │                               │
+   │                               │
+   │ 4             5             6 │
+   │                               │
+   │                               │
+   │ 1             2             3 │
+   └───────────────────────────────┘
+*/
+        static constexpr XY a7{ 0, 1 }, a8{ 0.5, 1 }, a9{ 1, 1 };
+        static constexpr XY a4{ 0, 0.5f }, a5{ 0.5, 0.5f }, a6{ 1, 0.5f };
+        static constexpr XY a1{ 0, 0 }, a2{ 0.5, 0 }, a3{ 1, 0 };
+        XY p7{}, p8{}, p9{};
+        XY p4{}, p5{}, p6{};
+        XY p1{}, p2{}, p3{};
 
-		XY mousePos{};
-		std::array<BtnState, GLFW_MOUSE_BUTTON_LAST + 1 + 4> mouse{};	// +4 for wheel up, down, left, right
-		std::array<float, 4> wheelTimeouts{};				// store mouse wheel timeout
-		std::array<BtnState, GLFW_KEY_LAST + 1> keyboard{};
-		List<JoyState> joys;
-		JoyState joy;										// joy = sum(joys) ( easy access for single player )
 
-		bool running{};										// set false: quit app
+        RGBA8 clearColor{};									// for glClearColor
+        std::array<uint32_t, 3> blendDefault{ GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_FUNC_ADD };
+        std::array<uint32_t, 3> blend{ blendDefault };
 
-		bool focused{};										// user readonly
-		bool isFullScreen{};								// user readonly
-		bool isBorderless{};								// user readonly
-		bool minimized{};									// user readonly
+        float time{}, delta{};								// usually for ui logic
+        int32_t drawVerts{}, drawCall{}, drawFPS{};			// counters
+        float drawFPSTimePool{};							// for count drawFPS
 
-		bool mute{};										// global sound settings
+        float masterVolume{ 1.f }							// global sound settings
+            , audioVolume{ 1.f }
+        , musicVolume{ 0.5f };
 
-		Weak<Node> uiHandler;
-		Grid2dAABB<Node*> uiGrid;
-		List<Weak<Node>> uiAutoUpdates;
+        XY mousePos{};
+        std::array<BtnState, GLFW_MOUSE_BUTTON_LAST + 1 + 4> mouse{};	// +4 for wheel up, down, left, right
+        std::array<float, 4> wheelTimeouts{};				// store mouse wheel timeout
+        std::array<BtnState, GLFW_KEY_LAST + 1> keyboard{};
+        List<JoyState> joys;
+        JoyState joy;										// joy = sum(joys) ( easy access for single player )
 
-		Shader* shader{};
+        bool running{};										// set false: quit app
 
-		Sound sound;
+        bool focused{};										// user readonly
+        bool isFullScreen{};								// user readonly
+        bool isBorderless{};								// user readonly
+        bool minimized{};									// user readonly
 
-		std::string rootPath;
-		std::vector<std::string> searchPaths;
-		std::filesystem::path tmpPath;
+        bool mute{};										// global sound settings
 
-		List<std::function<int32_t()>> delayUpdates;			// call after update
-		Task<> baseTask;
-#ifndef __EMSCRIPTEN__
-		GLFWwindow* wnd{};
-#endif
+        Weak<Node> uiHandler;
+        Grid2dAABB uiGrid;
+        List<Weak<Node>> uiAutoUpdates;
 
-		// call at Init / Run
-		void DisableIME() {
+        Shader* shader{};
+
+        Sound sound;
+
+        std::string rootPath;
+        std::vector<std::string> searchPaths;
+        std::filesystem::path tmpPath;
+
+        List<std::function<int32_t()>> delayUpdates;		// call after update
+
+        GLFWwindow* wnd{};
 #ifdef WIN32
-			ImmDisableIME(0);
-#endif
-			// todo: more platform support
-		}
-
-		// example:
-		// GameBase::instance->delayUpdates.Emplace([w = WeakFromThis(this)] { if (!w) return 1; return 0; });
-		void ExecuteDelayUpdates() {
-			for (int32_t i = delayUpdates.len - 1; i >= 0; --i) {
-				if (delayUpdates[i]()) {
-					delayUpdates.SwapRemoveAt(i);
-				}
-			}
-		}
-
-		// for window resize event
-		void ResizeCalc() {
-			worldMinXY = -windowSize * 0.5f;
-			worldMaxXY = windowSize * 0.5f;
-			if (windowSize.x / designSize.x > windowSize.y / designSize.y) {
-				scale = windowSize.y / designSize.y;
-				size.y = designSize.y;
-				size.x = windowSize.x / scale;
-			}
-			else {
-				scale = windowSize.x / designSize.x;
-				size.x = designSize.x;
-				size.y = windowSize.y / scale;
-			}
-			size_2 = size * 0.5f;
-			p7 = { -size_2.x, +size_2.y }; p8 = { 0, +size_2.y }; p9 = { +size_2.x, +size_2.y };
-			p4 = { -size_2.x, 0 }; p5 = { 0, 0 }; p6 = { +size_2.x, 0 };
-			p1 = { -size_2.x, -size_2.y }; p2 = { 0, -size_2.y }; p3 = { +size_2.x, -size_2.y };
-		};
-
-		// for framebuffer only
-		void SetWindowSize(XY siz) {
-			if (siz.x < 1.f) siz.x = 1.f;
-			if (siz.y < 1.f) siz.y = 1.f;
-			windowSize = siz;
-			ResizeCalc();
-		}
-
-		void GLViewport() {
-			glViewport(0, 0, (GLsizei)windowSize.x, (GLsizei)windowSize.y);
-		}
-
-		void GLClear(RGBA8 c) {
-			glClearColor(c.r / 255.f, c.g / 255.f, c.b / 255.f, c.a / 255.f);
-			glClear(GL_COLOR_BUFFER_BIT);// | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-		}
-
-		void GLBlendFunc(std::array<uint32_t, 3> const& args) {
-			if (blend != args) {
-				ShaderEnd();
-				blend = args;
-				glBlendFunc(args[0], args[1]);
-				glBlendEquation(args[2]);
-			}
-		}
-
-		void GLBlendFunc() {
-			blend = blendDefault;
-			glBlendFunc(blendDefault[0], blendDefault[1]);
-			glBlendEquation(blendDefault[2]);
-		}
-
-
-		void SetBlendPremultipliedAlpha(bool e_) {
-			if (e_) {
-				GLBlendFunc({GL_ONE, GL_ONE_MINUS_SRC_ALPHA, GL_FUNC_ADD});
-			}
-			else {
-				GLBlendFunc({ GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_FUNC_ADD });
-			}
-		}
-
-		void SetDefaultBlendPremultipliedAlpha(bool e_) {
-			if (e_) {
-				blendDefault = { GL_ONE, GL_ONE_MINUS_SRC_ALPHA, GL_FUNC_ADD };
-			}
-			else {
-				blendDefault = { GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_FUNC_ADD };
-			}
-		}
-
-		template<typename ST>
-		XX_INLINE ST& ShaderBegin(ST& s) {
-			if (shader != &s) {
-				ShaderEnd();
-				s.Begin();
-				shader = &s;
-			}
-			return s;
-		}
-
-		XX_INLINE void ShaderEnd() {
-			if (shader) {
-				shader->End();
-				shader = {};
-			}
-		}
-
-		inline static bool IsAbsolute(std::string_view s) {
-			return s[0] == '/' || (s.size() > 1 && s[1] == ':');
-		}
-
-		// convert dir to search path format
-		inline static std::string ToSearchPath(std::string_view dir) {
-			std::string s;
-
-			dir = Trim(dir);
-			if (dir.empty()) {
-				CoutN("dir is empty");
-				throw dir;
-			}
-
-			// replace all \ to /, .\ or ./ to empty
-			for (size_t i = 0, siz = dir.size(); i < siz; i++) {
-				if (dir[i] == '.' && (dir[i + 1] == '\\' || dir[i + 1] == '/')) {
-					++i;
-					continue;
-				}
-				else if (dir[i] == '\\') {
-					s.push_back('/');
-				}
-				else {
-					s.push_back(dir[i]);
-				}
-			}
-			if (s.empty()) {
-				CoutN("dir is empty");
-				throw dir;
-			}
-
-			// make sure / at the end
-			if (s.back() != '/') {
-				s.push_back('/');
-			}
-
-			return s;
-		}
-
-		// add relative base dir to searchPaths
-		void SearchPathAdd(std::string_view dir, bool insertToFront = false) {
-			auto s = ToSearchPath(dir);
-			if (!IsAbsolute(s)) {
-				s.insert(0, rootPath);
-			}
-
-			if (insertToFront) {
-				searchPaths.insert(searchPaths.begin(), std::move(s));
-			}
-			else {
-				searchPaths.push_back(std::move(s));
-			}
-		}
-
-		// search file by searchPaths + fn. not found return ""
-		std::string GetFullPath(std::string_view fn, bool fnIsFileName = true) {
-			// prepare
-			fn = Trim(fn);
-
-			// is absolute path?
-			if (IsAbsolute(fn))
-				return std::string(fn);
-
-			// foreach search path find
-			for (size_t i = 0, e = searchPaths.size(); i < e; ++i) {
-				tmpPath = (std::u8string&)searchPaths[i];
-				tmpPath /= (std::u8string_view&)fn;
-				if (std::filesystem::exists(tmpPath)) {
-					if (fnIsFileName) {
-						if (std::filesystem::is_regular_file(tmpPath)) goto LabReturn;
-					}
-					else {
-						if (std::filesystem::is_directory(tmpPath)) goto LabReturn;
-					}
-				}
-				continue;
-			LabReturn:
-				return U8AsString(tmpPath.u8string());
-			}
-			// not found
-			return {};
-		}
-
-		// zstd ?
-		XX_INLINE static bool IsCompressedData(uint8_t const* buf, size_t len) {
-			return len >= 4 && buf[0] == 0x28 && buf[1] == 0xB5 && buf[2] == 0x2F && buf[3] == 0xFD;
-		}
-
-		// read all data by full path
-		Data LoadFileDataWithFullPath(std::string_view fp) {
-			Data d;
-			if (int32_t r = ReadAllBytes((std::u8string_view&)fp, d)) {
-				CoutN("file read error. r = ", r, ", fn = ", fp);
-				throw fp;
-			}
-			if (d.len == 0) {
-				CoutN("file content is empty. fn = ", fp);
-				throw fp;
-			}
-			if (IsCompressedData(d.buf, d.len)) {
-				Data d2;
-				ZstdDecompress(d, d2);
-				return d2;
-			}
-			return d;
-		}
-
-		// read all data by short path. return data + full path
-		std::pair<Data, std::string> LoadFileData(std::string_view const& fn) {
-			auto p = GetFullPath(fn);
-			if (p.empty()) {
-				CoutN("fn can't find: ", fn);
-				throw fn;
-			}
-			auto d = LoadFileDataWithFullPath(p);
-			return { std::move(d), std::move(p) };
-		}
-
-		// copy or decompress
-		Data LoadDataFromData(uint8_t const* buf, size_t len) {
-			if (IsCompressedData(buf, len)) {
-				Data d;
-				ZstdDecompress({ (char*)buf, len }, d);
-				return d;
-			}
-			return { buf, len };
-		}
-
-		template<size_t len>
-		Data LoadDataFromData(const uint8_t(&buf)[len]) {
-			return LoadDataFromData(buf, len);
-		}
-
-		// load texture from file
-		Shared<GLTexture> LoadTexture(std::string_view fn) {
-			auto [d, p] = LoadFileData(fn);
-			assert(d);
-			return MakeShared<GLTexture>(LoadGLTexture(d, p));
-		}
-
-		// load texture from data
-		Shared<GLTexture> LoadTextureFromData(uint8_t const* buf, size_t len, std::string_view fn = {}) {
-			if (IsCompressedData(buf, len)) {	// zstd
-				Data d;
-				ZstdDecompress({(char*)buf, len}, d);
-				return MakeShared<GLTexture>(LoadGLTexture(d, fn));
-			}
-			return MakeShared<GLTexture>(LoadGLTexture({(char*)buf, len}, fn));
-		}
-
-		// load texture from data
-		template<size_t len>
-		Shared<GLTexture> LoadTextureFromData(const uint8_t(&buf)[len], std::string_view fn = {}) {
-			return LoadTextureFromData(buf, len, fn);
-		}
-
-
-
-		// d: ogg / wav
-		XX_INLINE Shared<SoundSource> LoadSoundSourceFromData(uint8_t* buf, size_t len, bool looping = false) {
-			assert(!IsCompressedData(buf, len));
-			auto rtv = MakeShared<SoundSource>();
-			auto r = rtv->wav.loadMem(buf, len, false, false);
-			assert(!r);
-			if (looping) {
-				rtv->wav.setLooping(true);
-			}
-			return rtv;
-		}
-
-		template<size_t len>
-		XX_INLINE Shared<SoundSource> LoadSoundSourceFromData(const uint8_t(&buf)[len], bool looping = false) {
-			return LoadSoundSourceFromData((uint8_t*)buf, len, looping);
-		}
-
-		XX_INLINE Shared<SoundSource> LoadSoundSource(std::string_view fn, bool looping = false) {
-			auto [d, p] = LoadFileData(fn);
-			assert(d);
-			return LoadSoundSourceFromData(d.buf, d.len, looping);
-		}
-
-		XX_INLINE unsigned int GetActiveVoiceCount() {
-			return sound.GetActiveVoiceCount();
-		}
-
-		XX_INLINE int PlayAudio(Shared<SoundSource> const& ss_, float volume_ = 1.f, float pan_ = 0.f, float speed_ = 1.f) {
-			if (mute || audioVolume == 0) return 0;
-			return sound.Play(ss_, volume_ * audioVolume, pan_, speed_);
-		}
-
-		XX_INLINE int PlayMusic(Shared<SoundSource> const& ss_, float volume_ = 1.f, float pan_ = 0.f, float speed_ = 1.f) {
-			if (mute || musicVolume == 0) return 0;
-			return sound.Play(ss_, volume_ * musicVolume, pan_, speed_);
-		}
-
-
-
-		// life cycle 1
-		void BaseInit() {
-			sound.Init();
-
-#ifdef WIN32
-			SetConsoleOutputCP(CP_UTF8);
-			timeBeginPeriod(1);
+        HANDLE eventForDelay = CreateEvent(NULL, FALSE, FALSE, NULL);
 #endif
 
-			for (auto& o : keyboard) o.globalTime = &time;
-			for (auto& o : mouse) o.globalTime = &time;
-			joy.Init(&time);
+        List<ZNode> tmpZNodes;	// for node tree sort
 
-			auto currDir = std::filesystem::absolute("./").u8string();
-			this->rootPath = this->ToSearchPath((std::string&)currDir);
-			this->searchPaths.clear();
-			this->searchPaths.push_back(this->rootPath);
+        // for easy draw root node only
+        void DrawNode(Node* tar) {
+            FillZNodes(tmpZNodes, tar);
+            OrderByZDrawAndClear(tmpZNodes);
+        }
 
-			uiGrid.Init(64, 128);	// 8k
-		}
+        // embed res
+        struct {
+            Shared<Scale9Config>
+                cfg_s9,
+                cfg_s9bN,
+                cfg_s9bH,
+                cfg_s9bg,
+                cfg_sbar,
+                cfg_sblock;
+            // ...
 
-		// life cycle 2
-		void BaseGLInit() {
-#ifndef __EMSCRIPTEN__
-			//glEnable(GL_PRIMITIVE_RESTART);
-			//glPrimitiveRestartIndex(65535);
-#endif
-			glDisable(GL_CULL_FACE);
-			glDisable(GL_DEPTH_TEST);
-			glEnable(GL_BLEND);
-		}
-	};
+            TinyFrame
+                ui_s9,
+                ui_button_h,
+                ui_button_n,
+                ui_checkbox_0,
+                ui_checkbox_1,
+                ui_imgbtn_h,
+                ui_imgbtn_n,
+                ui_dropdownlist_icon,
+                ui_dropdownlist_head,
+                ui_panel,
+                ui_slider_bar,
+                ui_slider_block,
+                shape_dot,
+                shape_gear,
+                shape_heart;
+            // ...
+
+            List<TinyFrame> icon_flags_;
+
+            Shared<SoLoud::Wav>
+                ss_ui_focus;
+            // ...
+
+            Shared<BMFont> font_sys;
+        } embed;
+
+
+        // example:
+        // GameBase::instance->delayUpdates.Emplace([w = WeakFromThis(this)] { if (!w) return 1; return 0; });
+        void ExecuteDelayUpdates();
+        void DisableIME();  // call before Run if needed
+
+
+        // convert dir to search path format
+        static std::string ToSearchPath(std::string_view dir);
+
+        // add relative base dir to searchPaths
+        void SearchPathAdd(std::string_view dir, bool insertToFront = false);
+
+        // short file name to full path name( with search path )
+        std::string GetFullPath(std::string_view fn, bool fnIsFileName = true);
+
+        // read all data by full path
+        Data LoadFileDataWithFullPath(std::string_view fp);
+
+        // read all data by short path. return data
+        Data LoadFileData(std::string_view fn);
+
+        // auto decompress
+        Data LoadDataFromData(uint8_t const* buf, size_t len);
+        Data LoadDataFromData(Span d);
+        template<size_t len>
+        Data LoadDataFromData(const uint8_t(&buf)[len]) {
+            return LoadDataFromData(buf, len);
+        }
+
+        // auto decompress
+        Shared<GLTexture> LoadTextureFromData(void* buf_, size_t len_);
+        Shared<GLTexture> LoadTextureFromData(Span d);
+        template<size_t len>
+        Shared<GLTexture> LoadTextureFromData(const uint8_t(&buf)[len]) {
+            return LoadTextureFromData((void*)buf, len);
+        }
+
+        Shared<GLTexture> LoadTexture(std::string_view fn_);
+
+
+        void ResizeCalc();  // for window resize event
+        void SetWindowSize(XY siz); // for framebuffer only
+        void GLViewport();
+        void GLClear(RGBA8 c);
+        void GLBlendFunc(std::array<uint32_t, 3> const& args);
+        void GLBlendFunc();
+        void SetBlendPremultipliedAlpha(bool e_);
+        void SetDefaultBlendPremultipliedAlpha(bool e_);
+
+        // internal funcs
+		void HandleMouseMove(XY mp_);
+        void HandleMouseButtonPressed(int32_t idx);
+        void HandleMouseButtonReleased(int32_t idx);
+        void HandleMouseWheel(double xoffset, double yoffset);
+        void HandleKeyboardPressed(int32_t idx);
+        void HandleKeyboardReleased(int32_t idx);
+        void HandleJoystickConnected(int jid);
+        void HandleJoystickDisconnected(int jid);
+        void BaseUpdate();
+
+        void SetMousePointerVisible(bool visible_);
+        void SetFullScreenMode(XY size_ = {});
+        void SetWindowMode(XY size_ = {});
+        void SetBorderlessMode(bool b = true);
+        void SleepSecs(double secs);    // example: SleepSecs(cDelta - (glfwGetTime() - time));
+
+
+        // ogg / wav is supported
+        Shared<SoLoud::Wav> LoadSoundSourceFromData(uint8_t* buf, size_t len, bool looping = false);
+        Shared<SoLoud::Wav> LoadSoundSource(std::string_view fn, bool looping = false);
+        unsigned int GetActiveVoiceCount();
+        int PlayAudio(Shared<SoLoud::Wav> const& ss_, float volume_ = 1.f, float pan_ = 0.f, float speed_ = 1.f);
+        int PlayMusic(Shared<SoLoud::Wav> const& ss_, float volume_ = 1.f, float pan_ = 0.f, float speed_ = 1.f);
+        template<size_t len>
+        Shared<SoLoud::Wav> LoadSoundSourceFromData(const uint8_t(&buf)[len], bool looping = false) {
+            return LoadSoundSourceFromData((uint8_t*)buf, len, looping);
+        }
+
+
+        int32_t Run();
+        void Loop(bool fromEvent);
+
+        template<typename ST>
+        ST& ShaderBegin(ST& s) {
+            if (shader != &s) {
+                ShaderEnd();
+                s.Begin();
+                shader = &s;
+            }
+            return s;
+        }
+        void ShaderEnd();
+
+        Shader_Quad shaderQuad;     // default shader
+        Shader_Quad& Quad() { return ShaderBegin(shaderQuad); }
+
+        Shader_QuadLight shaderQuadLight;
+        Shader_QuadLight& QuadLight() { return ShaderBegin(shaderQuadLight); }
+
+        Shader_Spine shaderSpine;
+        Shader_Spine& Spine() { return ShaderBegin(shaderSpine); }
+
+        Shader_TexVert shaderTexVert;
+        Shader_TexVert& TexVert() { return ShaderBegin(shaderTexVert); }
+        // ...
+    };
 
 }

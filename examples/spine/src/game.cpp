@@ -42,7 +42,7 @@ void Game::GLInit() {
 	// load spine res & parse
 	auto& se = xx::gSpineEnv;
 
-	se.Load("res/owl-pro", res.owl.skel, res.owl.tex);
+	se.Load(false, "res/owl-pro", res.owl.skel, res.owl.tex);
 	res.owl.tex->TryGenerateMipmap();
 	res.owl.idle = res.owl.skel->findAnimation("idle");
 	res.owl.blink = res.owl.skel->findAnimation("blink");
@@ -51,29 +51,29 @@ void Game::GLInit() {
 	res.owl.down = res.owl.skel->findAnimation("down");
 	res.owl.left = res.owl.skel->findAnimation("left");
 
-	se.Load("res/spineboy-pro", res.spineBoy.skel, res.spineBoy.tex);
+	se.Load(false, "res/spineboy-pro", res.spineBoy.skel, res.spineBoy.tex);
 	res.spineBoy.tex->TryGenerateMipmap();
 	res.spineBoy.walk = res.spineBoy.skel->findAnimation("walk");
 	res.spineBoy.aim = res.spineBoy.skel->findAnimation("aim");
 	res.spineBoy.jump = res.spineBoy.skel->findAnimation("jump");
 	res.spineBoy.shoot = res.spineBoy.skel->findAnimation("shoot");
 
-	se.Load("res/man1", res.man1.skel, res.man1.tex);
+	se.Load(false, "res/man1", res.man1.skel, res.man1.tex);
 	res.man1.tex->TryGenerateMipmap();
 	res.man1.idle = res.man1.skel->findAnimation("idle");
 
-	se.Load("res/eye", res.eye.skel, res.eye.tex);
+	se.Load(false, "res/eye", res.eye.skel, res.eye.tex);
 	res.eye.tex->TryGenerateMipmap();
 
 	for (size_t i = 1; i <= 2; i++) {
 		auto& o = res.flower_.Emplace();
-		se.Load(xx::ToString("res/flower_", i), o.skel, o.tex);
+		se.Load(false, xx::ToString("res/flower_", i), o.skel, o.tex);
 		o.tex->TryGenerateMipmap();
 		o.idle = o.skel->findAnimation("idle");
 	}
 	for (size_t i = 1; i <= 4; i++) {
 		auto& o = res.grass_.Emplace();
-		se.Load(xx::ToString("res/grass_", i), o.skel, o.tex);
+		se.Load(false, xx::ToString("res/grass_", i), o.skel, o.tex);
 		o.tex->TryGenerateMipmap();
 		o.idle = o.skel->findAnimation("idle");
 	}

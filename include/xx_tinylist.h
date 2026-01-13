@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "xx_typetraits.h"
+#include "xx_string.h"
 #pragma warning(disable: 4200)
 
 namespace xx {
@@ -52,7 +52,7 @@ namespace xx {
 
 		// func == [](auto& a, auto& b) { return a->xxx < b->xxx; }
 		template<typename F>
-		XX_INLINE void StdSort(F&& func) {
+		void StdSort(F&& func) {
 			if (!core) return;
 			std::sort(core->buf, core->buf + core->len, std::forward<F>(func));
 		}
@@ -237,7 +237,7 @@ namespace xx {
 			}
 		}
 
-		XX_INLINE void PopBack() {
+		void PopBack() {
 			assert(core && core->len);
 			--core->len;
 			if constexpr (!(std::is_standard_layout_v<T> && std::is_trivial_v<T>)) {
@@ -245,11 +245,11 @@ namespace xx {
 			}
 		}
 
-		XX_INLINE T& Back() {
+		T& Back() {
 			assert(core && core->len);
 			return core->buf[core->len - 1];
 		}
-		XX_INLINE T const& Back() const {
+		T const& Back() const {
 			assert(core && core->len);
 			return core->buf[core->len - 1];
 		}

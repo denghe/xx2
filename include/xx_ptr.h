@@ -1,15 +1,12 @@
 ﻿#pragma once
-#include "xx_typetraits.h"
-
-// std::shared_ptr / weak_ptr likely but thin, no atomic( fast 4 times ), a little unsafe for easy use
+#include "xx_includes.h"
 
 namespace xx {
 
     // for SerdeBase check
     template <class T> concept HasMemberType_cParentTypeId = requires(T) { T::cParentTypeId; };
 
-    /***********************************************************************************************/
-
+    // for Shared / Weak
     typedef void(*PtrDeleter)(void*);
     template<typename T>
     struct PtrHeader {
@@ -21,14 +18,14 @@ namespace xx {
             size_t ud;
         };
         T data;
-        XX_INLINE void Init() {
+        void Init() {
             sharedCount = 1;
             weakCount = 0;
         }
     };
 
     template<typename HT>
-    XX_INLINE HT* CalcPtrHeader(void* p) {
+    HT* CalcPtrHeader(void* p) {
         return container_of(p, HT, data);
     }
 
@@ -47,8 +44,7 @@ namespace xx {
     struct Weak;
 
 
-    /***********************************************************************************************/
-
+	// std::shared_ptr / weak_ptr likely but thin, no atomic( fast 4 times ), a little unsafe for easy use
     template<typename T>
     struct Shared {
         using HeaderType = PtrHeader_t<T>;
@@ -136,7 +132,7 @@ namespace xx {
             o.pointer = {};
         }
 
-        Shared(Shared&& o) {
+        Shared(Shared&& o) noexcept {
             pointer = o.pointer;
             o.pointer = {};
         }
@@ -176,7 +172,7 @@ namespace xx {
             return *this;
         }
 
-        Shared &operator=(Shared &&o) {
+        Shared &operator=(Shared &&o) noexcept {
             std::swap(pointer, o.pointer);
             return *this;
         }
@@ -214,7 +210,7 @@ namespace xx {
         }
 
         // unsafe
-        XX_INLINE HeaderType* GetHeader() const {
+        HeaderType* GetHeader() const {
             return (HeaderType*)CalcPtrHeader<HeaderType>(pointer);
         }
 
@@ -295,11 +291,11 @@ namespace xx {
     inline static void* Nil{};
 
     template<typename T>
-    XX_INLINE typename Shared<T>::HeaderType* GetPtrHeader(T const* p) {
+    typename Shared<T>::HeaderType* GetPtrHeader(T const* p) {
         return container_of(p, typename Shared<T>::HeaderType, data);
     }
 
-    /************************************************************************************/
+    /***********************************************************************************/
     // std::weak_ptr like
 
     template<typename T>
@@ -457,7 +453,7 @@ namespace xx {
             }
         }
 
-        Weak(Weak &&o) : h((HeaderType*)o.h) {
+        Weak(Weak &&o) noexcept : h((HeaderType*)o.h) {
             o.h = {};
         }
 
@@ -485,7 +481,7 @@ namespace xx {
             return *this;
         }
 
-        Weak &operator=(Weak &&o) {
+        Weak &operator=(Weak &&o) noexcept {
             std::swap(h, o.h);
             return *this;
         }

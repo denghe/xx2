@@ -46,7 +46,7 @@ namespace xx::TexturePackerReader {
 		int Load(Data const& fileData) {
 			pugi::xml_document doc;
 			if (auto&& r = doc.load_buffer(fileData.buf, fileData.len); r.status) {
-				std::cerr << "load_buffer error : " << r.description() << std::endl;
+				//std::cout << "load_buffer error : " << r.description() << std::endl;
 				return -1;
 			}
 

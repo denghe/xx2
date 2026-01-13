@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "xx_node.h"
 #include "xx_bmfont.h"
+#include "xx_gamebase.h"
 
 namespace xx {
 
@@ -14,32 +15,16 @@ namespace xx {
 		static constexpr int32_t cTypeId{ 1 };
 
 		List<LabelChar> chars;
-		Shared<BMFont> bmf = GameBase_shader::GetInstance()->embed.font_sys;
+		Shared<BMFont> bmf = GameBase::instance->embed.font_sys;
 		float fontSize{ 32 };
 		float baseScale{ fontSize / bmf->fontSize };
 		RGBA8 color{};
 
-		Label& Init(int32_t z_, XY position_, XY anchor_ = 0, float fontSize_ = 32, RGBA8 color_ = RGBA8_White) {
-			assert(typeId == cTypeId);
-			z = z_;
-			position = position_;
-			anchor = anchor_;
-			color = color_;
-			fontSize = fontSize_;
-			baseScale = fontSize / bmf->fontSize;
-			return *this;
-		}
+		Label& Init(int32_t z_, XY position_, XY anchor_ = 0, float fontSize_ = 32, RGBA8 color_ = RGBA8_White);
 
-		Label& SetColor(RGBA8 color_) {
-			color = color_;
-			return *this;
-		}
+		Label& SetColor(RGBA8 color_);
 
-		Label& SetFont(Shared<BMFont> bmf_) {
-			bmf = std::move(bmf_);
-			baseScale = fontSize / bmf->fontSize;
-			return *this;
-		}
+		Label& SetFont(Shared<BMFont> bmf_);
 
 		// S : literal string u8/32string [view]
 		template<typename S>
@@ -86,22 +71,10 @@ namespace xx {
 		Label& operator()(S const& txt_) {
 			return SetText(txt_);
 		}
-		Label& operator()(Shared<BMFont> bmf_) {
-			return SetFont(std::move(bmf_));
-		}
 
-		virtual void Draw() override {
-			if (chars.Empty()) return;
-			auto& q = GameBase_shader::GetInstance()->Quad();
-			RGBA8 c = { color.r, color.g, color.b, (uint8_t)(color.a * alpha) };
-			float cp;
-			if (enabled) cp = 1.f;
-			else cp = 0.5f;
-			auto s = worldScale * baseScale;
-			for (auto& f : chars) {
-				q.Draw(f.texId, f.uvRect, worldMinXY + f.offset * worldScale, 0, s, 0, cp, c);
-			}
-		}
+		Label& operator()(Shared<BMFont> bmf_);
+
+		virtual void Draw() override;
 
 		// for rich label
 		struct CalcResult {
@@ -139,7 +112,7 @@ namespace xx {
 
 		template<typename S>
 		inline static CalcResult Calc(float fontSize_, float maxWidth_, S&& txt_
-			, Shared<BMFont> const& bmf_ = GameBase_shader::GetInstance()->embed.font_sys
+			, Shared<BMFont> const& bmf_ = GameBase::instance->embed.font_sys
 		) {
 			return Calc(fontSize_, maxWidth_, bmf_, StrPtr(txt_), StrLen(txt_));
 		}
