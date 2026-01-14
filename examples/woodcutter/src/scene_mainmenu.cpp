@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 #include "scene_mainmenu.h"
 #include "scene_test1.h"
+#include "scene_test2.h"
 
 void Scene_MainMenu::Init() {
 	MakeUI();
@@ -61,6 +62,10 @@ void Scene_MainMenu::MakeUI() {
 
 	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test1( NxN )")).onClicked = [this] {
 		gg.MakeScene<Test1::Scene>()->Init(1.4, 0.1, 5);
+	};
+
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test2")).onClicked = [this] {
+		gg.MakeScene<Test2::Scene>()->Init();
 	};
 
 

@@ -426,6 +426,19 @@ namespace xx {
 
 
     /************************************************************************************/
+    // ctor call helper
+
+    template<typename U>
+    struct TCtor {
+        U* p;
+        template<typename...Args>
+        U& operator()(Args&&...args) {
+            return *new (p) U(std::forward<Args>(args)...);
+        }
+    };
+
+
+    /************************************************************************************/
     // std::????map<std::string, T>    .find( std::string_view
     // example:
     // std::unordered_map<std::string, XXXXXXXX, xx::StdStringHash, std::equal_to<>> m;

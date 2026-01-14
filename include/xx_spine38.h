@@ -68,6 +68,7 @@ namespace xx {
 
 	// spine's global env
 	struct SpineEnv {
+		SpineEnv();
 		SpineExtension ext;
 		SpineTextureLoader textureLoader;
 
@@ -81,14 +82,11 @@ namespace xx {
 
 		spine::SkeletonData* AddSkeletonData(bool skeletonFileIsJson, spine::Atlas* atlas, std::string_view skeletonFileName, float scale = 1.f);
 
-		void Init();
-
 		void Load(bool skeletonFileIsJson, std::string const& baseFileNameWithPath, spine::SkeletonData*& sd, xx::Shared<xx::GLTexture>& tex, float scale = 1.f);
 
 		// unsafe. careful SkeletonData* refs
 		void Clear();
 	};
 
-	inline SpineEnv gSpineEnv;	// need init at GameBase
-
+	extern SpineEnv gSpineEnv;
 }

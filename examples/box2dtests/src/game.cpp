@@ -97,7 +97,7 @@ void Game::Update() {
 	// handle inputs
 	if (gg.keyboard[GLFW_KEY_LEFT_BRACKET](0.2f)) {
 		isShowInfo = !isShowInfo;
-		xx::CoutN("show fps: ", isShowInfo ? "ON":"OFF");
+		xx::CoutN("show fps: ", isShowInfo ? "ON" : "OFF");
 	}
 	if (gg.keyboard[GLFW_KEY_RIGHT_BRACKET](0.2f)) {
 		isLimitFPS = !isLimitFPS;

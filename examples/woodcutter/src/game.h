@@ -25,6 +25,8 @@ struct Game : xx::GameBase {
 	std::string fpsVal;
 	xx::Shared<xx::Node> ui;
 	xx::Weak<xx::Label> uiFPS;
+	xx::Weak<xx::Label> uiText;
+	bool uiColorFlag{};
 
 	xx::Shared<xx::SceneBase> scene, oldScene;	// oldScene: delay remove( after draw )
 	template<typename T>
@@ -35,6 +37,10 @@ struct Game : xx::GameBase {
 	}
 
 	_pics _pics;
+	struct {
+		xx::Frame p11;
+		xx::Frame p11a;
+	} fs;
 	xx::STBImage _mask_bg_1;
 	xx::List<xx::List<xx::Frame>> treeIdles;
 	xx::List<xx::List<xx::Frame>> treeTurns;

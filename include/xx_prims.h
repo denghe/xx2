@@ -26,17 +26,17 @@ namespace xx {
         constexpr X_Y& operator=(HasField_XY auto const& v) { x = T(v.x); y = T(v.y); return *this; }
         constexpr X_Y& operator=(IsArithmetic auto v) { x = T(v); y = T(v); return *this; }
 
-        constexpr X_Y operator-() const { return { -x, -y }; }
+        [[nodiscard]] constexpr X_Y operator-() const { return { -x, -y }; }
 
-        constexpr X_Y operator+(HasField_XY auto const& v) const { return { T(x + v.x), T(y + v.y) }; }
-        constexpr X_Y operator-(HasField_XY auto const& v) const { return { T(x - v.x), T(y - v.y) }; }
-        constexpr X_Y operator*(HasField_XY auto const& v) const { return { T(x * v.x), T(y * v.y) }; }
-        constexpr X_Y operator/(HasField_XY auto const& v) const { return { T(x / v.x), T(y / v.y) }; }
+        [[nodiscard]] constexpr X_Y operator+(HasField_XY auto const& v) const { return { T(x + v.x), T(y + v.y) }; }
+        [[nodiscard]] constexpr X_Y operator-(HasField_XY auto const& v) const { return { T(x - v.x), T(y - v.y) }; }
+        [[nodiscard]] constexpr X_Y operator*(HasField_XY auto const& v) const { return { T(x * v.x), T(y * v.y) }; }
+        [[nodiscard]] constexpr X_Y operator/(HasField_XY auto const& v) const { return { T(x / v.x), T(y / v.y) }; }
 
-        constexpr X_Y operator+(IsArithmetic auto v) const { return { T(x + v), T(y + v) }; }
-        constexpr X_Y operator-(IsArithmetic auto v) const { return { T(x - v), T(y - v) }; }
-        constexpr X_Y operator*(IsArithmetic auto v) const { return { T(x * v), T(y * v) }; }
-        constexpr X_Y operator/(IsArithmetic auto v) const { return { T(x / v), T(y / v) }; }
+        [[nodiscard]] constexpr X_Y operator+(IsArithmetic auto v) const { return { T(x + v), T(y + v) }; }
+        [[nodiscard]] constexpr X_Y operator-(IsArithmetic auto v) const { return { T(x - v), T(y - v) }; }
+        [[nodiscard]] constexpr X_Y operator*(IsArithmetic auto v) const { return { T(x * v), T(y * v) }; }
+        [[nodiscard]] constexpr X_Y operator/(IsArithmetic auto v) const { return { T(x / v), T(y / v) }; }
 
         constexpr X_Y& operator+=(HasField_XY auto const& v) { x = T(x + v.x); y = T(y + v.y); return *this; }
         constexpr X_Y& operator-=(HasField_XY auto const& v) { x = T(x - v.x); y = T(y - v.y); return *this; }
@@ -48,18 +48,19 @@ namespace xx {
         constexpr X_Y& operator*=(IsArithmetic auto v) { x = T(x * v); y = T(y * v); return *this; }
         constexpr X_Y& operator/=(IsArithmetic auto v) { x = T(x / v); y = T(y / v); return *this; }
 
-        constexpr bool operator==(HasField_XY auto const& v) const { return memcmp(this, &v, sizeof(v)) == 0; }
-        constexpr bool operator!=(HasField_XY auto const& v) const { return memcmp(this, &v, sizeof(v)) != 0; }
+        [[nodiscard]] constexpr bool operator==(HasField_XY auto const& v) const { return memcmp(this, &v, sizeof(v)) == 0; }
+        [[nodiscard]] constexpr bool operator!=(HasField_XY auto const& v) const { return memcmp(this, &v, sizeof(v)) != 0; }
 
-        constexpr X_Y Add(IsArithmetic auto v) const { return { T(x + v), T(y + v) }; }
-        constexpr X_Y Add(IsArithmetic auto vx, IsArithmetic auto vy) const { return { T(x + vx), T(y + vy) }; }
-        constexpr X_Y AddX(IsArithmetic auto v) const { return { T(x + v), y }; }
-        constexpr X_Y AddY(IsArithmetic auto v) const { return { x, T(y + v) }; }
+        [[nodiscard]] constexpr X_Y Add(IsArithmetic auto v) const { return { T(x + v), T(y + v) }; }
+        [[nodiscard]] constexpr X_Y Add(IsArithmetic auto vx, IsArithmetic auto vy) const { return { T(x + vx), T(y + vy) }; }
+        [[nodiscard]] constexpr X_Y AddX(IsArithmetic auto v) const { return { T(x + v), y }; }
+        [[nodiscard]] constexpr X_Y AddY(IsArithmetic auto v) const { return { x, T(y + v) }; }
         // ...
-        constexpr X_Y FlipY() const { return { x, -y }; }
-        constexpr X_Y FlipX() const { return { -x, y }; }
-        constexpr X_Y OneMinusX() const { return { T{1} - x, y }; }
-        constexpr X_Y OneMinusY() const { return { x, T{1} - y }; }
+
+        [[nodiscard]] constexpr X_Y FlipY() const { return { x, -y }; }
+        [[nodiscard]] constexpr X_Y FlipX() const { return { -x, y }; }
+        [[nodiscard]] constexpr X_Y OneMinusX() const { return { T{1} - x, y }; }
+        [[nodiscard]] constexpr X_Y OneMinusY() const { return { x, T{1} - y }; }
         // ...
 
         constexpr void Reset() {
@@ -68,11 +69,11 @@ namespace xx {
         }
 
         template<typename U>
-        constexpr auto As() const -> X_Y<U> {
+        [[nodiscard]] constexpr auto As() const -> X_Y<U> {
 			return { (U)x, (U)y };
         }
 
-        constexpr bool IsZero() const {
+        [[nodiscard]] constexpr bool IsZero() const {
             if constexpr (std::is_floating_point_v<T>) {
                 return (std::abs(x) < std::numeric_limits<T>::epsilon())
                     && (std::abs(y) < std::numeric_limits<T>::epsilon());
@@ -80,34 +81,30 @@ namespace xx {
             else return x == T{} && y == T{};
         }
 
-        constexpr bool IsZeroSimple() const {
+        [[nodiscard]] constexpr bool IsZeroSimple() const {
             return x == T{} && y == T{};
         }
 
-        constexpr bool IsOutOfEdge(HasField_XY auto const& edge) const {
+        [[nodiscard]] constexpr bool IsOutOfEdge(HasField_XY auto const& edge) const {
             return x < 0 || y < 0 || x >= edge.x || y >= edge.y;
         }
 
-        template<typename R = T>
-        constexpr auto Floor() const -> X_Y<R> requires std::is_same_v<float, T> {
+        [[nodiscard]] constexpr auto Floor() const -> X_Y requires std::is_same_v<float, T> {
             return { std::floorf(x), std::floorf(y) };
         }
 
-        //template<typename R = T, typename U = float>
-        //constexpr auto Mag2() const -> R {
-        //    return R(x) * R(x) + R(y) * R(y);
-        //}
+        [[nodiscard]] constexpr auto Mag2() const -> T requires std::is_same_v<float, T> {
+            return x * x + y * y;
+        }
 
-        //template<typename R = T>
-        //constexpr auto Mag() const -> R {
-        //    return (R)std::sqrt(Mag2<R>());
-        //}
+        [[nodiscard]] constexpr auto Mag() const -> T requires std::is_same_v<float, T> {
+            return std::sqrtf(Mag2());
+        }
 
-        //template<typename R = T>
-        //constexpr auto Normalize() const -> X_Y<R> {
-        //    auto mag = Mag<R>();
-        //    return { R(x) / mag, R(y) / mag };
-        //}
+        [[nodiscard]] constexpr auto Normalize() const -> X_Y requires std::is_same_v<float, T> {
+            auto mag = Mag();
+            return { x / mag, y / mag };
+        }
 
         // ...
     };

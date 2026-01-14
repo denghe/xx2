@@ -16,9 +16,11 @@ void Game::Init() {
 void Game::GLInit() {
 	// init global ui
 	ui.Emplace()->InitRoot(scale);
-	ui->Make<xx::Label>()->Init(2, p9, a9, 32.f)("ESC: back   [: show/hide Info   ]:on/off FPS limit");
+	ui->Make<xx::Label>()->Init(2, p9, a9, 32.f)("keys: ESC, [, ]");
 	uiFPS = ui->Make<xx::Label>();
 	uiFPS->Init(2, p7, a7, 32.f)("");
+	uiText = ui->Make<xx::Label>();
+	uiText->Init(2, p8, a8, 32.f)("");
 
 	// hide hardware mouse
 	//SetMousePointerVisible(false);
@@ -29,6 +31,12 @@ void Game::GLInit() {
 	// begin load res
 	// load texture packer
 	_pics.Load("res/");
+	// load single frame
+	fs.p11 = LoadTexture("res/p11.png");
+	fs.p11a = LoadTexture("res/p11a.pnga");
+	fs.p11.tex->SetParm(GL_LINEAR, GL_CLAMP_TO_EDGE);
+	fs.p11a.tex->SetParm(GL_LINEAR, GL_CLAMP_TO_EDGE);
+
 	// load file data( for memory scan )
 	_mask_bg_1.Fill(LoadFileData("res/_mask_bg_1.png"));
 
@@ -59,6 +67,8 @@ void Game::GLInit() {
 	}
 	for (auto& fs : treeIdles) for (auto& f : fs) tp.tfs.Add(f);
 	for (auto& fs : treeTurns) for (auto& f : fs) tp.tfs.Add(f);
+	//tp.tfs.Add(fs.p11);
+	//tp.tfs.Add(fs.p11a);
 	tp.AutoPack();
 	tp.Tex().SetParm(GL_LINEAR, GL_CLAMP_TO_EDGE);
 	xx::CoutN(tp.Tex().size);
@@ -100,16 +110,22 @@ void Game::Update() {
 	scene->Update();
 	if (!minimized) {
 		scene->Draw();
-
-		// draw ui
-		uiFPS->SetText(fpsVal);
-		gg.GLBlendFunc(gg.blendDefault);
-		gg.DrawNode(ui);
-
-		// draw mouse pointer
-		//Quad().DrawFrame(_pics.a_[0], mousePos);
 	}
-	if (oldScene) oldScene.Reset();
+	if (oldScene) {
+		uiText->SetText("");
+		oldScene.Reset();
+	}
+
+	// draw ui
+	auto c = uiColorFlag ? xx::RGBA8_Red : xx::RGBA8_Blue;
+	uiColorFlag = !uiColorFlag;
+	uiFPS->SetText(fpsVal).SetColor(c);
+	uiText->SetColor(c);
+	gg.SetBlendPremultipliedAlpha(false);
+	gg.DrawNode(ui);
+	
+	// draw mouse pointer
+	//Quad().DrawFrame(all.mouse_pointer, mousePos, 3.f);
 }
 
 void Game::Delay() {

@@ -3,8 +3,9 @@
 #include "xx_gamebase.h"
 
 namespace xx {
-
 	// ref: spine-sfml.cpp
+
+	SpineEnv gSpineEnv;
 
 	SpinePlayer::SpinePlayer(spine::SkeletonData* skeletonData)
 		: animationStateData(skeletonData)
@@ -341,7 +342,7 @@ namespace xx {
 	/*****************************************************************************************************************************************************************************************/
 
 
-	void SpineEnv::Init() {
+	SpineEnv::SpineEnv() {
 		spine::SpineExtension::setInstance(&ext);
 	}
 

@@ -743,8 +743,6 @@ namespace xx {
 		shaderTexVert.Init();
 		// ...
 
-		gSpineEnv.Init();
-
 		// search exists joys
 		for (auto jid = GLFW_JOYSTICK_1; jid <= GLFW_JOYSTICK_LAST; jid++) {
 			if (glfwJoystickPresent(jid)) {
