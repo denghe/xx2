@@ -148,7 +148,7 @@ namespace xx {
     }
 
 
-    GLTexture LoadGLTexture(void* buf_, size_t len_) {
+    GLTexture LoadGLTexture(void* buf_, size_t len_, bool pngAutoPremultiplyAlpla_) {
         assert(len_ >= 16);
         std::string_view buf((char*)buf_, len_);
 
@@ -157,6 +157,22 @@ namespace xx {
             int w, h, comp;
             if (auto image = stbi_load_from_memory((stbi_uc*)buf.data(), (int)buf.size(), &w, &h, &comp, 0)) {
                 assert(comp == 3 || comp == 4);
+                if (pngAutoPremultiplyAlpla_ && comp == 4) {
+                    for (int y = 0; y < h; ++y) {
+                        for (int x = 0; x < w; ++x) {
+                            auto& px = ((RGBA8*)image)[y * w + x];
+                            if (px.a == 255) continue;
+                            else if (px.a == 0) {
+                                px.r = px.g = px.b = 0;
+                            }
+                            else {
+                                px.r = (uint8_t)(px.r * px.a * (1.f / 255.f));
+                                px.g = (uint8_t)(px.g * px.a * (1.f / 255.f));
+                                px.b = (uint8_t)(px.b * px.a * (1.f / 255.f));
+                            }
+                        }
+                    }
+                }
                 auto t = LoadGLTexture(image, w, h, comp == 3 ? GL_RGB : GL_RGBA);
                 stbi_image_free(image);
                 return t;
@@ -241,8 +257,8 @@ namespace xx {
         return {};
     }
 
-    GLTexture LoadGLTexture(Span d) {
-        return LoadGLTexture(d.buf, d.len);
+    GLTexture LoadGLTexture(Span d, bool pngAutoPremultiplyAlpla_) {
+        return LoadGLTexture(d.buf, d.len, pngAutoPremultiplyAlpla_);
     }
 
     GLFrameBuffer MakeGLFrameBuffer() {

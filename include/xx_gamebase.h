@@ -185,14 +185,14 @@ namespace xx {
         }
 
         // auto decompress
-        Shared<GLTexture> LoadTextureFromData(void* buf_, size_t len_);
-        Shared<GLTexture> LoadTextureFromData(Span d);
+        Shared<GLTexture> LoadTextureFromData(void* buf_, size_t len_, bool pngAutoPremultiplyAlpl_a = false);
+        Shared<GLTexture> LoadTextureFromData(Span d, bool pngAutoPremultiplyAlpla_ = false);
         template<size_t len>
-        Shared<GLTexture> LoadTextureFromData(const uint8_t(&buf)[len]) {
-            return LoadTextureFromData((void*)buf, len);
+        Shared<GLTexture> LoadTextureFromData(const uint8_t(&buf)[len], bool pngAutoPremultiplyAlpla_ = false) {
+            return LoadTextureFromData((void*)buf, len, pngAutoPremultiplyAlpla_);
         }
 
-        Shared<GLTexture> LoadTexture(std::string_view fn_);
+        Shared<GLTexture> LoadTexture(std::string_view fn_, bool pngAutoPremultiplyAlpla_ = false);
 
 
         void ResizeCalc();  // for window resize event

@@ -10,7 +10,7 @@ namespace Test2 {
 		// todo
 
 		auto cfg = xx::MakeShared<xx::ParticleConfig>();
-		cfg->frame = gg.fs.p11a;
+		cfg->frame = gg.fs.p11;
 		cfg->emission = 5000;
 		cfg->lifetime = -1.f;
 		cfg->particleLife = { 2.f, 3.5f };

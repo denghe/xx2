@@ -65,8 +65,8 @@ namespace xx {
     GLShader LoadGLFragmentShader(std::initializer_list<std::string_view>&& codes_);
     GLProgram LinkGLProgram(GLuint vs, GLuint fs);
     GLTexture LoadGLTexture(void* data, GLsizei w, GLsizei h, GLint colorFormat);
-    GLTexture LoadGLTexture(void* buf_, size_t len_);
-    GLTexture LoadGLTexture(Span d);
+    GLTexture LoadGLTexture(void* buf_, size_t len_, bool pngAutoPremultiplyAlpla_ = false);
+    GLTexture LoadGLTexture(Span d, bool pngAutoPremultiplyAlpla_ = false);
 
     GLFrameBuffer MakeGLFrameBuffer();
     void BindGLFrameBufferTexture(GLuint f, GLuint t);

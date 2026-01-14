@@ -213,22 +213,23 @@ namespace xx {
 		return LoadDataFromData((uint8_t*)d.buf, d.len);
 	}
 
-    Shared<GLTexture> GameBase::LoadTextureFromData(void* buf_, size_t len_) {
+    Shared<GLTexture> GameBase::LoadTextureFromData(void* buf_, size_t len_, bool pngAutoPremultiplyAlpla_) {
 		if (IsZstdCompressedData(buf_, len_)) {	// zstd
 			Data d;
 			ZstdDecompress({ (char*)buf_, len_ }, d);
 			return MakeShared<GLTexture>(LoadGLTexture(d));
 		}
-        return MakeShared<GLTexture>(LoadGLTexture(buf_, len_ ));
+        return MakeShared<GLTexture>(LoadGLTexture(buf_, len_, pngAutoPremultiplyAlpla_));
     }
 
-	Shared<GLTexture> GameBase::LoadTextureFromData(Span d) {
-		return LoadTextureFromData(d.buf, d.len);
+	Shared<GLTexture> GameBase::LoadTextureFromData(Span d, bool pngAutoPremultiplyAlpla_) {
+		return LoadTextureFromData(d.buf, d.len, pngAutoPremultiplyAlpla_);
 	}
 
-    Shared<GLTexture> GameBase::LoadTexture(std::string_view fn) {
+    Shared<GLTexture> GameBase::LoadTexture(std::string_view fn, bool pngAutoPremultiplyAlpla_) {
 		auto fp = GetFullPath(fn);
-		return LoadTextureFromData(ReadAllBytes_sv(fp));
+		auto d = ReadAllBytes_sv(fp);
+		return LoadTextureFromData(d, pngAutoPremultiplyAlpla_);
     }
 
 

@@ -39,7 +39,8 @@ struct Game : xx::GameBase {
 	_pics _pics;
 	struct {
 		xx::Frame p11;
-		xx::Frame p11a;
+		xx::Frame p11a1;
+		xx::Frame p11a2;
 	} fs;
 	xx::STBImage _mask_bg_1;
 	xx::List<xx::List<xx::Frame>> treeIdles;
