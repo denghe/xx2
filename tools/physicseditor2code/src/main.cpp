@@ -158,7 +158,6 @@ press ENTER to continue...)#";
 		static_assert(sizeof(pugi::char_t) == 1);
 
 		xx::AppendFormat(h, R"#(#pragma once
-#include "pch.h"
 #include <xx_box2d.h>
 
 struct {0} {{
@@ -171,7 +170,7 @@ struct {0} {{
 		xx::AppendFormat(cpp, R"#(#include "pch.h"
 #include "{0}.h"
 
-XX_INLINE void ::_phys::MakePolygon(b2BodyId const& id_, b2ShapeDef& def_, float scale_, XY const* data_, size_t len_) {{
+XX_INLINE void ::{0}::MakePolygon(b2BodyId const& id_, b2ShapeDef& def_, float scale_, XY const* data_, size_t len_) {{
 	auto buf = (XY*)alloca(len_ * sizeof(XY));
 	for (int32_t i = 0; i < len_; ++i) {{
 		buf[i] = data_[i] * scale_;
@@ -181,7 +180,7 @@ XX_INLINE void ::_phys::MakePolygon(b2BodyId const& id_, b2ShapeDef& def_, float
 	b2CreatePolygonShape(id_, &def_, &polygon);
 };
 
-XX_INLINE void ::_phys::MakeCircle(b2BodyId const& id_, b2ShapeDef& def_, float scale_, float x_, float y_, float r_) {{
+XX_INLINE void ::{0}::MakeCircle(b2BodyId const& id_, b2ShapeDef& def_, float scale_, float x_, float y_, float r_) {{
 	auto circle = b2Circle{{ .center = {{x_ * scale_, y_ * scale_ }, .radius = r_ * scale_ };
 	b2CreateCircleShape(id_, &def_, &circle);
 };

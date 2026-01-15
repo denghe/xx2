@@ -1,5 +1,4 @@
 #pragma once
-#include "pch.h"
 #include <xx_box2d.h>
 
 struct _phys {

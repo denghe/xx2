@@ -19,7 +19,7 @@ namespace G {
 		bodyDef.userData = this;
 		b2body.InitDef(scene_->b2world, bodyDef);
 
-		auto& ff = gg.rnd.NextElement(gg.fis);
+		auto& ff = gg.rnd.NextElement(gg.fishsFramePhysMaps);
 		frame = *ff.first;
 
 		auto def = b2DefaultShapeDef();

@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "pch.h"
 #include "_phys.h"
+#include "_phys_rocks.h"
 #include "pics.h"
 
 struct Game : xx::GameBase {
@@ -29,7 +30,8 @@ struct Game : xx::GameBase {
 
 	pics pics;
 
-	xx::List<std::pair<xx::Frame*, _phys::InitFunc>> fis;
+	xx::List<std::pair<xx::Frame*, _phys::InitFunc>> fishsFramePhysMaps;
+	xx::List<std::pair<xx::Frame*, _phys_rocks::InitFunc>> rocksFramePhysMaps;
 
 
 	void Init() override;

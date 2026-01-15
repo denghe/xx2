@@ -6,7 +6,8 @@
 * PlistFileName.h
 
 #pragma once
-#include "pch.h"
+#include <xx_frame.h>
+
 struct PlistFileName {
 	xx::Frame xxx1;
 	xx::Frame xxx2;
@@ -25,10 +26,11 @@ struct PlistFileName {
 * PlistFileName.cpp
 
 include "pch.h"
+#include <xx_gamebase.h>
 #include "PlistFileName.h"
 
 void PlistFileName::Load(std::string picFN_, bool generateMipmap_) {
-	auto t = LoadTexture(picFN_);
+	auto t = xx::GameBase::instance->LoadTexture(picFN_);
 	if(generateMipmap_) t->TryGenerateMipmap();
 
 	this->xxx1 = { t, X, Y, W, H, ANCHOR };
@@ -192,6 +194,8 @@ press ENTER to continue...)#";
 
 		xx::Append(code, R"#(#pragma once
 #include "pch.h"
+#include <xx_frame.h>
+
 struct )#", structName, R"#( {)#", tmp, R"#(
 
 	void Load(std::string picFN_, bool generateMipmap_ = true);
@@ -245,9 +249,11 @@ struct )#", structName, R"#( {)#", tmp, R"#(
 
 		xx::Append(code, R"#(#include "pch.h"
 #include "game.h"
+#include <xx_gamebase.h>
 #include ")#", structName, R"#(.h"
+
 void )#", structName, R"#(::Load(std::string picFN_, bool generateMipmap_) {
-	auto t = gg.LoadTexture(picFN_);
+	auto t = xx::GameBase::instance->LoadTexture(picFN_);
 	if(generateMipmap_) t->TryGenerateMipmap();
 )#", tmp, R"#(
 };

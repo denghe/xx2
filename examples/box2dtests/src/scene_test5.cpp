@@ -7,7 +7,7 @@ namespace Test5 {
 	void DroppingItem::Init(Scene* scene_, float radius_) {
 		typeId = cTypeId;
 		scene = scene_;
-		frame = *gg.rnd.NextElement(gg.fis).first;
+		frame = *gg.rnd.NextElement(gg.fishsFramePhysMaps).first;
 		radius = radius_;
 		scale = radius * 2.f / frame.uvRect.w;
 		indexAtContainer = scene->droppingItems.len - 1;

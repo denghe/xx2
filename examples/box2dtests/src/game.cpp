@@ -31,7 +31,7 @@ void Game::GLInit() {
 	// begin load res
 	pics.Load("res/pics.pvr.zst", false);
 
-	fis.Adds({
+	fishsFramePhysMaps.Adds({
 		{&pics._10, _phys::_10::Init},
 		{&pics._110, _phys::_110::Init},
 		{&pics._123, _phys::_123::Init},
@@ -75,6 +75,15 @@ void Game::GLInit() {
 		// ...
 	});
 
+	rocksFramePhysMaps.Adds({
+		{&pics.rock1_[0], _phys_rocks::rock1_1::Init},
+		{&pics.rock1_[1], _phys_rocks::rock1_2::Init},
+		{&pics.rock1_[2], _phys_rocks::rock1_3::Init},
+		{&pics.rock1_[3], _phys_rocks::rock1_4::Init},
+		{&pics.rock1_[4], _phys_rocks::rock1_5::Init},
+		{&pics.rock1_[5], _phys_rocks::rock1_6::Init},
+		// ...
+	});
 
 	//// combine all.frames & spines.framess
 	//xx::RectPacker tp;
