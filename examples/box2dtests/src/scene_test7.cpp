@@ -1,8 +1,8 @@
 ﻿#include "pch.h"
-#include "scene_test6.h"
+#include "scene_test7.h"
 #include "scene_mainmenu.h"
 
-namespace Test6 {
+namespace Test7 {
 
 	bool SceneBase::Update() {
 		auto [p, r] = b2body.GetPosRadians();
@@ -18,24 +18,21 @@ namespace Test6 {
 
 	/***************************************************************************************/
 
-	void Bag::Init(Scene* scene_, XY pos_, XY scale_) {
+	void Wall::Init(Scene* scene_) {
 		frame = gg.pics.bag_[0];
 		scene = scene_;
-		pos = pos_;
-		y = pos_.y;
-		scale = scale_;
+		pos = {};
+		y = pos.y;
+		scale = 1.f;
 
 		auto len = b2HullPoints.size();
 		assert(_countof(cHullPoints) == len);
-		auto siz = frame.Size() * scale_;
-		auto ap = frame.anchor * siz;
-		auto offset = ap - siz * 0.5f;
 		for (size_t i = 0; i < len; ++i) {
-			(XY&)b2HullPoints[i] = cHullPoints[len - i - 1] * scale_ + offset;
+			(XY&)b2HullPoints[i] = cHullPoints[len - 1 - i] * scale;
 		}
 
 		auto bodyDef = b2DefaultBodyDef();
-		bodyDef.position = (b2Vec2&)pos_;
+		bodyDef.position = (b2Vec2&)pos;
 		bodyDef.userData = this;
 		b2body.InitDef(scene_->b2world, bodyDef);
 
@@ -43,13 +40,11 @@ namespace Test6 {
 		b2ChainDef chainDef = b2DefaultChainDef();
 		chainDef.points = b2HullPoints.data();
 		chainDef.count = b2HullPoints.size();
-		//chainDef.enableSensorEvents = true;
 		chainDef.isLoop = true;
 		auto chainId = b2CreateChain(b2body, &chainDef);
-		//xx::CoutN(chainId.index1);
 	}
 
-	void Bag::Draw() {
+	void Wall::Draw() {
 		gg.Quad().DrawFrame(gg.pics.bag_bg_[0], scene->cam.ToGLPos(pos), scale * scene->cam.scale, radians);
 		gg.Quad().DrawFrame(frame, scene->cam.ToGLPos(pos), scale * scene->cam.scale, radians, 0.2f);
 		auto basePos = pos;
@@ -73,8 +68,8 @@ namespace Test6 {
 		auto bodyDef = b2DefaultBodyDef();
 		bodyDef.type = b2_dynamicBody;
 		bodyDef.position = (b2Vec2&)pos_;
-		bodyDef.angularDamping = 1.f;
-		bodyDef.linearVelocity = { 0, 300.f };
+		bodyDef.angularDamping = 0.f;
+		bodyDef.linearVelocity = { 0, 0 };
 		bodyDef.userData = this;
 		b2body.InitDef(scene_->b2world, bodyDef);
 
@@ -82,6 +77,8 @@ namespace Test6 {
 		frame = *std::get<0>(o);
 
 		auto def = b2DefaultShapeDef();
+		def.material.friction = 0.2;
+		def.material.restitution = 0.8;
 		def.enableSensorEvents = true;
 		auto& buf = std::get<1>(o);
 		auto& len = std::get<2>(o);
@@ -95,29 +92,25 @@ namespace Test6 {
 
 	bool Rock::Update() {
 		if (SceneBase::Update()) return true;
-		return (pos.x < -1000 || pos.x > 1000
-			|| pos.y < -1000 || pos.y > 1000);
+		return (pos.x < 0 || pos.x > 1920
+			|| pos.y < 0 || pos.y > 1080);
 	}
 
 	/***************************************************************************************/
 
 	void Scene::Init() {
-		cam.Init(gg.scale, 1.f);
+		cam.Init(gg.scale, 1.f, gg.designSize / 2);
 		ui.Emplace()->InitRoot(gg.scale * cUIScale);
 
 		auto def = b2DefaultWorldDef();
-		def.gravity = { 0, 1000.f };
+		def.gravity = { 0, 0 };
 		def.maximumLinearSpeed = 1000 * b2GetLengthUnitsPerMeter();
 		def.contactSpeed = 1000.0f * b2GetLengthUnitsPerMeter();
 		//def.contactHertz = 120.0;
 		//def.contactDampingRatio = 0;
 		b2world.InitDef(def, 1);
 
-		bag.Emplace()->Init(this, { 0, 500.f }, 5.f);
-
-		rocks.Emplace().Emplace()->Init(this, {0.f, 0.f});
-		rocks.Emplace().Emplace()->Init(this, {100.f, 0.f});
-		rocks.Emplace().Emplace()->Init(this, {-100.f, 0.f});
+		wall.Emplace()->Init(this);
 	}
 
 	void Scene::Gen(int32_t num_) {
@@ -154,7 +147,7 @@ namespace Test6 {
 	}
 
 	void Scene::FixedUpdate() {
-		bag->Update();
+		wall->Update();
 		for (auto i = rocks.len - 1; i >= 0; --i) {
 			if (rocks[i]->Update()) rocks.SwapRemoveAt(i);
 		}
@@ -170,7 +163,7 @@ namespace Test6 {
 	}
 
 	void Scene::Draw() {
-		bag->Draw();
+		wall->Draw();
 		for (auto& o : rocks) o->Draw();
 
 		gg.uiText->SetText(xx::ToString("num rocks = ", rocks.len));
