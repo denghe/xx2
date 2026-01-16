@@ -78,12 +78,19 @@ namespace Test6 {
 		bodyDef.userData = this;
 		b2body.InitDef(scene_->b2world, bodyDef);
 
-		auto& fp = gg.rnd.NextElement(gg.rocksFramePhysMaps);
-		frame = *fp.first;
+		auto o = gg.rnd.NextElement(gg.rocksFramePhysMaps);
+		frame = *std::get<0>(o);
 
 		auto def = b2DefaultShapeDef();
 		def.enableSensorEvents = true;
-		fp.second(b2body, 1, &def, {});
+		auto& buf = std::get<1>(o);
+		auto& len = std::get<2>(o);
+		//for (size_t i = 0; i < len; ++i) {
+		//	buf[i] = buf[i] * scale_;
+		//}
+		auto hull = b2ComputeHull((b2Vec2*)buf, len);
+		auto polygon = b2MakePolygon(&hull, 1);
+		b2CreatePolygonShape(b2body, &def, &polygon);
 	}
 
 	/***************************************************************************************/
@@ -95,7 +102,9 @@ namespace Test6 {
 		auto def = b2DefaultWorldDef();
 		def.gravity = { 0, 1000.f };
 		def.maximumLinearSpeed = 1000 * b2GetLengthUnitsPerMeter();
-		def.contactHertz = 120;
+		def.contactSpeed = 1000.0f * b2GetLengthUnitsPerMeter();
+		//def.contactHertz = 120.0;
+		//def.contactDampingRatio = 0;
 		b2world.InitDef(def, 1);
 
 		bag.Emplace()->Init(this, { 0, 200.f }, 2.f);

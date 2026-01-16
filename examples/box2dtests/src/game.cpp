@@ -76,12 +76,12 @@ void Game::GLInit() {
 	});
 
 	rocksFramePhysMaps.Adds({
-		{&pics.rock1_[0], _phys_rocks::rock1_1::Init},
-		{&pics.rock1_[1], _phys_rocks::rock1_2::Init},
-		{&pics.rock1_[2], _phys_rocks::rock1_3::Init},
-		{&pics.rock1_[3], _phys_rocks::rock1_4::Init},
-		{&pics.rock1_[4], _phys_rocks::rock1_5::Init},
-		{&pics.rock1_[5], _phys_rocks::rock1_6::Init},
+		{&pics.rock1_[0], _phys_rocks::rock1_1, _countof(_phys_rocks::rock1_1)},
+		{&pics.rock1_[1], _phys_rocks::rock1_2, _countof(_phys_rocks::rock1_2)},
+		{&pics.rock1_[2], _phys_rocks::rock1_3, _countof(_phys_rocks::rock1_3)},
+		{&pics.rock1_[3], _phys_rocks::rock1_4, _countof(_phys_rocks::rock1_4)},
+		{&pics.rock1_[4], _phys_rocks::rock1_5, _countof(_phys_rocks::rock1_5)},
+		{&pics.rock1_[5], _phys_rocks::rock1_6, _countof(_phys_rocks::rock1_6)},
 		// ...
 	});
 

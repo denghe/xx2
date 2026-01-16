@@ -31,7 +31,7 @@ struct Game : xx::GameBase {
 	pics pics;
 
 	xx::List<std::pair<xx::Frame*, _phys::InitFunc>> fishsFramePhysMaps;
-	xx::List<std::pair<xx::Frame*, _phys_rocks::InitFunc>> rocksFramePhysMaps;
+	xx::List<std::tuple<xx::Frame*, XY const*, size_t>> rocksFramePhysMaps;
 
 
 	void Init() override;
