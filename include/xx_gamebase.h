@@ -1,14 +1,16 @@
 ﻿#pragma once
 #include "xx_gl.h"
 #include "xx_grid2daabb.h"
-#include "xx_shader_quad.h"
-#include "xx_shader_quad_light.h"
-#include "xx_shader_spine.h"
-#include "xx_shader_texvert.h"
 #include "xx_node.h"
 #include "xx_bmfont.h"
 #include "xx_input.h"
 #include "xx_sound.h"
+#include "xx_shader_quad.h"
+#include "xx_shader_quad_light.h"
+#include "xx_shader_spine.h"
+#include "xx_shader_texvert.h"
+#include "xx_shader_line.h"
+// ...
 
 namespace xx {
 
@@ -259,6 +261,9 @@ namespace xx {
 
         Shader_TexVert shaderTexVert;
         Shader_TexVert& TexVert() { return ShaderBegin(shaderTexVert); }
+
+        Shader_Line shaderLine;
+        Shader_Line& Line() { return ShaderBegin(shaderLine); }
         // ...
     };
 

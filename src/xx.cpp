@@ -10,6 +10,7 @@
 #include "xx_stbimage.cpp"
 #include "xx_framebuffer.cpp"
 #include "xx_gamebase.cpp"
+
 #include "xx_lmdb.cpp"
 #include "xx_gl.cpp"
 #include "xx_grid2daabb.cpp"
@@ -21,6 +22,11 @@
 #include "xx_shaker.cpp"
 #include "xx_shaders.cpp"
 #include "xx_scissor.cpp"
+#include "xx_sound.cpp"
+#include "xx_space_.cpp"
+#include "xx_spine.cpp"
+#include "xx_spine38.cpp"
+
 #include "xx_ui_background.cpp"
 #include "xx_ui_button.cpp"
 #include "xx_ui_checkbox.cpp"
@@ -35,7 +41,4 @@
 #include "xx_ui_scale9config.cpp"
 #include "xx_ui_scrollview.cpp"
 #include "xx_ui_slider.cpp"
-#include "xx_sound.cpp"
-#include "xx_space_.cpp"
-#include "xx_spine.cpp"
-#include "xx_spine38.cpp"
+

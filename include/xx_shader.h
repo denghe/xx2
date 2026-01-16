@@ -12,6 +12,7 @@ namespace xx {
     // base class
     struct Shader {
         static constexpr size_t maxVertNums{ 65535 };	// 65535 for primitive restart index
+		static constexpr size_t maxIndexNums{ 65535 };	// 65535 for int16_t
 
         GLShader v, f;
         GLProgram p;

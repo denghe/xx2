@@ -25,8 +25,8 @@ namespace xx {
         int32_t count{};
 
         void Init();
-        virtual void Begin() override;
-        virtual void End() override;
+        void Begin() override;
+        void End() override;
         void Commit();
         Shader_QuadData* Alloc(GLuint texId_, int32_t num_);
         void Draw(GLuint texId_, UVRect rect_, XY pos_ = {}, XY anchor_ = 0.5f, XY scale_ = 1.f, float radians_ = 0.f, float colorplus_ = 1.f, RGBA8 color_ = RGBA8_White);
