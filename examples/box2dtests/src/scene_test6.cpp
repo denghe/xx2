@@ -93,6 +93,12 @@ namespace Test6 {
 		b2CreatePolygonShape(b2body, &def, &polygon);
 	}
 
+	bool Rock::Update() {
+		if (SceneBase::Update()) return true;
+		return (pos.x < -1000 || pos.x > 1000
+			|| pos.y < -1000 || pos.y > 1000);
+	}
+
 	/***************************************************************************************/
 
 	void Scene::Init() {

@@ -26,6 +26,7 @@ namespace Test6 {
 
 	struct Rock : SceneBase {
 		void Init(Scene* scene_, XY pos_);
+		bool Update() override;
 	};
 
 	struct Scene : xx::SceneBase {
