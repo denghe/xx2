@@ -8,8 +8,11 @@
 #include "scene_test5.h"
 #include "scene_test6.h"
 #include "scene_test7.h"
+#include "scene_test8.h"
+#include "scene_test9.h"
 
 void Scene_MainMenu::Init() {
+	gg.clearColor = {};
 	MakeUI();
 }
 
@@ -55,8 +58,16 @@ void Scene_MainMenu::MakeUI() {
 		gg.MakeScene<Test6::Scene>()->Init();
 	};
 
-	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test7( rocks drop into wall )")).onClicked = [this] {
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test7( rocks drop into C wall )")).onClicked = [this] {
 		gg.MakeScene<Test7::Scene>()->Init();
+	};
+
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test8( rocks drop into donut wall )")).onClicked = [this] {
+		gg.MakeScene<Test8::Scene>()->Init();
+	};
+
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test9( rocks drop into gamble machine )")).onClicked = [this] {
+		gg.MakeScene<Test9::Scene>()->Init();
 	};
 
 	L.InitEnd();

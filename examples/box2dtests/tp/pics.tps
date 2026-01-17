@@ -809,6 +809,21 @@
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
+            <key type="filename">pics/ball4324.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0.5,0.5</point_f>
+                <key>spriteScale</key>
+                <double>1</double>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>10,10,20,20</rect>
+                <key>scale9Paddings</key>
+                <rect>10,10,20,20</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
             <key type="filename">pics/bg_fish.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
@@ -821,6 +836,21 @@
                 <rect>709,181,1419,361</rect>
                 <key>scale9Paddings</key>
                 <rect>709,181,1419,361</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
+            <key type="filename">pics/block444.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0.5,0.5</point_f>
+                <key>spriteScale</key>
+                <double>1</double>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>3,3,6,6</rect>
+                <key>scale9Paddings</key>
+                <rect>3,3,6,6</rect>
                 <key>scale9FromFile</key>
                 <false/>
             </struct>

@@ -18,7 +18,7 @@ struct PlistFileName {
 	std::array<xx::Frame, ???> xxxC_;
 	...
 
-	void Load(std::string picFN_, bool generateMipmap_ = true);
+	xx::Shared<xx::GLTexture> Load(std::string picFN_, bool generateMipmap_ = true);
 };
 
 ///////////////////////////////////////////////////////
@@ -29,7 +29,7 @@ include "pch.h"
 #include <xx_gamebase.h>
 #include "PlistFileName.h"
 
-void PlistFileName::Load(std::string picFN_, bool generateMipmap_) {
+xx::Shared<xx::GLTexture> PlistFileName::Load(std::string picFN_, bool generateMipmap_) {
 	auto t = xx::GameBase::instance->LoadTexture(picFN_);
 	if(generateMipmap_) t->TryGenerateMipmap();
 
@@ -49,6 +49,8 @@ void PlistFileName::Load(std::string picFN_, bool generateMipmap_) {
 	this->xxxC_[1] = { t, X, Y, W, H, ANCHOR };
 	this->xxxC_[2] = { t, X, Y, W, H, ANCHOR };
 	...
+
+	return t;
 }
 
 
@@ -198,7 +200,7 @@ press ENTER to continue...)#";
 
 struct )#", structName, R"#( {)#", tmp, R"#(
 
-	void Load(std::string picFN_, bool generateMipmap_ = true);
+	xx::Shared<xx::GLTexture> Load(std::string picFN_, bool generateMipmap_ = true);
 };
 )#");
 		// save to file
@@ -252,10 +254,11 @@ struct )#", structName, R"#( {)#", tmp, R"#(
 #include <xx_gamebase.h>
 #include ")#", structName, R"#(.h"
 
-void )#", structName, R"#(::Load(std::string picFN_, bool generateMipmap_) {
+xx::Shared<xx::GLTexture> )#", structName, R"#(::Load(std::string picFN_, bool generateMipmap_) {
 	auto t = xx::GameBase::instance->LoadTexture(picFN_);
 	if(generateMipmap_) t->TryGenerateMipmap();
 )#", tmp, R"#(
+	return t;
 };
 )#");
 		// save to file

@@ -1,4 +1,5 @@
 #pragma once
+#include "pch.h"
 #include <xx_frame.h>
 
 struct pics {
@@ -42,7 +43,9 @@ struct pics {
 	xx::Frame _467;
 	xx::Frame _470;
 	xx::Frame _472;
+	xx::Frame ball4324;
 	xx::Frame bg_fish;
+	xx::Frame block444;
 	xx::Frame circle256;
 	xx::Frame wood1;
 	xx::Frame wood2;
@@ -51,5 +54,5 @@ struct pics {
 	std::array<xx::Frame, 1> bag_bg_;
 	std::array<xx::Frame, 6> rock1_;
 
-	void Load(std::string picFN_, bool generateMipmap_ = true);
+	xx::Shared<xx::GLTexture> Load(std::string picFN_, bool generateMipmap_ = true);
 };

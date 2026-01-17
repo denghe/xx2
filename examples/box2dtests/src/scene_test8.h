@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "game.h"
 
-namespace Test7 {
+namespace Test8 {
 
 
 	struct Scene;
@@ -17,9 +17,7 @@ namespace Test7 {
 	};
 
 	struct Wall : SceneItem {
-		static constexpr XY cHullPoints[] = { {240,135},{1680,135},{1680,405},{720,405},{720,675},{1680,675},{1680,945},{240,945} };
-		std::array<b2Vec2, 8> b2HullPoints{};
-		XY scale{};
+		xx::List<XY> b2HullPointsOutside, b2HullPointsInside;
 		void Init(Scene* scene_);
 		void Draw() override;
 	};

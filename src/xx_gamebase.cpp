@@ -684,6 +684,8 @@ namespace xx {
 		glDisable(GL_CULL_FACE);
 		glDisable(GL_DEPTH_TEST);
 		glEnable(GL_BLEND);
+		glEnable(GL_PRIMITIVE_RESTART);
+		glPrimitiveRestartIndex(0xFFFF);
 
 		// init fonts
 		embed.font_sys.Emplace();

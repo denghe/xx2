@@ -29,7 +29,7 @@ void Game::GLInit() {
 	sgrdd.Init(64, 64);
 
 	// begin load res
-	pics.Load("res/pics.pvr.zst", false);
+	pics.Load("res/pics.pvr.zst", false)->SetParm(GL_LINEAR, GL_CLAMP_TO_EDGE);
 
 	fishsFramePhysMaps.Adds({
 		{&pics._10, _phys::_10::Init},

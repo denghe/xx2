@@ -1,8 +1,9 @@
 ﻿#pragma once
 #include "game.h"
 
-namespace Test7 {
+namespace Test9 {
 
+	// todo
 
 	struct Scene;
 	struct SceneItem {
@@ -10,17 +11,21 @@ namespace Test7 {
 		xx::Frame frame;
 		xx::B2Body b2body;
 		xx::B2Shape b2shape;
-		XY pos{};
+		XY pos{};	// center
 		float y{}, radians{};
 		virtual bool Update();
 		virtual void Draw();
 	};
 
-	struct Wall : SceneItem {
-		static constexpr XY cHullPoints[] = { {240,135},{1680,135},{1680,405},{720,405},{720,675},{1680,675},{1680,945},{240,945} };
-		std::array<b2Vec2, 8> b2HullPoints{};
-		XY scale{};
-		void Init(Scene* scene_);
+	struct Block : SceneItem {
+		XY size{};
+		void Init(Scene* scene_, XY pos_, XY size_);
+		void Draw() override;
+	};
+
+	struct Ball : SceneItem {
+		float radius{};
+		void Init(Scene* scene_, XY pos_, float radius_);
 		void Draw() override;
 	};
 
@@ -36,7 +41,8 @@ namespace Test7 {
 		float time{}, timePool{}, timeScale{ 1 };
 
 		xx::B2World b2world;
-		xx::Shared<Wall> wall;
+		xx::List<Block> blocks;
+		xx::List<Ball> balls;
 		xx::List<xx::Shared<Rock>> rocks;
 
 		float genTimer{};
