@@ -38,15 +38,18 @@ namespace Test9 {
 		void Draw() override;
 	};
 
+	struct Rock;
 	struct Ball : SceneItem {
 		static constexpr int32_t cTypeId{ __LINE__ };
 		xx::RGBA8 color{};
-		bool bouncing{};
+		bool bouncing{}, disabing{};
+		int16_t sameRockHitCount{};
 		int32_t _1{}, _1i;
 		XY _1inc{}, offset{};
 		float scale{}, colorplus{};
+		Rock* lastRock{};
 		void Bounce();
-		void Hit(struct Rock* rock_);
+		void Hit(Rock* rock_);
 		void Init(Scene* scene_, XY pos_, float radius_);
 		bool Update() override;
 		void Draw() override;

@@ -79,7 +79,20 @@ namespace Test9 {
 
 	void Ball::Hit(Rock* rock_) {
 		gg.PlayAudio(gg.embed.ss_ui_focus);
-		// todo: move effect & draw number
+		// todo: draw number
+		// check same rock multi hit: temporarily disable ball's shape hit event
+		if (lastRock == rock_) {
+			++sameRockHitCount;
+			if (sameRockHitCount > 30) {
+				disabing = true;
+				b2Body_Disable(b2body);
+				xx::CoutN("disable ball");
+			}
+		}
+		else {
+			sameRockHitCount = 1;
+		}
+		lastRock = rock_;
 		bouncing = true;
 		_1 = 0;
 		_1inc = (pos - rock_->pos).Normalize() * 1.f;
@@ -117,6 +130,12 @@ namespace Test9 {
 
 	bool Ball::Update() {
 		if (bouncing) Bounce();
+		if (disabing) {
+			if (--sameRockHitCount == 0) {
+				disabing = {};
+				b2Body_Enable(b2body);
+			}
+		}
 		return false;
 	}
 
@@ -274,7 +293,7 @@ namespace Test9 {
 			}
 		}
 
-		genTimer += gg.cDelta * 1.f * 0.5;
+		genTimer += gg.cDelta * 1.f * 40;
 		while (genTimer >= 1.f) {
 			genTimer -= 1.f;
 			Gen(1);
