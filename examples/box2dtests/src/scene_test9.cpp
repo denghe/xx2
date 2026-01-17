@@ -110,15 +110,15 @@ namespace Test9 {
 		if (SceneItem::Update()) return true;
 
 		// edge check
-		return (pos.x < 0 || pos.x > 1920
-			|| pos.y < 0 || pos.y > 1080);
+		return (pos.x < 0 || pos.x >= mapSize.x
+			|| pos.y < 0 || pos.y >= mapSize.y);
 	}
 
 	/***************************************************************************************/
 
 	void Scene::Init() {
-		gg.clearColor = { 130, 130, 130, 255 };
-		cam.Init(gg.scale, 1.f, gg.designSize / 2);
+		gg.clearColor = { 60, 60, 60, 255 };
+		cam.Init(gg.scale, 0.5f, mapSize_2);
 		ui.Emplace()->InitRoot(gg.scale * cUIScale);
 
 		auto def = b2DefaultWorldDef();
@@ -129,25 +129,17 @@ namespace Test9 {
 		//def.contactDampingRatio = 0;
 		b2world.InitDef(def, 1);
 
-		auto ds = gg.designSize;
-		auto ds_2 = gg.designSize / 2;
-		static constexpr float edgeWidth{ 100.f }, edgeWidth_2{ edgeWidth / 2 };
-		blocks.Emplace().Init(this, XY{ edgeWidth_2, ds_2.y }, XY{ edgeWidth, ds.y });
-		blocks.Emplace().Init(this, XY{ ds.x - edgeWidth_2, ds_2.y }, XY{ edgeWidth, ds.y });
+		blocks.Emplace().Init(this, XY{ edgeWidth_2, mapSize_2.y }, XY{ edgeWidth, mapSize.y });
+		blocks.Emplace().Init(this, XY{ mapSize.x - edgeWidth_2, mapSize_2.y }, XY{ edgeWidth, mapSize.y });
 
-		static constexpr XY blockSize{ 12, 150 }, blockSize_2{ blockSize / 2 };
-		static constexpr int32_t numBlocks = 12;
-		auto freeWidth = ds.x - blockSize.x * numBlocks - edgeWidth * 2;
+		auto freeWidth = mapSize.x - blockSize.x * numBlocks - edgeWidth * 2;
 		auto step = freeWidth / (numBlocks + 1) + blockSize.x;
 		for (int i = 1; i <= numBlocks; ++i) {
 			auto x = edgeWidth + step * i - blockSize_2.x;
-			blocks.Emplace().Init(this, XY{ x, ds.y - blockSize_2.y }, blockSize);
+			blocks.Emplace().Init(this, XY{ x, mapSize.y - blockSize_2.y }, blockSize);
 		}
 
-		static constexpr float ballRadius{ 10.f };
-		static constexpr int32_t numBallRows{ 7 }, numBallCols{ 16 };
 		step = freeWidth / (numBallCols + 1) + ballRadius;
-		float baseY = 200.f;
 		for (int j = 0; j < numBallRows; ++j) {
 			int32_t isSingle = j & 1;
 			float baseX = edgeWidth - (isSingle ? step / 2 : 0);
@@ -169,13 +161,10 @@ namespace Test9 {
 
 	void Scene::Gen(int32_t num_) {
 		for (int i = 0; i < num_; ++i) {
-			//XY pos;
-			//pos.x = gg.rnd.Next(-800, 800);
-			//pos.y = gg.rnd.Next(-800, 800);
-			//if (gg.rnd.Next<bool>())
-			//	item1s.Emplace().Emplace()->Init(this, pos, 5);
-			//else 
-			//	item2s.Emplace().Emplace()->Init(this, pos, 5);
+			XY pos;
+			pos.x = gg.rnd.Next(spaceXRange.from, spaceXRange.to);
+			pos.y = 1.f;
+			rocks.Emplace().Emplace()->Init(this, pos);
 		}
 	}
 
@@ -207,11 +196,12 @@ namespace Test9 {
 
 		b2world.Step();
 
-		genTimer += gg.cDelta * 300.f;
-		if (genTimer >= 1.f) {
-			auto n = (int32_t)genTimer;
-			genTimer -= n;
-			Gen(n);
+		// todo: ball hit check & draw number effect
+
+		genTimer += gg.cDelta * 1.f * 20;
+		while (genTimer >= 1.f) {
+			genTimer -= 1.f;
+			Gen(1);
 		}
 	}
 

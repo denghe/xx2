@@ -4,6 +4,15 @@
 namespace Test9 {
 
 	// todo
+	static constexpr float cUIScale{ 0.5f };
+	static constexpr XY mapSize{ 1920, 1920 }, mapSize_2{ mapSize / 2 };
+	static constexpr float edgeWidth{ 100.f }, edgeWidth_2{ edgeWidth / 2 };
+	static constexpr XY blockSize{ 12, 150 }, blockSize_2{ blockSize / 2 };
+	static constexpr int32_t numBlocks{ 12 };
+	static constexpr float ballRadius{ 10.f };
+	static constexpr int32_t numBallRows{ 14 }, numBallCols{ 16 };
+	static constexpr float baseY{ 300.f };
+	static constexpr xx::FromTo<float> spaceXRange{ edgeWidth, mapSize.x - edgeWidth };
 
 	struct Scene;
 	struct SceneItem {
@@ -35,7 +44,6 @@ namespace Test9 {
 	};
 
 	struct Scene : xx::SceneBase {
-		static constexpr float cUIScale{ 0.5f };
 		xx::Shared<xx::Node> ui;
 		xx::Camera cam;
 		float time{}, timePool{}, timeScale{ 1 };
