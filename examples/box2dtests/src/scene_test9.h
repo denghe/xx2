@@ -75,6 +75,7 @@ namespace Test9 {
 		float genTimer{};
 		void Gen(int32_t num_);
 
+		void InitUI();
 		void Init();
 		void Update() override;
 		void FixedUpdate();

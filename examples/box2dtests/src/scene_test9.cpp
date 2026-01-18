@@ -193,11 +193,50 @@ namespace Test9 {
 
 	/***************************************************************************************/
 
+	void Scene::InitUI() {
+		static constexpr float cLineHeight{ 100 };
+		static constexpr float cItemHeight{ 80 };
+		static constexpr float cMargin{ 20 };
+		auto fontSize = cItemHeight - gg.embed.cfg_s9bN->paddings.TopBottom();
+
+		ui.Emplace()->InitRoot(gg.scale * cUIScale);
+		auto C = ui->Make<xx::Node>();
+		xx::Layouter L;
+		auto ds = gg.designSize / cUIScale;
+		auto hds = ds * 0.5f;
+		L.InitBegin(C, 2, { -hds.x + 30, hds.y }, { 0, 1 }, ds.x - 60)
+			.HAlign(xx::HAligns::Left)
+			.LeftMargin(cMargin)
+			.DefaultLineHeight(cLineHeight);
+
+		L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("game speed: 1x")).onClicked = [this] {
+			timeScale = 1.f;
+		};
+
+		L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("2x")).onClicked = [this] {
+			timeScale = 2.f;
+		};
+
+		L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("5x")).onClicked = [this] {
+			timeScale = 5.f;
+		};
+
+		L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("10x")).onClicked = [this] {
+			timeScale = 10.f;
+		};
+
+		L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("20x")).onClicked = [this] {
+			timeScale = 20.f;
+		};
+
+		L.InitEnd();
+	}
+
 	void Scene::Init() {
+		InitUI();
 		gg.clearColor = { 60, 60, 60, 255 };
 		cam.Init(gg.scale, 0.5f, mapSize_2);
 		effectTextManager.Init(&cam, 10000);
-		ui.Emplace()->InitRoot(gg.scale * cUIScale);
 
 		auto def = b2DefaultWorldDef();
 		def.gravity = { 0, 1000 };
@@ -310,7 +349,7 @@ namespace Test9 {
 		for (auto& o : rocks) o->Draw();
 		effectTextManager.Draw();
 
-		gg.uiText->SetText(xx::ToString("num rocks = ", rocks.len));
+		gg.uiText->SetText(xx::ToString("num rocks = ", rocks.len, " num numbers = ", effectTextManager.ens.Count()));
 		gg.SetBlendPremultipliedAlpha(false);
 		gg.DrawNode(ui);
 	}
