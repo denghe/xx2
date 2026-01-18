@@ -5,6 +5,7 @@
 #include "xx_data.h"
 #include "xx_file.h"
 #include "xx_list.h"
+#include "xx_queue.h"
 #include "xx_ptr.h"
 #include "xx_prims.h"
 #include "xx_rnd.h"
@@ -29,6 +30,7 @@
 #include "xx_shaker.h"
 #include "xx_gamebase.h"
 #include "xx_scenebase.h"
+#include "xx_effect_text.h"
 
 #include "xx_ui_label.h"
 #include "xx_ui_image.h"

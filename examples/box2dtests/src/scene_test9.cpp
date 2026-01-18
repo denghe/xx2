@@ -38,7 +38,6 @@ namespace Test9 {
 	}
 
 	bool Block::Update() {
-		// todo
 		return false;
 	}
 
@@ -76,17 +75,16 @@ namespace Test9 {
 		color = xx::GetRandomColor(gg.rnd, {255,0,0,255});
 	}
 
-
 	void Ball::Hit(Rock* rock_) {
 		gg.PlayAudio(gg.embed.ss_ui_focus);
-		// todo: draw number
+		// todo: calculate ball's value
+		scene->effectTextManager.Add(pos, rock_->pos - pos, color, 3, gg.rnd.Next(100), true);
 		// check same rock multi hit: temporarily disable ball's shape hit event
 		if (lastRock == rock_) {
 			++sameRockHitCount;
 			if (sameRockHitCount > 30) {
 				disabing = true;
 				b2Body_Disable(b2body);
-				xx::CoutN("disable ball");
 			}
 		}
 		else {
@@ -151,10 +149,12 @@ namespace Test9 {
 		scene = scene_;
 		pos = pos_;
 		y = pos_.y;
+		radians = gg.rnd.Next<float>(0, float(M_PI * 2));
 
 		auto bodyDef = b2DefaultBodyDef();
 		bodyDef.type = b2_dynamicBody;
 		bodyDef.position = (b2Vec2&)pos_;
+		bodyDef.rotation = b2MakeRot(radians);
 		bodyDef.angularDamping = 1.f;
 		bodyDef.linearVelocity = { 0, 300 };
 		bodyDef.userData = this;
@@ -184,6 +184,8 @@ namespace Test9 {
 	bool Rock::Update() {
 		if (SceneItem::Update()) return true;
 
+		// todo: check out of bounds, + score
+
 		// edge check
 		return (pos.x < 0 || pos.x >= mapSize.x
 			|| pos.y < 0 || pos.y >= mapSize.y);
@@ -194,6 +196,7 @@ namespace Test9 {
 	void Scene::Init() {
 		gg.clearColor = { 60, 60, 60, 255 };
 		cam.Init(gg.scale, 0.5f, mapSize_2);
+		effectTextManager.Init(&cam, 10000);
 		ui.Emplace()->InitRoot(gg.scale * cUIScale);
 
 		auto def = b2DefaultWorldDef();
@@ -265,6 +268,7 @@ namespace Test9 {
 	}
 
 	void Scene::FixedUpdate() {
+		effectTextManager.Update(time);
 		for (auto& o : balls) o->Update();
 		for (auto i = rocks.len - 1; i >= 0; --i) {
 			if (rocks[i]->Update()) rocks.SwapRemoveAt(i);
@@ -304,6 +308,7 @@ namespace Test9 {
 		for (auto& o : blocks) o->Draw();
 		for (auto& o : balls) o->Draw();
 		for (auto& o : rocks) o->Draw();
+		effectTextManager.Draw();
 
 		gg.uiText->SetText(xx::ToString("num rocks = ", rocks.len));
 		gg.SetBlendPremultipliedAlpha(false);

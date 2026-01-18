@@ -16,7 +16,14 @@ namespace xx {
         Span();
         Span(Span const& o) = default;
         Span& operator=(Span const& o) = default;
+
         Span(void const* buf, size_t len);
+
+        template<size_t len_>
+        Span(const uint8_t(&buf_)[len_]) {
+            buf = (uint8_t*)buf_;
+			len = len_;
+        }
 
         template<typename T, typename = std::enable_if_t<std::is_class_v<T>>>
         explicit Span(T const& d)

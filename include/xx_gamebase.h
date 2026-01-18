@@ -10,6 +10,7 @@
 #include "xx_shader_spine.h"
 #include "xx_shader_texvert.h"
 #include "xx_shader_line.h"
+#include "xx_shader_numbers.h"
 // ...
 
 namespace xx {
@@ -154,6 +155,7 @@ namespace xx {
             // ...
 
             Shared<BMFont> font_sys;
+            GLTexture png_numbers;
         } embed;
 
 
@@ -181,18 +183,10 @@ namespace xx {
         // auto decompress
         Data LoadDataFromData(uint8_t const* buf, size_t len);
         Data LoadDataFromData(Span d);
-        template<size_t len>
-        Data LoadDataFromData(const uint8_t(&buf)[len]) {
-            return LoadDataFromData(buf, len);
-        }
 
         // auto decompress
         Shared<GLTexture> LoadTextureFromData(void* buf_, size_t len_, bool pngAutoPremultiplyAlpl_a = false);
         Shared<GLTexture> LoadTextureFromData(Span d, bool pngAutoPremultiplyAlpla_ = false);
-        template<size_t len>
-        Shared<GLTexture> LoadTextureFromData(const uint8_t(&buf)[len], bool pngAutoPremultiplyAlpla_ = false) {
-            return LoadTextureFromData((void*)buf, len, pngAutoPremultiplyAlpla_);
-        }
 
         Shared<GLTexture> LoadTexture(std::string_view fn_, bool pngAutoPremultiplyAlpla_ = false);
 
@@ -225,15 +219,12 @@ namespace xx {
 
 
         // ogg / wav is supported
-        Shared<SoLoud::Wav> LoadSoundSourceFromData(uint8_t* buf, size_t len, bool looping = false);
         Shared<SoLoud::Wav> LoadSoundSource(std::string_view fn, bool looping = false);
+        Shared<SoLoud::Wav> LoadSoundSourceFromData(uint8_t* buf, size_t len, bool looping = false);
+        Shared<SoLoud::Wav> LoadSoundSourceFromData(Span data_, bool looping = false);
         unsigned int GetActiveVoiceCount();
         int PlayAudio(Shared<SoLoud::Wav> const& ss_, float volume_ = 1.f, float pan_ = 0.f, float speed_ = 1.f);
         int PlayMusic(Shared<SoLoud::Wav> const& ss_, float volume_ = 1.f, float pan_ = 0.f, float speed_ = 1.f);
-        template<size_t len>
-        Shared<SoLoud::Wav> LoadSoundSourceFromData(const uint8_t(&buf)[len], bool looping = false) {
-            return LoadSoundSourceFromData((uint8_t*)buf, len, looping);
-        }
 
 
         int32_t Run();
@@ -264,6 +255,9 @@ namespace xx {
 
         Shader_Line shaderLine;
         Shader_Line& Line() { return ShaderBegin(shaderLine); }
+
+        Shader_Numbers shaderNumbers;
+        Shader_Numbers& Numbers() { return ShaderBegin(shaderNumbers); }
         // ...
     };
 

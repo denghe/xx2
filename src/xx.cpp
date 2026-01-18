@@ -5,6 +5,7 @@
 #include "xx_camera.cpp"
 #include "xx_data.cpp"
 #include "xx_embeds.cpp"
+
 #include "xx_file.cpp"
 #include "xx_frame.cpp"
 #include "xx_stbimage.cpp"
@@ -21,11 +22,13 @@
 #include "xx_rnd.cpp"
 #include "xx_shaker.cpp"
 #include "xx_shaders.cpp"
+
 #include "xx_scissor.cpp"
 #include "xx_sound.cpp"
 #include "xx_space_.cpp"
 #include "xx_spine.cpp"
 #include "xx_spine38.cpp"
+#include "xx_effect_text.cpp"
 
 #include "xx_ui_background.cpp"
 #include "xx_ui_button.cpp"

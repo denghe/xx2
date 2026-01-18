@@ -313,6 +313,10 @@ namespace xx {
 		return rtv;
 	}
 
+	Shared<SoLoud::Wav> GameBase::LoadSoundSourceFromData(Span data_, bool looping) {
+		return LoadSoundSourceFromData(data_.buf, data_.len, looping);
+	}
+
 	Shared<SoLoud::Wav> GameBase::LoadSoundSource(std::string_view fn, bool looping) {
 		auto d = LoadFileData(fn);
 		assert(d);
@@ -716,6 +720,8 @@ namespace xx {
 		embed.icon_flags_.Emplace(ft, 734, 1008, 16, 16);
 		embed.icon_flags_.Emplace(ft, 751, 1008, 16, 16);
 
+		embed.png_numbers = LoadGLTexture(embeds::png::numbers);
+
 		// init cfgs
 		embed.cfg_s9.Emplace();
 		embed.cfg_s9->frame = embed.ui_s9;
@@ -745,6 +751,7 @@ namespace xx {
 		shaderSpine.Init();
 		shaderTexVert.Init();
 		shaderLine.Init();
+		shaderNumbers.Init();
 		// ...
 
 		// search exists joys

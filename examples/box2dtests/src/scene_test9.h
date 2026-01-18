@@ -9,10 +9,10 @@ namespace Test9 {
 	static constexpr float edgeWidth{ 100.f }, edgeWidth_2{ edgeWidth / 2 };
 	static constexpr XY blockSize{ 12, 150 }, blockSize_2{ blockSize / 2 };
 	static constexpr int32_t numBlocks{ 12 };
-	static constexpr float ballRadius{ 10.f };
+	static constexpr float ballRadius{ 10.f }, rockMinRadius{ 25.f };
 	static constexpr int32_t numBallRows{ 14 }, numBallCols{ 16 };
 	static constexpr float baseY{ 300.f };
-	static constexpr xx::FromTo<float> spaceXRange{ edgeWidth, mapSize.x - edgeWidth };
+	static constexpr xx::FromTo<float> spaceXRange{ edgeWidth + rockMinRadius, mapSize.x - edgeWidth - rockMinRadius };
 
 	struct Scene;
 	struct SceneItem {
@@ -70,6 +70,7 @@ namespace Test9 {
 		xx::List<xx::Shared<Block>> blocks;
 		xx::List<xx::Shared<Ball>> balls;
 		xx::List<xx::Shared<Rock>> rocks;
+		xx::EffectTextManager effectTextManager;
 
 		float genTimer{};
 		void Gen(int32_t num_);
