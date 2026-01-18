@@ -52,7 +52,7 @@ namespace xx {
 			Clear<true>();
 		}
 
-		void Reserve(IndexType newCap) noexcept {
+		void Reserve(IndexType newCap) {
 			assert(newCap > 0);
 			if (newCap <= cap) return;
 			cap = newCap;
@@ -72,7 +72,7 @@ namespace xx {
 			}
 		}
 
-		void Ensure(IndexType space) noexcept {
+		void Ensure(IndexType space) {
 			Reserve(Count() + space);
 		}
 
@@ -256,22 +256,22 @@ namespace xx {
 			}
 		}
 
-		T const& operator[](IndexType idx) const noexcept {
+		T const& operator[](IndexType idx) const {
 			assert(Exists(idx));
 			return buf[idx].value;
 		}
 
-		T& operator[](IndexType idx) noexcept {
+		T& operator[](IndexType idx) {
 			assert(Exists(idx));
 			return buf[idx].value;
 		}
 
-		T const& operator[](IndexAndVersion const& iv) const noexcept {
+		T const& operator[](IndexAndVersion const& iv) const {
 			assert(Exists(iv));
 			return buf[iv.index].value;
 		}
 
-		T& operator[](IndexAndVersion const& iv) noexcept {
+		T& operator[](IndexAndVersion const& iv) {
 			assert(Exists(iv));
 			return buf[iv.index].value;
 		}

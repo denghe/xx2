@@ -38,7 +38,7 @@ namespace xx {
 			Clear<true>();
 		}
 
-		void Reserve(SizeType newCap) noexcept {
+		void Reserve(SizeType newCap) {
 			assert(newCap > 0);
 			if (newCap <= cap) return;
 			cap = newCap;
@@ -56,7 +56,7 @@ namespace xx {
 			}
 		}
 
-		void Ensure(SizeType space) noexcept {
+		void Ensure(SizeType space) {
 			Reserve(Count() + space);
 		}
 
@@ -150,13 +150,13 @@ namespace xx {
 			len = 0;
 		}
 
-		T const& operator[](SizeType idx) const noexcept {
+		T const& operator[](SizeType idx) const {
 			assert(idx >= 0);
 			assert(idx < len);
 			return buf[idx].value;
 		}
 
-		T& operator[](SizeType idx) noexcept {
+		T& operator[](SizeType idx) {
 			assert(idx >= 0);
 			assert(idx < len);
 			return buf[idx].value;

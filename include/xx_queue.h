@@ -17,7 +17,7 @@ namespace xx {
 		SizeType	cap;
 		SizeType	head{}, tail{};						// TH..............................
 
-		explicit Queue(SizeType capacity = 8) noexcept {
+		explicit Queue(SizeType capacity = 8) {
 			if (capacity < 8) {
 				capacity = 8;
 			} else {
@@ -32,8 +32,15 @@ namespace xx {
 			std::swap(head, o.head);
 			std::swap(tail, o.tail);
 		}
+		Queue& operator=(Queue&& o) noexcept {
+			std::swap(buf, o.buf);
+			std::swap(cap, o.cap);
+			std::swap(head, o.head);
+			std::swap(tail, o.tail);
+			return *this;
+		}
 
-		~Queue() noexcept {
+		~Queue() {
 			assert(buf);
 			Clear();
 			delete[](MyAlignedStorage<T>*)buf;
@@ -43,11 +50,11 @@ namespace xx {
 		Queue(Queue const& o) = delete;
 		Queue& operator=(Queue const& o) = delete;
 
-		T& operator[](SizeType idx) const noexcept {
+		T& operator[](SizeType idx) const {
 			return At(idx);
 		}
 
-		T& At(SizeType idx) const noexcept {
+		T& At(SizeType idx) const {
 			assert(idx < Count());
 			if (head + idx < cap) {
 				return (T&)buf[head + idx];
@@ -56,7 +63,7 @@ namespace xx {
 			}
 		}
 
-		SizeType Count() const noexcept {
+		SizeType Count() const {
 			//......Head+++++++++++Tail.......
 			//...............FR...............
 			if (head <= tail) return tail - head;
@@ -64,11 +71,11 @@ namespace xx {
 			else return tail + (cap - head);
 		}
 
-		bool Empty() const noexcept {
+		bool Empty() const {
 			return head == tail;
 		}
 
-		void Clear() noexcept {
+		void Clear() {
 			//........HT......................
 			if (head == tail) return;
 
@@ -95,7 +102,7 @@ namespace xx {
 		}
 
 		template<bool callByEmplace = false>
-		void Reserve(SizeType capacity) noexcept {
+		void Reserve(SizeType capacity) {
 			assert(capacity > 0);
 			if (capacity <= cap) return;
 
@@ -151,7 +158,7 @@ namespace xx {
 		}
 
 		template<typename...Args>
-		T& Emplace(Args&&...args) noexcept {
+		T& Emplace(Args&&...args) {
 			auto idx = tail;
 			new (buf + tail++) T(std::forward<Args>(args)...);
 			if (tail == cap) {			// cycle
@@ -165,24 +172,24 @@ namespace xx {
 		}
 
 		template<typename ...TS>
-		void Push(TS&& ...vs) noexcept {
+		void Push(TS&& ...vs) {
 			(Emplace(std::forward<TS>(vs)), ...);
 		}
 
-		bool TryPop(T& outVal) noexcept {
+		bool TryPop(T& outVal) {
 			if (head == tail) return false;
 			outVal = std::move(buf[head]);
 			Pop();
 			return true;
 		}
 
-		T& Top() const noexcept {
+		T& Top() const {
 			assert(head != tail);
 			return (T&)buf[head];
 		}
 
 		// ++head
-		void Pop() noexcept {
+		void Pop() {
 			assert(head != tail);
 			if constexpr (!(std::is_standard_layout_v<T> && std::is_trivial_v<T>)) {
 				buf[head].~T();
@@ -193,7 +200,7 @@ namespace xx {
 			}
 		}
 
-		SizeType PopMulti(SizeType count) noexcept {
+		SizeType PopMulti(SizeType count) {
 			if (count <= 0) return 0;
 
 			auto dataLen = Count();
@@ -239,12 +246,12 @@ namespace xx {
 		}
 
 		// [ tail-1 ]
-		T& Last() const noexcept {
+		T& Last() const {
 			assert(head != tail);
 			return (T&)buf[tail - 1 == (size_t)-1 ? cap - 1 : tail - 1];
 		}
 
-		void PopLast() noexcept {
+		void PopLast() {
 			assert(head != tail);
 			if constexpr (!(std::is_standard_layout_v<T> && std::is_trivial_v<T>)) {
 				buf[tail].~T();

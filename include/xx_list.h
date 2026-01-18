@@ -28,7 +28,7 @@ namespace xx {
             std::swap(cap, o.cap);
             return *this;
         }
-        ~List() noexcept {
+        ~List() {
             Clear(true);
         }
 
@@ -61,13 +61,13 @@ namespace xx {
             std::sort(buf, buf + len, std::forward<F>(func));
         }
 
-        void Reserve(SizeType cap_) noexcept {
+        void Reserve(SizeType cap_) {
             if (auto newBuf = ReserveBegin(cap_)) {
                 ReserveEnd(newBuf);
             }
         }
 
-        T* ReserveBegin(SizeType cap_) noexcept {
+        T* ReserveBegin(SizeType cap_) {
             assert(cap_ > 0);
             if (cap_ <= cap) return {};
             if (!cap) {
@@ -80,7 +80,7 @@ namespace xx {
             } while (cap < cap_);
             return (T*) new MyAlignedStorage<T>[cap];
         }
-        void ReserveEnd(T* newBuf) noexcept {
+        void ReserveEnd(T* newBuf) {
             if constexpr (IsPod_v<T>) {
                 ::memcpy((void*)newBuf, (void*)buf, len * sizeof(T));
             }
@@ -95,7 +95,7 @@ namespace xx {
         }
 
         template<bool fillVal = false, int val = 0>
-        void Resize(SizeType len_) noexcept {
+        void Resize(SizeType len_) {
             if (len_ == len) return;
             else if (len_ < len) {
                 for (SizeType i = len_; i < len; ++i) {
@@ -116,35 +116,35 @@ namespace xx {
             len = len_;
         }
 
-        T& operator[](SizeType idx) const noexcept {
+        T& operator[](SizeType idx) const {
             assert(idx >= 0 && idx < len);
             return (T&)buf[idx];
         }
 
-        T& At(SizeType idx) const noexcept {
+        T& At(SizeType idx) const {
             assert(idx >= 0 && idx < len);
             return (T&)buf[idx];
         }
 
-        T& Top() const noexcept {
+        T& Top() const {
             assert(len > 0);
             return (T&)buf[len - 1];
         }
 
-        void Pop() noexcept {
+        void Pop() {
             assert(len > 0);
             --len;
             buf[len].~T();
         }
 
-        bool TryPop(T& output) noexcept {
+        bool TryPop(T& output) {
             if (!len) return false;
             output = (T&&)buf[--len];
             buf[len].~T();
             return true;
         }
 
-        void Clear(bool freeBuf = false) noexcept {
+        void Clear(bool freeBuf = false) {
             if (!cap) return;
             if (len) {
                 for (SizeType i = 0; i < len; ++i) {
@@ -159,7 +159,7 @@ namespace xx {
             }
         }
 
-        void Remove(T const& v) noexcept {
+        void Remove(T const& v) {
             for (SizeType i = 0; i < len; ++i) {
                 if (v == buf[i]) {
                     RemoveAt(i);
@@ -168,7 +168,7 @@ namespace xx {
             }
         }
 
-        void RemoveAt(SizeType idx) noexcept {
+        void RemoveAt(SizeType idx) {
             assert(idx >= 0 && idx < len);
             --len;
             if constexpr (IsPod_v<T>) {
@@ -183,7 +183,7 @@ namespace xx {
             }
         }
 
-        void SwapRemoveAt(SizeType idx) noexcept {
+        void SwapRemoveAt(SizeType idx) {
             assert(idx >= 0 && idx < len);
             buf[idx].~T();
             --len;
@@ -211,7 +211,7 @@ namespace xx {
         }
 
         template<typename...Args>
-        T& Emplace(Args&&...args) noexcept {
+        T& Emplace(Args&&...args) {
             if (auto newBuf = ReserveBegin(len + 1)) {
                 new (&newBuf[len]) T(std::forward<Args>(args)...);
                 ReserveEnd(newBuf);
@@ -223,15 +223,15 @@ namespace xx {
         }
 
         template<typename ...TS>
-        void Add(TS&&...vs) noexcept {
+        void Add(TS&&...vs) {
             (Emplace(std::forward<TS>(vs)), ...);
         }
 
-        void Adds(std::initializer_list<T> vs) noexcept {
+        void Adds(std::initializer_list<T> vs) {
             AddRange(vs.begin(), vs.size());
         }
 
-        void AddRange(T const* items, SizeType count) noexcept {
+        void AddRange(T const* items, SizeType count) {
             if (auto newBuf = ReserveBegin(len + count)) {
                 if constexpr (std::is_standard_layout_v<T> && std::is_trivial_v<T>) {
                     ::memcpy(newBuf + len, items, count * sizeof(T));
@@ -257,11 +257,11 @@ namespace xx {
         }
 
         template<typename L>
-        void AddRange(L const& list) noexcept {
+        void AddRange(L const& list) {
             return AddRange(list.buf, list.len);
         }
 
-        SizeType Find(T const& v) const noexcept {
+        SizeType Find(T const& v) const {
             for (SizeType i = 0; i < len; ++i) {
                 if (v == buf[i]) return i;
             }
@@ -269,7 +269,7 @@ namespace xx {
         }
 
         template<typename Func>
-        bool Exists(Func&& cond) const noexcept {
+        bool Exists(Func&& cond) const {
             for (SizeType i = 0; i < len; ++i) {
                 if (cond(buf[i])) return true;
             }
@@ -279,14 +279,14 @@ namespace xx {
         // simple support "for( auto&& c : list )" syntax
         struct Iter {
             T* ptr;
-            bool operator!=(Iter const& other) noexcept { return ptr != other.ptr; }
-            Iter& operator++() noexcept { ++ptr; return *this; }
-            T& operator*() noexcept { return *ptr; }
+            bool operator!=(Iter const& other) { return ptr != other.ptr; }
+            Iter& operator++() { ++ptr; return *this; }
+            T& operator*() { return *ptr; }
         };
-        Iter begin() noexcept { return Iter{ buf }; }
-        Iter end() noexcept { return Iter{ buf + len }; }
-        Iter begin() const noexcept { return Iter{ buf }; }
-        Iter end() const noexcept { return Iter{ buf + len }; }
+        Iter begin() { return Iter{ buf }; }
+        Iter end() { return Iter{ buf + len }; }
+        Iter begin() const { return Iter{ buf }; }
+        Iter end() const { return Iter{ buf + len }; }
     };
 
     // mem moveable tag

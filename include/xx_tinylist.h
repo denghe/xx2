@@ -23,7 +23,7 @@ namespace xx {
 			std::swap(core, o.core);
 			return *this;
 		}
-		~TinyList() noexcept {
+		~TinyList() {
 			Clear(true);
 		}
 
@@ -57,13 +57,13 @@ namespace xx {
 			std::sort(core->buf, core->buf + core->len, std::forward<F>(func));
 		}
 
-		void Reserve(SizeType cap_) noexcept {
+		void Reserve(SizeType cap_) {
 			if (auto newBuf = ReserveBegin(cap_)) {
 				ReserveEnd(newBuf);
 			}
 		}
 
-		Core* ReserveBegin(SizeType cap_) noexcept {
+		Core* ReserveBegin(SizeType cap_) {
 			assert(cap_ > 0);
 			if (core && cap_ <= core->cap) return {};
 			if (!core) {
@@ -92,7 +92,7 @@ namespace xx {
 			return newCore;
 		}
 
-		void ReserveEnd(Core* newCore) noexcept {
+		void ReserveEnd(Core* newCore) {
 			auto& buf = core->buf;
 			auto& len = core->len;
 			auto& newBuf = newCore->buf;
@@ -109,7 +109,7 @@ namespace xx {
 		}
 
 		template<bool fillVal = false, int val = 0>
-		void Resize(SizeType len_) noexcept {
+		void Resize(SizeType len_) {
 			if (!core) {
 				if (!len_) return;
 				Reserve(len_);
@@ -141,44 +141,44 @@ namespace xx {
 			core->len = len_;
 		}
 
-		T const& operator[](SizeType idx) const noexcept {
+		T const& operator[](SizeType idx) const {
 			assert(core && idx >= 0 && idx < core->len);
 			return core->buf[idx];
 		}
-		T& operator[](SizeType idx) noexcept {
+		T& operator[](SizeType idx) {
 			assert(core && idx >= 0 && idx < core->len);
 			return core->buf[idx];
 		}
-		T const& At(SizeType idx) const noexcept {
+		T const& At(SizeType idx) const {
 			xx_assert(core && idx >= 0 && idx < core->len);
 			return core->buf[idx];
 		}
-		T& At(SizeType idx) noexcept {
+		T& At(SizeType idx) {
 			xx_assert(core && idx >= 0 && idx < core->len);
 			return core->buf[idx];
 		}
 
-		T& Top() noexcept {
+		T& Top() {
 			assert(core && core->len > 0);
 			return core->buf[core->len - 1];
 		}
-		void Pop() noexcept {
+		void Pop() {
 			assert(core && core->len > 0);
 			--core->len;
 			std::destroy_at(&core->buf[core->len]);
 		}
-		T const& Top() const noexcept {
+		T const& Top() const {
 			assert(core && core->len > 0);
 			return core->buf[core->len - 1];
 		}
-		bool TryPop(T& output) noexcept {
+		bool TryPop(T& output) {
 			if (!core || !core->len) return false;
 			output = std::move(core->buf[--core->len]);
 			std::destroy_at(&core->buf[core->len]);
 			return true;
 		}
 
-		void Clear(bool freeBuf = false) noexcept {
+		void Clear(bool freeBuf = false) {
 			if (!core) return;
 			if (core->len) {
 				for (SizeType i = 0, len = core->len; i < len; ++i) {
@@ -192,7 +192,7 @@ namespace xx {
 			}
 		}
 
-		void Remove(T const& v) noexcept {
+		void Remove(T const& v) {
 			assert(core);
 			auto& len = core->len;
 			auto& buf = core->buf;
@@ -255,7 +255,7 @@ namespace xx {
 		}
 
 		template<typename...Args>
-		T& Emplace(Args&&...args) noexcept {
+		T& Emplace(Args&&...args) {
 			if (auto newCore = ReserveBegin(core ? core->len + 1 : 4)) {
 				auto& newBuf = newCore->buf;
 				auto& len = newCore->len;
@@ -268,11 +268,11 @@ namespace xx {
 		}
 
 		template<typename ...TS>
-		void Add(TS&&...vs) noexcept {
+		void Add(TS&&...vs) {
 			(Emplace(std::forward<TS>(vs)), ...);
 		}
 
-		void AddRange(T const* items, SizeType count) noexcept {
+		void AddRange(T const* items, SizeType count) {
 			assert(items && count > 0);
 			if (auto newCore = ReserveBegin(core ? core->len + count : count)) {
 				auto& newBuf = newCore->buf;
@@ -301,11 +301,11 @@ namespace xx {
 		}
 
 		template<typename L>
-		void AddRange(L const& list) noexcept {
+		void AddRange(L const& list) {
 			return AddRange(list.Buf(), list.Len());
 		}
 
-		SizeType Find(T const& v) const noexcept {
+		SizeType Find(T const& v) const {
 			for (SizeType i = 0; i < core->len; ++i) {
 				if (v == core->buf[i]) return i;
 			}
@@ -313,7 +313,7 @@ namespace xx {
 		}
 
 		template<typename Func>
-		bool Exists(Func&& cond) const noexcept {
+		bool Exists(Func&& cond) const {
 			for (SizeType i = 0; i < core->len; ++i) {
 				if (cond(core->buf[i])) return true;
 			}
@@ -322,14 +322,14 @@ namespace xx {
 
 		//struct Iter {
 		//	T* ptr;
-		//	bool operator!=(Iter const& other) noexcept { return ptr != other.ptr; }
-		//	Iter& operator++() noexcept { ++ptr; return *this; }
-		//	T& operator*() noexcept { return *ptr; }
+		//	bool operator!=(Iter const& other) { return ptr != other.ptr; }
+		//	Iter& operator++() { ++ptr; return *this; }
+		//	T& operator*() { return *ptr; }
 		//};
-		//Iter begin() noexcept { assert(core); return Iter{ core->buf }; }
-		//Iter end() noexcept { assert(core); return Iter{ core->buf + core->len }; }
-		//Iter begin() const noexcept { assert(core); return Iter{ core->buf }; }
-		//Iter end() const noexcept { assert(core); return Iter{ core->buf + core->len }; }
+		//Iter begin() { assert(core); return Iter{ core->buf }; }
+		//Iter end() { assert(core); return Iter{ core->buf + core->len }; }
+		//Iter begin() const { assert(core); return Iter{ core->buf }; }
+		//Iter end() const { assert(core); return Iter{ core->buf + core->len }; }
 
 	};
 

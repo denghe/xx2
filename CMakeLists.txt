@@ -107,8 +107,10 @@ if(MSVC)
 		$<$<PLATFORM_ID:Windows>:/MP${Biogears_BUILD_PARALLEL_LEVEL}>
 	)
 	
+	target_compile_options(xx PRIVATE $<$<PLATFORM_ID:Windows>:/arch:AVX2>)
+	
 else()
 	
-	target_compile_options(${name} PRIVATE -Wno-invalid-offsetof)
+	target_compile_options(xx PRIVATE -Wno-invalid-offsetof)
 
 endif()

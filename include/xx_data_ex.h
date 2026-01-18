@@ -71,7 +71,7 @@ struct XXXXXXXXXXX : ParentType {
             memset(pids.data(), 0, sizeof(uint16_t) * pids.size());
         }
 
-		bool IsBaseOf(uint16_t baseTypeId, uint16_t typeId) noexcept {
+		bool IsBaseOf(uint16_t baseTypeId, uint16_t typeId) {
 			for (; typeId != baseTypeId; typeId = pids[typeId]) {
 				if (!typeId || typeId == pids[typeId]) return false;
 			}
@@ -79,13 +79,13 @@ struct XXXXXXXXXXX : ParentType {
 		}
 
 		template<typename BT>
-		bool IsBaseOf(uint16_t typeId) noexcept {
+		bool IsBaseOf(uint16_t typeId) {
 			static_assert(std::is_base_of_v<SerdeBase, BT>);
 			return IsBaseOf(BT::cTypeId, typeId);
 		}
 
 		template<typename BT, typename T>
-		bool IsBaseOf() noexcept {
+		bool IsBaseOf() {
 			static_assert(std::is_base_of_v<SerdeBase, T>);
 			static_assert(std::is_base_of_v<SerdeBase, BT>);
 			return IsBaseOf(BT::cTypeId, T::cTypeId);
