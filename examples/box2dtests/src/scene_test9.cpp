@@ -72,7 +72,7 @@ namespace Test9 {
 		def.material.restitution = 0.5f;
 		b2CreateCircleShape(b2body, &def, &circle);
 
-		color = xx::GetRandomColor(gg.rnd, {255,0,0,255});
+		color = xx::GetRandomColor(gg.rnd, { 255,0,0,255 });
 	}
 
 	void Ball::Hit(Rock* rock_) {
@@ -82,7 +82,7 @@ namespace Test9 {
 		// check same rock multi hit: temporarily disable ball's shape hit event
 		if (lastRock == rock_) {
 			++sameRockHitCount;
-			if (sameRockHitCount > 30) {
+			if (sameRockHitCount > 5) {
 				disabing = true;
 				b2Body_Disable(b2body);
 			}
@@ -107,13 +107,13 @@ namespace Test9 {
 			XX_YIELD(_1);
 		}
 		colorplus = 0.5f;
-		for (_1i = 0; _1i < 9+4; ++_1i) {
+		for (_1i = 0; _1i < 9 + 4; ++_1i) {
 			offset -= _1inc;
 			scale -= 0.03f;
 			XX_YIELD(_1);
 		}
 		scale = 1.f;
-		for (_1i = 0; _1i < 4+2; ++_1i) {
+		for (_1i = 0; _1i < 4 + 2; ++_1i) {
 			offset += _1inc;
 			XX_YIELD(_1);
 		}
@@ -129,7 +129,9 @@ namespace Test9 {
 	bool Ball::Update() {
 		if (bouncing) Bounce();
 		if (disabing) {
-			if (--sameRockHitCount == 0) {
+			sameRockHitCount -= 0.1f;
+			if (sameRockHitCount <= 0) {
+				sameRockHitCount = 0;
 				disabing = {};
 				b2Body_Enable(b2body);
 			}
@@ -184,12 +186,48 @@ namespace Test9 {
 	bool Rock::Update() {
 		if (SceneItem::Update()) return true;
 
-		// todo: check out of bounds, + score
+		// todo: check rock in BonusArea
+		if (pos.y >= mapSize.y) {
+			for (auto& ba : scene->bonusAreas) {
+				if (ba.InArea(pos.x)) {
+					// hit bonus area
+					scene->effectTextManager.Add(ba.pos, { 0,-100 }, xx::RGBA8_White, 3, ba.ratio, true);
+					//gg.PlayAudio(gg.embed.ss_ui_confirm);
+					break;
+				}
+			}
+		}
 
 		// edge check
 		return (pos.x < 0 || pos.x >= mapSize.x
 			|| pos.y < 0 || pos.y >= mapSize.y);
 	}
+
+	/***************************************************************************************/
+
+	void BonusArea::Init(Scene* scene_, XY pos_, float width_, int32_t ratio_) {
+		scene = scene_;
+		pos = pos_;
+		halfWidth = width_ * 0.5f;
+		ratio = ratio_;
+		data.Fill(0, 1, xx::RGBA8_White, ratio_);
+	}
+
+	void BonusArea::Draw() {
+		data.scale = scene->cam.scale * 2;
+		data.pos = scene->cam.ToGLPos(pos)
+			- XY{ data.cCharSize.x * data.Len(), data.cCharSize.y } * 0.5f * data.scale;
+		gg.Numbers().Draw(data);
+	}
+
+	void BonusArea::SetRatio() {
+		// todo
+	}
+
+	bool BonusArea::InArea(float x_) const {
+		return x_ >= pos.x - halfWidth && x_ <= pos.x + halfWidth;
+	}
+
 
 	/***************************************************************************************/
 
@@ -211,23 +249,23 @@ namespace Test9 {
 
 		L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("game speed: 1x")).onClicked = [this] {
 			timeScale = 1.f;
-		};
+			};
 
 		L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("2x")).onClicked = [this] {
 			timeScale = 2.f;
-		};
+			};
 
 		L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("5x")).onClicked = [this] {
 			timeScale = 5.f;
-		};
+			};
 
 		L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("10x")).onClicked = [this] {
 			timeScale = 10.f;
-		};
+			};
 
 		L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("20x")).onClicked = [this] {
 			timeScale = 20.f;
-		};
+			};
 
 		L.InitEnd();
 	}
@@ -246,21 +284,24 @@ namespace Test9 {
 		//def.contactDampingRatio = 0;
 		b2world.InitDef(def, 1);
 
-		blocks.Emplace().Emplace()->Init(this, XY{edgeWidth_2, mapSize_2.y}, XY{edgeWidth, mapSize.y});
+		blocks.Emplace().Emplace()->Init(this, XY{ edgeWidth_2, mapSize_2.y }, XY{ edgeWidth, mapSize.y });
 		blocks.Emplace().Emplace()->Init(this, XY{ mapSize.x - edgeWidth_2, mapSize_2.y }, XY{ edgeWidth, mapSize.y });
 
 		auto freeWidth = mapSize.x - blockSize.x * numBlocks - edgeWidth * 2;
 		auto step = freeWidth / (numBlocks + 1) + blockSize.x;
+		auto y = mapSize.y - blockSize_2.y;
+		bonusAreas.Emplace().Init(this, XY{ edgeWidth + step / 2, y }, step, 123);
 		for (int i = 1; i <= numBlocks; ++i) {
 			auto x = edgeWidth + step * i - blockSize_2.x;
-			blocks.Emplace().Emplace()->Init(this, XY{ x, mapSize.y - blockSize_2.y }, blockSize);
+			blocks.Emplace().Emplace()->Init(this, XY{ x, y }, blockSize);
+			bonusAreas.Emplace().Init(this, { x + step / 2 + blockSize_2.x, y }, step, 123);
 		}
 
 		step = freeWidth / (numBallCols + 1) + ballRadius;
 		for (int j = 0; j < numBallRows; ++j) {
 			int32_t isSingle = j & 1;
 			float baseX = edgeWidth - (isSingle ? step / 2 : 0);
-			auto y = baseY + step * j - ballRadius;
+			y = baseY + step * j - ballRadius;
 			for (int i = 1; i <= numBallCols + isSingle; ++i) {
 				auto x = baseX + step * i - ballRadius;
 				balls.Emplace().Emplace()->Init(this, XY{ x, y }, ballRadius);
@@ -274,6 +315,9 @@ namespace Test9 {
 				balls.Emplace().Emplace()->Init(this, XY{ x + ballRadius * 1.4142 * 2, y - ballRadius * 1.4142 * 2 }, ballRadius);
 			}
 		}
+
+		// todo: fill ratioNumbers
+
 	}
 
 	void Scene::Gen(int32_t num_) {
@@ -336,7 +380,7 @@ namespace Test9 {
 			}
 		}
 
-		genTimer += gg.cDelta * 1.f * 40;
+		genTimer += gg.cDelta * 1.f * 100;
 		while (genTimer >= 1.f) {
 			genTimer -= 1.f;
 			Gen(1);
@@ -344,6 +388,7 @@ namespace Test9 {
 	}
 
 	void Scene::Draw() {
+		for (auto& o : bonusAreas) o.Draw();
 		for (auto& o : blocks) o->Draw();
 		for (auto& o : balls) o->Draw();
 		for (auto& o : rocks) o->Draw();

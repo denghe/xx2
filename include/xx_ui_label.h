@@ -32,39 +32,9 @@ namespace xx {
 			return SetText(StrPtr(txt_), StrLen(txt_));
 		}
 
-		// S : literal string u8/32string [view]
+		// C: char / char8_t / char32_t
 		template<typename C>
-		Label& SetText(C const* txt_, size_t len_) {
-			chars.Clear();
-			if (!len_) {
-				return *this;
-			}
-			float px{}, py{}, maxpx{}, lineHeight = bmf->lineHeight * baseScale
-				, fontDefaultWidth = bmf->fontSize * baseScale;
-			for (int32_t i = 0; i < len_; ++i) {
-				auto t = txt_[i];
-				if (t == '\r' || t == '\n') continue;
-				if (auto r = bmf->Get(t); r) {
-					auto cw = r->xadvance * baseScale;
-					auto& c = chars.Emplace();
-					c.offset.x = px + r->xoffset * baseScale;
-					c.offset.y = py - r->yoffset * baseScale;
-					c.uvRect.x = r->x;
-					c.uvRect.y = r->y;
-					c.uvRect.w = r->width;
-					c.uvRect.h = r->height;
-					c.texId = r->texId;
-
-					px += cw;
-				}
-				else {
-					px += fontDefaultWidth;
-				}
-			}
-			size = { std::max(px, maxpx), -py + lineHeight };
-			FillTrans();
-			return *this;
-		}
+		Label& SetText(C const* txt_, size_t len_);
 
 		// for easy use
 		template<typename S>
@@ -85,33 +55,13 @@ namespace xx {
 
 		// for rich label
 		// calc & return pixel width & used len & is line end
+		// C: char / char8_t / char32_t
 		template<typename C>
-		inline static CalcResult Calc(float fontSize_, float maxWidth_
-			, Shared<BMFont> const& bmf_, C const* txt_, int32_t txtLen_) {
-			assert(txtLen_ > 0);
-			auto baseScale = fontSize_ / bmf_->fontSize;
-			float px{};
-			int32_t i{};
-			for (; i < txtLen_; ++i) {
-				auto t = txt_[i];
-				if (t == '\r') continue;
-				else if (t == '\n') {
-					return { px, i + 1, true };
-				}
-				auto r = bmf_->Get(t);
-				float cw;
-				if (r) cw = r->xadvance * baseScale;
-				else cw = fontSize_;
-				if (maxWidth_ > 0 && px + cw > maxWidth_) {
-					return { px, i, true };
-				}
-				px += cw;
-			}
-			return { px, i, false };
-		}
+		static CalcResult Calc(float fontSize_, float maxWidth_
+			, Shared<BMFont> const& bmf_, C const* txt_, int32_t txtLen_);
 
 		template<typename S>
-		inline static CalcResult Calc(float fontSize_, float maxWidth_, S&& txt_
+		static CalcResult Calc(float fontSize_, float maxWidth_, S&& txt_
 			, Shared<BMFont> const& bmf_ = GameBase::instance->embed.font_sys
 		) {
 			return Calc(fontSize_, maxWidth_, bmf_, StrPtr(txt_), StrLen(txt_));

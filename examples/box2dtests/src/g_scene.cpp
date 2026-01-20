@@ -112,7 +112,7 @@ namespace G {
 		gg.Quad().DrawTinyFrame(gg.embed.shape_dot, 0, 0.5f, gg.windowSize, 0, 1, {38,194,208,255});
 		gg.Quad().DrawFrame(gg.pics.bg_fish, { 0, -200 }, cam.scale * 3.3);
 
-		// sort order by y. map y to 0 ~ 1080 ( design size.y ). FPS 3x faster than std::sort
+		// sort order by y. y map to mapSize.y. FPS 3x faster than std::sort
 		for (auto& o : fishs) SortContainerAdd(o.pointer);
 		SortContainerDraw();
 		circle->Draw();

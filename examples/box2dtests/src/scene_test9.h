@@ -43,7 +43,7 @@ namespace Test9 {
 		static constexpr int32_t cTypeId{ __LINE__ };
 		xx::RGBA8 color{};
 		bool bouncing{}, disabing{};
-		int16_t sameRockHitCount{};
+		float sameRockHitCount{};
 		int32_t _1{}, _1i;
 		XY _1inc{}, offset{};
 		float scale{}, colorplus{};
@@ -61,6 +61,18 @@ namespace Test9 {
 		bool Update() override;
 	};
 
+	struct BonusArea {
+		Scene* scene{};
+		XY pos{};
+		int32_t ratio{};
+		float halfWidth{};
+		xx::Shader_NumbersData data;
+		void Init(Scene* scene_, XY pos_, float width_, int32_t ratio_);
+		void Draw();
+		void SetRatio(); // todo
+		bool InArea(float x_) const;
+	};
+
 	struct Scene : xx::SceneBase {
 		xx::Shared<xx::Node> ui;
 		xx::Camera cam;
@@ -71,6 +83,7 @@ namespace Test9 {
 		xx::List<xx::Shared<Ball>> balls;
 		xx::List<xx::Shared<Rock>> rocks;
 		xx::EffectTextManager effectTextManager;
+		xx::List<BonusArea> bonusAreas;
 
 		float genTimer{};
 		void Gen(int32_t num_);

@@ -693,7 +693,7 @@ void main() {
     // xx_shader_numbers.h
     /**************************************************************************************************/
 
-    int32_t Shader_NumbersData::Fill(std::string_view n_) {
+    int32_t Shader_NumbersData::FillTxt(std::string_view n_) {
         assert(n_.size());
         auto buf = n_.data();
         auto len = n_.size();
@@ -705,7 +705,7 @@ void main() {
 		return (int32_t)len;
     }
 
-    int32_t Shader_NumbersData::Fill(int32_t n_, bool includeSignal_) {
+    int32_t Shader_NumbersData::FillTxt(int32_t n_, bool includeSignal_) {
         std::string s;
         if (includeSignal_) {
             if (n_ >= 0) {
@@ -720,21 +720,23 @@ void main() {
         else {
             Append(s, std::abs(n_));
         }
-        return Fill(s);
+        return FillTxt(s);
+    }
+
+    void Shader_NumbersData::FillBase(XY pos_, XY scale_, RGBA8 color_) {
+        pos = pos_;
+        scale = scale_;
+        color = color_;
     }
 
     int32_t Shader_NumbersData::Fill(XY pos_, XY scale_, RGBA8 color_, std::string_view n_) {
-        pos = pos_;
-        scale = scale_;
-        color = color_;
-        return Fill(n_);
+        FillBase(pos_, scale_, color_);
+        return FillTxt(n_);
     }
 
     int32_t Shader_NumbersData::Fill(XY pos_, XY scale_, RGBA8 color_, int32_t n_, bool includeSignal_) {
-        pos = pos_;
-        scale = scale_;
-        color = color_;
-        return Fill(n_, includeSignal_);
+        FillBase(pos_, scale_, color_);
+        return FillTxt(n_, includeSignal_);
     }
 
 
@@ -862,15 +864,21 @@ void main() {
 
     Shader_NumbersData* Shader_Numbers::Alloc(int32_t num_) {
         assert(GameBase::instance->shader == this);
-        if (count + 1 > maxNums) {
+        if (count + num_ > maxNums) {
             Commit();
         }
-        return &data[count++];
+        auto r = &data[count];
+        count += num_;
+        return r;
+    }
+
+    void Shader_Numbers::Draw(Shader_NumbersData const* buf_, int32_t len_) {
+        auto ptr = Alloc(len_);
+        memcpy(ptr, buf_, sizeof(Shader_NumbersData) * len_);
     }
 
     void Shader_Numbers::Draw(Shader_NumbersData const& d_) {
-        auto ptr = Alloc(1);
-        memcpy(ptr, &d_, sizeof(d_));
+        Draw(&d_, 1);
     }
 
 }

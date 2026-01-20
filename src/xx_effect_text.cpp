@@ -11,7 +11,7 @@ namespace xx {
 		alpha = 1;
 		scale = scale_;
 
-		auto len = data.Fill(value_, includeSignal_);
+		auto len = data.FillTxt(value_, includeSignal_);
 		pos_.x -= len * 0.5f * (GameBase::instance->embed.png_numbers.size.x / 12) * scale_.x;
 		pos = pos_;
 	}
