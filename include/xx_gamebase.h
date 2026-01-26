@@ -65,7 +65,8 @@ namespace xx {
 
 
         RGBA8 clearColor{};									// for glClearColor
-        std::array<uint32_t, 3> blendDefault{ GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_FUNC_ADD };
+        //std::array<uint32_t, 3> blendDefault{ GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_FUNC_ADD };
+		std::array<uint32_t, 3> blendDefault{ GL_ONE, GL_ONE_MINUS_SRC_ALPHA, GL_FUNC_ADD };            // premultiplied alpha
         std::array<uint32_t, 3> blend{ blendDefault };
 
         float time{}, delta{};								// usually for ui logic
@@ -185,10 +186,10 @@ namespace xx {
         Data LoadDataFromData(Span d);
 
         // auto decompress
-        Shared<GLTexture> LoadTextureFromData(void* buf_, size_t len_, bool pngAutoPremultiplyAlpl_a = false);
-        Shared<GLTexture> LoadTextureFromData(Span d, bool pngAutoPremultiplyAlpla_ = false);
+        Shared<GLTexture> LoadTextureFromData(void* buf_, size_t len_, bool pngAutoPremultiplyAlpl_a = true);
+        Shared<GLTexture> LoadTextureFromData(Span d, bool pngAutoPremultiplyAlpla_ = true);
 
-        Shared<GLTexture> LoadTexture(std::string_view fn_, bool pngAutoPremultiplyAlpla_ = false);
+        Shared<GLTexture> LoadTexture(std::string_view fn_, bool pngAutoPremultiplyAlpla_ = true);
 
 
         void ResizeCalc();  // for window resize event
@@ -197,8 +198,8 @@ namespace xx {
         void GLClear(RGBA8 c);
         void GLBlendFunc(std::array<uint32_t, 3> const& args);
         void GLBlendFunc();
-        void SetBlendPremultipliedAlpha(bool e_);
-        void SetDefaultBlendPremultipliedAlpha(bool e_);
+        void SetBlendPremultipliedAlpha(bool e_ = true);
+        void SetDefaultBlendPremultipliedAlpha(bool e_ = true);
 
         // internal funcs
 		void HandleMouseMove(XY mp_);

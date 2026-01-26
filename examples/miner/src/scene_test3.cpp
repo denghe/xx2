@@ -126,7 +126,6 @@ namespace Test3 {
 		// draw airplane
 		for (auto& o : airplanes) o->Draw();
 
-		gg.GLBlendFunc(gg.blendDefault);
 		gg.DrawNode(ui);
 	}
 

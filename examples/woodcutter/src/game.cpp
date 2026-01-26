@@ -32,12 +32,10 @@ void Game::GLInit() {
 	// load texture packer
 	_pics.Load("res/");
 	// load single frame
-	fs.p11 = LoadTexture("res/p11.png", true);
+	fs.p11 = LoadTexture("res/p11.png");
 	fs.p11.tex->SetParm(GL_LINEAR, GL_CLAMP_TO_EDGE);
-	fs.p11a1 = LoadTexture("res/p11a.png", true);
-	fs.p11a1.tex->SetParm(GL_LINEAR, GL_CLAMP_TO_EDGE);
-	fs.p11a2 = LoadTexture("res/p11a.pnga");
-	fs.p11a2.tex->SetParm(GL_LINEAR, GL_CLAMP_TO_EDGE);
+	fs.p11a = LoadTexture("res/p11a.png");
+	fs.p11a.tex->SetParm(GL_LINEAR, GL_CLAMP_TO_EDGE);
 
 	// load file data( for memory scan )
 	_mask_bg_1.Fill(LoadFileData("res/_mask_bg_1.png"));
@@ -123,7 +121,6 @@ void Game::Update() {
 	uiColorFlag = !uiColorFlag;
 	uiFPS->SetText(fpsVal).SetColor(c);
 	uiText->SetColor(c);
-	gg.SetBlendPremultipliedAlpha(false);
 	gg.DrawNode(ui);
 	
 	// draw mouse pointer

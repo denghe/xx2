@@ -250,7 +250,6 @@ struct )#", structName, R"#( {)#", tmp, R"#(
 		}
 
 		xx::Append(code, R"#(#include "pch.h"
-#include "game.h"
 #include <xx_gamebase.h>
 #include ")#", structName, R"#(.h"
 

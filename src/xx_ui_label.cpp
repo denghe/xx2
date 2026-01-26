@@ -43,6 +43,10 @@ namespace xx {
 		}
 	}
 
+	void Label::Clear() {
+		chars.Clear();
+	}
+
 	template<typename C>
 	Label& Label::SetText(C const* txt_, size_t len_) {
 		chars.Clear();

@@ -36,6 +36,9 @@ namespace xx {
 		template<typename C>
 		Label& SetText(C const* txt_, size_t len_);
 
+		// text = ""
+		void Clear();
+
 		// for easy use
 		template<typename S>
 		Label& operator()(S const& txt_) {

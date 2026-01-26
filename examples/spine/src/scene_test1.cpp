@@ -71,7 +71,6 @@ void Scene_Test1::FixedUpdate() {
 
 void Scene_Test1::Draw() {
 	sp->Draw();
-	gg.GLBlendFunc(gg.blendDefault);
 	gg.DrawNode(ui);
 }
 

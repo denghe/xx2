@@ -258,7 +258,6 @@ namespace Test4 {
 		for (auto& o : obyis) o.second->Draw();
 		obyis.Clear();
 
-		gg.GLBlendFunc(gg.blendDefault);
 		gg.DrawNode(ui);
 	}
 

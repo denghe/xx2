@@ -225,7 +225,6 @@ namespace TestB {
 		// combine tex & light
 		gg.QuadLight().Draw(t, t2, xx::RGBA8_White, 2);
 
-		gg.GLBlendFunc(gg.blendDefault);
 		gg.DrawNode(ui);
 		gg.ShaderEnd();	// ensure tmp texture not release
 	}

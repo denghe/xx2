@@ -100,7 +100,6 @@ void Scene_Test1::FixedUpdate() {
 void Scene_Test1::Draw() {
 	for (auto& o : bugs) o->Draw();
 	// ...
-	gg.GLBlendFunc(gg.blendDefault);
 	gg.DrawNode(ui);
 }
 

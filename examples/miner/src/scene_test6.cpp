@@ -257,7 +257,6 @@ void Scene::Draw() {
 	for (auto& o : obyis) o.second->Draw();
 	obyis.Clear();
 
-	gg.GLBlendFunc(gg.blendDefault);
 	gg.DrawNode(ui);
 }
 

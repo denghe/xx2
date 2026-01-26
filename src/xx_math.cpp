@@ -207,5 +207,10 @@ namespace xx {
         return { (uint8_t)(r * 255), (uint8_t)(g * 255), (uint8_t)(b * 255), refColor_.a };
     }
 
+    XY RotatePoint(XY d, float radians) {
+        auto c = std::cos(radians);
+        auto s = std::sin(radians);
+        return { d.x * c - d.y * s, d.x * s + d.y * c };
+    }
 
 }

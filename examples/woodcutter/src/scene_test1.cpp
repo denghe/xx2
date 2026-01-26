@@ -313,7 +313,6 @@ namespace Test1 {
 			gg.Quad().DrawFrame(gg._pics.a_[0], gg.mousePos, cs);
 		}
 
-		gg.GLBlendFunc(gg.blendDefault);
 		gg.DrawNode(ui);
 	}
 

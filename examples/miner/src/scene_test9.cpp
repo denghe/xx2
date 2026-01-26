@@ -92,7 +92,6 @@ void Scene::Draw() {
 	gg.Quad().Draw(gg.all.minecart_[1], gg.all.minecart_[1], 0, { 0.f, 1.f }, cam.scale, 0, 0.5f, {255,255,255,127});
 
 
-	gg.GLBlendFunc(gg.blendDefault);
 	gg.DrawNode(ui);
 }
 

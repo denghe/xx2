@@ -15,6 +15,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 include_directories(
 	src/
+	../../pugixml/src/
 )
 
 file(GLOB sources

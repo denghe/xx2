@@ -217,7 +217,6 @@ void Game::Update() {
 
 		// draw ui
 		uiFPS->SetText(fpsVal);
-		gg.GLBlendFunc(gg.blendDefault);
 		gg.DrawNode(ui);
 
 		// draw mouse pointer

@@ -185,7 +185,6 @@ namespace Test5 {
 		SortContainerDraw();
 
 		gg.uiText->SetText(xx::ToString("num items = ", droppingItems.len + vortexItems.len));
-		gg.SetBlendPremultipliedAlpha(false);
 		gg.DrawNode(ui);
 	}
 

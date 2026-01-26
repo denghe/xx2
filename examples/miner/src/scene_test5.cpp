@@ -360,7 +360,6 @@ namespace Test5 {
 			currencyUI[i]->SetText(xx::ToString(currency[i]));
 		}
 
-		gg.GLBlendFunc(gg.blendDefault);
 		gg.DrawNode(ui);
 	}
 

@@ -29,7 +29,7 @@ namespace Test2 {
 		cfg->colorVar = 0.5;
 		cfg->alphaVar = 1;
 
-		p.Init(cfg, 200000, true);
+		p.Init(cfg, 200000);
 	}
 
 	void Scene::Update() {
@@ -73,7 +73,6 @@ namespace Test2 {
 		p.Draw(cam);
 
 		gg.uiText->SetText(xx::ToString("num particals = ", p.particles.Count()));
-		gg.SetBlendPremultipliedAlpha(false);
 		gg.DrawNode(ui);
 	}
 

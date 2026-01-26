@@ -92,7 +92,6 @@ namespace G2 {
 		for (auto& o : woods) SortContainerAdd(o.pointer);
 		SortContainerDraw();
 
-		gg.SetBlendPremultipliedAlpha(false);
 		gg.uiText->SetText(xx::ToString("num woods = ", woods.len));
 		gg.DrawNode(ui);
 	}

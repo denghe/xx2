@@ -65,7 +65,8 @@ out vec4 oColor;
 
 void main() {
     vec4 c = vColor * texture(uTex0, vTexCoord / vec2(textureSize(uTex0, 0)));
-    oColor = vec4( (c.x + 0.00001f) * vColorplus, (c.y + 0.00001f) * vColorplus, (c.z + 0.00001f) * vColorplus, c.w );
+    //oColor = vec4( (c.x + 0.00001f) * vColorplus, (c.y + 0.00001f) * vColorplus, (c.z + 0.00001f) * vColorplus, c.w );
+    oColor = vec4( c.x * vColorplus, c.y * vColorplus, c.z * vColorplus, c.w );
 })"sv });
 
             p = LinkGLProgram(v, f);
@@ -229,9 +230,7 @@ void main() {
 vec2 uv = vTexCoord / vec2(textureSize(uTex0, 0));
 vec4 c = vColor * texture(uTex0, uv);
 vec4 c1 = texture(uTex1, uv);
-oColor = vec4( (c.x + 0.00001f) * vColorplus * c1.x
-                , (c.y + 0.00001f) * vColorplus * c1.y
-                , (c.z + 0.00001f) * vColorplus * c1.z, c.w );
+oColor = vec4( c.x * vColorplus * c1.x, c.y * vColorplus * c1.y, c.z * vColorplus * c1.z, c.w );
 })"sv });
 
         p = LinkGLProgram(v, f);

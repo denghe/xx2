@@ -109,6 +109,10 @@ namespace xx {
     std::u32string StringU8ToU32(std::string_view const& sv);
     void StringU32ToU8(std::string& out, std::u32string_view const& sv);
     std::string StringU32ToU8(std::u32string_view const& sv);
+    // IVS variation selectors are in the range U+E0100–U+E01EF
+    XX_INLINE bool Char32IsIVS(char32_t c32) {
+        return c32 >= 0xE0100 && c32 <= 0xE01EF;
+    }
 
     template<typename T>
     std::string const& U8AsString(T const& u8s) {

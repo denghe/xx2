@@ -43,7 +43,6 @@ void Scene_Test3::Update() {
 
 void Scene_Test3::Draw() {
 	sp->Draw();
-	gg.GLBlendFunc(gg.blendDefault);
 	gg.DrawNode(ui);
 }
 

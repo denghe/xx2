@@ -203,7 +203,6 @@ namespace Test8 {
 		for (auto& o : rocks) o->Draw();
 
 		gg.uiText->SetText(xx::ToString("num rocks = ", rocks.len));
-		gg.SetBlendPremultipliedAlpha(false);
 		gg.DrawNode(ui);
 	}
 

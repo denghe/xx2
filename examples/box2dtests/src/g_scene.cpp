@@ -118,7 +118,6 @@ namespace G {
 		circle->Draw();
 
 		gg.uiText->SetText(xx::ToString("count = ", fishs.len));
-		gg.SetBlendPremultipliedAlpha(false);
 		gg.DrawNode(ui);
 	}
 

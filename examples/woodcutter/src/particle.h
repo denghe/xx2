@@ -45,12 +45,10 @@ namespace xx {
         xx::ListLink<ParticleItem, int> particles;
         XY prevPos, pos, rootPos;
         float age, emissionResidue;
-		bool enableBlendPremultipliedAlpha{};
 
-		void Init(xx::Shared<ParticleConfig> cfg_, size_t const& cap = 1000, bool enableBlendPremultipliedAlpha_ = true) {
+		void Init(xx::Shared<ParticleConfig> cfg_, size_t const& cap = 1000) {
 			particles.Clear<true>();
 			particles.Reserve(cap);
-            enableBlendPremultipliedAlpha = enableBlendPremultipliedAlpha_;
 			cfg = std::move(cfg_);
 
 			pos = prevPos = rootPos = {};
@@ -199,11 +197,8 @@ namespace xx {
             return particles.Count() == 0;
         }
 
-        // warning: maybe change blend
         void Draw(Camera& cam_) const {
             auto e = GameBase::instance;
-			//auto bakBlend = e->blend;
-            e->SetBlendPremultipliedAlpha(enableBlendPremultipliedAlpha);
 
 			auto scale_ = cam_.scale;
 
@@ -220,7 +215,6 @@ namespace xx {
 
 				shader.DrawFrame(cfg->frame, cam_.ToGLPos(par.pos + rootPos), par.size * scale_, par.spin * par.age, 1.f, fc);
             }
-			//e->GLBlendFunc(bakBlend);
         }
 
 	};

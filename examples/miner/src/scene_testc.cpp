@@ -225,7 +225,6 @@ namespace TestC {
 		for (auto& o : miners) SortContainerAdd(o.pointer);
 		SortContainerDraw();
 
-		gg.GLBlendFunc(gg.blendDefault);
 		gg.DrawNode(ui);
 	}
 

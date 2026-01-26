@@ -10,6 +10,10 @@ namespace xx {
         return uvRect;
     }
 
+    TinyFrame::operator bool() const {
+        return tex.pointer != nullptr;
+    }
+
     XY TinyFrame::Size() const {
         return { uvRect.w, uvRect.h };
     }
@@ -23,7 +27,9 @@ namespace xx {
         uvRect = tex->Rect();
     }
 
-
+    void TinyFrame::Clear() {
+        tex.Reset();
+    }
 
 
     Frame::operator TinyFrame& () const {
@@ -45,6 +51,10 @@ namespace xx {
         return anchor;
     }
 
+    Frame::operator bool() const {
+		return tex.pointer != nullptr;
+    }
+
     XY Frame::Size() const {
         return { uvRect.w, uvRect.h };
     }
@@ -57,6 +67,10 @@ namespace xx {
         tex = std::move(t);
         uvRect = tex->Rect();
         anchor = 0.5f;
+    }
+
+    void Frame::Clear() {
+        tex.Reset();
     }
 
 }

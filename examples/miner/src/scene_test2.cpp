@@ -369,7 +369,6 @@ namespace Test2 {
 		}
 
 		// draw ui
-		gg.GLBlendFunc(gg.blendDefault);
 		gg.DrawNode(ui);
 
 		//// gizmos

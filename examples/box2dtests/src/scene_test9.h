@@ -20,11 +20,11 @@ namespace Test9 {
 		int32_t typeId{};	// sould be set in Init func
 		float y{};
 		Scene* scene{};
-		xx::Frame frame;
 		xx::B2Body b2body;
 		xx::B2Shape b2shape;
 		XY pos{};	// center
 		float radians{}, radius{};
+		xx::Frame frame;
 		virtual bool Update();
 		virtual void Draw();
 		virtual ~SceneItem() {};

@@ -141,7 +141,6 @@ namespace Test1 {
 		for (auto& o : item2s) o->Draw();
 
 		gg.uiText->SetText(xx::ToString("count = ", item1s.len + item2s.len));
-		gg.SetBlendPremultipliedAlpha(false);
 		gg.DrawNode(ui);
 	}
 

@@ -10,7 +10,6 @@ namespace xx {
     // todo: kernings support
 
     struct BMFontChar {
-        // char32_t id;
         uint16_t x, y, width, height;
         int16_t xoffset, yoffset, xadvance;
         uint8_t page, chnl;

@@ -52,11 +52,13 @@ namespace xx {
         operator UVRect () const { return Rect(); }
 
         static GLuint MakeTex();
-        static void SetTexParm(GLuint id_, GLuint minFilter_, GLuint magFilter_, GLuint sWraper_, GLuint tWraper_); // filter:  GL_NEAREST  GL_LINEAR    wraper:  GL_CLAMP_TO_EDGE   GL_REPEAT
+        void Make(XY size_, bool hasAlpha_ = true); // true: RGBA;  false: RGB
 
-        void Make(XY size_, bool hasAlpha_ = true);
+        // filter:  GL_NEAREST  GL_LINEAR    wraper:  GL_CLAMP_TO_EDGE   GL_REPEAT
+        static void SetTexParm(GLuint id_, GLuint minFilter_, GLuint magFilter_, GLuint sWraper_, GLuint tWraper_);
         void SetParm(GLuint minFilter_, GLuint magFilter_, GLuint sWraper_, GLuint tWraper_);
-        void SetParm(GLuint minmagFilter_, GLuint stWraper_);
+        // default: GL_NEAREST, GL_CLAMP_TO_EDGE
+        void SetParm(GLuint minmagFilter_ = GL_NEAREST, GLuint stWraper_ = GL_CLAMP_TO_EDGE);
         void TryGenerateMipmap();
     };
 

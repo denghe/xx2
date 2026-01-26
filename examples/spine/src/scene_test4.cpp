@@ -45,7 +45,6 @@ void Scene_Test4::Draw() {
 	for (auto& sb : sbs) {
 		sb.sp->Draw();
 	}
-	gg.GLBlendFunc(gg.blendDefault);
 	gg.DrawNode(ui);
 }
 

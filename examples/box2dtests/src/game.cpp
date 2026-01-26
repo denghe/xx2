@@ -94,9 +94,6 @@ void Game::GLInit() {
 	////tp.Tex().SetParm(GL_LINEAR, GL_CLAMP_TO_EDGE);
 
 
-	SetDefaultBlendPremultipliedAlpha(true);
-
-
 	// init first scene
 	scene.Emplace<Scene_MainMenu>()->Init();
 }
@@ -116,22 +113,21 @@ void Game::Update() {
 	scene->Update();
 	if (!minimized) {
 		scene->Draw();
+
+		// draw ui
+		auto c = uiColorFlag ? xx::RGBA8_Red : xx::RGBA8_Blue;
+		uiColorFlag = !uiColorFlag;
+		uiFPS->SetText(fpsVal).SetColor(c);
+		uiText->SetColor(c);
+		gg.DrawNode(ui);
+	
+		// draw mouse pointer
+		//Quad().DrawFrame(all.mouse_pointer, mousePos, 3.f);
 	}
 	if (oldScene) {
 		uiText->SetText("");
 		oldScene.Reset();
 	}
-
-	// draw ui
-	auto c = uiColorFlag ? xx::RGBA8_Red : xx::RGBA8_Blue;
-	uiColorFlag = !uiColorFlag;
-	uiFPS->SetText(fpsVal).SetColor(c);
-	uiText->SetColor(c);
-	gg.SetBlendPremultipliedAlpha(false);
-	gg.DrawNode(ui);
-	
-	// draw mouse pointer
-	//Quad().DrawFrame(all.mouse_pointer, mousePos, 3.f);
 }
 
 void Game::Delay() {

@@ -202,7 +202,6 @@ namespace Test1 {
 			gg.Quad().DrawFrame(rock->f, cam.ToGLPos(rock->pos), cRocksScale * cam.scale);
 		}
 
-		gg.GLBlendFunc(gg.blendDefault);
 		gg.DrawNode(ui);
 	}
 

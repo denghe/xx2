@@ -20,4 +20,5 @@ namespace xx {
 
     RGBA8 GetRandomColor(Rnd& rnd, RGBA8 refColor_);
 
+    XY RotatePoint(XY d, float radians);
 }

@@ -25,6 +25,7 @@ namespace xx {
 
         operator GLuint () const;
         operator UVRect () const;
+        operator bool() const;
         XY Size() const;
         void operator=(Shared<GLTexture> t);
         TinyFrame(Shared<GLTexture> t);
@@ -33,6 +34,8 @@ namespace xx {
             tex = std::move(t);
             uvRect = { (uint16_t)x, (uint16_t)y, (uint16_t)w, (uint16_t)h };
         }
+
+        void Clear();
     };
 
 
@@ -54,6 +57,7 @@ namespace xx {
         operator GLuint () const;
         operator UVRect () const;
         operator XY const& () const;
+        operator bool () const;
         XY Size() const;
         void operator=(Shared<GLTexture> t);
 
@@ -64,6 +68,8 @@ namespace xx {
             uvRect = { (uint16_t)x, (uint16_t)y, (uint16_t)w, (uint16_t)h };
             anchor = anchor_;
         }
+
+        void Clear();
     };
 
 }

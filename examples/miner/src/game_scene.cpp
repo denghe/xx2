@@ -270,7 +270,6 @@ void Scene::Draw() {
 	}
 
 	// draw ui
-	gg.GLBlendFunc(gg.blendDefault);
 	gg.DrawNode(ui);
 }
 

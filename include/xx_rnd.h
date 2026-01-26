@@ -84,6 +84,11 @@ namespace xx {
         }
 
         template<typename V>
+        V Next(FromTo<V> const& fromTo) {
+            return Next(fromTo.from, fromTo.to);
+        }
+
+        template<typename V>
         V NextRadians() {
             if constexpr (std::is_floating_point_v<V>) {
                 return (V)Next<float>(-M_PI, M_PI);
