@@ -150,29 +150,28 @@ struct XXXXXXXXXXX : ParentType {
         using U = typename T::ElementType;
         //static_assert(TypeId_v<U> > 0);
 
-        template<bool needReserve = true>
         static inline void Write(Data& d, T const& in) {
             if (!in) {
-                d.WriteFixed<needReserve>((uint8_t)0);              // index( nullptr ) same as WriteVar(size_t 0)
+                d.WriteFixed((uint8_t)0);               // index( nullptr ) same as WriteVar(size_t 0)
             } else {
                 auto h = in.GetHeader();
-                if (h->ud == 0) {                   // first time
+                if (h->ud == 0) {                       // first time
                     auto& ptrs = ((DataEx&)d).ptrs;
-                    ptrs.Emplace(&h->ud);           // for restore
-                    h->ud = (size_t)ptrs.len;       // store index
-                    d.WriteVarInteger<needReserve>(h->ud);          // index
-                    d.WriteVarInteger<needReserve>(in->typeId);     // type id
-                    in->WriteTo(d);                                 // content
-                } else {                            // exists
-                    d.WriteVarInteger<needReserve>(h->ud);          // index
+                    ptrs.Emplace(&h->ud);               // for restore
+                    h->ud = (size_t)ptrs.len;           // store index
+                    d.WriteVarInteger(h->ud);           // index
+                    d.WriteVarInteger(in->typeId);      // type id
+                    in->WriteTo(d);                     // content
+                } else {                                // exists
+                    d.WriteVarInteger(h->ud);           // index
                 }
             }
         }
 
         static inline int Read(Data_r& dr, T& out) {
             size_t idx;
-            if (int r = dr.Read(idx)) return r;                     // index
-            if (!idx) {                             // nullptr
+            if (int r = dr.Read(idx)) return r;         // index
+            if (!idx) {                                 // nullptr
                 out.Reset();
                 return 0;
             }
@@ -180,9 +179,9 @@ struct XXXXXXXXXXX : ParentType {
             auto& ptrs = ((DataEx_r&)dr).ptrs;
             auto& si = *((DataEx_r&)dr).si;
             auto len = (size_t)ptrs.len;
-            if (idx == len) {                       // first time
+            if (idx == len) {                           // first time
                 uint16_t typeId;
-                if (int r = dr.Read(typeId)) return r;              // type id
+                if (int r = dr.Read(typeId)) return r;  // type id
                 if (!typeId) return __LINE__;
                 if (!si.fs[typeId]) return __LINE__;
                 if (!si.IsBaseOf<U>(typeId)) return __LINE__;
@@ -208,13 +207,12 @@ struct XXXXXXXXXXX : ParentType {
         using U = typename T::ElementType;
         //static_assert(TypeId_v<U> > 0);
 
-        template<bool needReserve = true>
         static inline void Write(Data& d, T const& in) {
             if (!in) {
-                d.WriteFixed<needReserve>((uint8_t)0);              // index( nullptr ) same as WriteVar(size_t 0)
+                d.WriteFixed((uint8_t)0);              // index( nullptr ) same as WriteVar(size_t 0)
             } else {
                 auto p = &in.h->data;
-                d.Write<needReserve>((Shared<U>&)p);
+                d.Write((Shared<U>&)p);
             }
         }
 
