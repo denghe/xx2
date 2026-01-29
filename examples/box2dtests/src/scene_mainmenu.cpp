@@ -10,6 +10,7 @@
 #include "scene_test7.h"
 #include "scene_test8.h"
 #include "scene_test9.h"
+#include "scene_test10.h"
 
 void Scene_MainMenu::Init() {
 	gg.clearColor = {};
@@ -68,6 +69,10 @@ void Scene_MainMenu::MakeUI() {
 
 	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test9( rocks drop into gamble machine )")).onClicked = [this] {
 		gg.MakeScene<Test9::Scene>()->Init();
+	};
+
+	L.Append(C->Make<xx::LabelButton>()->Init(2, 0, 0, fontSize)("test10( throwing sand particles )")).onClicked = [this] {
+		gg.MakeScene<Test10::Scene>()->Init();
 	};
 
 	L.InitEnd();
