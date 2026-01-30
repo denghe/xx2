@@ -59,7 +59,7 @@ xx::Shared<xx::GLTexture> PlistFileName::Load(std::string picFN_, bool generateM
 int main() {
 	SetConsoleOutputCP(CP_UTF8);
 	auto&& cp = std::filesystem::current_path();
-	std::cout << "tool: texturepacker cocos2dx *.plist -> *.h & cpp\n\nworking dir: " << cp.string() << R"#(
+	std::cout << "tool: texturepacker cocos2dx *.plist -> *.h & cpp\n\nworking dir: " << xx::U8AsString(cp.u8string()) << R"#(
 
 tips: 
 file name can't contains space or dot

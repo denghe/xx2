@@ -4,7 +4,7 @@
 int main() {
 	SetConsoleOutputCP(CP_UTF8);
 	auto&& cp = std::filesystem::current_path();
-	std::cout << "tool: jimeng-2025-10-11-1035-XXXXXXXXXXXXXXXX.png -> XXXXXXXXXXXXXXXX-2025-10-11-1035.png\nworking dir: " << cp.string() << "\npress ENTER continue...\n";
+	std::cout << "tool: jimeng-2025-10-11-1035-XXXXXXXXXXXXXXXX.png -> XXXXXXXXXXXXXXXX-2025-10-11-1035.png\nworking dir: " << xx::U8AsString(cp.u8string()) << "\npress ENTER continue...\n";
 	std::cin.get();
 
 	for (auto&& o : std::filesystem::directory_iterator(cp)) {

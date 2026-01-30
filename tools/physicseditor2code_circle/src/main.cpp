@@ -72,7 +72,7 @@ struct Circle {
 int main() {
 	SetConsoleOutputCP(CP_UTF8);
 	auto&& cp = std::filesystem::current_path();
-	std::cout << "tool: PhysicsEditor's Box2d XML store file ( only circles ) -> *.h\n\nworking dir: " << cp.string() << R"#(
+	std::cout << "tool: PhysicsEditor's Box2d XML store file ( only circles ) -> *.h\n\nworking dir: " << xx::U8AsString(cp.u8string()) << R"#(
 press ENTER to continue...)#";
 	std::cin.get();
 

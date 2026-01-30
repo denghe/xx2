@@ -6,7 +6,7 @@
 int main() {
 	SetConsoleOutputCP(CP_UTF8);
 	auto&& cp = std::filesystem::current_path();
-	std::cout << "tool: *.png -> *.pnga ( premultiplied alpha )\n\nworking dir: " << cp.string() << R"#(
+	std::cout << "tool: *.png -> *.pnga ( premultiplied alpha )\n\nworking dir: " << xx::U8AsString(cp.u8string()) << R"#(
 
 press ENTER to continue...)#";
 	std::cin.get();
@@ -30,7 +30,7 @@ press ENTER to continue...)#";
 		xx::CoutN("handle ", f.fileName, ":");
 		auto outNamePrefix = f.fileName.substr(0, f.fileName.size() - 4);
 
-		auto d = xx::ReadAllBytes(f.fullpath);
+		auto d = xx::ReadAllBytes((std::u8string&)f.fullpath);
 		if (!d.len) {
 			xx::CoutN(" read file failed! ", f.fullpath);
 			return __LINE__;

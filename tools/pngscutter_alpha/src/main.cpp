@@ -6,7 +6,7 @@
 int main() {
 	SetConsoleOutputCP(CP_UTF8);
 	auto&& cp = std::filesystem::current_path();
-	std::cout << "tool: *.png -> *_{n}.png\n\nworking dir: " << cp.string() << R"#(
+	std::cout << "tool: *.png -> *_{n}.png\n\nworking dir: " << xx::U8AsString(cp.u8string()) << R"#(
 
 search content by non alpha area
 
@@ -33,7 +33,7 @@ press ENTER to continue...)#";
 		xx::CoutN("handle ", f.fileName, ":");
 		auto outNamePrefix = f.fileName.substr(0, f.fileName.size() - 4) + "_cutalpha_";
 
-		auto d = xx::ReadAllBytes(f.fullpath);
+		auto d = xx::ReadAllBytes((std::u8string&)f.fullpath);
 		if (!d.len) {
 			xx::CoutN(" read file failed! ", f.fullpath);
 			return __LINE__;
@@ -121,7 +121,7 @@ press ENTER to continue...)#";
 			auto sw = maxXY.x - minXY.x + 1;
 			auto sh = maxXY.y - minXY.y + 1;
 			// ignore small size subs
-			if (sw >= 16 && sh >= 16) {
+			if (sw >= 3 && sh >= 3) {
 				xx::CoutN("find out sub content: num pixels = ", ps.len, " width = ", sw, " height = ", sh);
 				auto obuf = std::make_unique<uint32_t[]>(sw * sh);
 				for (auto idx : ps) {

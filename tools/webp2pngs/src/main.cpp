@@ -4,7 +4,7 @@
 int main() {
     SetConsoleOutputCP(CP_UTF8);
     auto&& cp = std::filesystem::current_path();
-    std::cout << "tool: *.webp -> *_{n}.png\n\nworking dir: " << cp.string() << R"#(
+    std::cout << "tool: *.webp -> *_{n}.png\n\nworking dir: " << xx::U8AsString(cp.u8string()) << R"#(
 
 tips: require C:\Softs\libwebp-1.6.0-windows-x64\bin\webpmux.exe
 
