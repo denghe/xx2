@@ -42,4 +42,8 @@ namespace xx {
 		FillTransRecursive();
 	}
 
+	LabelButton& LabelButton::SetLabelBorder(RGBA8 borderColor_, float borderWidth_) {
+		At<Label>(0).SetBorder(borderColor_, borderWidth_);
+		return *this;
+	}
 }

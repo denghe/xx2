@@ -25,6 +25,7 @@ namespace xx {
 		}
 
 		void ApplyCfg() override;
+		LabelButton& SetLabelBorder(RGBA8 borderColor_ = RGBA8_Black, float borderWidth_ = 1.f);
 	};
 
 }

@@ -20,6 +20,12 @@ namespace xx {
 		return *this;
 	}
 
+	Label& Label::SetBorder(RGBA8 borderColor_, float borderWidth_) {
+		borderColor = borderColor_;
+		borderWidth = borderWidth_;
+		return *this;
+	}
+
 	Label& Label::SetFont(Shared<BMFont> bmf_) {
 		bmf = std::move(bmf_);
 		baseScale = fontSize / bmf->fontSize;
@@ -38,8 +44,23 @@ namespace xx {
 		if (enabled) cp = 1.f;
 		else cp = 0.5f;
 		auto s = worldScale * baseScale;
-		for (auto& f : chars) {
-			q.Draw(f.texId, f.uvRect, worldMinXY + f.offset * worldScale, 0, s, 0, cp, c);
+		if (borderWidth > 0.f) {
+			static constexpr XY offsets[] = {
+				{ -1, -1 }, { 0, -1 }, { 1, -1 },
+				{ -1, 0 }/*, { 0, 0 }*/, { 1, 0 },
+				{ -1, 1 }, { 0, 1 }, { 1, 1 },
+			};
+			for (auto& f : chars) {
+				for (auto& offset : offsets) {
+					q.Draw(f.texId, f.uvRect, worldMinXY + (f.offset + offset * borderWidth * baseScale) * worldScale, 0, s, 0, cp, borderColor);
+				}
+				q.Draw(f.texId, f.uvRect, worldMinXY + f.offset * worldScale, 0, s, 0, cp, c);
+			}
+		}
+		else {
+			for (auto& f : chars) {
+				q.Draw(f.texId, f.uvRect, worldMinXY + f.offset * worldScale, 0, s, 0, cp, c);
+			}
 		}
 	}
 

@@ -752,6 +752,8 @@ namespace xx {
 		shaderTexVert.Init();
 		shaderLine.Init();
 		shaderNumbers.Init();
+		shaderQuadOutline.Init();
+		shaderQuadEx.Init();
 		// ...
 
 		// search exists joys

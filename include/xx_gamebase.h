@@ -11,6 +11,8 @@
 #include "xx_shader_texvert.h"
 #include "xx_shader_line.h"
 #include "xx_shader_numbers.h"
+#include "xx_shader_quad_outline.h"
+#include "xx_shader_quadex.h"
 // ...
 
 namespace xx {
@@ -259,6 +261,12 @@ namespace xx {
 
         Shader_Numbers shaderNumbers;
         Shader_Numbers& Numbers() { return ShaderBegin(shaderNumbers); }
+
+        Shader_QuadOutline shaderQuadOutline;
+        Shader_QuadOutline& QuadOutline() { return ShaderBegin(shaderQuadOutline); }
+
+        Shader_QuadEx shaderQuadEx;
+        Shader_QuadEx& QuadEx() { return ShaderBegin(shaderQuadEx); }
         // ...
     };
 

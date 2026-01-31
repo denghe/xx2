@@ -18,11 +18,13 @@ namespace xx {
 		Shared<BMFont> bmf = GameBase::instance->embed.font_sys;
 		float fontSize{ 32 };
 		float baseScale{ fontSize / bmf->fontSize };
-		RGBA8 color{};
+		RGBA8 color{}, borderColor{};
+		float borderWidth{};
 
 		Label& Init(int32_t z_, XY position_, XY anchor_ = 0, float fontSize_ = 32, RGBA8 color_ = RGBA8_White);
 
 		Label& SetColor(RGBA8 color_);
+		Label& SetBorder(RGBA8 borderColor_ = RGBA8_Black, float borderWidth_ = 1.f);
 
 		Label& SetFont(Shared<BMFont> bmf_);
 
