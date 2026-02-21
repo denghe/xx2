@@ -59,7 +59,8 @@ namespace Test8 {
 			auto len = b2HullPointsInside.len;
 			auto ptr = line.Alloc(len + 1);
 			for (size_t i = 0; i < len; ++i) {
-				ptr[i] = (xx::Shader_LineData&)(scene->cam.ToGLPos(basePos + b2HullPointsInside[i]));
+				auto p = scene->cam.ToGLPos(basePos + b2HullPointsInside[i]);
+				ptr[i] = (xx::Shader_LineData&)p;
 				(xx::RGBA8&)ptr[i] = xx::RGBA8_Red;
 			}
 			ptr[len] = ptr[0];
@@ -68,7 +69,8 @@ namespace Test8 {
 			auto len = b2HullPointsOutside.len;
 			auto ptr = line.Alloc(len + 1);
 			for (size_t i = 0; i < len; ++i) {
-				ptr[i] = (xx::Shader_LineData&)(scene->cam.ToGLPos(basePos + b2HullPointsOutside[i]));
+				auto p = scene->cam.ToGLPos(basePos + b2HullPointsOutside[i]);
+				ptr[i] = (xx::Shader_LineData&)p;
 				(xx::RGBA8&)ptr[i] = xx::RGBA8_Red;
 			}
 			ptr[len] = ptr[0];
@@ -125,7 +127,8 @@ namespace Test8 {
 		vel.x += norm.x;
 		vel.y += norm.y;
 		static constexpr float cSpeed{ 100.f };
-		b2Body_SetLinearVelocity(b2body, (b2Vec2&)(vel * cSpeed * b2GetLengthUnitsPerMeter()));
+		auto v = vel * cSpeed * b2GetLengthUnitsPerMeter();
+		b2Body_SetLinearVelocity(b2body, v);
 
 		// edge check
 		return (pos.x < 0 || pos.x > 1920

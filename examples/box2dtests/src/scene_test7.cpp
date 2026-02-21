@@ -49,7 +49,8 @@ namespace Test7 {
 		auto len = b2HullPoints.size();
 		auto ptr = line.Alloc(len + 1);
 		for (size_t i = 0; i < len; ++i) {
-			ptr[i] = (xx::Shader_LineData&)(scene->cam.ToGLPos(basePos + b2HullPoints[i]));
+			auto p = scene->cam.ToGLPos(basePos + b2HullPoints[i]);
+			ptr[i] = (xx::Shader_LineData&)p;
 			(xx::RGBA8&)ptr[i] = xx::RGBA8_Red;
 		}
 		ptr[len] = ptr[0];

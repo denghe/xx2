@@ -320,26 +320,23 @@ namespace xx {
 	struct DataFuncs<T, std::enable_if_t< (IsList_v<T>)>> {
 		using U = typename T::ChildType;
 		using S = typename T::S;
-		template<bool needReserve = true>
 		static inline void Write(Data& d, T const& in) {
 			auto inLen = in.Len();
-			d.WriteVarInteger<needReserve>((size_t)inLen);
+			d.WriteVarInteger((size_t)inLen);
 			if (!inLen) return;
 			if constexpr (sizeof(U) == 1 || std::is_floating_point_v<U>) {
-				d.WriteFixedArray<needReserve>(in.Buf(), inLen);
+				d.WriteFixedArray(in.Buf(), inLen);
 			} else if constexpr (std::is_integral_v<U>) {
-				if constexpr (needReserve) {
-					auto cap = (size_t)inLen * (sizeof(U) + 2);
-					if (d.cap < cap) {
-						d.Reserve<false>(cap);
-					}
+				auto cap = (size_t)inLen * (sizeof(U) + 2);
+				if (d.cap < cap) {
+					d.Reserve(cap);
 				}
 				for (S i = 0; i < inLen; ++i) {
-					d.WriteVarInteger<false>(in[i]);
+					d.WriteVarInteger(in[i]);
 				}
 			} else {
 				for (S i = 0; i < inLen; ++i) {
-					d.Write<needReserve>(in[i]);
+					d.Write(in[i]);
 				}
 			}
 		}

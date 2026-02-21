@@ -7,7 +7,7 @@ namespace G2 {
 		static constexpr int32_t cTypeId{__LINE__};
 		void Init(Scene* scene_, XY pos_);
 		void Draw() override;
-		void Dispose();	// unsafe
+		void Dispose() override;	// unsafe
 		~Wall() override;
 	};
 

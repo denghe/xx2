@@ -900,7 +900,7 @@ void main() {
 
     void Shader_QuadOutline::Init() {
 
-        v = LoadGLVertexShader({ R"(#version 300 es
+        v = LoadGLVertexShader({ XX_SHADER_CODE_FIRST_LINE R"(
 uniform vec2 uCxy;	// screen center coordinate
 
 in vec2 aVert;	// fans index { 0, 0 }, { 0, 1.f }, { 1.f, 0 }, { 1.f, 1.f }
@@ -940,7 +940,7 @@ vOutlineColor = aOutlineColor;
 vOutlineThickness = aOutlineThickness;
 })"sv });
 
-        f = LoadGLFragmentShader({ R"(#version 300 es
+        f = LoadGLFragmentShader({ XX_SHADER_CODE_FIRST_LINE R"(
 precision highp float;          // mediump draw border has issue
 uniform sampler2D uTex0;
 
@@ -1120,7 +1120,7 @@ else oColor = c;
 
     void Shader_QuadEx::Init() {
 
-        v = LoadGLVertexShader({ R"(#version 300 es
+        v = LoadGLVertexShader({ XX_SHADER_CODE_FIRST_LINE R"(
 uniform vec2 uCxy;	// screen center coordinate
 
 in vec2 aVert;	// fans index { 0, 0 }, { 0, 1.f }, { 1.f, 0 }, { 1.f, 1.f }
@@ -1157,7 +1157,7 @@ vTexCoord = (vec2(aVert.x * aTexRect.z, aTexRect.w - aVert.y * aTexRect.w) + aTi
 vTexRect = aTexRect;
 })"sv });
 
-        f = LoadGLFragmentShader({ R"(#version 300 es
+        f = LoadGLFragmentShader({ XX_SHADER_CODE_FIRST_LINE R"(
 precision highp float;          // mediump draw border has issue
 uniform sampler2D uTex0;
 

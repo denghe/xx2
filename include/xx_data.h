@@ -496,7 +496,7 @@ namespace xx {
 
     template<typename ...TS>
     void Data::Write(TS const& ...vs) {
-        (DataFuncs<TS>::template Write(*this, vs), ...);
+        (DataFuncs<TS>::Write(*this, vs), ...);
     }
 
     /**********************************************************************************************************************/

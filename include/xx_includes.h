@@ -20,13 +20,13 @@
 #include <unordered_map>
 #include <set>
 #include <map>
+#include <list>
+#include <bit>
+#include <algorithm>
+#include <charconv>
 //#include <sstream>
-//#include <bit>
 //#include <concepts>
-//#include <charconv>
-//#include <list>
 //#include <stdexcept>
-//#include <algorithm>
 //#include <iostream>
 //#include <thread>
 //#include <mutex>
@@ -95,6 +95,7 @@ constexpr size_t _countof(T const (&arr)[N]) {
 
 
 #ifndef _WIN32
+#include <unistd.h>
 inline void Sleep(int const& ms) {
     usleep(ms * 1000);
 }
@@ -456,9 +457,42 @@ namespace xx {
         }
     };
 
+    /***********************************************************************************/
+    // find max size in multi types
+
+    template<typename T, typename... Args>
+    struct MaxSizeof {
+        static const size_t value = sizeof(T) > MaxSizeof<Args...>::value
+            ? sizeof(T)
+            : MaxSizeof<Args...>::value;
+    };
+    template<typename T>
+    struct MaxSizeof<T> {
+        static const size_t value = sizeof(T);
+    };
+
+    template<typename T, typename... Args>
+    constexpr size_t MaxSizeof_v = MaxSizeof<T, Args...>::value;
+
+
+    template<typename T, typename... Args>
+    struct MaxAlignof {
+        static const size_t value = alignof(T) > MaxAlignof<Args...>::value
+            ? alignof(T)
+            : MaxAlignof<Args...>::value;
+    };
+    template<typename T>
+    struct MaxAlignof<T> {
+        static const size_t value = alignof(T);
+    };
+
+    template<typename T, typename... Args>
+    constexpr size_t MaxAlignof_v = MaxAlignof<T, Args...>::value;
+
 
     /***********************************************************************************/
     // replace std::aligned_storage & std::aligned_union
+
 
     template <typename T>
     class MyAlignedStorage {
