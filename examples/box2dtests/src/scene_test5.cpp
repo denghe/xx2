@@ -157,7 +157,9 @@ namespace Test5 {
 
 #if 1
 		// gen
-		if (gg.keyboard[GLFW_KEY_SPACE](0.2f)) {
+		if (gg.keyboard[GLFW_KEY_SPACE](0.2f)
+			|| gg.mouse[GLFW_MOUSE_BUTTON_1](0.2f)
+			) {
 			genSpeed *= 2.f;
 			if (genSpeed >= 200.f) genSpeed = 200.f;
 		}

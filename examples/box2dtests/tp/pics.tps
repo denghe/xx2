@@ -854,6 +854,24 @@
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
+            <key type="filename">pics/cell_bucket.png</key>
+            <key type="filename">pics/cell_door.png</key>
+            <key type="filename">pics/cell_player.png</key>
+            <key type="filename">pics/cell_wall.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0.5,0.5</point_f>
+                <key>spriteScale</key>
+                <double>1</double>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>32,32,64,64</rect>
+                <key>scale9Paddings</key>
+                <rect>32,32,64,64</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
             <key type="filename">pics/circle256.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>

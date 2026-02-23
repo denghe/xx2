@@ -46,6 +46,10 @@ struct pics {
 	xx::Frame ball4324;
 	xx::Frame bg_fish;
 	xx::Frame block444;
+	xx::Frame cell_bucket;
+	xx::Frame cell_door;
+	xx::Frame cell_player;
+	xx::Frame cell_wall;
 	xx::Frame circle256;
 	xx::Frame wood1;
 	xx::Frame wood2;
