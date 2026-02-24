@@ -341,7 +341,7 @@ namespace Test11 {
 
 		mapSize = cRoom1x1PixelSize;
 		cam.Init(gg.scale, gg.designSize.y / mapSize.y, mapSize / 2);
-		sortContainer.Resize<true>((int32_t)mapSize.y);
+		sortContainer.Resize<true>((int32_t)cRoomMaxPixelSize.y);
 		gridBuildings.Init(cCellPixelSize, std::ceilf(mapSize.y / cCellPixelSize), std::ceilf(mapSize.x / cCellPixelSize));
 		//gridItems.Init(cCellPixelSize, std::ceilf(mapSize.y / cCellPixelSize), std::ceilf(mapSize.x / cCellPixelSize));
 		phys.Emplace()->Init(this);
@@ -372,10 +372,18 @@ namespace Test11 {
 		GenWallVertical(14, 5, 7, false, true);
 
 		GenPlayer(7, 4);
-		GenBucket(6, 4);
-		GenBucket(8, 4);
-		GenBucket(7, 3);
-		GenBucket(7, 5);
+
+		for (int x = 1; x <= 13; ++x) {
+			for (int y = 1; y <= 7; ++y) {
+				if (x == 7 && y == 4) continue;
+				GenBucket(x, y);
+			}
+		}
+
+		//GenBucket(6, 4);
+		//GenBucket(8, 4);
+		//GenBucket(7, 3);
+		//GenBucket(7, 5);
 	}
 
 	void Scene::Update() {
@@ -408,6 +416,24 @@ namespace Test11 {
 		}
 
 		phys->Update();
+
+
+		if (gg.mouse[GLFW_MOUSE_BUTTON_1] || gg.mouse[GLFW_MOUSE_BUTTON_2] || gg.mouse[GLFW_MOUSE_BUTTON_3]) {
+			auto p = cam.ToLogicPos(gg.mousePos);
+			if (p.x > cCellPixelSize && p.x < mapSize.x - cCellPixelSize
+				&& p.y > cCellPixelSize && p.y < mapSize.y - cCellPixelSize) {
+				size_t count = 1;
+				if (gg.mouse[GLFW_MOUSE_BUTTON_3]) {
+					count = 100;
+				} else if (gg.mouse[GLFW_MOUSE_BUTTON_2]) {
+					count = 10;
+				}
+				for (size_t i = 0; i < count; i++) {
+					auto pos = p + xx::GetRndPosDoughnut(gg.rnd, cItemMaxRadius);
+					buckets.Emplace().Emplace()->Init(this, p);
+				}
+			}
+		}
 	}
 
 	void Scene::Draw() {
@@ -424,7 +450,7 @@ namespace Test11 {
 		for (auto& o : buckets) SortContainerAdd(o.pointer);
 		SortContainerDraw();
 
-		//gg.uiText->SetText(xx::ToString("num items = ", droppingItems.len));
+		gg.uiText->SetText(xx::ToString("num items = ", buckets.len));
 		gg.DrawNode(ui);
 	}
 

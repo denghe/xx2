@@ -9,8 +9,9 @@ namespace Test11 {
 	static constexpr float cCellPixelSize{ 128 };
 	static constexpr float cCellPixelHalfSize{ cCellPixelSize / 2.f };
 	static constexpr float cWallRadius{ cCellPixelSize / 2.f };
-	static constexpr float cBucketRadius{ cWallRadius * 0.7f };
-	static constexpr float cPlayerRadius{ cWallRadius * 0.7f };
+	static constexpr float cBucketRadius{ cWallRadius * 0.5f };
+	static constexpr float cPlayerRadius{ cWallRadius * 0.5f };
+	static constexpr float cItemMaxRadius{ cBucketRadius };
 
 	static constexpr XY cRoomMaxContentSize{ 26, 14 };	// logic
 	static constexpr XY cRoomMaxTotalSize{ cRoomMaxContentSize + 2 };
@@ -41,7 +42,7 @@ namespace Test11 {
 		virtual ~SceneItem() {};
 	};
 
-	// todo: Player, Wall, Door, Rock, Bucket, Bomb....
+	// todo: Bomb....
 
 	struct Wall : SceneItem {
 		static constexpr int32_t cTypeId{ __LINE__ };
@@ -61,7 +62,7 @@ namespace Test11 {
 
 	struct Player : SceneItem {
 		static constexpr int32_t cTypeId{ __LINE__ };
-		static constexpr XY cSpeedMax{ 1500.f };
+		static constexpr XY cSpeedMax{ 2000.f };
 		static constexpr XY cAccel{ cSpeedMax * 0.1f };
 		XY lastMoveDir{}, speed{};
 		void Init(Scene* scene_, XY pos_);
@@ -124,10 +125,15 @@ namespace Test11 {
 	/***************************************************************************************************/
 
 	struct PhysSystem {
-		static constexpr float cVelocityDamping{ 500.f };
+		static constexpr float eps{ 0.0001f };
+		static constexpr float cVelocityDamping{ 300.f };
 		//static constexpr float cGravity{ 100.f };
 		static constexpr float cResponseCoef{ 0.5f };
-		static constexpr float cMaxSpeed{ 0.05f };
+		static constexpr float cMaxSpeed{ 500.f / gg.cFps };
+
+		static constexpr float cCellPixelSize{ cItemMaxRadius * 2.f };
+		static constexpr float _1_cellSize{ 1.f / cCellPixelSize };
+		static constexpr float cMargin{ cCellPixelSize };
 
 		struct Node {
 			int32_t next;
@@ -153,7 +159,6 @@ namespace Test11 {
 		int32_t freeHead{ -1 }, freeCount{}, count{}, capacity{};	// for nodes
 		int32_t datasLen{};											// for datas
 
-		float _1_cellSize{};
 		XY pixelSize{};
 
 		std::unique_ptr<Node[]> nodes;
@@ -168,10 +173,11 @@ namespace Test11 {
 		void Init(Scene* scene_, int32_t capacity_ = 0) {
 			assert(!nodes && !buckets && capacity_ >= 0);
 			scene = scene_;
-			numRows = scene->gridBuildings.numRows;
-			numCols = scene->gridBuildings.numCols;
-			_1_cellSize = scene->gridBuildings._1_cellSize;
 			pixelSize = scene->gridBuildings.pixelSize;
+
+			numRows = std::ceilf(pixelSize.y / cCellPixelSize);
+			numCols = std::ceilf(pixelSize.x / cCellPixelSize);
+
 			bucketsLen = numRows * numCols;
 			capacity = capacity_;
 			freeHead = -1;
@@ -263,7 +269,6 @@ namespace Test11 {
 		}
 
 		XX_INLINE void FillBuckets() {
-			
 			for (int32_t di = 0; di < datasLen; ++di) {
 				auto p = (datas[di].pos * _1_cellSize).As<int32_t>();
 				assert(p.x >= 0 && p.x < numCols && p.y >= 0 && p.y < numRows);
@@ -299,19 +304,26 @@ namespace Test11 {
 		}
 
 		XX_INLINE void Calc(Data& d1_, Data& d2_) {
-			static constexpr float eps{ 0.0001f };
 			auto d = d1_.pos - d2_.pos;
 			auto mag2 = d.x * d.x + d.y * d.y;
 			auto r = d1_.radius + d2_.radius;
 			auto rr = r * r;
-			if (mag2 >= rr || mag2 <= eps) return;
-			auto mag = std::sqrtf(mag2);
-			auto a = cResponseCoef * (r - mag);
-			auto spd = d / mag * a;
-			if (spd.x > cMaxSpeed) spd.x = cMaxSpeed;
-			else if (spd.x < -cMaxSpeed) spd.x = -cMaxSpeed;
-			if (spd.y > cMaxSpeed) spd.y = cMaxSpeed;
-			else if (spd.y < -cMaxSpeed) spd.y = -cMaxSpeed;
+			if (mag2 >= rr) return;
+			XY spd;
+			if (mag2 <= eps) {
+				auto radians = gg.rnd.Next<float>(-M_PI, M_PI);
+				XY cossin{ std::cosf(radians), std::sinf(radians) };
+				spd = cossin * cMaxSpeed;
+			}
+			else {
+				auto mag = std::sqrtf(mag2);
+				auto a = cResponseCoef * (r - mag);
+				spd = d / mag * a;
+				if (spd.x > cMaxSpeed) spd.x = cMaxSpeed;
+				else if (spd.x < -cMaxSpeed) spd.x = -cMaxSpeed;
+				if (spd.y > cMaxSpeed) spd.y = cMaxSpeed;
+				else if (spd.y < -cMaxSpeed) spd.y = -cMaxSpeed;
+			}
 			d1_.pos += spd;
 			d2_.pos -= spd;
 		}
@@ -319,11 +331,44 @@ namespace Test11 {
 		XX_INLINE void UpdateDatas() {
 			for (int32_t i = 0; i < datasLen; ++i) {
 				auto& o = datas[i];
+				auto ud = nodes[o.indexAtNodes].ud;
 				//o.acc += XY{ 0, cGravity };
 
+#if 0
+				// edge protection
+				if (o.pos.x >= pixelSize.x - cMargin) {
+					o.pos.x = pixelSize.x - cMargin;
+				}
+				else if (o.pos.x < cMargin) {
+					o.pos.x = cMargin;
+				}
+				if (o.pos.y >= pixelSize.y - cMargin) {
+					o.pos.y = pixelSize.y - cMargin;
+				}
+				else if (o.pos.y < cMargin) {
+					o.pos.y = cMargin;
+				}
+#endif
+
 				auto spd = o.pos - o.lpos;
+				auto vd = cVelocityDamping;
+				if (ud->typeId == Player::cTypeId) {
+					vd = cVelocityDamping * 3.f;
+				}
+
+				spd = spd + (o.acc - spd * vd) * (gg.cDelta * gg.cDelta);
+				// max speed limit
+				//if (spd.x * spd.x + spd.y * spd.y > cMaxSpeed * cMaxSpeed) {
+				//	auto mag = std::sqrtf(spd.x * spd.x + spd.y * spd.y);
+				//	spd = spd / mag * cMaxSpeed;
+				//}
+				if (spd.x > cMaxSpeed) spd.x = cMaxSpeed;
+				else if (spd.x < -cMaxSpeed) spd.x = -cMaxSpeed;
+				if (spd.y > cMaxSpeed) spd.y = cMaxSpeed;
+				else if (spd.y < -cMaxSpeed) spd.y = -cMaxSpeed;
+
 				o.lpos = o.pos;
-				o.pos = o.pos + spd + (o.acc - spd * cVelocityDamping) * (gg.cDelta * gg.cDelta);
+				o.pos = o.pos + spd;
 				o.acc = {};
 
 				// wall collision response
@@ -345,9 +390,9 @@ namespace Test11 {
 				});
 
 				// write back
-				auto& udPos = nodes[o.indexAtNodes].ud->pos;
-				if (udPos != o.pos) {
-					udPos = o.pos;
+				if (ud->pos != o.pos) {
+					ud->pos = o.pos;
+					ud->y = o.pos.y;
 				}
 			}
 		}
