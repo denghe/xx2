@@ -87,7 +87,8 @@ namespace Test11 {
 		radians = {};
 		indexAtContainer = scene->players.len - 1;
 		assert(scene->players[indexAtContainer].pointer == this);
-		scene->gridItems.Add(indexAtGrid, this);
+		//scene->gridItems.Add(indexAtGrid, this);
+		indexAtGrid = scene->phys->Add(this);
 	}
 
 	bool Player::Update() {
@@ -175,43 +176,36 @@ namespace Test11 {
 			speed.y = 0;
 		}
 
-		// new pos calc
-		auto newPos = pos;
-		if (speed.x != 0 || speed.y != 0) {
-			if (speed.x != 0 && speed.y != 0) {
-				newPos += speed * 0.7071f;
-			}
-			else {
-				newPos += speed;
-			}
+		//// new pos calc
+		//auto newPos = pos;
+		//if (speed.x != 0 || speed.y != 0) {
+		//	if (speed.x != 0 && speed.y != 0) {
+		//		newPos += speed * 0.7071f;
+		//	}
+		//	else {
+		//		newPos += speed;
+		//	}
 
-			// todo: edge check, collision check
+		//	// todo: some check?
+		//}
 
-			using G = decltype(scene->gridBuildings);
-			auto& g = scene->gridBuildings;
-			auto cri = g.PosToCRIndex(newPos);
-			g.ForeachBy9(cri.y, cri.x, [&](G::Node& node, float range)->void {
-				auto d = newPos - node.cache.pos;
-				auto mag2 = d.x * d.x + d.y * d.y;
-				auto r = node.cache.radius + radius;
-				auto rr = r * r;
-				if (mag2 < rr) {	// cross?
-					if (mag2 > 0) {
-						auto mag = std::sqrtf(mag2);
-						auto norm = d / mag;
-						newPos = node.cache.pos + norm * r;	// force move away
-					}
-				}
-				});
+		//// move
+		//if (pos != newPos) {
+		//	pos = newPos;
+		//	y = pos.y;
+		//	scene->gridItems.Update(indexAtGrid, this);
+		//}
 
+		XY acc;
+		if (speed.x != 0 && speed.y != 0) {
+			acc = speed * 0.7071f;
+		}
+		else {
+			acc = speed;
 		}
 
-		// move
-		if (pos != newPos) {
-			pos = newPos;
-			y = pos.y;
-			scene->gridItems.Update(indexAtGrid, this);
-		}
+
+		scene->phys->At(indexAtGrid).acc += acc;
 
 		return false;
 	}
@@ -231,7 +225,8 @@ namespace Test11 {
 
 	Player::~Player() {
 		if (indexAtGrid > -1) {
-			scene->gridItems.Remove(indexAtGrid, this);
+			//scene->gridItems.Remove(indexAtGrid, this);
+			scene->phys->Remove(indexAtGrid);
 			indexAtGrid = -1;
 		}
 	}
@@ -249,11 +244,12 @@ namespace Test11 {
 		radians = {};
 		indexAtContainer = scene->buckets.len - 1;
 		assert(scene->buckets[indexAtContainer].pointer == this);
-		scene->gridItems.Add(indexAtGrid, this);
+		//scene->gridItems.Add(indexAtGrid, this);
+		indexAtGrid = scene->phys->Add(this);
 	}
 
 	bool Bucket::Update() {
-		// todo: handle inputs
+		// todo: logic
 		return false;
 	}
 
@@ -272,7 +268,8 @@ namespace Test11 {
 
 	Bucket::~Bucket() {
 		if (indexAtGrid > -1) {
-			scene->gridItems.Remove(indexAtGrid, this);
+			//scene->gridItems.Remove(indexAtGrid, this);
+			scene->phys->Remove(indexAtGrid);
 			indexAtGrid = -1;
 		}
 	}
@@ -334,6 +331,11 @@ namespace Test11 {
 		players.Emplace().Emplace()->Init(this, p);
 	}
 
+	void Scene::GenBucket(int32_t x_, int32_t y_) {
+		auto p = XY{ x_, y_ } * cCellPixelSize + cCellPixelHalfSize;
+		buckets.Emplace().Emplace()->Init(this, p);
+	}
+
 	void Scene::Init() {
 		ui.Emplace()->InitRoot(gg.scale * cUIScale);
 
@@ -341,7 +343,8 @@ namespace Test11 {
 		cam.Init(gg.scale, gg.designSize.y / mapSize.y, mapSize / 2);
 		sortContainer.Resize<true>((int32_t)mapSize.y);
 		gridBuildings.Init(cCellPixelSize, std::ceilf(mapSize.y / cCellPixelSize), std::ceilf(mapSize.x / cCellPixelSize));
-		gridItems.Init(cCellPixelSize, std::ceilf(mapSize.y / cCellPixelSize), std::ceilf(mapSize.x / cCellPixelSize));
+		//gridItems.Init(cCellPixelSize, std::ceilf(mapSize.y / cCellPixelSize), std::ceilf(mapSize.x / cCellPixelSize));
+		phys.Emplace()->Init(this);
 
 		// [][][][][][][]  [][][][][][][]
 		// []                          []
@@ -369,6 +372,10 @@ namespace Test11 {
 		GenWallVertical(14, 5, 7, false, true);
 
 		GenPlayer(7, 4);
+		GenBucket(6, 4);
+		GenBucket(8, 4);
+		GenBucket(7, 3);
+		GenBucket(7, 5);
 	}
 
 	void Scene::Update() {
@@ -394,6 +401,13 @@ namespace Test11 {
 				players[i]->Dispose();
 			}
 		}
+		for (auto i = buckets.len - 1; i >= 0; --i) {
+			if (buckets[i]->Update()) {
+				buckets[i]->Dispose();
+			}
+		}
+
+		phys->Update();
 	}
 
 	void Scene::Draw() {
@@ -407,6 +421,7 @@ namespace Test11 {
 
 		// sort order by y
 		for (auto& o : players) SortContainerAdd(o.pointer);
+		for (auto& o : buckets) SortContainerAdd(o.pointer);
 		SortContainerDraw();
 
 		//gg.uiText->SetText(xx::ToString("num items = ", droppingItems.len));
