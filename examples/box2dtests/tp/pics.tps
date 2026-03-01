@@ -856,6 +856,7 @@
             </struct>
             <key type="filename">pics/cell_bucket.png</key>
             <key type="filename">pics/cell_door.png</key>
+            <key type="filename">pics/cell_floor.png</key>
             <key type="filename">pics/cell_player.png</key>
             <key type="filename">pics/cell_wall.png</key>
             <struct type="IndividualSpriteSettings">

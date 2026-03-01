@@ -51,8 +51,9 @@ xx::Shared<xx::GLTexture> pics::Load(std::string picFN_, bool generateMipmap_) {
 	this->block444 = { t, 4074, 436, 12, 12, { 0.5, 0.5 } };
 	this->cell_bucket = { t, 3896, 805, 128, 128, { 0.5, 0.5 } };
 	this->cell_door = { t, 3896, 943, 128, 128, { 0.5, 0.5 } };
-	this->cell_player = { t, 3896, 1081, 128, 128, { 0.5, 0.5 } };
-	this->cell_wall = { t, 1535, 1600, 128, 128, { 0.5, 0.5 } };
+	this->cell_floor = { t, 3896, 1081, 128, 128, { 0.5, 0.5 } };
+	this->cell_player = { t, 1535, 1600, 128, 128, { 0.5, 0.5 } };
+	this->cell_wall = { t, 892, 1664, 128, 128, { 0.5, 0.5 } };
 	this->circle256 = { t, 3816, 1219, 256, 256, { 0.5, 0.5 } };
 	this->wood1 = { t, 570, 1167, 34, 39, { 0.5, 0.4 } };
 	this->wood2 = { t, 4074, 413, 13, 13, { 0.5, 0.5 } };

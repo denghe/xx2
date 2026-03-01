@@ -48,6 +48,7 @@ struct pics {
 	xx::Frame block444;
 	xx::Frame cell_bucket;
 	xx::Frame cell_door;
+	xx::Frame cell_floor;
 	xx::Frame cell_player;
 	xx::Frame cell_wall;
 	xx::Frame circle256;

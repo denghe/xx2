@@ -438,7 +438,14 @@ namespace Test11 {
 
 	void Scene::Draw() {
 		// bg color
-		gg.Quad().DrawTinyFrame(gg.embed.shape_dot, 0, 0.5f, gg.windowSize, 0, 1, { 0x81,0xbd,0x57,255 });
+		//gg.Quad().DrawTinyFrame(gg.embed.shape_dot, 0, 0.5f, gg.windowSize, 0, 1, { 0x81,0xbd,0x57,255 });
+
+		for (int i = 0; i < gridBuildings.numRows; ++i) {
+			for (int j = 0; j < gridBuildings.numCols; ++j) {
+				XY p{ j * cCellPixelSize, i * cCellPixelSize };
+				gg.Quad().DrawTinyFrame(gg.pics.cell_floor, cam.ToGLPos(p), {0,1}, cam.scale, 0);
+			}
+		}
 
 		// todo: floor
 		// walls & doors
