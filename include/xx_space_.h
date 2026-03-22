@@ -9,7 +9,7 @@ namespace xx {
 	};
 
 	struct SpaceGridRingDiffuseData {
-		int32_t cellSize;
+		int32_t cellSize{};
 		List<SpaceGridCountRadius> lens;
 		List<XYi> idxs;
 

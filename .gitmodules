@@ -28,3 +28,12 @@
 [submodule "enkiTS"]
 	path = enkiTS
 	url = https://github.com/dougbinks/enkiTS.git
+[submodule "ogg"]
+	path = ogg
+	url = https://github.com/xiph/ogg.git
+[submodule "opus"]
+	path = opus
+	url = https://github.com/xiph/opus.git
+[submodule "opusfile"]
+	path = opusfile
+	url = https://github.com/xiph/opusfile.git

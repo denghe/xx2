@@ -12,8 +12,8 @@ namespace xx::embeds::fnt {
 	// ...
 }
 
-namespace xx::embeds::wav {
-	extern uint8_t ui_focus[374];
+namespace xx::embeds::opus {
+	extern uint8_t ui_focus[255];
 }
 
 // ...

@@ -37,7 +37,7 @@ namespace xx {
         Weak<Node> scissor;											// fill by scroll view MakeContent
 
         SimpleAffineTransform& trans() { return (SimpleAffineTransform&)worldScale; }
-        XY worldScale, worldMinXY;
+        XY worldScale{}, worldMinXY{};
         SimpleAffineTransform const& trans() const { return (SimpleAffineTransform&)worldScale; }
 
         XY position{}, anchor{ 0.5, 0.5 }, scale{ 1, 1 }, size{};

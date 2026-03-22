@@ -14,7 +14,7 @@ SET(ZSTD_MULTITHREAD_SUPPORT_DEFAULT OFF CACHE BOOL "ZSTD_MULTITHREAD_SUPPORT_DE
 SET(ZSTD_MULTITHREAD_SUPPORT OFF CACHE BOOL "ZSTD_MULTITHREAD_SUPPORT" FORCE)
 add_subdirectory(zstd/build/cmake zstd)
 
-SET(BOX2D_AVX2 ON CACHE BOOL "BOX2D_AVX2" FORCE)
+#SET(BOX2D_AVX2 ON CACHE BOOL "BOX2D_AVX2" FORCE)
 add_subdirectory(box2d box2d)
 
 SET(ENKITS_BUILD_C_INTERFACE OFF CACHE BOOL "ENKITS_BUILD_C_INTERFACE" FORCE)
@@ -26,6 +26,16 @@ add_subdirectory(lmdb lmdb)
 add_subdirectory(spine-runtimes-cpp-38 spine)
 
 add_subdirectory(soloud soloud)
+
+add_subdirectory(ogg ogg)
+
+SET(OPUS_STATIC_RUNTIME ON CACHE BOOL "OPUS_STATIC_RUNTIME" FORCE)
+add_subdirectory(opus opus)
+
+SET(OP_DISABLE_DOCS ON CACHE BOOL "OP_DISABLE_DOCS" FORCE)
+SET(OP_DISABLE_EXAMPLES ON CACHE BOOL "OP_DISABLE_EXAMPLES" FORCE)
+SET(OP_DISABLE_HTTP ON CACHE BOOL "OP_DISABLE_HTTP" FORCE)
+add_subdirectory(opusfile opusfile)
 
 file(GLOB xx_sources
 	include/*.h
@@ -60,6 +70,10 @@ target_link_libraries(xx spine)
 target_link_libraries(xx box2d)
 target_link_libraries(xx enkiTS)
 target_link_libraries(xx soloud)
+target_link_libraries(xx ogg)
+target_link_libraries(xx opus)
+target_link_libraries(xx opusfile)
+
 if (APPLE)
 	find_library(AUDIOTOOLBOX_FRAMEWORK AudioToolbox)
 	target_link_libraries(xx ${AUDIOTOOLBOX_FRAMEWORK})
@@ -107,7 +121,7 @@ if(MSVC)
 		$<$<PLATFORM_ID:Windows>:/MP${Biogears_BUILD_PARALLEL_LEVEL}>
 	)
 	
-	target_compile_options(xx PRIVATE $<$<PLATFORM_ID:Windows>:/arch:AVX2>)
+	#target_compile_options(xx PRIVATE $<$<PLATFORM_ID:Windows>:/arch:AVX2>)
 	
 else()
 	

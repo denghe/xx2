@@ -1,4 +1,6 @@
 ﻿#include "xx_file.h"
+#include "xx_zstd.h"
+#include "xx_opus.h"
 #include "xx_embeds.h"
 #include "xx_gamebase.h"
 #include "xx_spine.h"
@@ -305,7 +307,9 @@ namespace xx {
 	Shared<SoLoud::Wav> GameBase::LoadSoundSourceFromData(uint8_t* buf, size_t len, bool looping) {
 		assert(!IsZstdCompressedData(buf, len));
 		auto rtv = MakeShared<SoLoud::Wav>();
-		auto r = rtv->loadMem(buf, len, false, false);
+		auto numChannels = LoadOpusMemory(tmpFloats, buf, len);
+		assert(numChannels > 0);
+		auto r = rtv->loadRawWaveInterleaved(tmpFloats.buf, tmpFloats.len, numChannels);
 		assert(!r);
 		if (looping) {
 			rtv->setLooping(true);
@@ -743,7 +747,7 @@ namespace xx {
 		// ...
 
 		// init sound sources
-		embed.ss_ui_focus = LoadSoundSourceFromData(embeds::wav::ui_focus);
+		embed.ss_ui_focus = LoadSoundSourceFromData(embeds::opus::ui_focus);
 
 		// init shaders
 		shaderQuad.Init();

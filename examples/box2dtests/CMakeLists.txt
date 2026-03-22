@@ -80,7 +80,7 @@ if(MSVC)
 	set_source_files_properties(src/pch.cpp PROPERTIES COMPILE_FLAGS "/Ycpch.h")
 	target_compile_options(${name} PRIVATE $<$<PLATFORM_ID:Windows>:/Yupch.h>)
 	
-	target_compile_options(${name} PRIVATE $<$<PLATFORM_ID:Windows>:/arch:AVX2>)
+	#target_compile_options(${name} PRIVATE $<$<PLATFORM_ID:Windows>:/arch:AVX2>)
 else()
 
 	target_precompile_headers(${name}

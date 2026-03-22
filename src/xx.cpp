@@ -7,6 +7,8 @@
 #include "xx_embeds.cpp"
 
 #include "xx_file.cpp"
+#include "xx_zstd.cpp"
+#include "xx_opus.cpp"
 #include "xx_frame.cpp"
 #include "xx_stbimage.cpp"
 #include "xx_framebuffer.cpp"

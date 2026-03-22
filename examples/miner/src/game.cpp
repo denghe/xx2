@@ -34,14 +34,14 @@ void Game::GLInit() {
 	shaderGrass.Init();
 
 	// begin load res
-	// load wav ogg
-	ss.pickaxe = LoadSoundSource("res/pickaxe.wav");
-	ss.rockbreak = LoadSoundSource("res/rockbreak.ogg");
-	ss.pop = LoadSoundSource("res/pop.wav");
-	ss.miner1_atk = LoadSoundSource("res/miner1_atk.ogg");
-	ss.miner2_atk = LoadSoundSource("res/miner2_atk.ogg");
-	ss.miner3_atk = LoadSoundSource("res/miner3_atk.ogg");
-	ss.miner4_atk = LoadSoundSource("res/miner4_atk.ogg");
+	// load opus
+	ss.pickaxe = LoadSoundSource("res/pickaxe.opus");
+	ss.rockbreak = LoadSoundSource("res/rockbreak.opus");
+	ss.pop = LoadSoundSource("res/pop.opus");
+	ss.miner1_atk = LoadSoundSource("res/miner1_atk.opus");
+	ss.miner2_atk = LoadSoundSource("res/miner2_atk.opus");
+	ss.miner3_atk = LoadSoundSource("res/miner3_atk.opus");
+	ss.miner4_atk = LoadSoundSource("res/miner4_atk.opus");
 
 	// load texture packer
 	all.Load("res/");

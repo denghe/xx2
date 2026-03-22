@@ -50,8 +50,8 @@ void Game::Update() {
 xx::Task<> Game::Task() {
 	// begin load res
 
-	// ogg
-	ss.explosion = LoadSoundSource("res/explosion.ogg");
+	// opus
+	ss.explosion = LoadSoundSource("res/explosion.opus");
 
 	// png
 	res.damage_numbers = LoadTexture("res/damage_numbers.png");	// do not pack

@@ -106,6 +106,7 @@ namespace xx {
         std::string rootPath;
         std::vector<std::string> searchPaths;
         std::filesystem::path tmpPath;
+		List<float> tmpFloats;		                        // for load ogg opus data
 
         List<std::function<int32_t()>> delayUpdates;		// call after update
 

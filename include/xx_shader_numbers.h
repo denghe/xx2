@@ -8,7 +8,7 @@ namespace xx {
 
         XY pos{}, scale{ 1, 1 };                // float * 4
         xx::RGBA8 color{ 255, 255, 255, 255 };  // u8 * 4
-        uint32_t numbers[4];                    // u32 * 4      // last one byte is len
+        uint32_t numbers[4]{};                  // u32 * 4      // last one byte is len
 
         int32_t Len() const {
             auto tar = (uint8_t*)&numbers;
