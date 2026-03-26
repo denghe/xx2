@@ -95,6 +95,9 @@ namespace xx {
 
         bool mute{};										// global sound settings
 
+        bool isResizing{};
+        bool isAMDCard{};                                   // for ATI graphics card bug fix
+
         Weak<Node> uiHandler;
         Grid2dAABB uiGrid;
         List<Weak<Node>> uiAutoUpdates;
@@ -194,7 +197,7 @@ namespace xx {
 
         Shared<GLTexture> LoadTexture(std::string_view fn_, bool pngAutoPremultiplyAlpla_ = true);
 
-
+		void FixAMDGraphicsCardBugs();
         void ResizeCalc();  // for window resize event
         void SetWindowSize(XY siz); // for framebuffer only
         void GLViewport();

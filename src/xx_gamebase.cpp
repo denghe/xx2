@@ -29,6 +29,17 @@ namespace xx {
         }
     }
 
+	// viewport maybe ignore title bar height when resizing window ( AMD card only )
+	void GameBase::FixAMDGraphicsCardBugs() {
+		if (isResizing && isAMDCard) {
+			int x, y, w, h;
+			glfwGetWindowPos(wnd, &x, &y);
+			glfwGetWindowSize(wnd, &w, &h);
+			glfwSetWindowMonitor(wnd, NULL, x, y, w, h + 1, GLFW_DONT_CARE);
+			glfwSetWindowMonitor(wnd, NULL, x, y, w, h, GLFW_DONT_CARE);
+		}
+	}
+
     // for window resize event
     void GameBase::ResizeCalc() {
         worldMinXY = -windowSize * 0.5f;
@@ -600,6 +611,11 @@ namespace xx {
 		glfwSwapInterval(0);	// no v-sync by default
 		gladLoadGL(glfwGetProcAddress);
 
+
+		// for some ATI card bug fix
+		std::string_view sv((char*)glGetString(GL_VENDOR));
+		isAMDCard = sv.starts_with("ATI") || sv.starts_with("AMD");
+
 		// register event callbacks
 
 		// window focus
@@ -623,6 +639,11 @@ namespace xx {
 				g->GLViewport();
 			}
 			g->OnResize(false);
+		});
+
+		glfwSetWindowSizeCallback(wnd, [](GLFWwindow* wnd, int w, int h) {
+			auto g = (GameBase*)glfwGetWindowUserPointer(wnd);
+			g->isResizing = true;
 		});
 
 		// mouse move
@@ -689,6 +710,7 @@ namespace xx {
 			printf("glGetError() == %d\n", (int)e);
 		};
 
+		GLViewport();
 		glDisable(GL_CULL_FACE);
 		glDisable(GL_DEPTH_TEST);
 		glEnable(GL_BLEND);
@@ -781,9 +803,10 @@ namespace xx {
 		glfwSetWindowRefreshCallback(wnd, [](GLFWwindow* wnd) {
 			auto g = (GameBase*)glfwGetWindowUserPointer(wnd);
 			g->Loop(true);
-			});
+		});
 
 		while (running && !glfwWindowShouldClose(wnd)) {
+			isResizing = false;
 			glfwPollEvents();
 			Loop(false);
 		}
@@ -792,6 +815,7 @@ namespace xx {
 	}
 
 	void GameBase::Loop(bool fromEvent) {
+		FixAMDGraphicsCardBugs();
 		GLClear(clearColor);
 		GLBlendFunc();
 
