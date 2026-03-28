@@ -269,6 +269,14 @@ namespace xx {
         }
 
         template<typename Func>
+        SizeType FindEx(Func&& cond) const {
+            for (SizeType i = 0; i < len; ++i) {
+                if (cond(buf[i])) return i;
+            }
+            return SizeType(-1);
+        }
+
+        template<typename Func>
         bool Exists(Func&& cond) const {
             for (SizeType i = 0; i < len; ++i) {
                 if (cond(buf[i])) return true;

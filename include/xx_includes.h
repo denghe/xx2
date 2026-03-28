@@ -137,6 +137,8 @@ inline void Sleep(int const& ms) {
 #define XX_YIELD_I_TO_BEGIN(lineNumber)  lineNumber = 0; return 0;
 #define XX_YIELD_Z_TO_BEGIN(lineNumber)  lineNumber = 0; return 0;
 #define XX_END(lineNumber)               }
+#define XX_END_F(lineNumber)             } return false;
+#define XX_END_Z(lineNumber)             } return 0;
 
 
 
