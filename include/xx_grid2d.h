@@ -198,6 +198,10 @@ namespace xx {
 			return (Node&)nodes[nodeIndex_];
 		}
 
+		XX_INLINE T& ValueAt(int32_t nodeIndex_) const {
+			return NodeAt(nodeIndex_).value;
+		}
+
 		XX_INLINE int32_t Count() const {
 			return count - freeCount;
 		}
