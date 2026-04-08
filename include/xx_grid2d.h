@@ -264,6 +264,22 @@ namespace xx {
 			/* 9 */ForeachCore(rowNumber_ - 1, columnNumber_ + 1, 0, func);
 		}
 
+		// foreach target + neighbors: 9 cells( range always == 0 )
+		// Func return value must be bool. return true mean break
+		template <typename F, typename R = std::invoke_result_t<F, Node&, float>>
+		bool ForeachBy9Break(int32_t rowNumber_, int32_t columnNumber_, F&& func) {
+			/* 4 */if (ForeachCore(rowNumber_, columnNumber_ - 1, 0, func)) return true;
+			/* 5 */if (ForeachCore(rowNumber_, columnNumber_, 0, func)) return true;
+			/* 6 */if (ForeachCore(rowNumber_, columnNumber_ + 1, 0, func)) return true;
+			/* 1 */if (ForeachCore(rowNumber_ + 1, columnNumber_ - 1, 0, func)) return true;
+			/* 2 */if (ForeachCore(rowNumber_ + 1, columnNumber_, 0, func)) return true;
+			/* 3 */if (ForeachCore(rowNumber_ + 1, columnNumber_ + 1, 0, func)) return true;
+			/* 7 */if (ForeachCore(rowNumber_ - 1, columnNumber_ - 1, 0, func)) return true;
+			/* 8 */if (ForeachCore(rowNumber_ - 1, columnNumber_, 0, func)) return true;
+			/* 9 */if (ForeachCore(rowNumber_ - 1, columnNumber_ + 1, 0, func)) return true;
+			return false;
+		}
+
 		// ring diffuse foreach ( usually for update logic or range search )
 		template <typename F, typename R = std::invoke_result_t<F, Node&, float>>
 		void ForeachByRange(int32_t rowNumber_, int32_t columnNumber_, int32_t searchRange, SpaceGridRingDiffuseData const& rdd, F&& func) {
