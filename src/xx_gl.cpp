@@ -43,7 +43,7 @@ namespace xx {
 
     // filter:  GL_NEAREST  GL_LINEAR    wraper:  GL_CLAMP_TO_EDGE   GL_REPEAT
     void GLTexture::SetTexParm(GLuint id_, GLuint minFilter_, GLuint magFilter_, GLuint sWraper_, GLuint tWraper_) {
-        glActiveTexture(GL_TEXTURE0);
+        //glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, id_);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter_);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter_);
@@ -69,7 +69,7 @@ namespace xx {
 
     void GLTexture::TryGenerateMipmap() {
         if (size.x == size.y && Round2n((size_t)size.x) == (size_t)size.x) {
-            glActiveTexture(GL_TEXTURE0);
+            //glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, id);
             glGenerateMipmap(GL_TEXTURE_2D);
             CheckGLError();
