@@ -213,4 +213,117 @@ namespace xx {
         return { d.x * c - d.y * s, d.x * s + d.y * c };
     }
 
+
+
+    float AngleGap(float tar, float cur) {
+        auto gap = cur - tar;
+        if (gap > gPI) {
+            gap -= g2PI;
+        }
+        if (gap < gNPI) {
+            gap += g2PI;
+        }
+        return gap;
+    }
+
+    float AngleLerpByRate(float tar, float cur, float rate) {
+        auto gap = AngleGap(tar, cur);
+        return cur - gap * rate;
+    }
+
+    float AngleLerpByFixed(float tar, float cur, float a) {
+        auto gap = AngleGap(tar, cur);
+        if (gap < 0) {
+            if (gap >= -a) return tar;
+            else if (auto r = cur + a; r < gPI) return r;
+            else return r - g2PI;
+        }
+        else {
+            if (gap <= a) return tar;
+            else if (auto r = cur - a; r > gPI) return r;
+            else return r + g2PI;
+        }
+    }
+
+    bool AngleStep(float& cur, float tar, float a) {
+        return (cur = AngleLerpByFixed(tar, cur, a)) == tar;
+    }
+
+    bool AngleLimit(float& a, float from, float to) {
+        // -PI ~~~~~~~~~~~~~~~~~~~~~~~~~ a ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ PI
+        assert(a >= gNPI && a <= gPI);
+        // from ~~~~~~~~~~~~~~ a ~~~~~~~~~~~~~~~~ to
+        if (a >= from && a <= to) return false;
+        // from ~~~~~~~~~~~~~~~ -PI ~~~~~~~~~~~~~~~~~~ to ~~~~~~~~~~~~~~~ PI
+        if (from < gNPI) {
+            // ~~~~~~ from ~~~~~~~ -PI ~~~~~~ to ~~~~ a ~~~~ 0 ~~~~~~~~~~~~~ PI
+            if (a < 0) {
+                if (a - to < from + g2PI - a) {
+                    a = to;
+                }
+                else {
+                    a = from + g2PI;
+                }
+                // ~~~~~ d ~~~~~~ from ~~~~~~~ -PI ~~~~~~~~ to ~~~~~~~~ 0 ~~~~~~~ a ~~~~ PI
+            }
+            else {
+                auto d = a - g2PI;
+                if (d >= from && d <= to) return false;
+                else {
+                    if (from - d < a - to) {
+                        a = from + g2PI;
+                    }
+                    else {
+                        a = to;
+                    }
+                }
+            }
+            // -PI ~~~~~~~~~~~~~~~ from ~~~~~~~~~~~~~~~~~~ PI ~~~~~~~~~~~~~~~ to
+        }
+        else if (to > gPI) {
+            // -PI ~~~~~~~~~~~~~~~ 0 ~~~~~ a ~~~~~ from ~~~~~~ PI ~~~~~~~ to
+            if (a > 0) {
+                if (from - a < a - (to - g2PI)) {
+                    a = from;
+                }
+                else {
+                    a = to - g2PI;
+                }
+                // -PI ~~~~~~~ a ~~~~~~~~ 0 ~~~~~~~ from ~~~~~~ PI ~~~~~~~ to ~~~~~ d ~~~~~
+            }
+            else {
+                auto d = a + g2PI;
+                if (d >= from && d <= to) return false;
+                else {
+                    if (from - a < d - to) {
+                        a = from;
+                    }
+                    else {
+                        a = to - g2PI;
+                    }
+                }
+            }
+        }
+        else {
+            // -PI ~~~~~ a ~~~~ from ~~~~~~~~~~~~~~~~~~ to ~~~~~~~~~~~ PI
+            if (a < from) {
+                if (to <= 0 || from - a < a - (to - g2PI)) {
+                    a = from;
+                }
+                else {
+                    a = to;
+                }
+                // -PI ~~~~~~~~~ from ~~~~~~~~~~~~~~~~~~ to ~~~~~ a ~~~~~~ PI
+            }
+            else {
+                if (from > 0 || a - to < from + g2PI - a) {
+                    a = to;
+                }
+                else {
+                    a = from;
+                }
+            }
+        }
+        return true;
+    }
 }
