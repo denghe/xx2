@@ -780,6 +780,7 @@ namespace xx {
 		shaderNumbers.Init();
 		shaderQuadOutline.Init();
 		shaderQuadEx.Init();
+		shaderHPBar.Init();
 		// ...
 
 		// search exists joys

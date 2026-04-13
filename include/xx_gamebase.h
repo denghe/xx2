@@ -13,6 +13,7 @@
 #include "xx_shader_numbers.h"
 #include "xx_shader_quad_outline.h"
 #include "xx_shader_quadex.h"
+#include "xx_shader_hpbar.h"
 // ...
 
 namespace xx {
@@ -271,6 +272,9 @@ namespace xx {
 
         Shader_QuadEx shaderQuadEx;
         Shader_QuadEx& QuadEx() { return ShaderBegin(shaderQuadEx); }
+
+        Shader_HPBar shaderHPBar;
+        Shader_HPBar& HPBar() { return ShaderBegin(shaderHPBar); }
         // ...
     };
 
