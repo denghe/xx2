@@ -70,6 +70,10 @@ namespace xx {
         return { (float)((double)a * point.x + (double)c * point.y + tx), (float)((double)b * point.x + (double)d * point.y + ty) };
     }
 
+    XY AffineTransform::Apply(XY const& point) const {
+        return { (float)((double)a * point.x + (double)c * point.y + tx), (float)((double)b * point.x + (double)d * point.y + ty) };
+    }
+
     XY AffineTransform::NoRadiansApply(XY const& point) const {
         return { (float)((double)a * point.x + tx), (float)((double)d * point.y + ty) };
     }

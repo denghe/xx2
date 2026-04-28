@@ -669,7 +669,7 @@ void main() {
     Shader_LineData* Shader_Line::Alloc(int32_t num_) {
         assert(num_ <= maxVertNums);
         auto c = pointsCount + num_;
-        if (c > maxVertNums) {
+        if (c > maxVertNums / 2) {
             Commit();
             c = num_;
         }
@@ -687,6 +687,29 @@ void main() {
         memcpy(Alloc(num_), buf_, sizeof(Shader_LineData) * num_);
     }
 
+    void Shader_Line::DrawCircle(XY centerPos_, float radius_, std::optional<float> radians_, int32_t segments_, xx::RGBA8 color_) {
+        auto len = segments_ + 1;
+        float a{};
+        if (radians_.has_value()) {
+            ++len;
+			a = *radians_;
+        }
+		auto points = Alloc(len);
+        auto coef = 2.0f * (float)M_PI / segments_;
+        for (int32_t i = 0; i <= segments_; ++i) {
+			auto& p = points[i];
+            auto rads = i * coef + a;
+            p.x = radius_ * cosf(rads) + centerPos_.x;
+            p.y = radius_ * sinf(rads) + centerPos_.y;
+            (uint32_t&)p.r = (uint32_t&)color_;
+        }
+        if (radians_.has_value()) {
+            auto& p = points[len - 1];
+            p.x = centerPos_.x;
+            p.y = centerPos_.y;
+            (uint32_t&)p.r = (uint32_t&)color_;
+        }
+    }
 
     /**************************************************************************************************/
     // xx_shader_numbers.h

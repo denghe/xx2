@@ -13,8 +13,7 @@ namespace xx {
 		GLVertexArrays va;
 		GLBuffer vb, ib;
 
-		static const int32_t maxNums = maxVertNums * 1.5;
-		std::unique_ptr<Shader_LineData[]> points = std::make_unique_for_overwrite<Shader_LineData[]>(maxVertNums);
+		std::unique_ptr<Shader_LineData[]> points = std::make_unique_for_overwrite<Shader_LineData[]>(maxIndexNums);
 		size_t pointsCount = 0;
 		std::unique_ptr<uint16_t[]> indexs = std::make_unique_for_overwrite<uint16_t[]>(maxIndexNums);
 		size_t indexsCount = 0;
@@ -26,6 +25,7 @@ namespace xx {
 		void Commit();
 		Shader_LineData* Alloc(int32_t num_);
 		void Fill(Shader_LineData const* buf_, int32_t num_);
+		void DrawCircle(XY centerPos_, float radius_, std::optional<float> radians_ = {}, int32_t segments_ = 20, xx::RGBA8 color_ = xx::RGBA8_White);
 	};
 
 }

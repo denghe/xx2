@@ -18,7 +18,8 @@ namespace xx {
         void Pos(XY const& pos);
         void Identity();
         // default apply
-        XY operator()(XY const& point) const;
+        XY operator()(XY const& point) const;   // == Apply
+        XY Apply(XY const& point) const;
         XY NoRadiansApply(XY const& point) const;
         // child concat parent
         AffineTransform MakeConcat(AffineTransform const& t2);
