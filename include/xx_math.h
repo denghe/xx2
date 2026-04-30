@@ -26,6 +26,8 @@ namespace xx {
 
     XY RotatePoint(XY d, float radians);
 
+    // return std::atan2f(d_.y, d_.x);
+    float Atan2(XY d_);
 
     float AngleGap(float tar, float cur);
 

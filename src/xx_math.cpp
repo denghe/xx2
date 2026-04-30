@@ -213,7 +213,9 @@ namespace xx {
         return { d.x * c - d.y * s, d.x * s + d.y * c };
     }
 
-
+    float Atan2(XY d_) {
+		return std::atan2f(d_.y, d_.x);
+    }
 
     float AngleGap(float tar, float cur) {
         auto gap = cur - tar;
