@@ -597,20 +597,17 @@ namespace xx {
 
 		glfwSetWindowSizeLimits(wnd, minSize.x, minSize.y, GLFW_DONT_CARE, GLFW_DONT_CARE);
 
-		SetWindowMode();	// window pos -> center
+		//SetWindowMode();	// window pos -> center
 
 		glfwPollEvents();	// fix macos content scale mouse pos issue
 
 		int w{}, h{};
+		// for small res device ( steamdeck: 1280x800 likely ), if designSize > phys res, set full screen mode
+		SetFullScreenMode();
 		glfwGetFramebufferSize(wnd, &w, &h);
 		windowSize.x = (float)w;
 		windowSize.y = (float)h;
 		ResizeCalc();
-
-		// for small res device ( steamdeck: 1280x800 likely ), if designSize > phys res, set full screen mode
-		if (windowSize.x < designSize.x || windowSize.y < designSize.y) {
-			SetFullScreenMode();
-		}
 
 		//glfwSetInputMode(wnd, GLFW_LOCK_KEY_MODS, GLFW_TRUE);
 		glfwSwapInterval(0);	// no v-sync by default
