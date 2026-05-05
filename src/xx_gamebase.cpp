@@ -607,6 +607,11 @@ namespace xx {
 		windowSize.y = (float)h;
 		ResizeCalc();
 
+		// for small res device ( steamdeck: 1280x800 likely ), if designSize > phys res, set full screen mode
+		if (windowSize.x < designSize.x || windowSize.y < designSize.y) {
+			SetFullScreenMode();
+		}
+
 		//glfwSetInputMode(wnd, GLFW_LOCK_KEY_MODS, GLFW_TRUE);
 		glfwSwapInterval(0);	// no v-sync by default
 		gladLoadGL(glfwGetProcAddress);
