@@ -21,7 +21,7 @@ void Eye::Update() {
 }
 
 void Eye::Draw() {
-	sp->Draw();
+	sp->Draw(scene->cam.scale);
 }
 
 

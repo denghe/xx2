@@ -42,7 +42,7 @@ void Man1::Update() {
 }
 
 void Man1::Draw() {
-	sp->Draw();
+	sp->Draw(scene->cam.scale);
 }
 
 

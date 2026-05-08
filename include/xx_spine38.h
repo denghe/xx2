@@ -31,7 +31,7 @@ namespace xx {
 		SpinePlayer& Update(float delta);
 		GLVertTexture AnimToTexture(spine::Animation* anim, float frameDelay);
 		GLVertTexture AnimToTexture(std::string_view animName, float frameDelay);
-		void Draw();	// careful: blend maybe changed
+		void Draw(float cameraScale = 1.f);	// careful: blend maybe changed
 		SpinePlayer& SetTimeScale(float t);
 		SpinePlayer& SetUsePremultipliedAlpha(bool b);
 		SpinePlayer& SetPosition(float x, float y);

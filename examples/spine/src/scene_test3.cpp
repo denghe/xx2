@@ -42,7 +42,7 @@ void Scene_Test3::Update() {
 }
 
 void Scene_Test3::Draw() {
-	sp->Draw();
+	sp->Draw(cam.scale);
 	gg.DrawNode(ui);
 }
 

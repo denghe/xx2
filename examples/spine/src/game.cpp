@@ -14,6 +14,10 @@ void Game::Init() {
 }
 
 void Game::GLInit() {
+#ifndef NDEBUG
+	SetWindowMode();
+#endif
+
 	// init basedata
 	sgrdd.Init(64, 64);
 

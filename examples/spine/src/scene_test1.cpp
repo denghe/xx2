@@ -70,7 +70,7 @@ void Scene_Test1::FixedUpdate() {
 }
 
 void Scene_Test1::Draw() {
-	sp->Draw();
+	sp->Draw(cam.scale);
 	gg.DrawNode(ui);
 }
 

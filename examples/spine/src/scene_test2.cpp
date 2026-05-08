@@ -8,12 +8,13 @@ void Scene_Test2::Init() {
 
 	static constexpr int32_t numRows{ 30 }, numCols{ 50 };
 	XY step { gg.designSize.x / numCols, gg.designSize.y / numRows };
+	XY offset{ -gg.designSize / 2 };
 	for (size_t i = 0; i < numRows; i++) {
 		for (size_t j = 0; j < numCols; j++) {
 			auto& owl = owls.Emplace();
 			auto& sp = owl.sp;
 			sp.Emplace(gg.res.owl.skel);
-			sp->SetPosition({ step.x * j - gg.worldMaxXY.x, step.y * i - gg.worldMaxXY.y });
+			sp->SetPosition({ step.x * j + offset.x, step.y * i + offset.y });
 			sp->SetScale(0.05);
 
 			sp->SetUsePremultipliedAlpha(true);
@@ -72,7 +73,7 @@ void Scene_Test2::Update() {
 
 void Scene_Test2::Draw() {
 	for (auto& owl : owls) {
-		owl.sp->Draw();
+		owl.sp->Draw(cam.scale);
 	}
 	gg.DrawNode(ui);
 }

@@ -32,7 +32,7 @@ namespace xx {
 		return *this;
 	}
 
-	void SpinePlayer::Draw() {
+	void SpinePlayer::Draw(float cameraScale_) {
 		auto eg = GameBase::instance;
 
 		// Early out if skeleton is invisible
@@ -147,8 +147,8 @@ namespace xx {
 			for (size_t ii = 0; ii < indicesCount; ++ii) {
 				auto index = (*indices)[ii] << 1;
 				auto&& v = vs[ii];
-				v.pos.x = (*vertices)[index];
-				v.pos.y = (*vertices)[index + 1];
+				v.pos.x = (*vertices)[index] * cameraScale_;
+				v.pos.y = (*vertices)[index + 1] * cameraScale_;
 				v.uv.x = (*uvs)[index] * texture->size.x;
 				v.uv.y = (*uvs)[index + 1] * texture->size.y;
 				(uint32_t&)v.color = (uint32_t&)color;
