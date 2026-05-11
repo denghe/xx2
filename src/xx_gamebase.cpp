@@ -444,7 +444,7 @@ namespace xx {
 		auto& joy = joys.Emplace();
 		joy.Init(&time);
 		joy.jid = jid;
-		joy.name = glfwGetGamepadName(jid);
+		if (auto s = glfwGetGamepadName(jid)) joy.name = s;
 	}
 
 	void GameBase::HandleJoystickDisconnected(int jid) {
@@ -602,8 +602,10 @@ namespace xx {
 		glfwPollEvents();	// fix macos content scale mouse pos issue
 
 		int w{}, h{};
+#ifdef NDEBUG
 		// for small res device ( steamdeck: 1280x800 likely ), if designSize > phys res, set full screen mode
 		SetFullScreenMode();
+#endif
 		glfwGetFramebufferSize(wnd, &w, &h);
 		windowSize.x = (float)w;
 		windowSize.y = (float)h;

@@ -17,6 +17,7 @@
 #include "xx_lmdb.cpp"
 #include "xx_gl.cpp"
 #include "xx_grid2daabb.cpp"
+#include "xx_curvemovepath.cpp"
 #include "xx_input.cpp"
 #include "xx_math.cpp"
 #include "xx_node.cpp"
