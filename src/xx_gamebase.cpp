@@ -35,6 +35,7 @@ namespace xx {
 			int x, y, w, h;
 			glfwGetWindowPos(wnd, &x, &y);
 			glfwGetWindowSize(wnd, &w, &h);
+			if (w <= 0 || h <= 0) return;
 			glfwSetWindowMonitor(wnd, NULL, x, y, w, h + 1, GLFW_DONT_CARE);
 			glfwSetWindowMonitor(wnd, NULL, x, y, w, h, GLFW_DONT_CARE);
 		}
