@@ -24,21 +24,28 @@ namespace Test5 {
 	struct TalentBase {
 		TalentTypes type{};
 		int32_t id{}, parentId{};
-		int32_t maxLevel{};
-		xx::List<xx::List<TalentPrice>> levelPricess;
 		XY pos{};
+		int32_t maxLevel{};							// auto set by AddLevelPrices function
+		xx::List<xx::List<TalentPrice>> levelPricess;
+		void AddLevelPrices(std::initializer_list<TalentPrice> prices_);
+
 		// todo: joystick focus?
-		int32_t level{};							// runtime / player settings?
-		bool canLevelUp{};							// runtime
+
+		int32_t level{};							// runtime / need Save & Load
+
 		bool visible{};								// runtime
+		bool canLevelUp{};							// runtime
 		TalentBase* parent{};						// runtime
 		Scene* scene{};								// runtime
+
 		virtual void LevelUp();						// ++level && deducte resources?
 		virtual xx::Shared<xx::Node> GetInfo();		// generate info panel ui
 		virtual void Update();						// set canLevelUp? visible?
 		virtual void Draw();						// draw icon by type. draw line
 		virtual ~TalentBase() {}
-		virtual void FillInfo(xx::Layouter& L_);
+
+		virtual void FillInfo(xx::Layouter& L_);	// fill info panel CONTENT by derived
+		virtual bool CheckVisibleCondition();		// visible = rtv
 	};
 
 	struct TalentA : TalentBase {

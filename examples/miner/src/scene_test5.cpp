@@ -4,6 +4,12 @@
 
 namespace Test5 {
 
+	void TalentBase::AddLevelPrices(std::initializer_list<TalentPrice> prices_) {
+		auto& ps = levelPricess.Emplace();
+		ps.Adds(prices_);
+		++maxLevel;
+	}
+
 	void TalentBase::Draw() {
 		if (!visible) return;
 		auto ts = scene->talentScale;
@@ -49,7 +55,9 @@ namespace Test5 {
 		auto node = xx::MakeShared<xx::Node>();
 		xx::Layouter L;
 		L.InitBegin(node, 100, {}, { 0.5f, 0 }, 500);
-		FillInfo(L);
+
+		FillInfo(L);	// fill content by derived class function
+
 		L.EndLine().LineHeight(10);
 		L.Image(gg.embed.shape_dot, {500, 2}, false);
 		L.EndLine().LineHeight();
@@ -77,6 +85,10 @@ namespace Test5 {
 		assert(false);	// must override
 	}
 
+	bool TalentBase::CheckVisibleCondition() {
+		return true;
+	}
+
 	void TalentBase::LevelUp() {
 		assert(canLevelUp);
 		assert(level < maxLevel);
@@ -96,7 +108,11 @@ namespace Test5 {
 			return;
 		}
 		else {
-			visible = true;
+			visible = CheckVisibleCondition();
+			if (!visible) {
+				canLevelUp = false;
+				return;
+			}
 		}
 		if (level == maxLevel) {
 			canLevelUp = false;
@@ -204,33 +220,27 @@ namespace Test5 {
 			t->type = TalentA::cType;
 			t->id = 0;
 			t->parentId = 0;
-			t->maxLevel = 1;
 			t->pos = basePos;
-			t->levelPricess.Resize(t->maxLevel);
-			t->levelPricess[0].Add(TalentPrice{ CurrencyTypes::A, 50 });
+			t->AddLevelPrices({ { CurrencyTypes::A, 50 } });
 		}
 		{
 			auto& t = talents.Emplace().Emplace<TalentB>();
 			t->type = TalentB::cType;
 			t->id = 1;
 			t->parentId = 0;
-			t->maxLevel = 2;
 			t->pos = basePos - d;
-			t->levelPricess.Resize(t->maxLevel);
-			t->levelPricess[0].Adds({ { CurrencyTypes::A, 50 }, { CurrencyTypes::B, 50 } });
-			t->levelPricess[1].Adds({ { CurrencyTypes::A, 100 }, { CurrencyTypes::B, 100 } });
+			t->AddLevelPrices({ { CurrencyTypes::A, 50 }, { CurrencyTypes::B, 50 } });
+			t->AddLevelPrices({ { CurrencyTypes::A, 100 }, { CurrencyTypes::B, 100 } });
 		}
 		{
 			auto& t = talents.Emplace().Emplace<TalentC>();
 			t->type = TalentC::cType;
 			t->id = 2;
 			t->parentId = 0;
-			t->maxLevel = 3;
 			t->pos = basePos + XY{ d, -d };
-			t->levelPricess.Resize(t->maxLevel);
-			t->levelPricess[0].Adds({ { CurrencyTypes::B, 50 }, { CurrencyTypes::C, 50 } });
-			t->levelPricess[1].Adds({ { CurrencyTypes::B, 100 }, { CurrencyTypes::C, 100 } });
-			t->levelPricess[2].Adds({ { CurrencyTypes::B, 200 }, { CurrencyTypes::C, 200 } });
+			t->AddLevelPrices({ { CurrencyTypes::B, 50 }, { CurrencyTypes::C, 50 } });
+			t->AddLevelPrices({ { CurrencyTypes::B, 100 }, { CurrencyTypes::C, 100 } });
+			t->AddLevelPrices({ { CurrencyTypes::B, 200 }, { CurrencyTypes::C, 200 } });
 		}
 
 		// init talents grid
