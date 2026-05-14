@@ -27,7 +27,7 @@ namespace Test5 {
 		XY pos{};
 		int32_t maxLevel{};							// auto set by AddLevelPrices function
 		xx::List<xx::List<TalentPrice>> levelPricess;
-		void AddLevelPrices(std::initializer_list<TalentPrice> prices_);
+		TalentBase* AddLevelPrices(std::initializer_list<TalentPrice> prices_);
 
 		// todo: joystick focus?
 
@@ -80,8 +80,20 @@ namespace Test5 {
 		bool lastMBPressed{};	// for first press check
 		bool talentDragging{};
 		bool clicking{};
+
 		xx::Grid2dCircle<TalentBase*> talentsGrid;
 		xx::List<xx::Shared<TalentBase>> talents;
+
+		template<typename T>
+		xx::Shared<T>& MakeTalent(int32_t id_, int32_t pid_, XY pos_) {
+			auto& t = talents.Emplace().Emplace<T>();
+			t->type = T::cType;
+			t->id = id_;
+			t->parentId = pid_;
+			t->pos = pos_;
+			return t;
+		}
+
 		void SetTalentLevel(int32_t id_, int32_t level_);
 		TalentBase* FindTalent(XY pos_);
 

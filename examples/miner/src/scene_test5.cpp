@@ -4,10 +4,11 @@
 
 namespace Test5 {
 
-	void TalentBase::AddLevelPrices(std::initializer_list<TalentPrice> prices_) {
+	TalentBase* TalentBase::AddLevelPrices(std::initializer_list<TalentPrice> prices_) {
 		auto& ps = levelPricess.Emplace();
 		ps.Adds(prices_);
 		++maxLevel;
+		return this;
 	}
 
 	void TalentBase::Draw() {
@@ -215,33 +216,14 @@ namespace Test5 {
 		auto basePos = gg.designSize / 2;
 
 		// fill talents
-		{
-			auto& t = talents.Emplace().Emplace<TalentA>();
-			t->type = TalentA::cType;
-			t->id = 0;
-			t->parentId = 0;
-			t->pos = basePos;
-			t->AddLevelPrices({ { CurrencyTypes::A, 50 } });
-		}
-		{
-			auto& t = talents.Emplace().Emplace<TalentB>();
-			t->type = TalentB::cType;
-			t->id = 1;
-			t->parentId = 0;
-			t->pos = basePos - d;
-			t->AddLevelPrices({ { CurrencyTypes::A, 50 }, { CurrencyTypes::B, 50 } });
-			t->AddLevelPrices({ { CurrencyTypes::A, 100 }, { CurrencyTypes::B, 100 } });
-		}
-		{
-			auto& t = talents.Emplace().Emplace<TalentC>();
-			t->type = TalentC::cType;
-			t->id = 2;
-			t->parentId = 0;
-			t->pos = basePos + XY{ d, -d };
-			t->AddLevelPrices({ { CurrencyTypes::B, 50 }, { CurrencyTypes::C, 50 } });
-			t->AddLevelPrices({ { CurrencyTypes::B, 100 }, { CurrencyTypes::C, 100 } });
-			t->AddLevelPrices({ { CurrencyTypes::B, 200 }, { CurrencyTypes::C, 200 } });
-		}
+		MakeTalent<TalentA>(0, 0, basePos)->AddLevelPrices({ { CurrencyTypes::A, 50 } });
+		MakeTalent<TalentB>(1, 0, basePos - d)
+			->AddLevelPrices({ { CurrencyTypes::A, 50 }, { CurrencyTypes::B, 50 } })
+			->AddLevelPrices({ { CurrencyTypes::A, 100 }, { CurrencyTypes::B, 100 } });
+		MakeTalent<TalentC>(2, 0, basePos + XY{ d, -d })
+			->AddLevelPrices({ { CurrencyTypes::B, 50 }, { CurrencyTypes::C, 50 } })
+			->AddLevelPrices({ { CurrencyTypes::B, 100 }, { CurrencyTypes::C, 100 } })
+			->AddLevelPrices({ { CurrencyTypes::B, 200 }, { CurrencyTypes::C, 200 } });
 
 		// init talents grid
 		auto numRows = (int32_t)std::ceilf(gg.designSize.y / 256.f);
