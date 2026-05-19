@@ -48,8 +48,8 @@ namespace xx {
         constexpr X_Y& operator*=(IsArithmetic auto v) { x = T(x * v); y = T(y * v); return *this; }
         constexpr X_Y& operator/=(IsArithmetic auto v) { x = T(x / v); y = T(y / v); return *this; }
 
-        [[nodiscard]] constexpr bool operator==(HasField_XY auto const& v) const { return memcmp(this, &v, sizeof(v)) == 0; }
-        [[nodiscard]] constexpr bool operator!=(HasField_XY auto const& v) const { return memcmp(this, &v, sizeof(v)) != 0; }
+        [[nodiscard]] constexpr bool operator==(HasField_XY auto const& v) const { return x == v.x && y == v.y; }
+        [[nodiscard]] constexpr bool operator!=(HasField_XY auto const& v) const { return x != v.x || y != v.y; }
 
         [[nodiscard]] constexpr X_Y Add(IsArithmetic auto v) const { return { T(x + v), T(y + v) }; }
         [[nodiscard]] constexpr X_Y Add(IsArithmetic auto vx, IsArithmetic auto vy) const { return { T(x + vx), T(y + vy) }; }
