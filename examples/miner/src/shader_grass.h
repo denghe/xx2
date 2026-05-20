@@ -143,7 +143,7 @@ float getGrassBlade(in vec2 position, in vec2 grassPos, out vec4 color) {
     	return grassVector3.z * gxn;
     }
     else {
-        color = vec4(0., 0., 0., 1.);
+        color = vColor;//vec4(0., 0., 0., 1.);
         return -1.0;
     }
 }
