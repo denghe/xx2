@@ -37,3 +37,6 @@
 [submodule "opusfile"]
 	path = opusfile
 	url = https://github.com/xiph/opusfile.git
+[submodule "imgui"]
+	path = imgui
+	url = https://github.com/denghe/imgui.git
