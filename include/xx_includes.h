@@ -544,27 +544,29 @@ namespace xx {
         return SG(std::forward<F>(f));
     }
 
-    // return first bit '1' index
-    template<typename T, typename = std::enable_if_t<std::is_integral_v<T>>>
-    XX_INLINE size_t Calc2n(T n) {
-        static_assert(sizeof(T) >= 4);
-        return (sizeof(size_t) * 8 - 1) - std::countl_zero(n);
-    }
+    //// return first bit '1' index
+    //template<typename T, typename = std::enable_if_t<std::is_integral_v<T>>>
+    //XX_INLINE size_t Calc2n(T n) {
+    //    static_assert(sizeof(T) >= 4);
+    //    return (sizeof(size_t) * 8 - 1) - std::countl_zero(n);
+    //}
 
-    // return 2^x ( >= n )
-    template<typename T, typename = std::enable_if_t<std::is_integral_v<T>>>
-    XX_INLINE T Round2n(T n) {
-        static_assert(sizeof(T) >= 4);
-        auto shift = Calc2n(n);
-        auto rtv = T(1) << shift;
-        if (rtv == n) return n;
-        else return rtv << 1;
-    }
+	// replaced by std::bit_ceil in C++20
+    //// return 2^x ( >= n )
+    //template<typename T, typename = std::enable_if_t<std::is_integral_v<T>>>
+    //XX_INLINE T Round2n(T n) {
+    //    static_assert(sizeof(T) >= 4);
+    //    auto shift = Calc2n(n);
+    //    auto rtv = T(1) << shift;
+    //    if (rtv == n) return n;
+    //    else return rtv << 1;
+    //}
 
-    template<typename T, typename = std::enable_if_t<std::is_integral_v<T>>>
-    XX_INLINE bool IsPowerOfTwo(T n) {
-        return (n != 0) && ((n & (n - 1)) == 0);
-    }
+	// replaced by std::has_single_bit in C++20
+    //template<typename T, typename = std::enable_if_t<std::is_integral_v<T>>>
+    //XX_INLINE bool IsPowerOfTwo(T n) {
+    //    return (n != 0) && ((n & (n - 1)) == 0);
+    //}
 
     template<typename T, typename ...Args>
     XX_INLINE T& ReNew(T& o, Args&& ...args) {
@@ -572,6 +574,7 @@ namespace xx {
         return *std::construct_at(&o, std::forward<Args>(args)...);
     }
 
+	// std::byteswap in C++23, for older compilers, use compiler built-in or intrinsics
     template<typename T>
     XX_INLINE T BSwap(T i) {
         T r;

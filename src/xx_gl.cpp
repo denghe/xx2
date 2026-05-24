@@ -68,7 +68,7 @@ namespace xx {
     }
 
     void GLTexture::TryGenerateMipmap() {
-        if (size.x == size.y && Round2n((size_t)size.x) == (size_t)size.x) {
+        if (size.x == size.y && std::has_single_bit((size_t)size.x)) {
             //glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, id);
             glGenerateMipmap(GL_TEXTURE_2D);

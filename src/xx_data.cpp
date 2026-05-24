@@ -170,7 +170,7 @@ namespace xx {
     Data::Data(size_t cap)
         : cap(cap) {
         assert(cap);
-        auto siz = Round2n(cap);
+        auto siz = std::bit_ceil(cap);
         buf = (new uint8_t[siz]);
         this->cap = siz;
     }
@@ -221,7 +221,7 @@ namespace xx {
 
         size_t siz;
         if (round2n) {
-            siz = Round2n(newCap);
+            siz = std::bit_ceil(newCap);
         }
         else {
             siz = newCap;

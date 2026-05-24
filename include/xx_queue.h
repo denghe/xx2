@@ -21,7 +21,7 @@ namespace xx {
 			if (capacity < 8) {
 				capacity = 8;
 			} else {
-				cap = SizeType(Round2n(capacity * sizeof(T)) / sizeof(T));
+				cap = SizeType(std::bit_ceil(capacity * sizeof(T)) / sizeof(T));
 			}
 			buf = (T*)new MyAlignedStorage<T>[cap];				// buf can't be null
 		}
@@ -106,7 +106,7 @@ namespace xx {
 			assert(capacity > 0);
 			if (capacity <= cap) return;
 
-			auto newBufLen = SizeType(Round2n(capacity * sizeof(T)) / sizeof(T));
+			auto newBufLen = SizeType(std::bit_ceil(capacity * sizeof(T)) / sizeof(T));
 			auto newBuf = (T*)new MyAlignedStorage<T>[newBufLen];
 
 			// callByEmplace == true: ++++++++++++++TH++++++++++++++++
