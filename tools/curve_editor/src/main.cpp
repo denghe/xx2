@@ -50,7 +50,7 @@ void Game::GLInit() {
 	lsPoint.FillCirclePoints({}, pointRadius, {}, 16);
 	meListener.Init(GLFW_MOUSE_BUTTON_1);
 	LoadData();
-	exportFileName = gg.GetFullPath("res", false) + "/curves.bin";
+	exportFileName = gg.GetFullPath("res", false) + "/curves";	// do not include extension
 	MakeNewLineName();
 }
 
@@ -154,20 +154,100 @@ void Game::SaveData() {
 	LoadData();
 }
 
+std::string Game::ReplaceName(std::string name_) {
+	std::string name(name_);
+	for (auto& c : name) {
+		if (c == ' ' || c == '?' || c == '<' || c == '>' || c == '.'
+			|| c == '+' || c == '-' || c == '*' || c == '/'
+			) {
+			c = '_';
+		}
+	}
+	return name;
+}
+
 void Game::ExportData() {
+
+	// export .h
+	std::string code;
+	xx::Append(code, R"#(#include <xx_curvemovepath.h>
+
+struct _curves {
+)#");
+	int index = 0;
+	for(auto& line : data.lines) {
+		xx::AppendFormat(code, R"#(
+	xx::MovePathCache {0}; // {1}: {2})#", ReplaceName(line.name), index++, line.name);
+	}
+
+	xx::AppendFormat(code, R"#(
+
+	uint32_t designWidth{{{0}}, designHeight{{{1}}, safeLength{{{2}};
+
+	// fill contents
+	void Init(float stepDistance_ = 1.f);
+
+	// array access
+	xx::MovePathCache& operator[](size_t index_);
+};
+)#", data.designWidth, data.designHeight, data.safeLength);
+
+	auto r = xx::WriteAllBytes(exportFileName + ".h", (char*)code.data(), code.size());
+	if (r) {
+		msg = xx::ToString("WriteAllBytes to file: ", exportFileName, " error! r = ", r);
+		return;
+	}
+
+	// export .cpp
+	code.clear();
+	xx::Append(code, R"#(#include "pch.h"
+#include "curves.h"
+
+void _curves::Init(float stepDistance_) {
+	std::vector<xx::CurvePoint> cps;
+	xx::MovePath mp;
+)#");
+	for (auto& line : data.lines) {
+		xx::AppendFormat(code, R"#(
+	// {0};
+	cps.clear();)#", line.name);
+		for (auto& p : line.points) {
+			xx::AppendFormat(code, R"#(
+	cps.push_back({{ {{{0}, {1}}, {2}, {3} });)#", p.x, p.y, p.tension / 100.f, p.numSegments);
+		}
+		xx::AppendFormat(code, R"#(
+	mp.Clear();
+	mp.FillCurve({0}, cps);
+	this->{1}.Init(mp, stepDistance_);
+)#", line.isLoop ? "true" : "false", ReplaceName(line.name));
+	}
+	xx::AppendFormat(code, R"#(
+}
+
+xx::MovePathCache& _curves::operator[](size_t index_) {{
+	assert(index_ < {0});
+	return ((xx::MovePathCache*)this)[index_];
+}
+)#", data.lines.size());
+	r = xx::WriteAllBytes(exportFileName + ".cpp", (char*)code.data(), code.size());
+	if (r) {
+		msg = xx::ToString("WriteAllBytes to file: ", exportFileName, " error! r = ", r);
+		return;
+	}
+
+	// export .bin
 	// format: lines size + Line{ name size + name content + 1 byte isloop + points size + Point{ x,y,t,n }... }...
 	xx::Data d;
 	d.Write(data);
-	auto&& r = xx::WriteAllBytes(exportFileName, (char*)d.buf, d.len);
+	r = xx::WriteAllBytes(exportFileName + ".bin", (char*)d.buf, d.len);
 	if (r) {
 		msg = xx::ToString("WriteAllBytes to file: ", exportFileName, " error! r = ", r);
-	} else {
-		msg = xx::ToString("export success!");
-		exporting = false;
+		return;
 	}
 
-	// todo: gen .h & .cpp
-	// line name to member name
+	// success
+	msg = xx::ToString("export success!");
+	exporting = false;
 }
 
 void Game::ImGuiDrawWindow_Error() {
@@ -714,16 +794,6 @@ int32_t Game::UpdateLogic() {
 		ls.Draw();
 	}
 
-	//xx::SimpleLabel lbl;
-	//lbl.SetAnchor({ 0,0 }).SetColor({ 127,127,0,255 })
-	//	.SetPosition(gg.ninePoints[1].MakeAdd(leftPanelWidth + margin * 2, 32 + margin))
-	//	.SetText(fnt, xx::ToString("Arrow Up/Down: move line   zoom = ", zoom, ", points.size() = ", line->points.size()))
-	//	.Draw()
-	//	.SetAnchor({ 0,1 })
-	//	.SetPosition(gg.ninePoints[7].MakeAdd(leftPanelWidth + margin * 2, -margin))
-	//	.SetText(fnt, "Z/X: Zooom in/out  W/S: select prev/next line  A/D: add/remove selected or last point MB1: select & drag point"sv, 32
-	//		, gg.w - (leftPanelWidth + margin * 3))
-	//	.Draw();
 	return 0;
 }
 

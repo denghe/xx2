@@ -155,6 +155,7 @@ struct Game : xx::GameBase {
 	void LoadData();
 	void SaveData();
 	void ExportData();
+	static std::string ReplaceName(std::string name_);
 
 	void SelectLine(std::string_view const& name);
 	int32_t GetLineIndexByName(std::string_view const& name);

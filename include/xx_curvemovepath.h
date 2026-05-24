@@ -114,7 +114,7 @@ namespace xx {
     struct MovePathCache {
         std::vector<MovePathCachePoint> points;
         bool loop{};
-        float stepDistance{};
+        float totalDistance{}, stepDistance{};
 
         void Init(MovePath const& mp, float stepDistance = 1.f);
         MovePathCachePoint* Move(float totalDistance);

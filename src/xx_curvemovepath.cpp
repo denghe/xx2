@@ -156,6 +156,7 @@ namespace xx {
     void MovePathCache::Init(MovePath const& mp, float stepDistance) {
         assert(stepDistance > 0);
         assert(mp.totalDistance > stepDistance);
+        this->totalDistance = mp.totalDistance;
         this->stepDistance = stepDistance;
         this->loop = mp.loop;
         auto td = mp.totalDistance + stepDistance;
