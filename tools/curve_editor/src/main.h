@@ -18,6 +18,28 @@ namespace MovePathStore {
 	};
 }
 
+// for export MovePathStore
+namespace xx {
+	template<typename T>
+	struct DataFuncs<T, std::enable_if_t<std::is_same_v<::MovePathStore::Data, std::decay_t<T>>>> {
+		template<bool needReserve = true> static inline void Write(Data& d, T const& in) {
+			d.Write(in.lines);
+		}
+	};
+	template<typename T>
+	struct DataFuncs<T, std::enable_if_t<std::is_same_v<::MovePathStore::Line, std::decay_t<T>>>> {
+		template<bool needReserve = true> static inline void Write(Data& d, T const& in) {
+			d.Write(in.name, in.isLoop, in.points);
+		}
+	};
+	template<typename T>
+	struct DataFuncs<T, std::enable_if_t<std::is_same_v<::MovePathStore::Point, std::decay_t<T>>>> {
+		template<bool needReserve = true> static inline void Write(Data& d, T const& in) {
+			d.Write(in.x, in.y, in.tension, in.numSegments);
+		}
+	};
+}
+
 AJSON(::MovePathStore::Point, x, y, tension, numSegments);
 AJSON(::MovePathStore::Line, name, isLoop, points);
 AJSON(::MovePathStore::Data, designWidth, designHeight, safeLength, lines);
@@ -73,6 +95,8 @@ struct Game : xx::GameBase {
 	static constexpr float cDelta{ 1.f / cFps };
 	static constexpr float cMaxDelta{ 0.1f };
 
+	xx::Shared<xx::Node> ui;
+	xx::Weak<xx::Label> uiText1, uiText2;
 	xx::FrameBuffer fb;
 	xx::MovePathCache mpc;
 	xx::LineStrip ls;
@@ -112,7 +136,7 @@ struct Game : xx::GameBase {
 	int32_t UpdateLogic();
 	void Delay() override;
 	//void Stat() override;
-	//void OnResize(bool modeChanged_) override;
+	void OnResize(bool modeChanged_) override;
 	//void OnFocus(bool focused_) override;
 
 	void ImGuiUpdate();

@@ -817,6 +817,7 @@ namespace xx {
 			Loop(false);
 		}
 
+		OnExit();
 		return EXIT_SUCCESS;
 	}
 

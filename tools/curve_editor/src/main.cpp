@@ -8,7 +8,7 @@ int32_t main() {
 }
 
 void Game::Init() {
-	title = "curve editor( store file path: res/curves.json, export to curves.bin )";
+	title = "curve editor( store file path: res/curves.json, export to curves.(bin,h,cpp) )";
 	windowSize = designSize = cDesignSize;
 }
 
@@ -41,12 +41,23 @@ void Game::GLInit() {
 	io.FontDefault = imfnt;
 	io.IniFilename = nullptr;
 
+	ui.Emplace()->InitRoot(scale);
+	(uiText1 = ui->Make<xx::Label>())->Init(2, p7 + XY{ 500, 0 }, a7, 32.f);
+	(uiText2 = ui->Make<xx::Label>())->Init(2, p7 + XY{ 500, -30 }, a7, 32.f);
+	uiText1->SetText("Arrow Up/Down: move line; Z/X: Zoom in/out;  W/S: select prev/next line;");
+	uiText2->SetText("A/D: add/remove selected or last point; mouse: select & drag; go: matrix translate");
 	fb.Init();
 	lsPoint.FillCirclePoints({}, pointRadius, {}, 16);
 	meListener.Init(GLFW_MOUSE_BUTTON_1);
 	LoadData();
 	exportFileName = gg.GetFullPath("res", false) + "/curves.bin";
 	MakeNewLineName();
+}
+
+void Game::OnResize(bool modeChanged_) {
+	uiText1->position = p7 + XY{ 500, 0 };
+	uiText2->position = p7 + XY{ 500, -30 };
+	ui->Resize(scale);
 }
 
 void Game::Update() {
@@ -60,6 +71,7 @@ void Game::Update() {
 		if (!msg.has_value() && !exporting) {
 			UpdateLogic();
 		}
+		DrawNode(ui);
 
 		if (msg.has_value()) {
 			ImGuiDrawWindow_Error();
@@ -142,28 +154,6 @@ void Game::SaveData() {
 	LoadData();
 }
 
-// for export MovePathStore
-namespace xx {
-	template<typename T>
-	struct DataFuncs<T, std::enable_if_t<std::is_same_v<::MovePathStore::Data, std::decay_t<T>>>> {
-		template<bool needReserve = true> static inline void Write(Data& d, T const& in) {
-			d.Write(in.lines);
-		}
-	};
-	template<typename T>
-	struct DataFuncs<T, std::enable_if_t<std::is_same_v<::MovePathStore::Line, std::decay_t<T>>>> {
-		template<bool needReserve = true> static inline void Write(Data& d, T const& in) {
-			d.Write(in.name, in.isLoop, in.points);
-		}
-	};
-	template<typename T>
-	struct DataFuncs<T, std::enable_if_t<std::is_same_v<::MovePathStore::Point, std::decay_t<T>>>> {
-		template<bool needReserve = true> static inline void Write(Data& d, T const& in) {
-			d.Write(in.x, in.y, in.tension, in.numSegments);
-		}
-	};
-}
-
 void Game::ExportData() {
 	// format: lines size + Line{ name size + name content + 1 byte isloop + points size + Point{ x,y,t,n }... }...
 	xx::Data d;
@@ -175,10 +165,10 @@ void Game::ExportData() {
 		msg = xx::ToString("export success!");
 		exporting = false;
 	}
+
+	// todo: gen .h & .cpp
+	// line name to member name
 }
-
-
-
 
 void Game::ImGuiDrawWindow_Error() {
 	ImVec2 p = ImGui::GetMainViewport()->Pos;
@@ -427,7 +417,8 @@ void Game::ImGuiDrawWindow_LeftBottom0() {
 			}
 		}
 
-		ImGui::Text("p");
+		// offset
+		ImGui::Text("o");
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(65);
 		ImGui::InputFloat("##afPosx", &afPos.x, {}, {}, "%.0f", ImGuiInputTextFlags_CharsDecimal);
@@ -435,6 +426,7 @@ void Game::ImGuiDrawWindow_LeftBottom0() {
 		ImGui::SetNextItemWidth(65);
 		ImGui::InputFloat("##afPosy", &afPos.y, {}, {}, "%.0f", ImGuiInputTextFlags_CharsDecimal);
 		ImGui::SameLine();
+		// scale
 		ImGui::Text("s");
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(65);
@@ -443,11 +435,13 @@ void Game::ImGuiDrawWindow_LeftBottom0() {
 		ImGui::SetNextItemWidth(65);
 		ImGui::InputFloat("##afScaley", &afScale.y, {}, {}, "%.2f", ImGuiInputTextFlags_CharsDecimal);
 		ImGui::SameLine();
+		// rotate
 		ImGui::Text("r");
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(65);
 		ImGui::InputFloat("##afAngle", &afAngle, {}, {}, "%.2f", ImGuiInputTextFlags_CharsDecimal);
 		ImGui::SameLine();
+		// affine matrix apply
 		if (ImGui::Button("go")) {
 			auto&& at = xx::AffineTransform::MakePosScaleRadians(afPos, afScale, afAngle * M_PI / 360.f);
 			for (auto& p : line->points) {

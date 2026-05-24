@@ -36,6 +36,7 @@ namespace xx {
         virtual void Stat() {}
         virtual void OnResize(bool modeChanged_) {}
         virtual void OnFocus(bool focused_) {}
+        virtual void OnExit() {}
 
 
         static constexpr XY minSize{ 384, 216 };			// for glfwSetWindowSizeLimits
