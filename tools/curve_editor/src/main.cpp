@@ -896,7 +896,8 @@ bool DragableCircle::HandleMouseDown(DragableCircleMouseEventListener& L) {
 }
 
 int32_t DragableCircle::HandleMouseMove(DragableCircleMouseEventListener& L) {
-	pos += (gg.mousePos - L.lastPos) * gg.scale;
+	auto o = (gg.mousePos - L.lastPos) / gg.zoom;
+	pos += o;
 	point->x = pos.x;
 	point->y = pos.y;
 	return 0;

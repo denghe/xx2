@@ -22,19 +22,19 @@ namespace MovePathStore {
 namespace xx {
 	template<typename T>
 	struct DataFuncs<T, std::enable_if_t<std::is_same_v<::MovePathStore::Data, std::decay_t<T>>>> {
-		template<bool needReserve = true> static inline void Write(Data& d, T const& in) {
+		static inline void Write(Data& d, T const& in) {
 			d.Write(in.lines);
 		}
 	};
 	template<typename T>
 	struct DataFuncs<T, std::enable_if_t<std::is_same_v<::MovePathStore::Line, std::decay_t<T>>>> {
-		template<bool needReserve = true> static inline void Write(Data& d, T const& in) {
+		static inline void Write(Data& d, T const& in) {
 			d.Write(in.name, in.isLoop, in.points);
 		}
 	};
 	template<typename T>
 	struct DataFuncs<T, std::enable_if_t<std::is_same_v<::MovePathStore::Point, std::decay_t<T>>>> {
-		template<bool needReserve = true> static inline void Write(Data& d, T const& in) {
+		static inline void Write(Data& d, T const& in) {
 			d.Write(in.x, in.y, in.tension, in.numSegments);
 		}
 	};
@@ -121,13 +121,14 @@ struct Game : xx::GameBase {
 	DragableCircleMouseEventListener meListener;
 	DragableCircle dc;
 
-	inline static const float leftPanelWidth{ 480 }, margin{ 10 }, leftCmdPanelHeight1{ 80 }, leftCmdPanelHeight2{ 120 }, pointRadius{10.f};
-	inline static const xx::XY errPanelSize{ 1200, 200 }, offset{ (leftPanelWidth + margin) / 2, 0 };
-	inline static const xx::XY exportPanelSize{ 1200, 200 };
+	static constexpr float leftPanelWidth{ 480 }, margin{ 10 }
+		, leftCmdPanelHeight1{ 80 }, leftCmdPanelHeight2{ 120 }, pointRadius{ 15.f };
+	static constexpr xx::XY errPanelSize{ 1200, 200 }, offset{ (leftPanelWidth + margin) / 2, 0 };
+	static constexpr xx::XY exportPanelSize{ 1200, 200 };
 
-	inline static const ImVec4 normalColor{ 0, 0, 0, 1.0f };
-	inline static const ImVec4 pressColor{ 0.5f, 0, 0, 1.0f };
-	inline static const ImVec4 releaseColor{ 0, 0.5f, 0, 1.0f };
+	static constexpr ImVec4 normalColor{ 0, 0, 0, 1.0f };
+	static constexpr ImVec4 pressColor{ 0.5f, 0, 0, 1.0f };
+	static constexpr ImVec4 releaseColor{ 0, 0.5f, 0, 1.0f };
 
 	void Init() override;
 	void GLInit() override;
