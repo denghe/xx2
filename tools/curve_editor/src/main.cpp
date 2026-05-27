@@ -50,7 +50,6 @@ void Game::GLInit() {
 	lsPoint.FillCirclePoints({}, pointRadius, {}, 16);
 	meListener.Init(GLFW_MOUSE_BUTTON_1);
 	LoadData();
-	exportFileName = gg.GetFullPath("res", false) + "/curves";	// do not include extension
 	MakeNewLineName();
 }
 
@@ -135,8 +134,7 @@ void Game::DrawIcon(MovePathStore::Line& line) {
 
 void Game::LoadData() {
 	if (auto p = gg.GetFullPath("curves.json"sv); p.empty()) {
-		// todo: create default data and save to file
-		//p = 
+		// create default data and save to file
 		auto cp = std::filesystem::current_path();
 		cp /= "curves.json";
 		fileName = cp.string();
@@ -150,6 +148,7 @@ void Game::LoadData() {
 		data = {};
 		ajson::load_from_buff(data, (char*)d.buf, d.len);
 	}
+	exportFileName = fileName.substr(0, fileName.find_last_of('.'));
 
 	ls.SetPosition({}).SetScale(0.016).SetColor({ 255,255,127,255 });
 	for (auto& line : data.lines) {
