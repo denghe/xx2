@@ -605,7 +605,9 @@ namespace xx {
 		int w{}, h{};
 #ifdef NDEBUG
 		// for small res device ( steamdeck: 1280x800 likely ), if designSize > phys res, set full screen mode
-		SetFullScreenMode();
+		if (!title.starts_with("curve")) {
+			SetFullScreenMode();
+		}
 #endif
 		glfwGetFramebufferSize(wnd, &w, &h);
 		windowSize.x = (float)w;
@@ -617,7 +619,7 @@ namespace xx {
 		gladLoadGL(glfwGetProcAddress);
 
 
-		// for some ATI card bug fix
+		// for some ATI/AMD card driver bug fix
 		std::string_view sv((char*)glGetString(GL_VENDOR));
 		isAMDCard = sv.starts_with("ATI") || sv.starts_with("AMD");
 

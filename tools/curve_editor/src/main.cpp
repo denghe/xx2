@@ -8,7 +8,7 @@ int32_t main() {
 }
 
 void Game::Init() {
-	title = "curve editor( store file path: res/curves.json, export to curves.(bin,h,cpp) )";
+	title = "curve editor( workDir/curves.json, export to bin,h,cpp )";
 	windowSize = designSize = cDesignSize;
 }
 
@@ -134,11 +134,22 @@ void Game::DrawIcon(MovePathStore::Line& line) {
 }
 
 void Game::LoadData() {
-	auto p = gg.GetFullPath("res/curves.json"sv);
-	auto d = gg.LoadFileDataWithFullPath(p);
-	fileName = std::move(p);
-	data = {};
-	ajson::load_from_buff(data, (char*)d.buf, d.len);
+	if (auto p = gg.GetFullPath("curves.json"sv); p.empty()) {
+		// todo: create default data and save to file
+		//p = 
+		auto cp = std::filesystem::current_path();
+		cp /= "curves.json";
+		fileName = cp.string();
+		std::string_view s = R"##({"designWidth":1920,"designHeight":1080,"safeLength":128,"lines":[]})##";
+		data = {};
+		ajson::load_from_buff(data, s.data(), s.size());
+	}
+	else {
+		auto d = gg.LoadFileDataWithFullPath(p);
+		fileName = std::move(p);
+		data = {};
+		ajson::load_from_buff(data, (char*)d.buf, d.len);
+	}
 
 	ls.SetPosition({}).SetScale(0.016).SetColor({ 255,255,127,255 });
 	for (auto& line : data.lines) {
