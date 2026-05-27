@@ -118,6 +118,7 @@ void Game::DrawIcon(MovePathStore::Line& line) {
 	if (mp.totalDistance > 1.f) {
 		mpc.Init(mp);
 		line.tex = fb.Draw({ 48,32 }, true, xx::RGBA8{}, [&] {
+			gg.flipY = 1;	// do not flip y for imgui
 			auto& ps = ls.Clear().SetPoints();
 			for (auto& p : mpc.points) {
 				ps.emplace_back(p.pos);
@@ -167,13 +168,20 @@ std::string Game::ReplaceName(std::string name_) {
 }
 
 void Game::ExportData() {
+	auto idx = exportFileName.find_last_of('/');
+	if (idx == std::string::npos) {
+		msg = xx::ToString("invalid export file name: ", exportFileName);
+		return;
+	}
+	auto fn = exportFileName.substr(idx + 1);
+	auto cn = ReplaceName(fn);
 
 	// export .h
 	std::string code;
-	xx::Append(code, R"#(#include <xx_curvemovepath.h>
+	xx::AppendFormat(code, R"#(#include <xx_curvemovepath.h>
 
-struct _curves {
-)#");
+struct {0} {{
+)#", cn);
 	int index = 0;
 	for(auto& line : data.lines) {
 		xx::AppendFormat(code, R"#(
@@ -200,35 +208,35 @@ struct _curves {
 
 	// export .cpp
 	code.clear();
-	xx::Append(code, R"#(#include "pch.h"
-#include "curves.h"
+	xx::AppendFormat(code, R"#(#include "pch.h"
+#include "{0}.h"
 
-void _curves::Init(float stepDistance_) {
-	std::vector<xx::CurvePoint> cps;
-	xx::MovePath mp;
-)#");
+void {0}::Init(float stepDistance_) {{
+	std::vector<xx::CurvePoint> tmpCps;
+	xx::MovePath tmpMp;
+)#", cn);
 	for (auto& line : data.lines) {
 		xx::AppendFormat(code, R"#(
 	// {0};
-	cps.clear();)#", line.name);
+	tmpCps.clear();)#", line.name);
 		for (auto& p : line.points) {
 			xx::AppendFormat(code, R"#(
-	cps.push_back({{ {{{0}, {1}}, {2}, {3} });)#", p.x, p.y, p.tension / 100.f, p.numSegments);
+	tmpCps.push_back({{ {{{0}, {1}}, {2}, {3} });)#", p.x, p.y, p.tension / 100.f, p.numSegments);
 		}
 		xx::AppendFormat(code, R"#(
-	mp.Clear();
-	mp.FillCurve({0}, cps);
-	this->{1}.Init(mp, stepDistance_);
+	tmpMp.Clear();
+	tmpMp.FillCurve({0}, tmpCps);
+	this->{1}.Init(tmpMp, stepDistance_);
 )#", line.isLoop ? "true" : "false", ReplaceName(line.name));
 	}
 	xx::AppendFormat(code, R"#(
 }
 
-xx::MovePathCache& _curves::operator[](size_t index_) {{
-	assert(index_ < {0});
+xx::MovePathCache& {0}::operator[](size_t index_) {{
+	assert(index_ < {1});
 	return ((xx::MovePathCache*)this)[index_];
 }
-)#", data.lines.size());
+)#", cn, data.lines.size());
 	r = xx::WriteAllBytes(exportFileName + ".cpp", (char*)code.data(), code.size());
 	if (r) {
 		msg = xx::ToString("WriteAllBytes to file: ", exportFileName, " error! r = ", r);
