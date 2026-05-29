@@ -253,6 +253,7 @@ xx::MovePathCache& {0}::operator[](size_t index_) {{
 		return;
 	}
 
+#if 0
 	// export .bin
 	// format: lines size + Line{ name size + name content + 1 byte isloop + points size + Point{ x,y,t,n }... }...
 	xx::Data d;
@@ -262,6 +263,7 @@ xx::MovePathCache& {0}::operator[](size_t index_) {{
 		msg = xx::ToString("WriteAllBytes to file: ", exportFileName, " error! r = ", r);
 		return;
 	}
+#endif
 
 	// success
 	msg = xx::ToString("export success!");
