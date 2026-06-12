@@ -25,13 +25,37 @@ struct PlistFileName {
 
 * PlistFileName.cpp
 
-include "pch.h"
 #include <xx_gamebase.h>
 #include "PlistFileName.h"
 
 xx::Shared<xx::GLTexture> PlistFileName::Load(std::string picFN_, bool generateMipmap_) {
 	auto t = xx::GameBase::instance->LoadTexture(picFN_);
 	if(generateMipmap_) t->TryGenerateMipmap();
+
+
+
+	static constexpr xx::UVRect uvrects[] = {
+		{X, Y, W, H},
+		{X, Y, W, H},
+		{X, Y, W, H},
+		// ...
+	};
+	static constexpr xx::XY anchors[] = {
+		{ AX, AY },
+		{ AX, AY },
+		{ AX, AY },
+		// ...
+	};
+	for (int32_t i = 0; i < sizeof(*this) / sizeof(xx::Frame); i++) {
+		auto& f = ((xx::Frame*)this)[i];
+		f.tex = t;
+		f.uvRect = uvrects[i];
+		f.anchor = anchors[i];
+	}
+
+
+
+	// bad performance for compile.
 
 	this->xxx1 = { t, X, Y, W, H, ANCHOR };
 	this->xxx2 = { t, X, Y, W, H, ANCHOR };
@@ -120,31 +144,36 @@ press ENTER to continue...)#";
 			std::cerr << "**************************** bad file size( width == height ): " << p << std::endl;
 			return __LINE__;
 		}
-		if (!xx::IsPowerOfTwo(tp.metadata.size.width)) {
+		if (!std::has_single_bit(tp.metadata.size.width)) {
 			std::cerr << "**************************** bad file size( width & height should be 2^n ): " << p << std::endl;
 			return __LINE__;
 		}
 
 		for (auto& f : tp.frames) {
-			std::cout << "handle frame: " << f.name << std::endl;
+			auto& k = f.name;
+			std::cout << "handle frame: " << k << std::endl;
+			if (k[0] >= '0' && k[0] <= '9') k = '_' + k;
+			for (auto& c : k) {
+				if (c == '/') c = '_';
+			}
 
-			for (auto const& c : f.name) {
+			for (auto const& c : k) {
 				if (c == '.' || c == ' ') {
-					std::cerr << "**************************** bad key name( can't contain ' ' or '.' ): " << f.name
+					std::cerr << "**************************** bad key name( can't contain ' ' or '.' ): " << k
 						<< "\n**************************** in plist: " << plistName
 						<< std::endl;
 					return __LINE__;
 				}
 			}
 
-			if (auto [iter, success] = keys.emplace(f.name, plistName); !success) {
-				std::cerr << "**************************** duplicate res name: " << f.name
+			if (auto [iter, success] = keys.emplace(k, plistName); !success) {
+				std::cerr << "**************************** duplicate res name: " << k
 					<< "\n**************************** in plist: " << iter->second
 					<< "\n**************************** and plist " << plistName
 					<< std::endl;
 				return __LINE__;
 			}
-			iter->second.push_back(f.name);
+			iter->second.push_back(k);
 		}
 	}
 
@@ -180,22 +209,21 @@ press ENTER to continue...)#";
 
 		std::string code, tmp;
 
-		for (auto k : keys) {
+		for (auto& k : keys) {
 			if (keyGroups.contains(k))
 				continue;
-			if (k[0] >= '0' && k[0] <= '9') k = '_' + k;
+			
 			xx::Append(tmp, R"#(
 	xx::Frame )#", k, R"#(;)#");
 		}
 		for (auto&& kv : keyGroups) {
-			auto k = kv.first;
-			if (k[0] >= '0' && k[0] <= '9') k = '_' + k;
+			auto& k = kv.first;
+
 			xx::Append(tmp, R"#(
 	std::array<xx::Frame, )#", kv.second.size(), R"#(> )#", k, R"#(_;)#");
 		}
 
 		xx::Append(code, R"#(#pragma once
-#include "pch.h"
 #include <xx_frame.h>
 
 struct )#", structName, R"#( {)#", tmp, R"#(
@@ -210,11 +238,11 @@ struct )#", structName, R"#( {)#", tmp, R"#(
 			return __LINE__;
 		}
 
-		// todo: cpp
 		code.clear();
 		tmp.clear();
 
-		for (auto k : keys) {
+#if 0
+		for (auto& k : keys) {
 			auto f = &tp.frames[0];
 			for (auto& o : tp.frames) {
 				if (o.name == k) {
@@ -224,7 +252,6 @@ struct )#", structName, R"#( {)#", tmp, R"#(
 			}
 			xx::XY anchor{ 0.5f };
 			if (f->anchor.has_value()) anchor = *f->anchor;
-			if (k[0] >= '0' && k[0] <= '9') k = '_' + k;
 			xx::Append(tmp, R"#(
 	this->)#", k, " = { t, ", f->textureRect.x, ", ", f->textureRect.y, ", ", f->textureRect.width, ", ", f->textureRect.height, ", { ", anchor.x, ", ", anchor.y, " } };");
 		}
@@ -248,9 +275,63 @@ struct )#", structName, R"#( {)#", tmp, R"#(
 	this->)#", k, "_[", i, "] = { t, ", f->textureRect.x, ", ", f->textureRect.y, ", ", f->textureRect.width, ", ", f->textureRect.height, ", { ", anchor.x, ", ", anchor.y, " } };");
 			}
 		}
+#else
+		std::string uvrectsCode, anchorsCode;
 
-		xx::Append(code, R"#(#include "pch.h"
-#include <xx_gamebase.h>
+		for (auto& k : keys) {
+			auto f = &tp.frames[0];
+			for (auto& o : tp.frames) {
+				if (o.name == k) {
+					f = &o;
+					break;
+				}
+			}
+			xx::XY anchor{ 0.5f };
+			if (f->anchor.has_value()) anchor = *f->anchor;
+			xx::Append(uvrectsCode, R"#(
+	{ )#", f->textureRect.x, ", ", f->textureRect.y, ", ", f->textureRect.width, ", ", f->textureRect.height, " },");
+			xx::Append(anchorsCode, R"#(
+	{ )#", anchor.x, ", ", anchor.y, " },");
+		}
+
+		for (auto&& kv : keyGroups) {
+			auto k = kv.first;
+			if (k[0] >= '0' && k[0] <= '9') k = '_' + k;
+			auto& names = kv.second;
+			for (int i = 0; i < names.size(); ++i) {
+				auto name = k + "_" + names[i];
+				auto f = &tp.frames[0];
+				for (auto& o : tp.frames) {
+					if (o.name == name) {
+						f = &o;
+						break;
+					}
+				}
+				xx::XY anchor{ 0.5f };
+				if (f->anchor.has_value()) anchor = *f->anchor;
+				xx::Append(uvrectsCode, R"#(
+	{ )#", f->textureRect.x, ", ", f->textureRect.y, ", ", f->textureRect.width, ", ", f->textureRect.height, " },");
+				xx::Append(anchorsCode, R"#(
+	{ )#", anchor.x, ", ", anchor.y, " },");
+			}
+		}
+
+		xx::Append(tmp, R"#(
+	static constexpr xx::UVRect uvrects[] = {)#", uvrectsCode, R"#(
+	};
+	static constexpr xx::XY anchors[] = {)#", anchorsCode, R"#(
+	};
+	for (int32_t i = 0; i < sizeof(*this) / sizeof(xx::Frame); i++) {
+		auto& f = ((xx::Frame*)this)[i];
+		f.tex = t;
+		f.uvRect = uvrects[i];
+		f.anchor = anchors[i];
+	}
+)#");
+
+#endif
+
+		xx::Append(code, R"#(#include <xx_gamebase.h>
 #include ")#", structName, R"#(.h"
 
 xx::Shared<xx::GLTexture> )#", structName, R"#(::Load(std::string picFN_, bool generateMipmap_) {

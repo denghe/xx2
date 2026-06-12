@@ -39,16 +39,19 @@ press ENTER to continue...)#";
 			}
 		}
 
+		// make sub dir for output
+		auto outDir = p.parent_path() / p.stem();
+		if (!std::filesystem::exists(outDir)) {
+			std::error_code ec;
+			std::filesystem::create_directory(outDir, ec);
+		}
+
 		// write char's pngs
 		xx::Data buf;
-		auto prefix = p.stem().u8string();
-		for (int32_t i = 0; i < 256; ++i) {
-			auto& c = bmf.charArray[i];
-			if (c.width == 0 || c.height == 0) continue;
-			auto& img = imgs[c.page];
-			auto fn = xx::ToString(prefix, "_", i, ".png");
+
+		auto WritePNG = [&](xx::STBImage& img, std::string const& fn, xx::BMFontChar& c) {
 			xx::CoutN(fn);
-			auto cfn = fn.c_str();
+			auto cfn = fn.data();
 			buf.Clear();
 			buf.Resize(c.width * c.height * 4);
 			for (int32_t y = 0; y < c.height; ++y) {
@@ -56,17 +59,20 @@ press ENTER to continue...)#";
 					XYi pos{ c.x + x, c.y + y };
 					auto idx1 = pos.y * img.w + pos.x;
 					auto idx2 = (y * c.width + x) * 4;
-					buf[idx2 + 0] = img[idx1 * 4 + 0];
-					buf[idx2 + 1] = img[idx1 * 4 + 1];
-					buf[idx2 + 2] = img[idx1 * 4 + 2];
-					buf[idx2 + 3] = img[idx1 * 4 + 3];
+					(uint32_t&)buf[idx2] = (uint32_t&)img[idx1 * 4];
 				}
 			}
 			stbi_write_png(cfn, c.width, c.height, 4, buf.buf, c.width * 4);
+		};
+
+		for (int32_t i = 0; i < 256; ++i) {
+			auto& c = bmf.charArray[i];
+			if (c.width == 0 || c.height == 0) continue;
+			WritePNG(imgs[c.page], xx::ToString(outDir, "/", i, ".png"), c);
 		}
 
 		for (auto& [k, v] : bmf.charMap) {
-			// todo
+			WritePNG(imgs[v.page], xx::ToString(outDir, "/", k, ".png"), v);
 		}
 	}
 

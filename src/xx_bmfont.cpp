@@ -173,6 +173,9 @@ namespace xx {
             for (auto&& f : texFNs) {
                 texs.Emplace(GameBase::instance->LoadTexture(f));
             }
+        }
+
+        if (texs.len) {
             // fill texId
             for (auto& c : charArray) {
                 c.texId = texs[c.page]->id;

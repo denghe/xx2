@@ -277,7 +277,7 @@ namespace xx {
                 } else {
                     if (o.first) {
                         return o.second() ? ForeachResult::RemoveAndContinue : ForeachResult::Continue;
-                    } else ForeachResult::RemoveAndContinue;
+                    } else return ForeachResult::RemoveAndContinue;
                 }
             });
             return this->tasks.Count();

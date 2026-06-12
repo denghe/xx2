@@ -29,11 +29,7 @@ namespace xx {
         XY Size() const;
         void operator=(Shared<GLTexture> t);
         TinyFrame(Shared<GLTexture> t);
-        template<typename T>
-        TinyFrame(Shared<GLTexture> t, T x, T y, T w, T h) {
-            tex = std::move(t);
-            uvRect = { (uint16_t)x, (uint16_t)y, (uint16_t)w, (uint16_t)h };
-        }
+        TinyFrame(Shared<GLTexture> t, int32_t x, int32_t y, int32_t w, int32_t h);
 
         void Clear();
     };
@@ -62,12 +58,7 @@ namespace xx {
         void operator=(Shared<GLTexture> t);
 
         Frame(Shared<GLTexture> t);
-        template<typename T>
-        Frame(Shared<GLTexture> t, T x, T y, T w, T h, XY anchor_ = 0.5f) {
-            tex = std::move(t);
-            uvRect = { (uint16_t)x, (uint16_t)y, (uint16_t)w, (uint16_t)h };
-            anchor = anchor_;
-        }
+        Frame(Shared<GLTexture> t, int32_t x, int32_t y, int32_t w, int32_t h, XY anchor_ = 0.5f);
 
         void Clear();
     };

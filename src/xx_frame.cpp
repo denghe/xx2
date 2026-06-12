@@ -22,6 +22,11 @@ namespace xx {
         operator=(std::move(t));
     }
 
+    TinyFrame::TinyFrame(Shared<GLTexture> t, int32_t x, int32_t y, int32_t w, int32_t h) {
+        tex = std::move(t);
+        uvRect = { (uint16_t)x, (uint16_t)y, (uint16_t)w, (uint16_t)h };
+    }
+
     void TinyFrame::operator=(Shared<GLTexture> t) {
         tex = std::move(t);
         uvRect = tex->Rect();
@@ -61,6 +66,12 @@ namespace xx {
 
     Frame::Frame(Shared<GLTexture> t) {
         operator=(std::move(t));
+    }
+
+    Frame::Frame(Shared<GLTexture> t, int32_t x, int32_t y, int32_t w, int32_t h, XY anchor_) {
+        tex = std::move(t);
+        uvRect = { (uint16_t)x, (uint16_t)y, (uint16_t)w, (uint16_t)h };
+        anchor = anchor_;
     }
 
     void Frame::operator=(Shared<GLTexture> t) {
