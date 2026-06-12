@@ -257,11 +257,9 @@ struct )#", structName, R"#( {)#", tmp, R"#(
 		}
 
 		for (auto&& kv : keyGroups) {
-			auto k = kv.first;
-			if (k[0] >= '0' && k[0] <= '9') k = '_' + k;
 			auto& names = kv.second;
 			for(int i = 0; i < names.size(); ++i) {
-				auto name = k + "_" + names[i];
+				auto name = kv.first + "_" + names[i];
 				auto f = &tp.frames[0];
 				for (auto& o : tp.frames) {
 					if (o.name == name) {
@@ -295,11 +293,9 @@ struct )#", structName, R"#( {)#", tmp, R"#(
 		}
 
 		for (auto&& kv : keyGroups) {
-			auto k = kv.first;
-			if (k[0] >= '0' && k[0] <= '9') k = '_' + k;
 			auto& names = kv.second;
 			for (int i = 0; i < names.size(); ++i) {
-				auto name = k + "_" + names[i];
+				auto name = kv.first + "_" + names[i];
 				auto f = &tp.frames[0];
 				for (auto& o : tp.frames) {
 					if (o.name == name) {

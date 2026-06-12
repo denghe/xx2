@@ -190,6 +190,47 @@ namespace xx {
         return 0;
     }
 
+
+    // load font & texture from frames
+    void BMFont::Init(Frame const* frames_, int32_t frameCount_, int32_t const* charCodes_) {
+        memset(charArray.data(), 0, sizeof(charArray));
+        charMap.clear();
+        kernings.clear();
+        texs.Clear();
+        texFNs.Clear();
+        paddingLeft = paddingTop = paddingRight = paddingBottom = fontSize = lineHeight = 0;
+        fontSize = 0;
+        lineHeight = 0;
+        fullPath.clear();
+
+		for (int32_t i = 0; i < frameCount_; ++i) {
+			auto& c = charMap[charCodes_[i]];
+			auto& f = frames_[i];
+			c.x = f.uvRect.x;
+			c.y = f.uvRect.y;
+			c.width = f.uvRect.w;
+			c.height = f.uvRect.h;
+			c.xoffset = 0;
+			c.yoffset = 0;
+			c.xadvance = f.uvRect.w;
+			c.chnl = 0;
+			c.texId = f.tex->id;
+			if (charCodes_[i] < 256) {
+				charArray[charCodes_[i]] = c;
+			}
+			if (c.height > lineHeight) {
+				lineHeight = c.height;
+			}
+            auto idx = texs.Find(f.tex);
+            if (idx < 0) {
+                idx = texs.len;
+                texs.Emplace(f.tex);
+            }
+			c.page = idx;
+		}
+		fontSize = lineHeight;
+    }
+
     // texture index: page
     BMFontChar const* BMFont::Get(char32_t charId) const {
         assert(charId >= 0);

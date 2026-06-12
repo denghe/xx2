@@ -65,15 +65,38 @@ press ENTER to continue...)#";
 			stbi_write_png(cfn, c.width, c.height, 4, buf.buf, c.width * 4);
 		};
 
+		std::vector<int32_t> charCodes;
+
 		for (int32_t i = 0; i < 256; ++i) {
 			auto& c = bmf.charArray[i];
 			if (c.width == 0 || c.height == 0) continue;
+			charCodes.push_back(i);
 			WritePNG(imgs[c.page], xx::ToString(outDir, "/", i, ".png"), c);
 		}
 
 		for (auto& [k, v] : bmf.charMap) {
+			if (k < 256) continue;	// already in charArray
+			charCodes.push_back(k);
 			WritePNG(imgs[v.page], xx::ToString(outDir, "/", k, ".png"), v);
 		}
+
+		std::sort(charCodes.begin(), charCodes.end(), std::less<int32_t>());
+
+		// write mapping code
+		auto pn = xx::U8AsString(p.stem().u8string());
+		auto vn = "charCodes_" + pn;
+		auto fn = outDir.u8string() + u8".h";
+		std::string code;
+		xx::AppendFormat(code, R"#(static constexpr int {0}[] = {{)#", vn);
+		for (auto& c : charCodes) {
+			xx::AppendFormat(code, R"#(
+{0},)#", c);
+		}
+		xx::Append(code, R"#(
+};
+)#");
+		xx::WriteAllBytes(fn, code.data(), code.size());
+		xx::CoutN("write ", fn);
 	}
 
 	xx::CoutN("finished! press ENTER to continue...");
