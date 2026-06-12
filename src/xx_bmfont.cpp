@@ -6,19 +6,19 @@ namespace xx {
 	
     // load binary .fnt & .pngs from file
     // return 0: success
-    int32_t BMFont::Init(std::string_view fn) {
-        auto p = GameBase::instance->GetFullPath(fn);
+    int32_t BMFont::Init(std::string_view fn_, bool autoLoadTexture_) {
+        auto p = GameBase::instance->GetFullPath(fn_);
         auto d = ReadAllBytes_sv(p);
         if (d.len < 4) return __LINE__; // throw std::logic_error(ToString("BMFont file's size is too small. fn = ", p));
         if (std::string_view((char*)d.buf, 3) != "BMF"sv) return __LINE__; // throw std::logic_error(ToString("bad BMFont format. fn = ", p));
         if (d[3] != 3) return __LINE__; // throw std::logic_error(ToString("BMFont only support version 3. fn = ", p));
-        if (auto r = Init(d.buf, d.len, p); r) return r;
+        if (auto r = Init(d.buf, d.len, p, autoLoadTexture_); r) return r;
         return 0;
     }
-
+        
     // load font & texture from memory
     // tex: for easy load font texture from memory
-    int32_t BMFont::Init(uint8_t const* buf_, size_t len_, std::string fullPath_, bool autoLoadTexture) {
+    int32_t BMFont::Init(uint8_t const* buf_, size_t len_, std::string fullPath_, bool autoLoadTexture_) {
         fullPath.clear();
         Data_r d{ buf_, len_ };
 
@@ -26,7 +26,7 @@ namespace xx {
         memset(charArray.data(), 0, sizeof(charArray));
         charMap.clear();
         kernings.clear();
-        if (autoLoadTexture) {
+        if (autoLoadTexture_) {
             texs.Clear();
         }
         paddingLeft = paddingTop = paddingRight = paddingBottom = fontSize = lineHeight = 0;
@@ -169,18 +169,17 @@ namespace xx {
         }
 
         // load textures
-        if (autoLoadTexture) {
+        if (autoLoadTexture_) {
             for (auto&& f : texFNs) {
                 texs.Emplace(GameBase::instance->LoadTexture(f));
             }
-        }
-
-        // fill texId
-        for (auto& c : charArray) {
-            c.texId = texs[c.page]->id;
-        }
-        for (auto& [k, v] : charMap) {
-            v.texId = texs[v.page]->id;
+            // fill texId
+            for (auto& c : charArray) {
+                c.texId = texs[c.page]->id;
+            }
+            for (auto& [k, v] : charMap) {
+                v.texId = texs[v.page]->id;
+            }
         }
 
         // store display info when success

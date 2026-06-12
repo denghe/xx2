@@ -28,11 +28,11 @@ namespace xx {
 
         // load binary .fnt & .pngs from file
         // return 0: success
-        int32_t Init(std::string_view fn);
+        int32_t Init(std::string_view fn_, bool autoLoadTexture_ = true);
 
         // load font & texture from memory
         // tex: for easy load font texture from memory
-        int32_t Init(uint8_t const* buf_, size_t len_, std::string fullPath_, bool autoLoadTexture = true);
+        int32_t Init(uint8_t const* buf_, size_t len_, std::string fullPath_, bool autoLoadTexture_ = true);
 
         // texture index: page
         BMFontChar const* Get(char32_t charId) const;

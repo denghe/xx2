@@ -178,21 +178,30 @@ namespace xx {
         if (IsAbsolutePathName(fn))
             return std::string(fn);
 
+		// no search path?
+		if (searchPaths.empty()) {
+			auto cp = std::filesystem::current_path();
+			tmpPath = cp / (std::u8string_view&)fn;
+			if (std::filesystem::exists(tmpPath)) {
+				if (fnIsFileName && std::filesystem::is_regular_file(tmpPath)
+					|| std::filesystem::is_directory(tmpPath)) {
+					return U8AsString(tmpPath.u8string());
+				}
+			}
+			// not found
+			return {};
+		}
+
         // foreach search path find
         for (size_t i = 0, e = searchPaths.size(); i < e; ++i) {
             tmpPath = (std::u8string&)searchPaths[i];
             tmpPath /= (std::u8string_view&)fn;
-            if (std::filesystem::exists(tmpPath)) {
-                if (fnIsFileName) {
-                    if (std::filesystem::is_regular_file(tmpPath)) goto LabReturn;
-                }
-                else {
-                    if (std::filesystem::is_directory(tmpPath)) goto LabReturn;
-                }
-            }
-            continue;
-        LabReturn:
-            return U8AsString(tmpPath.u8string());
+			if (std::filesystem::exists(tmpPath)) {
+				if (fnIsFileName && std::filesystem::is_regular_file(tmpPath)
+					|| std::filesystem::is_directory(tmpPath)) {
+					return U8AsString(tmpPath.u8string());
+				}
+			}
         }
         // not found
         return {};
