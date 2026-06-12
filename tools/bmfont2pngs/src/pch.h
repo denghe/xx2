@@ -3,3 +3,4 @@
 #include <xx.h>
 using XY = xx::XY;
 using XYi = xx::XYi;
+#include <stb_image_write.h>

@@ -31,7 +31,7 @@ namespace xx {
         }
         paddingLeft = paddingTop = paddingRight = paddingBottom = fontSize = lineHeight = 0;
 
-        List<std::string> texFNs;
+        texFNs.Clear();
         uint16_t pages{};
 
         (void)d.ReadJump(4);  // skip BMF\x3

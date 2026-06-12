@@ -21,6 +21,7 @@ namespace xx {
         std::unordered_map<uint32_t, BMFontChar> charMap; // key: char id
         std::unordered_map<uint64_t, int> kernings;	// key: char id pair
         List<Shared<GLTexture>> texs;
+        List<std::string> texFNs;
         uint8_t paddingLeft{}, paddingTop{}, paddingRight{}, paddingBottom{};
         int16_t fontSize{};
         uint16_t lineHeight{};
