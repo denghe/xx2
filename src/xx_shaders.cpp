@@ -692,7 +692,7 @@ void main() {
         float a{};
         if (radians_.has_value()) {
             ++len;
-			a = *radians_;
+			a = -*radians_;
         }
 		auto points = Alloc(len);
         auto coef = 2.0f * (float)M_PI / segments_;
