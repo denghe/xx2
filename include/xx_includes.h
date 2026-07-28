@@ -125,7 +125,7 @@ inline void Sleep(int const& ms) {
 	}
 
 */
-#define XX_BEGIN(lineNumber)             switch (lineNumber) { case 0:
+#define XX_BEGIN(lineNumber)        switch (lineNumber) { case 0:
 #define XX_YIELD(lineNumber)             lineNumber = __LINE__; return; case __LINE__:;
 #define XX_YIELD_F(lineNumber)           lineNumber = __LINE__; return false; case __LINE__:;
 #define XX_YIELD_B(lineNumber)           lineNumber = __LINE__; return false; case __LINE__:;
@@ -136,7 +136,7 @@ inline void Sleep(int const& ms) {
 #define XX_YIELD_B_TO_BEGIN(lineNumber)  lineNumber = 0; return false;
 #define XX_YIELD_I_TO_BEGIN(lineNumber)  lineNumber = 0; return 0;
 #define XX_YIELD_Z_TO_BEGIN(lineNumber)  lineNumber = 0; return 0;
-#define XX_END(lineNumber)               }
+#define XX_END(lineNumber, ...)          __VA_OPT__( lineNumber = 0; __VA_ARGS__ = 0; )}
 #define XX_END_F(lineNumber)             } return false;
 #define XX_END_Z(lineNumber)             } return 0;
 

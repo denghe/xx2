@@ -122,6 +122,10 @@ if(MSVC)
 		$<$<PLATFORM_ID:Windows>:/bigobj>
 		$<$<PLATFORM_ID:Windows>:/MP${Biogears_BUILD_PARALLEL_LEVEL}>
 	)
+
+	target_compile_options(xx PUBLIC
+		$<$<PLATFORM_ID:Windows>:/Zc:preprocessor>
+	)
 	
 	target_compile_options(glfw PRIVATE $<$<PLATFORM_ID:Windows>:/MP${Biogears_BUILD_PARALLEL_LEVEL}>)
 	target_compile_options(libzstd_static PRIVATE $<$<PLATFORM_ID:Windows>:/MP${Biogears_BUILD_PARALLEL_LEVEL}>)
