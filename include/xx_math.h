@@ -63,4 +63,7 @@ namespace xx {
     // limit a by from ~ to
     // no change: return false
     bool AngleLimit(float& a, float from, float to);
+
+    // xy.from: min xy . to: max xy.
+    bool BounceCircleIfIntersectsBox(FromTo<XY> const& xy, float radius, float speed, XY& inc, XY& newPos);
 }
