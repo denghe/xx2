@@ -328,4 +328,45 @@ namespace xx {
         }
         return true;
     }
+
+    bool BounceCircleIfIntersectsBox(FromTo<XY> const& xy, float radius, float speed, XY& inc, XY& newPos)
+    {
+        // find rect nearest point
+        XY np{ std::max(xy.from.x, std::min(newPos.x, xy.to.x)),
+              std::max(xy.from.y, std::min(newPos.y, xy.to.y)) };
+
+        // calc
+        auto d = np - newPos;
+        auto mag = std::sqrtf(d.x * d.x + d.y * d.y);
+        auto overlap = radius - mag;
+
+        // intersect
+        if (overlap > 0 && mag != 0.f)
+        {
+            auto mag_1 = 1 / mag;
+            auto p = d * mag_1 * overlap;
+
+            // bounce
+            if (np.x == newPos.x)
+            {
+                inc.y *= -1;
+            }
+            else if (np.y == newPos.y)
+            {
+                inc.x *= -1;
+            }
+            else
+            {
+                auto a1 = std::atan2f(-inc.y, -inc.x);
+                auto a2 = std::atan2f(-p.y, -p.x);
+                auto gap = AngleGap(a1, a2);
+                a2 += gap; // todo?
+                inc = XY{ std::cosf(a2) * speed, std::sinf(a2) * speed };
+            }
+
+            newPos -= p;
+            return true;
+        }
+        return false;
+    }
 }
