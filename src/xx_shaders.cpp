@@ -955,8 +955,12 @@ out vec4 oColor;
 
 void main() {
     vec4 c = vColor * texture(uTex0, vTexCoord / vec2(textureSize(uTex0, 0)));
-    vec3 c3 = vec3(c.x, c.y, c.z);
-	c = vec4(mix(c3, dot(vec3(0.299, 0.587, 0.114), c3), 1.0), c.w);
+
+	vec3 lum = vec3(0.299, 0.587, 0.114);
+	vec3 gray = vec3(dot(lum, c.xyz));
+    float factor = 1.0;
+	c = vec4(mix(c.xyz, gray, factor), c.w);
+
     oColor = vec4( c.x * vColorplus, c.y * vColorplus, c.z * vColorplus, c.w );
 })"sv });
 
