@@ -12,6 +12,7 @@
 #include "xx_shader_line.h"
 #include "xx_shader_numbers.h"
 #include "xx_shader_quad_outline.h"
+#include "xx_shader_quad_gray.h"
 #include "xx_shader_quadex.h"
 #include "xx_shader_hpbar.h"
 // ...
@@ -270,6 +271,9 @@ namespace xx {
 
         Shader_QuadOutline shaderQuadOutline;
         Shader_QuadOutline& QuadOutline() { return ShaderBegin(shaderQuadOutline); }
+
+        Shader_QuadGray shaderQuadGray;
+        Shader_QuadGray& QuadGray() { return ShaderBegin(shaderQuadGray); }
 
         Shader_QuadEx shaderQuadEx;
         Shader_QuadEx& QuadEx() { return ShaderBegin(shaderQuadEx); }

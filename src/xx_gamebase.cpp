@@ -795,6 +795,7 @@ namespace xx {
 		shaderLine.Init();
 		shaderNumbers.Init();
 		shaderQuadOutline.Init();
+		shaderQuadGray.Init();
 		shaderQuadEx.Init();
 		shaderHPBar.Init();
 		// ...
