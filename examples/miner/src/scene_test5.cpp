@@ -259,7 +259,7 @@ namespace Test5 {
 		}
 
 		// handle mouse drag, click
-		const auto mp = (cam.ToLogicPos(gg.mousePos) - talentBasePos) / talentScale;
+		auto mp = (cam.ToLogicPos(gg.mousePos) - talentBasePos) / talentScale;
 		currTalent = FindTalent(mp);
 		if (gg.mouse[GLFW_MOUSE_BUTTON_1]) {
 			if (clicking) {
@@ -271,6 +271,8 @@ namespace Test5 {
 			if (talentDragging) {
 				talentBasePos += (gg.mousePos - lastMousePos).FlipY() / cam.baseScale;
 				lastMousePos = gg.mousePos;
+				mp = (cam.ToLogicPos(gg.mousePos) - talentBasePos) / talentScale;
+				currTalent = FindTalent(mp);	// update currTalent while dragging
 			}
 			else if (!lastMBPressed) {	// first time
 				lastMBPressed = true;
