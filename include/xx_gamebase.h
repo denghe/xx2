@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "xx_gl.h"
-#include "xx_grid2daabb.h"
+#include "xx_grid2dbox.h"
 #include "xx_node.h"
 #include "xx_bmfont.h"
 #include "xx_input.h"
@@ -102,7 +102,7 @@ namespace xx {
         bool isAMDCard{};                                   // for ATI graphics card bug fix
 
         Weak<Node> uiHandler;
-        Grid2dAABB uiGrid;
+        Grid2dBox uiGrid;
         List<Weak<Node>> uiAutoUpdates;
 
         Shader* shader{};

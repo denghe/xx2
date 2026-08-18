@@ -1,9 +1,9 @@
-﻿#include "xx_grid2daabb.h"
+﻿#include "xx_grid2dbox.h"
 #include "xx_math.h"
 
 namespace xx {
 
-    void Grid2dAABB::Init(XYi gridSize_, XY cellSize_, int32_t cellCap_, int32_t capacity_) {
+    void Grid2dBox::Init(XYi gridSize_, XY cellSize_, int32_t cellCap_, int32_t capacity_) {
         assert(!nodes && capacity_ > 0);
         assert(gridSize_.x > 0 && gridSize_.y > 0);
         assert(cellSize_.x > 0 && cellSize_.y > 0);
@@ -19,13 +19,13 @@ namespace xx {
         for (auto& c : cells) c.Reserve(cellCap_);
     }
 
-    Grid2dAABB::~Grid2dAABB() {
+    Grid2dBox::~Grid2dBox() {
         if (!nodes) return;
         delete[](MyAlignedStorage<Node>*)nodes;
         nodes = {};
     }
 
-	void Grid2dAABB::Reserve(int32_t capacity_) {
+	void Grid2dBox::Reserve(int32_t capacity_) {
 		assert(capacity_ > 0);
 		if (capacity_ <= capacity) return;
 		auto newNodes = (Node*)new MyAlignedStorage<Node>[capacity_];
@@ -35,7 +35,7 @@ namespace xx {
 		capacity = capacity_;
 	}
 
-    int32_t Grid2dAABB::Add(FromTo<XY> const& aabb_, void* ud_) {
+    int32_t Grid2dBox::Add(FromTo<XY> const& aabb_, void* ud_) {
         assert(aabb_.from.x < aabb_.to.x && aabb_.from.y < aabb_.to.y);
         assert(aabb_.from.x >= 0 && aabb_.from.x < worldSize.x);
         assert(aabb_.from.y >= 0 && aabb_.from.y < worldSize.y);
@@ -80,7 +80,7 @@ namespace xx {
         return nodeIndex;
     }
 
-    void Grid2dAABB::Remove(int32_t nodeIndex_) {
+    void Grid2dBox::Remove(int32_t nodeIndex_) {
         assert(nodeIndex_ >= 0 && nodeIndex_ < count && nodes[nodeIndex_].next == -1);
         auto& o = nodes[nodeIndex_];
 
@@ -106,7 +106,7 @@ namespace xx {
 		o.ud = {};
     }
 
-    void Grid2dAABB::Update(int32_t nodeIndex_, FromTo<XY> const& aabb_) {
+    void Grid2dBox::Update(int32_t nodeIndex_, FromTo<XY> const& aabb_) {
         assert(nodes);
         assert(nodeIndex_ >= 0 && nodeIndex_ < count && nodes[nodeIndex_].next == -1);
         assert(aabb_.from.x < aabb_.to.x && aabb_.from.y < aabb_.to.y);
@@ -155,21 +155,21 @@ namespace xx {
         o.ccrr = ccrr;
     }
 
-	Grid2dAABB::Node& Grid2dAABB::NodeAt(int32_t nodeIndex_) const {
+	Grid2dBox::Node& Grid2dBox::NodeAt(int32_t nodeIndex_) const {
         assert(nodeIndex_ >= 0 && nodeIndex_ < count && nodes[nodeIndex_].next == -1);
-        return (Grid2dAABB::Node&)nodes[nodeIndex_];
+        return (Grid2dBox::Node&)nodes[nodeIndex_];
     }
 
-    int32_t Grid2dAABB::Count() const {
+    int32_t Grid2dBox::Count() const {
         return count - freeCount;
     }
 
-    bool Grid2dAABB::Empty() const {
+    bool Grid2dBox::Empty() const {
         return Count() == 0;
     }
 
 
-    bool Grid2dAABB::TryLimitAABB(FromTo<XY>& aabb_, float edge_) {
+    bool Grid2dBox::TryLimitAABB(FromTo<XY>& aabb_, float edge_) {
         assert(edge_ > 0 && edge_ < cellSize.x * 0.5f && edge_ < cellSize.y * 0.5f);
         auto ws = worldSize - edge_;
         if (!IsIntersect_BoxBoxF(XY{ edge_ }, ws, aabb_.from, aabb_.to)) return false;
@@ -180,7 +180,7 @@ namespace xx {
         return true;
     }
 
-    void Grid2dAABB::ForeachPoint(XY const& p_) {
+    void Grid2dBox::ForeachPoint(XY const& p_) {
         assert(p_.x >= 0 && p_.x < worldSize.x);
         assert(p_.y >= 0 && p_.y < worldSize.y);
         results.Clear();
@@ -195,7 +195,7 @@ namespace xx {
         }
     }
 
-    void Grid2dAABB::ForeachAABB(FromTo<XY> const& aabb_, int32_t except_) {
+    void Grid2dBox::ForeachAABB(FromTo<XY> const& aabb_, int32_t except_) {
         assert(aabb_.from.x < aabb_.to.x && aabb_.from.y < aabb_.to.y);
         assert(aabb_.from.x >= 0 && aabb_.from.x < worldSize.x);
         assert(aabb_.from.y >= 0 && aabb_.from.y < worldSize.y);

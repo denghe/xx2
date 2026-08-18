@@ -5,7 +5,7 @@
 
 namespace xx {
 	
-    struct Grid2dAABB {
+    struct Grid2dBox {
         struct Node {
             int32_t next, inResults;
             FromTo<XY> aabb;
@@ -20,12 +20,12 @@ namespace xx {
         List<List<int32_t>> cells{};	// value: nodes index
         List<int32_t> results;
 
-        Grid2dAABB() = default;
-        Grid2dAABB(Grid2dAABB const& o) = delete;
-        Grid2dAABB& operator=(Grid2dAABB const& o) = delete;
+        Grid2dBox() = default;
+        Grid2dBox(Grid2dBox const& o) = delete;
+        Grid2dBox& operator=(Grid2dBox const& o) = delete;
 
         void Init(XYi gridSize_, XY cellSize_, int32_t cellCap_ = 4, int32_t capacity_ = 16);
-        ~Grid2dAABB();
+        ~Grid2dBox();
         void Reserve(int32_t capacity_);
         int32_t Add(FromTo<XY> const& aabb_, void* ud_);
         void Remove(int32_t nodeIndex_);

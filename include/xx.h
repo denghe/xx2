@@ -16,7 +16,7 @@
 #include "xx_framebuffer.h"
 #include "xx_rectpacker.h"
 #include "xx_affine.h"
-#include "xx_grid2daabb.h"
+#include "xx_grid2dbox.h"
 #include "xx_shader.h"
 #include "xx_shader_quad.h"
 #include "xx_camera.h"
