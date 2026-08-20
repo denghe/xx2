@@ -485,11 +485,12 @@ namespace xx {
 				if (glfwGetGamepadState(jid, &gs)) {
 					for (auto i = 0; i <= GLFW_GAMEPAD_BUTTON_LAST; i++) {
 						if (gs.buttons[i]) {
-							j.btns[i].Press();
-							joy.btns[i].Press();
+							j.btns[i].pressed = true;
+							joy.btns[i].pressed = true;
 						}
 						else {
-							j.btns[i].Release();
+							j.btns[i].pressed = false;
+                            joy.btns[i].pressed = false;
 						}
 					}
 					for (auto i = 0; i < GLFW_GAMEPAD_AXIS_LAST - 1; i++) {
@@ -511,16 +512,16 @@ namespace xx {
 
 					// LT -> L2, RT -> R2
 					if (j.axes[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER] > -0.5f) {
-						j.btns[GLFW_GAMEPAD_BUTTON_LEFT_THUMB].Press();
+						j.btns[GLFW_GAMEPAD_BUTTON_LEFT_THUMB].pressed = true;
 					}
 					else {
-						j.btns[GLFW_GAMEPAD_BUTTON_LEFT_THUMB].Release();
+						j.btns[GLFW_GAMEPAD_BUTTON_LEFT_THUMB].pressed = false;
 					}
 					if (j.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > -0.5f) {
-						j.btns[GLFW_GAMEPAD_BUTTON_RIGHT_THUMB].Press();
+						j.btns[GLFW_GAMEPAD_BUTTON_RIGHT_THUMB].pressed = true;
 					}
 					else {
-						j.btns[GLFW_GAMEPAD_BUTTON_RIGHT_THUMB].Release();
+						j.btns[GLFW_GAMEPAD_BUTTON_RIGHT_THUMB].pressed = false;
 					}
 				}
 				else {
@@ -530,16 +531,16 @@ namespace xx {
 
 			// LT -> L2, RT -> R2
 			if (joy.axes[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER] > -0.5f) {
-				joy.btns[GLFW_GAMEPAD_BUTTON_LEFT_THUMB].Press();
+				joy.btns[GLFW_GAMEPAD_BUTTON_LEFT_THUMB].pressed = true;
 			}
 			else {
-				joy.btns[GLFW_GAMEPAD_BUTTON_LEFT_THUMB].Release();
+				joy.btns[GLFW_GAMEPAD_BUTTON_LEFT_THUMB].pressed = false;
 			}
 			if (joy.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > -0.5f) {
-				joy.btns[GLFW_GAMEPAD_BUTTON_RIGHT_THUMB].Press();
+				joy.btns[GLFW_GAMEPAD_BUTTON_RIGHT_THUMB].pressed = true;
 			}
 			else {
-				joy.btns[GLFW_GAMEPAD_BUTTON_RIGHT_THUMB].Release();
+				joy.btns[GLFW_GAMEPAD_BUTTON_RIGHT_THUMB].pressed = false;
 			}
 		}
 
