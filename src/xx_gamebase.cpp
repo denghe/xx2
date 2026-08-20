@@ -476,36 +476,40 @@ namespace xx {
 		}
 
 		// fill all joystick data
-		joy.ClearValues();
 		if (joys.len) {
 			GLFWgamepadstate gs;
-			for (int32_t i = 0; i < joys.len; ++i) {
-				auto& j = joys[i];
+			for (int32_t k = 0; k < joys.len; ++k) {
+				auto& j = joys[k];
 				auto jid = j.jid;
 				if (glfwGetGamepadState(jid, &gs)) {
+					// ABXY SELECT START ....
 					for (auto i = 0; i <= GLFW_GAMEPAD_BUTTON_LAST; i++) {
-						if (gs.buttons[i]) {
-							j.btns[i].Press();
-							joy.btns[i].Press();
+						auto& jb = j.btns[i];
+						if (gs.buttons[i] && !jb) {
+							jb.Press();
 						}
 						else {
-							j.btns[i].Release();
+							jb.Release();
 						}
 					}
+					// LEFT JOY & RIGHT JOY
 					for (auto i = 0; i < GLFW_GAMEPAD_AXIS_LAST - 1; i++) {
 						auto v = gs.axes[i];
-						if (std::abs(v) < 0.08f) j.axes[i] = 0.f;	// 0.08f: death zone
+						if (std::abs(v) < 0.08f) {
+							j.axes[i] = 0.f;	// 0.08f: death zone
+						}
 						else {
 							j.axes[i] = v;
-							joy.axes[i] = v;
 						}
 					}
+					// LT & RT
 					for (auto i = GLFW_GAMEPAD_AXIS_LAST - 1; i <= GLFW_GAMEPAD_AXIS_LAST; i++) {
 						auto v = gs.axes[i];
-						if (v < -0.9f) j.axes[i] = -1.f;	// 0.9f: death zone
+						if (v < -0.9f) {
+							j.axes[i] = -1.f;	// 0.9f: death zone
+						}
 						else {
 							j.axes[i] = v;
-							joy.axes[i] = v;
 						}
 					}
 
@@ -527,20 +531,44 @@ namespace xx {
 					j.ClearValues();
 				}
 			}
+		}
 
-			// LT -> L2, RT -> R2
-			if (joy.axes[GLFW_GAMEPAD_AXIS_LEFT_TRIGGER] > -0.5f) {
-				joy.btns[GLFW_GAMEPAD_BUTTON_LEFT_THUMB].Press();
+		// combine joys stat to joy
+		if (joys.len) {
+
+			// ABXY SELECT START ....
+			for (auto i = 0; i <= GLFW_GAMEPAD_BUTTON_LAST; i++) {
+				auto& jb = joy.btns[i];
+
+				bool pressed = false;
+				for (int32_t k = 0; k < joys.len; ++k) {
+					if (joys[k].btns[i]) {
+						pressed = true;
+						break;
+					}
+				}
+
+				if (jb && !pressed) {
+					jb.Release();
+				}
+				else if (!jb && pressed) {
+					jb.Press();
+				}
 			}
-			else {
-				joy.btns[GLFW_GAMEPAD_BUTTON_LEFT_THUMB].Release();
+			// LEFT JOY & RIGHT JOY & LT & RT
+			for (auto i = 0; i <= GLFW_GAMEPAD_AXIS_LAST; i++) {
+				float maxVal{};
+				for (int32_t k = 0; k < joys.len; ++k) {
+					auto& v = joys[k].axes[i];
+					if (std::abs(v) > std::abs(maxVal)) {
+						maxVal = v;
+					}
+				}
+				joy.axes[i] = maxVal;
 			}
-			if (joy.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > -0.5f) {
-				joy.btns[GLFW_GAMEPAD_BUTTON_RIGHT_THUMB].Press();
-			}
-			else {
-				joy.btns[GLFW_GAMEPAD_BUTTON_RIGHT_THUMB].Release();
-			}
+		}
+		else {
+			joy.ClearValues();
 		}
 
 		// timeout
