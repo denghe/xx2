@@ -44,7 +44,7 @@ namespace xx {
     struct Weak;
 
 
-	// std::shared_ptr / weak_ptr likely but thin, no atomic( fast 4 times ), a little unsafe for easy use
+	// std::shared_ptr / weak_ptr likely but thin, no atomic( fast 4 times ), a little unsafe for easy use( does not support multiple VTABLE )
     template<typename T>
     struct Shared {
         using HeaderType = PtrHeader_t<T>;
@@ -255,6 +255,7 @@ namespace xx {
             if (pointer == ptr) return;
             Reset();
             if (ptr) {
+                assert((void*)ptr == (void*)(T*)ptr);    // does not support multiple VTABLE
                 pointer = ptr;
                 ++CalcPtrHeader<HeaderType>(ptr)->sharedCount;
             }
@@ -387,6 +388,7 @@ namespace xx {
             Reset();
             if (s.pointer) {
                 h = (HeaderType*)s.GetHeader();
+                assert((void*)(T*)s.pointer == (void*)&h->data);    // does not support multiple VTABLE
                 ++h->weakCount;
             }
         }
