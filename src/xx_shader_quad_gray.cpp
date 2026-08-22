@@ -25,8 +25,8 @@ void main() {
     float radians = aScaleRadiansColorplus.z;
     vec2 offset = vec2((aVert.x - anchor.x) * scale.x, (aVert.y - anchor.y) * scale.y);
 
-    float c = cos(radians);
-    float s = sin(radians);
+    float c = cos(-radians);
+    float s = sin(-radians);
     vec2 v = pos + vec2(
        dot(offset, vec2(c, s)),
        dot(offset, vec2(-s, c))

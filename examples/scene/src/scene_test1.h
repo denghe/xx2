@@ -6,7 +6,7 @@ struct Bug {
 	static constexpr int32_t cLen{ 10 };
 	static constexpr float cStepMul{ 0.8f };
 	static constexpr float cStep0{ 16.f };
-	static constexpr float cScale0{ 0.3f };
+	static constexpr float cScale0{ 0.6f };
 	static constexpr float cSpeed{ 50.f / gg.cFps };
 	inline static std::array<float, cLen> scales;
 	inline static std::array<float, cLen> steps;

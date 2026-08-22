@@ -11,17 +11,17 @@ namespace Test2 {
 	}
 
 	bool Pickaxe::Update() {
-		static constexpr float cStep1Radians{ 30.f / 180.f * M_PI };
+		static constexpr float cStep1Radians{ -30.f / 180.f * M_PI };
 		static constexpr float cStep1RadiansStep{ cStep1Radians / (gg.cFps * 0.1f) };
-		static constexpr float cStep2Radians{ -50.f / 180.f * M_PI };
+		static constexpr float cStep2Radians{ 50.f / 180.f * M_PI };
 		static constexpr float cStep2RadiansStep{ (cStep2Radians - cStep1Radians) / (gg.cFps * 0.2f) };
 
 		XX_BEGIN(_1);
-		for (radians = 0; radians < cStep1Radians; radians += cStep1RadiansStep) {
+		for (radians = 0; radians > cStep1Radians; radians += cStep1RadiansStep) {
 			XX_YIELD_F(_1);
 		}
 		gg.PlayAudio(gg.ss.pickaxe);
-		for (; radians > cStep2Radians; radians += cStep2RadiansStep) {
+		for (; radians < cStep2Radians; radians += cStep2RadiansStep) {
 			XX_YIELD_F(_1);
 		}
 		return true;

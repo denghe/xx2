@@ -22,7 +22,7 @@ namespace Test3 {
 	}
 
 	void Airplane::Draw() {
-		gg.Quad().DrawFrame(f, scene->cam.ToGLPos(track[trackPointIndex]), scene->cam.scale, radians);
+		gg.Quad().DrawFrame(f, track[trackPointIndex] * scene->cam.scale, scene->cam.scale, radians);
 	}
 
 	/***************************************************************************************/
@@ -83,8 +83,8 @@ namespace Test3 {
 			track.second.Resize(numSteps);
 			auto cos = std::cosf(track.first);
 			auto sin = std::sinf(track.first);
-			XY inc{ -cos * step , -sin * step };
-			XY posBegin{ cos * r, sin * r };
+			XY inc{ cos * step , sin * step };
+			XY posBegin{ -cos * r, -sin * r };
 			for (int32_t j = 0; j < numSteps; ++j) {
 				track.second[j] = posBegin + inc * j;
 			}

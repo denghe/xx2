@@ -76,7 +76,7 @@ void Scene_MainMenu::MakeUI() {
 	};
 
 	offset.y -= cLineHeight;
-	ui->Make<xx::LabelButton>()->Init(2, offset, anchor, fontSize)("test1").onClicked = [this] {
+	ui->Make<xx::LabelButton>()->Init(2, offset, anchor, fontSize)("bugs test").onClicked = [this] {
 		gg.MakeScene<Scene_Test1>()->Init();
 	};
 

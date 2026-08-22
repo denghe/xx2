@@ -8,7 +8,7 @@ namespace Test8 {
 		auto [p, r] = b2body.GetPosRadians();
 		pos = p;
 		y = p.y;
-		radians = r;
+		radians = -r;	// box2d is clockwise, ogl is counter-clockwise
 		return false;
 	}
 

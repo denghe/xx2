@@ -15,9 +15,9 @@ void Bug::Init(Scene_Test1* scene_, XY pos_, XY tar_, xx::RGBA8 color_) {
 	scene = scene_;
 	color = color_;
 	poss[0] = pos_;
-	auto d = tar_ - poss[0];
+	auto d = poss[0] - tar_;
 	auto r = radianss[0] = std::atan2f(d.y, d.x);
-	XY inc{ std::cosf(r + M_PI), std::sinf(r + M_PI) };
+	XY inc{ std::cosf(r), std::sinf(r) };
 	for (int i = 1; i < cLen; ++i) {
 		poss[i] = poss[i - 1] + inc * steps[i];
 		radianss[i] = r;
@@ -44,17 +44,17 @@ void Bug::Update(XY tar_) {
 void Bug::Draw() {
 	auto& c = scene->cam;
 #if 0
-	gg.Quad().DrawFrame(gg.fs.bug_head, c.ToGLPos(poss[0]), scales[0] * c.scale, radianss[0], 1.f, color);
+	gg.Quad().DrawFrame(gg.fs.bug_head, poss[0] * c.scale, scales[0] * c.scale, radianss[0], 1.f, color);
 	for (int i = 1; i < cLen; ++i) {
-		gg.Quad().DrawFrame(gg.fs.bug_body, c.ToGLPos(poss[i]), scales[i] * c.scale, radianss[i], 1.f, color);
+		gg.Quad().DrawFrame(gg.fs.bug_body, poss[i] * c.scale, scales[i] * c.scale, radianss[i], 1.f, color);
 	}
 #else
 	auto& f0 = gg.fs.bug_head;
 	auto buf = gg.Quad().Alloc(f0, cLen);
-	buf[0].Fill(f0, c.ToGLPos(poss[0]), f0, scales[0] * c.scale, radianss[0], 1.f, color);
+	buf[0].Fill(f0, poss[0] * c.scale, f0, scales[0] * c.scale, radianss[0], 1.f, color);
 	auto& f1 = gg.fs.bug_body;
 	for (int i = 1; i < cLen; ++i) {
-		buf[i].Fill(f1, c.ToGLPos(poss[i]), f1, scales[i] * c.scale, radianss[i], 1.f, color);
+		buf[i].Fill(f1, poss[i] * c.scale, f1, scales[i] * c.scale, radianss[i], 1.f, color);
 	}
 #endif
 }
@@ -63,14 +63,16 @@ void Bug::Draw() {
 
 void Scene_Test1::Init() {
 	ui.Emplace()->InitRoot(gg.scale);
-	cam.Init(gg.scale, 1.f, gg.designSize / 2);
+	cam.Init(gg.scale, 1.f, 0);
 
 	Bug::StaticInit();
+	auto ds2 = gg.designSize * 0.5f;
+	auto tar = gg.mousePos / cam.baseScale;
 	for (int i = 0; i < 10000; ++i) {
-		XY pos = cam.original;
-		pos.x = gg.rnd.Next(0.f, gg.designSize.x);
-		pos.y = gg.rnd.Next(0.f, gg.designSize.y);
-		bugs.Emplace().Emplace()->Init(this, pos, cam.ToLogicPos(gg.mousePos), xx::GetRandomColor(gg.rnd, {222,0,0,255}));
+		XY pos{};
+		pos.x = gg.rnd.Next(-ds2.x, ds2.x);
+		pos.y = gg.rnd.Next(-ds2.y, ds2.y);
+		bugs.Emplace().Emplace()->Init(this, pos, tar, xx::GetRandomColor(gg.rnd, {222,0,0,255}));
 	}
 }
 
@@ -93,7 +95,7 @@ void Scene_Test1::Update() {
 
 void Scene_Test1::FixedUpdate() {
 	// ...
-	auto tar = cam.ToLogicPos(gg.mousePos);
+	auto tar = gg.mousePos / cam.baseScale;
 	for (auto& o : bugs) o->Update(tar);
 }
 
