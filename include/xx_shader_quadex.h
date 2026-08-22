@@ -32,6 +32,9 @@ namespace xx {
         virtual void End() override;
         void Commit();
         Shader_QuadExData* Alloc(GLuint texId, int32_t numQuads = 1);
+        void Draw(GLuint texId_, UVRect rect_, XY pos_ = {}, XY anchor_ = 0.5f, XY scale_ = 1.f, XY tiling_ = 1.f, XY offset_ = {}, float radians_ = 0.f, float colorplus_ = 1.f, RGBA8 color_ = RGBA8_White);
+        void DrawTinyFrame(TinyFrame& tinyFrame_, XY pos_ = {}, XY anchor_ = 0.5f, XY scale_ = 1.f, XY tiling_ = 1.f, XY offset_ = {}, float radians_ = 0.f, float colorplus_ = 1.f, RGBA8 color_ = RGBA8_White);
+        void DrawFrame(Frame& frame_, XY pos_ = {}, XY scale_ = 1.f, XY tiling_ = 1.f, XY offset_ = {}, float radians_ = 0.f, float colorplus_ = 1.f, RGBA8 color_ = RGBA8_White);
     };
 
 }

@@ -10,35 +10,12 @@ int32_t main() {
 void Game::Init() {
 	DisableIME();
 	title = "examples_window";
-	windowSize = designSize = { 1024, 768 };
+	windowSize = designSize = { 1280, 800 };
 }
 
 void Game::GLInit() {
 	// load res
-	res.imgs[0] = LoadTexture("res/heart.png");
-	res.imgs[1] = LoadTexture("res/1.png");
-	res.imgs[2] = LoadTexture("res/2.png");
-
-	// combine all.frames
-	xx::RectPacker tp;
-	for (int32_t i = 0; i < sizeof(res) / sizeof(xx::Frame); ++i) {
-		tp.tfs.Add((xx::TinyFrame*)&((xx::Frame*)&res)[i]);
-	}
-	tp.AutoPack();
-
-
-	auto ds = designSize / 2;
-	int idx{};
-	for (size_t i = 0; i < 30000; i++) {
-		auto& spr = sprites.Emplace();
-		spr.frame = res.imgs[idx];
-		spr.pos.x = rnd.Next(-ds.x, ds.x);
-		spr.pos.y = rnd.Next(-ds.y, ds.y);
-		++idx;
-		if (idx == res.imgs.size()) idx = 0;
-	}
-
-
+	pics.heart = LoadTexture("res/heart.png");
 
 	// init cam
 	cam.Init(scale, 1.f, {});
@@ -57,7 +34,7 @@ void Game::GLInit() {
 	};
 
 	// init logic
-	heart.Emplace()->Init(res.imgs[0]);
+	heart.Emplace()->Init(pics.heart);
 }
 
 void Game::Update() {
@@ -91,9 +68,17 @@ void Game::Update() {
 
 	// logic update
 	heart->Update();
+	bgOffset += XY{ 0.5f, 0.5f } * delta;
 
-	// draw
-	for (auto& spr : sprites) Quad().DrawFrame(spr.frame, cam.ToGLPos(spr.pos), cam.scale);
+	// draw bg
+	QuadEx().DrawFrame(pics.heart
+		, { 0.f, 0.f }
+		, designSize.x / pics.heart.uvRect.w * cam.scale
+		, 100
+		, bgOffset
+		, 0.f
+		, 0.5f
+	);
 
 	heart->Draw();
 	DrawNode(ui);

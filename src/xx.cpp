@@ -24,7 +24,17 @@
 #include "xx_rectpacker.cpp"
 #include "xx_rnd.cpp"
 #include "xx_shaker.cpp"
-#include "xx_shaders.cpp"
+
+#include "xx_shader_hpbar.cpp"
+#include "xx_shader_line.cpp"
+#include "xx_shader_numbers.cpp"
+#include "xx_shader_quad.cpp"
+#include "xx_shader_quad_gray.cpp"
+#include "xx_shader_quad_light.cpp"
+#include "xx_shader_quad_outline.cpp"
+#include "xx_shader_quad_ex.cpp"
+#include "xx_shader_spine38.cpp"
+#include "xx_shader_texvert.cpp"
 
 #include "xx_scissor.cpp"
 #include "xx_sound.cpp"
