@@ -38,6 +38,9 @@ namespace xx {
 
 		void ApplyCfg() override;
 		Slider& SetValue(double v);
+
+        // SetValue + ApplyValue + onChanged
+		Slider& SetValueEx(double v);
 		void ApplyValue();
 		void DragEnd();
 		// todo: enable disable

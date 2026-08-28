@@ -66,4 +66,10 @@ namespace xx {
 
     // xy.from: min xy . to: max xy.
     bool BounceCircleIfIntersectsBox(FromTo<XY> const& xy, float radius, float speed, XY& inc, XY& newPos);
+
+    // for slider
+    int32_t Double01ToInt(double num_, int32_t min_, int32_t max_);
+
+    // for slider
+    double IntToDouble01(int32_t num, int32_t min_, int32_t max_);
 }

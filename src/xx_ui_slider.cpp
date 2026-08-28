@@ -56,6 +56,13 @@ namespace xx {
 		return *this;
 	}
 
+	Slider& Slider::SetValueEx(double v) {
+        SetValue(v);
+        ApplyValue();
+        onChanged(v);
+		return *this;
+	}
+
 	void Slider::ApplyValue() {
 		assert(value >= 0 && value <= 1);
 

@@ -10,18 +10,26 @@ namespace xx {
 		soloud.Emplace()->init(SoLoud::Soloud::CLIP_ROUNDOFF, 0, 0, 1024);
 	}
 
-	void Sound::SetGlobalVolume(float v) {
-		globalVolume = v;
+	void Sound::SetMasterVolume(float v) {
+        GameBase::instance->masterVolume = v;
 		soloud->setGlobalVolume(v);
 	}
 
+    void Sound::SetAudioVolume(float v) {
+        GameBase::instance->audioVolume = v;
+    }
+
+    void Sound::SetMusicVolume(float v) {
+        GameBase::instance->musicVolume = v;
+    }
+
 	unsigned int Sound::GetActiveVoiceCount() {
-		if (globalVolume == 0.f) return 0;
+		if (GameBase::instance->masterVolume == 0.f) return 0;
 		return soloud->getActiveVoiceCount();
 	}
 
 	int Sound::Play(SoLoud::Wav* ss, float volume, float pan, float speed) {
-		if (globalVolume == 0.f) return -1;
+		if (GameBase::instance->masterVolume == 0.f) return -1;
 		int h = soloud->play(*ss, volume, pan);
 		if (speed != 1.f) {
 			soloud->setRelativePlaySpeed(h, speed);

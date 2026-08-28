@@ -26,27 +26,27 @@ namespace xx {
         return false;
     }
 
-	bool IsIntersect_BoxBoxF(XY b1minXY, XY b1maxXY, XY b2minXY, XY b2maxXY) {
-		return !(b1maxXY.x < b2minXY.x || b2maxXY.x < b1minXY.x
-			|| b1maxXY.y < b2minXY.y || b2maxXY.y < b1minXY.y);
-	}
+    bool IsIntersect_BoxBoxF(XY b1minXY, XY b1maxXY, XY b2minXY, XY b2maxXY) {
+        return !(b1maxXY.x < b2minXY.x || b2maxXY.x < b1minXY.x
+            || b1maxXY.y < b2minXY.y || b2maxXY.y < b1minXY.y);
+    }
 
-	bool IsIntersect_BoxPointF(XY b1minXY, XY b1maxXY, XY p) {
-		return !(b1maxXY.x < p.x || p.x < b1minXY.x || b1maxXY.y < p.y || p.y < b1minXY.y);
-	}
+    bool IsIntersect_BoxPointF(XY b1minXY, XY b1maxXY, XY p) {
+        return !(b1maxXY.x < p.x || p.x < b1minXY.x || b1maxXY.y < p.y || p.y < b1minXY.y);
+    }
 
-	float CalcBounce(float x) {
-		return 1.f - std::expf(-5.f * x) * std::cosf(6.f * (float)M_PI * x);
-	}
+    float CalcBounce(float x) {
+        return 1.f - std::expf(-5.f * x) * std::cosf(6.f * (float)M_PI * x);
+    }
 
-	XY GetRndPosDoughnut(Rnd& rnd_, float maxRadius_, float safeRadius_, float radiansFrom_, float radiansTo_) {
-		auto len = maxRadius_ - safeRadius_;
-		auto len_radius = len / maxRadius_;
-		auto safeRadius_radius = safeRadius_ / maxRadius_;
-		auto radius = std::sqrtf(rnd_.Next<float>(0, len_radius) + safeRadius_radius) * maxRadius_;
-		auto radians = rnd_.Next<float>(radiansFrom_, radiansTo_);
-		return { std::cosf(radians) * radius, std::sinf(radians) * radius };
-	}
+    XY GetRndPosDoughnut(Rnd& rnd_, float maxRadius_, float safeRadius_, float radiansFrom_, float radiansTo_) {
+        auto len = maxRadius_ - safeRadius_;
+        auto len_radius = len / maxRadius_;
+        auto safeRadius_radius = safeRadius_ / maxRadius_;
+        auto radius = std::sqrtf(rnd_.Next<float>(0, len_radius) + safeRadius_radius) * maxRadius_;
+        auto radians = rnd_.Next<float>(radiansFrom_, radiansTo_);
+        return { std::cosf(radians) * radius, std::sinf(radians) * radius };
+    }
 
 
 
@@ -214,7 +214,7 @@ namespace xx {
     }
 
     float Atan2(XY d_) {
-		return std::atan2f(d_.y, d_.x);
+        return std::atan2f(d_.y, d_.x);
     }
 
     float AngleGap(float tar, float cur) {
@@ -368,5 +368,17 @@ namespace xx {
             return true;
         }
         return false;
+    }
+
+    int32_t Double01ToInt(double num_, int32_t min_, int32_t max_) {
+        int32_t d = max_ - min_;
+        int32_t r = std::round(num_ * d);
+        return std::clamp(r, 0, d) + min_;
+    }
+
+    double IntToDouble01(int32_t num_, int32_t min_, int32_t max_) {
+        int32_t d = max_ - min_;
+        num_ = std::clamp(num_, min_, max_);
+        return (double)num_ / d;
     }
 }
