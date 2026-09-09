@@ -31,6 +31,10 @@ namespace xx {
 		int32_t selectedIndex{};
 		std::function<void(int32_t)> onSelectedIndexChanged = [](int32_t idx) { printf("DropDownList selectedIndex = %d\n", idx); };
 
+		std::function<void()> onAfterPop;	// use ItemsAt ref items to do something
+		std::function<void()> onPopClosed;
+		DropDownListItem* ItemsAt(int32_t idx_) const;
+
 		// init step 1/2
 		DropDownList& InitBegin(int32_t z_, XY position_, XY anchor_, XY fixedSize_
 			, Shared<Scale9Config> cfgNormal_ = GameBase::instance->embed.cfg_s9bN

@@ -7,6 +7,12 @@
 
 namespace xx {
 
+	DropDownListItem* DropDownList::ItemsAt(int32_t idx_) const {
+		assert(children.len == 6);	// when poped
+		assert(idx_ >= 0 && idx_ < items.len);
+		return (DropDownListItem*)children[4]->children[idx_].pointer;
+	}
+
 	// init step 1/2
 	DropDownList& DropDownList::InitBegin(int32_t z_, XY position_, XY anchor_, XY fixedSize_
 		, Shared<Scale9Config> cfgNormal_
@@ -73,7 +79,10 @@ namespace xx {
 		auto itemsBG = Make<Background>();
 		itemsBG->Init(z + 999, itemsContent).onOutsideClicked = [this] {
 			children.Resize(3);
+			if (onPopClosed) onPopClosed();
 		};
+
+		if (onAfterPop) onAfterPop();
 	}
 
 	void DropDownList::ItemCommit(int32_t idx_) {
@@ -90,7 +99,8 @@ namespace xx {
 	}
 
 
-
+	/*********************************************************************************************/
+	/*********************************************************************************************/
 
 
 	void DropDownListItem::Init(int32_t z_, Weak<DropDownList> owner_, int32_t idx_, bool highLight_) {
