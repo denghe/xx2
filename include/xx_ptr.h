@@ -102,8 +102,8 @@ namespace xx {
         Shared() = default;
 
         template<typename U>
+            requires (std::is_base_of_v<T, U> || std::is_same_v<T, U>)
         Shared(U* ptr) : pointer(ptr) {
-            static_assert(std::is_base_of_v<T, U> || std::is_same_v<T, U>);
             static_assert(PtrAlignCheck_v<T, U>);
             if (ptr) {
                 ++CalcPtrHeader<HeaderType>(ptr)->sharedCount;
@@ -117,16 +117,16 @@ namespace xx {
         }
 
         template<typename U>
+            requires (std::is_base_of_v<T, U> || std::is_same_v<T, U>)
         Shared(S<U> const& o) : Shared(o.pointer) {
-            static_assert(std::is_base_of_v<T, U> || std::is_same_v<T, U>);
             static_assert(PtrAlignCheck_v<T, U>);
         }
 
         Shared(Shared const& o) : Shared(o.pointer) {}
 
         template<typename U>
+            requires (std::is_base_of_v<T, U> || std::is_same_v<T, U>)
         Shared(S<U>&& o) {
-            static_assert(std::is_base_of_v<T, U> || std::is_same_v<T, U>);
             static_assert(PtrAlignCheck_v<T, U>);
             pointer = o.pointer;
             o.pointer = {};
@@ -138,8 +138,8 @@ namespace xx {
         }
 
         template<typename U>
+            requires (std::is_base_of_v<T, U> || std::is_same_v<T, U>)
         Shared &operator=(U* ptr) {
-            static_assert(std::is_base_of_v<T, U> || std::is_same_v<T, U>);
             static_assert(PtrAlignCheck_v<T, U>);
             Reset(ptr);
             return *this;
@@ -151,8 +151,8 @@ namespace xx {
         }
 
         template<typename U>
+            requires (std::is_base_of_v<T, U> || std::is_same_v<T, U>)
         Shared &operator=(S<U> const& o) {
-            static_assert(std::is_base_of_v<T, U> || std::is_same_v<T, U>);
             static_assert(PtrAlignCheck_v<T, U>);
             Reset(o.pointer);
             return *this;
@@ -164,8 +164,8 @@ namespace xx {
         }
 
         template<typename U>
+            requires (std::is_base_of_v<T, U> || std::is_same_v<T, U>)
         Shared &operator=(S<U> &&o) {
-            static_assert(std::is_base_of_v<T, U> || std::is_same_v<T, U>);
             static_assert(PtrAlignCheck_v<T, U>);
             Reset();
             std::swap(pointer, (*(Shared *) &o).pointer);
@@ -178,14 +178,14 @@ namespace xx {
         }
 
         template<typename U>
+            requires (std::is_base_of_v<T, U> || std::is_same_v<T, U>)
         bool operator==(S<U> const& o) const {
-            static_assert(std::is_base_of_v<T, U> || std::is_same_v<T, U>);
             return pointer == o.pointer;
         }
 
         template<typename U>
+            requires (std::is_base_of_v<T, U> || std::is_same_v<T, U>)
         bool operator!=(S<U> const& o) const {
-            static_assert(std::is_base_of_v<T, U> || std::is_same_v<T, U>);
             return pointer != o.pointer;
         }
 
@@ -203,8 +203,8 @@ namespace xx {
 
         // unsafe
         template<typename U>
+            requires (std::is_base_of_v<T, U> || std::is_same_v<T, U>)
         S<U> &Cast() const {
-            static_assert(std::is_base_of_v<T, U> || std::is_same_v<T, U>);
             static_assert(PtrAlignCheck_v<T, U>);
             return *(S<U> *) this;
         }
@@ -249,8 +249,8 @@ namespace xx {
         }
 
         template<typename U>
+            requires (std::is_base_of_v<T, U> || std::is_same_v<T, U>)
         void Reset(U* ptr) {
-            static_assert(std::is_base_of_v<T, U> || std::is_same_v<T, U>);
             static_assert(PtrAlignCheck_v<T, U>);
             if (pointer == ptr) return;
             Reset();
@@ -266,8 +266,8 @@ namespace xx {
         }
 
         template<typename U = T, typename...Args>
+            requires (std::is_base_of_v<T, U> || std::is_same_v<T, U>)
         S<U>& Emplace(Args &&...args) {
-            static_assert(std::is_base_of_v<T, U> || std::is_same_v<T, U>);
             static_assert(PtrAlignCheck_v<T, U>);
             using HT = typename S<U>::HeaderType;
             Reset();
@@ -343,24 +343,24 @@ namespace xx {
 
         // unsafe
         template<typename U>
+            requires (std::is_base_of_v<T, U> || std::is_same_v<T, U>)
         U* CastPointer() const {
-            static_assert(std::is_base_of_v<T, U> || std::is_same_v<T, U>);
             static_assert(PtrAlignCheck_v<T, U>);
             return (U*)&h->data;
         }
 
         // unsafe
         template<typename U = T>
+            requires (std::is_base_of_v<T, U> || std::is_same_v<T, U>)
         U& CastRef() const {
-            static_assert(std::is_base_of_v<T, U> || std::is_same_v<T, U>);
             static_assert(PtrAlignCheck_v<T, U>);
             return (U&)h->data;
         }
 
         // unsafe
         template<typename U>
+            requires (std::is_base_of_v<T, U> || std::is_same_v<T, U>)
         Weak<U>& Cast() const {
-            static_assert(std::is_base_of_v<T, U> || std::is_same_v<T, U>);
             static_assert(PtrAlignCheck_v<T, U>);
             return *(Weak<U>*)this;
         }
@@ -382,8 +382,8 @@ namespace xx {
         }
 
         template<typename U>
+            requires (std::is_base_of_v<T, U> || std::is_same_v<T, U>)
         void Reset(Shared<U> const& s) {
-            static_assert(std::is_base_of_v<T, U> || std::is_same_v<T, U>);
             static_assert(PtrAlignCheck_v<T, U>);
             Reset();
             if (s.pointer) {
