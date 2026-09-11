@@ -78,8 +78,8 @@ namespace xx {
 
 		auto itemsBG = Make<Background>();
 		itemsBG->Init(z + 999, itemsContent).onOutsideClicked = [this] {
+            if (onPopClosed) onPopClosed();
 			children.Resize(3);
-			if (onPopClosed) onPopClosed();
 		};
 
 		if (onAfterPop) onAfterPop();

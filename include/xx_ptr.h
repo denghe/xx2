@@ -422,15 +422,15 @@ namespace xx {
         }
 
         template<typename U>
+            requires (std::is_base_of_v<T, U> || std::is_same_v<T, U>)
         Weak &operator=(Shared<U> const &o) {
-            static_assert(std::is_base_of_v<T, U> || std::is_same_v<T, U>);
             Reset(o);
             return *this;
         }
 
         template<typename U>
+            requires (std::is_base_of_v<T, U> || std::is_same_v<T, U>)
         Weak(Shared<U> const &o) {
-            static_assert(std::is_base_of_v<T, U> || std::is_same_v<T, U>);
             Reset(o);
         }
 
@@ -447,8 +447,8 @@ namespace xx {
         }
 
         template<typename U>
+            requires (std::is_base_of_v<T, U> || std::is_same_v<T, U>)
         Weak(Weak<U> const &o) : h((HeaderType*)o.h) {
-            static_assert(std::is_base_of_v<T, U> || std::is_same_v<T, U>);
             static_assert(PtrAlignCheck_v<T, U>);
             if (o.h) {
                 ++o.h->weakCount;
@@ -460,8 +460,8 @@ namespace xx {
         }
 
         template<typename U>
+            requires (std::is_base_of_v<T, U> || std::is_same_v<T, U>)
         Weak(Weak<U> &&o) : h((HeaderType*)o.h) {
-            static_assert(std::is_base_of_v<T, U> || std::is_same_v<T, U>);
             static_assert(PtrAlignCheck_v<T, U>);
             o.h = {};
         }
@@ -474,8 +474,8 @@ namespace xx {
         }
 
         template<typename U>
+            requires (std::is_base_of_v<T, U> || std::is_same_v<T, U>)
         Weak &operator=(Weak<U> const &o) {
-            static_assert(std::is_base_of_v<T, U> || std::is_same_v<T, U>);
             static_assert(PtrAlignCheck_v<T, U>);
             if ((void *) &o != (void *) this) {
                 Reset(((Weak *) (&o))->Lock());
