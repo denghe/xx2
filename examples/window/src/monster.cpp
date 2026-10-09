@@ -32,6 +32,7 @@ void Monster::AnimScale() {
 
 void Monster::AnimBounce() {
 	XX_BEGIN(_2);
+	gg.PlayAudio(gg.wavs.heart_jump);
 	for (_2x = 0.0834f; _2x < 0.916f; _2x += gg.delta) {
 		{
 			auto r = xx::CalcBounce(_2x);

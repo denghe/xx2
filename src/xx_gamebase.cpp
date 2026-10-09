@@ -357,9 +357,9 @@ namespace xx {
 		return sound.Play(ss_, volume_ * audioVolume, pan_, speed_);
 	}
 
-	int GameBase::PlayMusic(Shared<SoLoud::Wav> const& ss_, float volume_, float pan_, float speed_) {
+	int GameBase::PlayMusic(Shared<SoLoud::Wav> const& ss_, float volume_, float pan_, float speed_, bool loop_) {
 		if (mute || musicVolume == 0) return 0;
-		return sound.Play(ss_, volume_ * musicVolume, pan_, speed_);
+		return sound.PlayBGM(ss_, volume_ * musicVolume, pan_, speed_, loop_);
 	}
 
 

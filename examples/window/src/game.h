@@ -14,11 +14,16 @@ struct Game : xx::GameBase {
 	struct {
 		xx::Frame heart;	// pixel: 29 * 24
 	} pics;
+	struct {
+		xx::Shared<SoLoud::Wav> bgm1;
+		xx::Shared<SoLoud::Wav> heart_jump;
+	} wavs;
 
 	xx::Shared<xx::Node> ui;
 	xx::Camera cam;
 	xx::Shared<Monster> heart;
 	XY bgOffset{};
+	float t{};	// for sound play
 
 	void Init() override;
 	void GLInit() override;

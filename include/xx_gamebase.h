@@ -234,7 +234,7 @@ namespace xx {
         Shared<SoLoud::Wav> LoadSoundSourceFromData(Span data_, bool looping = false);
         unsigned int GetActiveVoiceCount();
         int PlayAudio(Shared<SoLoud::Wav> const& ss_, float volume_ = 1.f, float pan_ = 0.f, float speed_ = 1.f);
-        int PlayMusic(Shared<SoLoud::Wav> const& ss_, float volume_ = 1.f, float pan_ = 0.f, float speed_ = 1.f);
+        int PlayMusic(Shared<SoLoud::Wav> const& ss_, float volume_ = 1.f, float pan_ = 0.f, float speed_ = 1.f, bool loop_ = true);
 
 
         int32_t Run();
