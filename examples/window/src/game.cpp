@@ -16,7 +16,7 @@ void Game::Init() {
 void Game::GLInit() {
 	// load res
 	pics.heart = LoadTexture("res/heart.png");
-	wavs.heart_jump = LoadSoundSource("res/heart_jump124.opus");
+	wavs.heart_jump = LoadSoundSource("res/heart_jump.opus");
 	wavs.bgm1 = LoadSoundSource("res/bgm1.opus");
 
 	// init cam
@@ -73,13 +73,6 @@ void Game::Update() {
 	// logic update
 	heart->Update();
 	bgOffset += XY{ 0.5f, 0.5f } * delta;
-
-	//t += delta;
-	//if (t > 0.1f) {
-	//	t -= 0.1f;
-		//gg.sound.Play(gg.wavs.heart_jump);
-	//}
-	xx::CoutN("active voice count = ", gg.sound.GetActiveVoiceCount());
 
 	// draw bg
 	QuadEx().DrawFrame(pics.heart
