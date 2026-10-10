@@ -280,9 +280,9 @@ void Scene::OnResize(bool modeChanged_) {
 
 void Scene::OnFocus(bool focused_) {
 	if (focused_) {
-		gg.sound.SetGlobalVolume(1);
+		gg.SetMasterVolume(1);
 	}
 	else {
-		gg.sound.SetGlobalVolume(0);
+		gg.SetMasterVolume(0);
 	}
 }

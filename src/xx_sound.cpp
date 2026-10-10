@@ -3,22 +3,26 @@
 namespace xx {
 
 	void Sound::Init() {
+		playingWavs.clear();
 		// small buffer for low latency. default is 0 ( auto: 4096 )
-		soloud.Emplace()->init(SoLoud::Soloud::CLIP_ROUNDOFF, 0, 0, 4096);
+		// soloud.Emplace()->init(SoLoud::Soloud::CLIP_ROUNDOFF, 0, 0, 1024);
+		soloud.Emplace()->init(0, 0, 0, 1024);
+		bgm.h = {};
 	}
 
-	void Sound::SetMasterVolume(float v) {
-        GameBase::instance->masterVolume = v;
-		soloud->setGlobalVolume(v);
+	int32_t Sound::Update() {
+		if (!soloud) return 0;
+		if (soloud->mReinitFailedCount > 3) {
+			auto t = soloud->getStreamPosition(bgm.h);
+			Init();
+			if (bgm.w && t > 0.f) {
+				auto h = PlayBGM(bgm.w, bgm.volume, bgm.pan, bgm.speed, bgm.loop);
+				soloud->seek(h, t);
+			}
+			return 1;
+		}
+		return 0;
 	}
-
-    void Sound::SetAudioVolume(float v) {
-        GameBase::instance->audioVolume = v;
-    }
-
-    void Sound::SetMusicVolume(float v) {
-        GameBase::instance->musicVolume = v;
-    }
 
 	SoLoud::handle Sound::Play(SoLoud::Wav* w, float volume, float pan, float speed) {
 		assert(w);
@@ -41,7 +45,6 @@ namespace xx {
 
 	SoLoud::handle Sound::PlayDirect(SoLoud::Wav* w, float volume, float pan, float speed) {
 		assert(w);
-		if (GameBase::instance->masterVolume == 0.f) return -1;
 		auto h = soloud->play(*w, volume, pan);
 		if (speed != 1.f) {
 			soloud->setRelativePlaySpeed(h, speed);
@@ -50,16 +53,21 @@ namespace xx {
 	}
 
 	SoLoud::handle Sound::PlayBGM(SoLoud::Wav* w, float volume, float pan, float speed, bool loop) {
-		soloud->stop(bgm);
-		bgm = PlayDirect(w, volume, pan, speed);
+		soloud->stop(bgm.h);
+		bgm.w = WeakFromThis(w);
+		bgm.h = PlayDirect(w, volume, pan, speed);
 		if (loop) {
-			soloud->setLooping(bgm, true);
+			soloud->setLooping(bgm.h, true);
 		}
-		return bgm;
+		bgm.volume = volume;
+		bgm.pan = pan;
+		bgm.speed = speed;
+		bgm.loop = loop;
+		return bgm.h;
 	}
 
 	void Sound::StopBGM() {
-		soloud->stop(bgm);
+		soloud->stop(bgm.h);
 		bgm = {};
 	}
 
@@ -67,9 +75,12 @@ namespace xx {
 		soloud->stop(h);
 	}
 
-	void Sound::StopAll() {
+	void Sound::StopAll(bool _includeBGM) {
 		soloud->stopAll();
 		playingWavs.clear();
+		if (_includeBGM) {
+			StopBGM();
+		}
 	}
 
 	void Sound::SetPauseAll(bool b) {
@@ -77,7 +88,6 @@ namespace xx {
 	}
 
 	unsigned int Sound::GetActiveVoiceCount() {
-		if (GameBase::instance->masterVolume == 0.f) return 0;
 		return soloud->getActiveVoiceCount();
 	}
 

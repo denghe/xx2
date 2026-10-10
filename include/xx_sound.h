@@ -7,26 +7,30 @@
 namespace xx {
 	struct Sound {
 		Shared<SoLoud::Soloud> soloud;
-		// count limit play config ( total 128 voices )
-		int32_t playConcurrentCount{ 8 };
+		// count limit play config ( per file. total MAX_ACTIVE_VOICE_COUNT voices )
+		int32_t playConcurrentCount{ 16 };
 		// maybe need clear when SoLoud::Wav released
 		std::unordered_map<SoLoud::Wav*, Queue<SoLoud::handle>> playingWavs;
-		SoLoud::handle bgm{};
+		struct {
+			SoLoud::handle h{};
+			Weak<SoLoud::Wav> w;
+			float volume{};
+			float pan{};
+			float speed{};
+			bool loop{};
+		} bgm;
 
 		void Init();
-		// global volume control, 0~1
-		void SetMasterVolume(float v);
-		// relate to Play() / PlayDirect()
-		void SetAudioVolume(float v);
-		// relate to PlayBGM()
-		void SetMusicVolume(float v);
+		// check default device changed & auto reinit
+		// return !0: reinit
+		int32_t Update();
 
 		// for audio
-		// count limit play ( per file 8 voices, total 128 voices )
+		// count limit play
 		SoLoud::handle Play(SoLoud::Wav* w, float volume = 1.f, float pan = 0.f, float speed = 1.f);
 		SoLoud::handle PlayDirect(SoLoud::Wav* w, float volume = 1.f, float pan = 0.f, float speed = 1.f);
 		void Stop(SoLoud::handle const& h);
-		void StopAll();
+		void StopAll(bool _includeBGM = true);
 
 		// for background music
 		SoLoud::handle PlayBGM(SoLoud::Wav* w, float volume = 1.f, float pan = 0.f, float speed = 1.f, bool loop = true);

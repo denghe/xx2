@@ -38,6 +38,7 @@ void Game::GLInit() {
 	// init logic
 	heart.Emplace()->Init(pics.heart);
 
+	// play bgm
 	PlayMusic(wavs.bgm1, 0.5f);
 }
 

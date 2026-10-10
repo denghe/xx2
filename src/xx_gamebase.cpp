@@ -352,17 +352,25 @@ namespace xx {
 		return sound.GetActiveVoiceCount();
 	}
 
-	int GameBase::PlayAudio(Shared<SoLoud::Wav> const& ss_, float volume_, float pan_, float speed_) {
-		if (mute || audioVolume == 0) return 0;
+	SoLoud::handle GameBase::PlayAudio(Shared<SoLoud::Wav> const& ss_, float volume_, float pan_, float speed_) {
+		if (mute || audioVolume < 0.01f) return 0;
 		return sound.Play(ss_, volume_ * audioVolume, pan_, speed_);
 	}
 
-	int GameBase::PlayMusic(Shared<SoLoud::Wav> const& ss_, float volume_, float pan_, float speed_, bool loop_) {
-		if (mute || musicVolume == 0) return 0;
+	SoLoud::handle GameBase::PlayMusic(Shared<SoLoud::Wav> const& ss_, float volume_, float pan_, float speed_, bool loop_) {
+		if (mute || musicVolume < 0.01f) return 0;
 		return sound.PlayBGM(ss_, volume_ * musicVolume, pan_, speed_, loop_);
 	}
 
-
+	void GameBase::SetMasterVolume(float v_) {
+		sound.soloud->setGlobalVolume(v_);
+	}
+	void GameBase::SetAudioVolume(float v_) {
+		audioVolume = v_;
+	}
+	void GameBase::SetMusicVolume(float v_) {
+		musicVolume = v_;
+	}
 
 
 
@@ -467,6 +475,11 @@ namespace xx {
 	}
 
 	void GameBase::BaseUpdate() {
+		// check sound device issue
+		if (sound.Update()) {
+			OnSoundDeviceReset();
+		}
+
 		// call ui auto updates
 		for (int32_t i = uiAutoUpdates.len - 1; i >= 0; --i) {
 			auto& o = uiAutoUpdates[i];

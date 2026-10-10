@@ -252,6 +252,7 @@ void Game::Stat() {
 			, drawCall, " drawVerts = ", drawVerts
 			, " uiAutoUpdates.len = ", uiAutoUpdates.len
 			, " delayUpdates.len = ", delayUpdates.len
+			, " active voice count = ", sound.GetActiveVoiceCount()
 		);
 	}
 }

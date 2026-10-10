@@ -37,6 +37,7 @@ namespace xx {
         virtual void Stat() {}
         virtual void OnResize(bool modeChanged_) {}
         virtual void OnFocus(bool focused_) {}
+        virtual void OnSoundDeviceReset() {}
         virtual void OnExit() {}
 
 
@@ -233,8 +234,11 @@ namespace xx {
         Shared<SoLoud::Wav> LoadSoundSourceFromData(uint8_t* buf, size_t len, bool looping = false);
         Shared<SoLoud::Wav> LoadSoundSourceFromData(Span data_, bool looping = false);
         unsigned int GetActiveVoiceCount();
-        int PlayAudio(Shared<SoLoud::Wav> const& ss_, float volume_ = 1.f, float pan_ = 0.f, float speed_ = 1.f);
-        int PlayMusic(Shared<SoLoud::Wav> const& ss_, float volume_ = 1.f, float pan_ = 0.f, float speed_ = 1.f, bool loop_ = true);
+        SoLoud::handle PlayAudio(Shared<SoLoud::Wav> const& ss_, float volume_ = 1.f, float pan_ = 0.f, float speed_ = 1.f);
+        SoLoud::handle PlayMusic(Shared<SoLoud::Wav> const& ss_, float volume_ = 1.f, float pan_ = 0.f, float speed_ = 1.f, bool loop_ = true);
+        void SetMasterVolume(float v_);  // global volume control, 0~1
+        void SetAudioVolume(float v_);   // relate to sound.Play() / sound.PlayDirect()
+        void SetMusicVolume(float v_);   // relate to sound.PlayBGM()
 
 
         int32_t Run();

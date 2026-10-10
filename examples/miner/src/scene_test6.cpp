@@ -95,9 +95,7 @@ LabMoveLoop:
 	goto LabMoveLoop;
 LabAttack:
 	SetAnim(AnimTypes::Atk);
-	if (gg.GetActiveVoiceCount() < 8) {
-		gg.PlayAudio(gg.mcs[minerTypeId].ss.Lock(), 0.3f);
-	}
+	gg.PlayAudio(gg.mcs[minerTypeId].ss.Lock(), 0.3f);
 	hited = 0;
 	while (!StepAnimOnce()) {
 		XX_YIELD(_1);

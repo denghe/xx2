@@ -94,9 +94,7 @@ namespace Test4 {
 		goto LabMoveLoop;
 	LabAttack:
 		SetAnim(AnimTypes::Atk);
-		if (gg.GetActiveVoiceCount() < 32) {
-			gg.PlayAudio(gg.mcs[minerTypeId].ss.Lock());
-		}
+		gg.PlayAudio(gg.mcs[minerTypeId].ss.Lock());
 		hited = 0;
 		while (!StepAnimOnce()) {
 			XX_YIELD(_1);
