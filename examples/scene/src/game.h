@@ -61,7 +61,8 @@ struct Game : xx::GameBase, Sav {
 
 	struct {
 		xx::Shared<SoLoud::Wav>
-			explosion
+			explosion,
+			bgm1
 		;
 	} ss;
 

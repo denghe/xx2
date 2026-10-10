@@ -35,6 +35,7 @@ namespace xx {
 		// for background music
 		SoLoud::handle PlayBGM(SoLoud::Wav* w, float volume = 1.f, float pan = 0.f, float speed = 1.f, bool loop = true);
 		void StopBGM();
+		void SetBGMVolume(float v);
 
 		// soloud function mappings
 		void SetPauseAll(bool b);

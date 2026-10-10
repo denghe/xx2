@@ -358,11 +358,13 @@ namespace xx {
 	}
 
 	SoLoud::handle GameBase::PlayMusic(Shared<SoLoud::Wav> const& ss_, float volume_, float pan_, float speed_, bool loop_) {
-		if (mute || musicVolume < 0.01f) return 0;
+		if (mute) volume_ = 0.f;
 		return sound.PlayBGM(ss_, volume_ * musicVolume, pan_, speed_, loop_);
 	}
 
+
 	void GameBase::SetMasterVolume(float v_) {
+		masterVolume = v_;
 		sound.soloud->setGlobalVolume(v_);
 	}
 	void GameBase::SetAudioVolume(float v_) {
@@ -370,8 +372,18 @@ namespace xx {
 	}
 	void GameBase::SetMusicVolume(float v_) {
 		musicVolume = v_;
+		sound.SetBGMVolume(v_);
 	}
-
+	void GameBase::SetMute(bool m_) {
+		mute = m_;
+		if (m_) {
+			sound.StopAll(false);
+			sound.SetBGMVolume(0.f);
+		}
+		else {
+			sound.SetBGMVolume(musicVolume);
+		}
+	}
 
 
 

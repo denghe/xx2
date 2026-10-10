@@ -5,10 +5,6 @@
 Game gg;
 
 int32_t main() {
-	// load settings from player data store file
-	if (int r = gg.SavInit(std::filesystem::current_path())) return r;
-	if (int r = gg.Load()) return r;
-
 	// enter game loop
 	return gg.Run();
 }
@@ -19,6 +15,16 @@ void Game::Init() {
 }
 
 void Game::GLInit() {
+	// load settings from player data store file
+	if (int r = gg.SavInit(std::filesystem::current_path())) {
+		// todo: handle error
+		return;
+	}
+	if (int r = gg.Load()) {
+		// todo: handle error
+		return;
+	}
+
 	// sync lang settings
 	lang.Set((i18n::Languages)settings.language);
 
@@ -35,12 +41,16 @@ void Game::GLInit() {
 		SetWindowMode(designSize);
 	}
 
+
+	// load some res
+	ss.explosion = LoadSoundSource("res/explosion.opus");
+	ss.bgm1 = LoadSoundSource("res/bgm1.opus");
+
 	// sync sound settings
-	mute = settings.mute;
-	masterVolume = settings.masterVolume;
-	audioVolume = settings.audioVolume;
-	musicVolume = settings.musicVolume;
-	sound.SetGlobalVolume(masterVolume);
+	SetMute(settings.mute);
+	SetMasterVolume(settings.masterVolume);
+	SetAudioVolume(settings.audioVolume);
+	SetMusicVolume(settings.musicVolume);
 }
 
 void Game::Update() {
@@ -48,11 +58,7 @@ void Game::Update() {
 }
 
 xx::Task<> Game::Task() {
-	// begin load res
-
-	// opus
-	ss.explosion = LoadSoundSource("res/explosion.opus");
-
+	// load some res
 	// png
 	res.damage_numbers = LoadTexture("res/damage_numbers.png");	// do not pack
 	res.hpbar = LoadTexture("res/hpbar.png");					// do not pack
@@ -102,6 +108,9 @@ xx::Task<> Game::Task() {
 
 	// init first scene
 	scene.Emplace<Scene_MainMenu>()->Init();
+
+	// play bgm
+	gg.PlayMusic(ss.bgm1);
 
 	// game loop
 	while (true) {

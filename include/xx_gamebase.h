@@ -79,9 +79,9 @@ namespace xx {
         int32_t drawVerts{}, drawCall{}, drawFPS{};			// counters
         float drawFPSTimePool{};							// for count drawFPS
 
-        float masterVolume{ 1.f }							// global sound settings
-            , audioVolume{ 1.f }
-        , musicVolume{ 0.5f };
+        float masterVolume{ 1.f };							// readonly. use SetMasterVolume() to change
+        float audioVolume{ 1.f };                           // readonly. use SetAudioVolume() to change
+        float musicVolume{ 0.5f };                          // readonly. use SetMusicVolume() to change
 
         XY mousePos{};
         std::array<BtnState, GLFW_MOUSE_BUTTON_LAST + 1 + 4> mouse{};	// +4 for wheel up, down, left, right
@@ -97,7 +97,7 @@ namespace xx {
         bool isBorderless{};								// user readonly
         bool minimized{};									// user readonly
 
-        bool mute{};										// global sound settings
+		bool mute{};										// readonly. use SetMute() to change
 
         bool isResizing{};
         bool isAMDCard{};                                   // for ATI graphics card bug fix
@@ -239,6 +239,7 @@ namespace xx {
         void SetMasterVolume(float v_);  // global volume control, 0~1
         void SetAudioVolume(float v_);   // relate to sound.Play() / sound.PlayDirect()
         void SetMusicVolume(float v_);   // relate to sound.PlayBGM()
+        void SetMute(bool m_);
 
 
         int32_t Run();

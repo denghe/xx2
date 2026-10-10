@@ -77,7 +77,7 @@ namespace UI {
 		offset.y -= cLineHeight;
 		Make<xx::CheckBox>()->Init(z + 2, offset, anchor, cItemSize, gg.mute)(gg.lang(Strs::mute))
 			.onValueChanged = [this](bool v) {
-			gg.mute = v;
+			gg.SetMute(v);
 			uiMasterVolume->SetEnabledRecursive(!v);
 			uiAudioVolume->SetEnabledRecursive(!v);
 			uiMusicVolume->SetEnabledRecursive(!v);
@@ -88,8 +88,7 @@ namespace UI {
 		uiMasterVolume->Init(z + 2, offset, anchor, cItemSize.y
 			, cSliderWidths[0], cSliderWidths[1], cSliderWidths[2], gg.masterVolume)(gg.lang(Strs::masterVolume))
 			.onChanged = [this](double v) {
-			gg.masterVolume = v;
-			gg.sound.SetGlobalVolume(v);
+			gg.SetMasterVolume(v);
 		};
 
 		offset.y -= cLineHeight;
@@ -97,7 +96,7 @@ namespace UI {
 		uiAudioVolume->Init(z + 2, offset, anchor, cItemSize.y
 			, cSliderWidths[0], cSliderWidths[1], cSliderWidths[2], gg.audioVolume)(gg.lang(Strs::audioVolume))
 			.onChanged = [this](double v) {
-			gg.audioVolume = v;
+			gg.SetAudioVolume(v);
 		};
 
 		offset.y -= cLineHeight;
@@ -105,7 +104,7 @@ namespace UI {
 		uiMusicVolume->Init(z + 2, offset, anchor, cItemSize.y
 			, cSliderWidths[0], cSliderWidths[1], cSliderWidths[2], gg.musicVolume)(gg.lang(Strs::musicVolume))
 			.onChanged = [this](double v) {
-			gg.musicVolume = v;
+			gg.SetMusicVolume(v);
 		};
 
 		// apply config values

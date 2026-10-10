@@ -44,7 +44,7 @@ namespace xx {
         XY worldMaxXY{}, worldSize{};								// boundingBox. world coordinate. fill by FillTrans()
 
         int32_t typeId{};											// fill by Make( need fill it by other makers )
-        int32_t indexAtParentChildren{ -1 };							// children[idx] == this
+        int32_t indexAtParentChildren{ -1 };						// children[idx] == this
         int32_t z{};												// global z for event priority or batch combine
         float alpha{ 1 };											// for some logic & draw
         bool inParentArea{ true };									// for child cut check. dropdownlist = false

@@ -71,15 +71,27 @@ namespace xx {
 		bgm = {};
 	}
 
+	void Sound::SetBGMVolume(float v) {
+		bgm.volume = v;
+		soloud->setVolume(bgm.h, v);
+	}
+
 	void Sound::Stop(SoLoud::handle const& h) {
 		soloud->stop(h);
 	}
 
 	void Sound::StopAll(bool _includeBGM) {
+		float t{};
+		if (!_includeBGM) {
+			t = soloud->getStreamPosition(bgm.h);
+		}
 		soloud->stopAll();
 		playingWavs.clear();
-		if (_includeBGM) {
-			StopBGM();
+		if (!_includeBGM && bgm.w) {
+			auto h = PlayBGM(bgm.w, bgm.volume, bgm.pan, bgm.speed, bgm.loop);
+			if (t > 0.f) {
+				soloud->seek(h, t);
+			}
 		}
 	}
 
