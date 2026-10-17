@@ -122,7 +122,8 @@ namespace xx {
         HANDLE eventForDelay = CreateEvent(NULL, FALSE, FALSE, NULL);
 #endif
 
-        List<ZNode> tmpZNodes;	// for node tree sort
+        List<ZNode> tmpZNodes;	                            // for node tree sort
+		List<Weak<MouseEventHandlerNode>> tmpWNodes;	    // for node tree foreach event handle
 
         // for easy draw root node only
         void DrawNode(Node* tar) {

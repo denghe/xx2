@@ -404,13 +404,21 @@ namespace xx {
 		std::sort(tmpZNodes.buf, tmpZNodes.buf + tmpZNodes.len
 			, ZNode::GreaterThanComparer);
 
-		// try dispatch
+		// convert to weaks
 		for (auto& zn : tmpZNodes) {
-			auto n = ((MouseEventHandlerNode*)zn.n);
-			if (!n->PosInScissor(mousePos)) continue;
-			if (n->OnMouseMove()) break;
+			tmpWNodes.Emplace(WeakFromThis((MouseEventHandlerNode*)zn.n));
 		}
+
+		// try dispatch
+		for (auto& w : tmpWNodes) {
+			if (!w) continue;
+			if (!w->PosInScissor(mousePos)) continue;
+			if (w->OnMouseMove()) break;
+		}
+
+		// cleanup
 		tmpZNodes.Clear();
+		tmpWNodes.Clear();
 	}
 
 	void GameBase::HandleMouseButtonPressed(int32_t idx) {
@@ -429,12 +437,23 @@ namespace xx {
 		std::sort(tmpZNodes.buf, tmpZNodes.buf + tmpZNodes.len
 			, ZNode::GreaterThanComparer);
 
+		// convert to weaks
 		for (auto& zn : tmpZNodes) {
-			auto n = ((MouseEventHandlerNode*)zn.n);
-			if (!n->PosInScissor(mousePos)) continue;
-			if (n->OnMouseDown(idx)) break;
+			tmpWNodes.Emplace(WeakFromThis((MouseEventHandlerNode*)zn.n));
 		}
+
+		// try dispatch
+		for (auto& w : tmpWNodes) {
+			if (!w) continue;
+			if (!w->PosInScissor(mousePos)) continue;
+			if (w->OnMouseDown(idx)) break;
+		}
+
+		// cleanup
 		tmpZNodes.Clear();
+		tmpWNodes.Clear();
+
+		// update mouse state
 		mouse[idx].Press();
 	}
 
