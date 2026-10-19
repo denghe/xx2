@@ -130,55 +130,62 @@ press ENTER to continue...)#";
 		/*
 		for code copy
 
-		fs mean wall Frames
-		std::array<Frame, 256> walls;
-		walls[0] = fs[0];
-		walls[1] = fs[1];
-		walls[4] = fs[2];
-		walls[5] = fs[3];
-		walls[7] = fs[4];
-		walls[16] = fs[5];
-		walls[17] = fs[6];
-		walls[20] = fs[7];
-		walls[21] = fs[8];
-		walls[23] = fs[9];
-		walls[28] = fs[10];
-		walls[29] = fs[11];
-		walls[31] = fs[12];
-		walls[64] = fs[13];
-		walls[65] = fs[14];
-		walls[68] = fs[15];
-		walls[69] = fs[16];
-		walls[71] = fs[17];
-		walls[80] = fs[18];
-		walls[81] = fs[19];
-		walls[84] = fs[20];
-		walls[85] = fs[21];
-		walls[87] = fs[22];
-		walls[92] = fs[23];
-		walls[93] = fs[24];
-		walls[95] = fs[25];
-		walls[112] = fs[26];
-		walls[113] = fs[27];
-		walls[116] = fs[28];
-		walls[117] = fs[29];
-		walls[119] = fs[30];
-		walls[124] = fs[31];
-		walls[125] = fs[32];
-		walls[127] = fs[33];
-		walls[193] = fs[34];
-		walls[197] = fs[35];
-		walls[199] = fs[36];
-		walls[209] = fs[37];
-		walls[213] = fs[38];
-		walls[215] = fs[39];
-		walls[221] = fs[40];
-		walls[223] = fs[41];
-		walls[241] = fs[42];
-		walls[245] = fs[43];
-		walls[247] = fs[44];
-		walls[253] = fs[45];
-		walls[255] = fs[46];
+auto WallsMapTo = [this](std::array<xx::TinyFrame, 256>& tar, std::array<xx::Frame, 47> const& src) {
+	tar[0] = src[0];
+	tar[1] = src[1];
+	tar[4] = src[2];
+	tar[5] = src[3];
+	tar[7] = src[4];
+	tar[16] = src[5];
+	tar[17] = src[6];
+	tar[20] = src[7];
+	tar[21] = src[8];
+	tar[23] = src[9];
+	tar[28] = src[10];
+	tar[29] = src[11];
+	tar[31] = src[12];
+	tar[64] = src[13];
+	tar[65] = src[14];
+	tar[68] = src[15];
+	tar[69] = src[16];
+	tar[71] = src[17];
+	tar[80] = src[18];
+	tar[81] = src[19];
+	tar[84] = src[20];
+	tar[85] = src[21];
+	tar[87] = src[22];
+	tar[92] = src[23];
+	tar[93] = src[24];
+	tar[95] = src[25];
+	tar[112] = src[26];
+	tar[113] = src[27];
+	tar[116] = src[28];
+	tar[117] = src[29];
+	tar[119] = src[30];
+	tar[124] = src[31];
+	tar[125] = src[32];
+	tar[127] = src[33];
+	tar[193] = src[34];
+	tar[197] = src[35];
+	tar[199] = src[36];
+	tar[209] = src[37];
+	tar[213] = src[38];
+	tar[215] = src[39];
+	tar[221] = src[40];
+	tar[223] = src[41];
+	tar[241] = src[42];
+	tar[245] = src[43];
+	tar[247] = src[44];
+	tar[253] = src[45];
+	tar[255] = src[46];
+};
+
+WallsMapTo(wallsShadowMaskTiles, pics.tiled_walls_shadowmask_);
+WallsMapTo(wallsTiles[0], pics.tiled_walls_1_);
+WallsMapTo(wallsTiles[1], pics.tiled_walls_2_);
+WallsMapTo(wallsTiles[2], pics.tiled_walls_3_);
+...
+
 		*/
 	}
 
