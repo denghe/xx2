@@ -13,6 +13,7 @@ struct Game : xx::GameBase {
 
 	struct {
 		xx::Frame heart;	// pixel: 29 * 24
+		xx::Frame tiled9;	// pixel: 32*3 / 32*3
 	} pics;
 	struct {
 		xx::Shared<SoLoud::Wav> bgm1;
@@ -22,7 +23,16 @@ struct Game : xx::GameBase {
 	xx::Shared<xx::Node> ui;
 	xx::Camera cam;
 	xx::Shared<Monster> heart;
+
+	xx::Shared<xx::GLTiledTexture> tiledData;
+	xx::Rnd rnd;
+	XYi gridSize{ designSize.x / 32 * 2, designSize.y / 32 * 2 };
+	XY mapSize{ gridSize.x * 32.f, gridSize.y * 32.f };
+	XYi tiledTexSize{ (gridSize.x + 7) & ~7u, (gridSize.y + 7) & ~7u };
+
 	XY bgOffset{};
+	bool bgChanged{};
+
 	float t{};	// for sound play
 
 	void Init() override;

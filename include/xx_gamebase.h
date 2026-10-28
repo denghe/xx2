@@ -15,6 +15,7 @@
 #include "xx_shader_quad_gray.h"
 #include "xx_shader_quadex.h"
 #include "xx_shader_hpbar.h"
+#include "xx_shader_tiled.h"
 // ...
 
 namespace xx {
@@ -286,6 +287,9 @@ namespace xx {
 
         Shader_HPBar shaderHPBar;
         Shader_HPBar& HPBar() { return ShaderBegin(shaderHPBar); }
+
+        Shader_Tiled shaderTiled;
+        Shader_Tiled& Tiled() { return ShaderBegin(shaderTiled); }
         // ...
     };
 

@@ -83,14 +83,10 @@ namespace xx {
 
     GLVertTexture LoadGLVertTexture(void* data, GLsizei w, GLsizei h, int32_t numVerts, int32_t numFrames);
 
-    //struct GLTiledTexture : GLRes<GLResTypes::Texture> {
-    //	XY size{};
-    //	XYi sizeXY;
-    //};
+    struct GLTiledTexture : GLRes<GLResTypes::Texture> {
+    	XY size{};
+        XYi unalignedSize{};
+    };
 
-    //inline GLTiledTexture LoadGLTiledTexture(void* data, GLsizei w, GLsizei h, XYi size) {
-    //	auto id = GLTexture::GenTex();
-    //	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, w, h, 0, GL_RGBA, GL_FLOAT, data);
-    //	return { id, {w, h}, size };
-    //}
+    GLTiledTexture LoadGLTiledTexture(void* data, GLsizei w, GLsizei h, XYi unalignedSize);
 }

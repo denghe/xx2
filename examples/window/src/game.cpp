@@ -16,6 +16,7 @@ void Game::Init() {
 void Game::GLInit() {
 	// load res
 	pics.heart = LoadTexture("res/heart.png");
+	pics.tiled9 = LoadTexture("res/tiled9.png");
 	wavs.heart_jump = LoadSoundSource("res/heart_jump.opus");
 	wavs.bgm1 = LoadSoundSource("res/bgm1.opus");
 
@@ -27,7 +28,7 @@ void Game::GLInit() {
 
 	ui->Make<xx::Label>()->Init(1, p5 + XY{ 0, -69 }, a5, 48)("hi");
 
-	ui->Make<xx::LabelButton>()->Init(2, p5 + XY{ 0, 50 }, a5, 48)("change color!!!").onClicked = [this] {
+	ui->Make<xx::LabelButton>()->Init(2, p5 + XY{ 0, 60 }, a5, 48)("change color!!!").onClicked = [this] {
 		heart->ChangeColor();
 	};
 
@@ -35,8 +36,23 @@ void Game::GLInit() {
 		heart->ChangeAnim();
 	};
 
+	ui->Make<xx::LabelButton>()->Init(4, p5 + XY{ 0, -60 }, a5, 48)("change bg").onClicked = [this] {
+		bgChanged = !bgChanged;
+	};
+
 	// init logic
 	heart.Emplace()->Init(pics.heart);
+
+	// init tiled bg
+	auto d = std::make_unique<std::array<float, 4>[]>(tiledTexSize.x * tiledTexSize.y);
+	for (int y = 0; y < gridSize.y; ++y) {
+		for (int x = 0; x < gridSize.x; ++x) {
+			auto u = rnd.Next<int32_t>(0, 3) * 32.f;
+			auto v = rnd.Next<int32_t>(0, 3) * 32.f;
+			d[y * tiledTexSize.x + x] = { u, v, 1, 0 };
+		}
+	}
+	tiledData.Emplace(xx::LoadGLTiledTexture(d.get(), tiledTexSize.x, tiledTexSize.y, gridSize));
 
 	// play bgm
 	PlayMusic(wavs.bgm1, 0.5f);
@@ -73,17 +89,31 @@ void Game::Update() {
 
 	// logic update
 	heart->Update();
-	bgOffset += XY{ 0.5f, 0.5f } * delta;
 
-	// draw bg
-	QuadEx().DrawFrame(pics.heart
-		, { 0.f, 0.f }
-		, designSize.x / pics.heart.uvRect.w * cam.scale
-		, 100
-		, bgOffset
-		, 0.f
-		, 0.5f
-	);
+
+	// bg update & draw
+	if (bgChanged) {
+		auto s = cam.scale * 0.5f;
+		Tiled().Draw(pics.tiled9.tex, tiledData)->Fill(
+			-mapSize * 0.5f * s	// pos
+			, s				// scale
+			, 32.f			// tile size
+			, mapSize		// mapsize
+			, 1.f			// tiling( known issue: bad draw )
+			, 0.f			// offset
+		);
+	}
+	else {
+		bgOffset += XY{ 0.5f, 0.5f } * delta;
+		QuadEx().DrawFrame(pics.heart
+			, { 0.f, 0.f }
+			, designSize.x / pics.heart.uvRect.w * cam.scale
+			, 100
+			, bgOffset
+			, 0.f
+			, 0.5f
+		);
+	}
 
 	heart->Draw();
 	DrawNode(ui);

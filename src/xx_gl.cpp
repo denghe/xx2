@@ -292,4 +292,9 @@ namespace xx {
         return { id, { w, h }, numVerts, numFrames };
     }
 
+    GLTiledTexture LoadGLTiledTexture(void* data, GLsizei w, GLsizei h, XYi unalignedSize) {
+        auto id = GLTexture::MakeTex();
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, w, h, 0, GL_RGBA, GL_FLOAT, data);
+        return { id,{ w, h }, unalignedSize };
+    }
 }

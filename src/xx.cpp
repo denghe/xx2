@@ -35,6 +35,7 @@
 #include "xx_shader_quad_ex.cpp"
 #include "xx_shader_spine38.cpp"
 #include "xx_shader_texvert.cpp"
+#include "xx_shader_tiled.cpp"
 
 #include "xx_scissor.cpp"
 #include "xx_sound.cpp"

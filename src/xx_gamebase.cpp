@@ -871,6 +871,7 @@ namespace xx {
 		shaderQuadGray.Init();
 		shaderQuadEx.Init();
 		shaderHPBar.Init();
+		shaderTiled.Init();
 		// ...
 
 		// search exists joys
