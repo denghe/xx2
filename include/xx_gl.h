@@ -85,8 +85,8 @@ namespace xx {
 
     struct GLTiledTexture : GLRes<GLResTypes::Texture> {
     	XY size{};
-        XYi unalignedSize{};
+        XYi mapSize{};
     };
 
-    GLTiledTexture LoadGLTiledTexture(void* data, GLsizei w, GLsizei h, XYi unalignedSize);
+    GLTiledTexture LoadGLTiledTexture(std::array<uint8_t, 2>* data, GLsizei w, GLsizei h, XYi mapSize);
 }

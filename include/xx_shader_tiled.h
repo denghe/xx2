@@ -5,26 +5,19 @@
 namespace xx {
 
     struct Shader_TiledData {
-        XY pos{}, scale{};                  // float * 4
-        XY tileSize{}, mapSize{};           // float * 4 ( pixel )
-        XY tiling{}, offset{};              // float * 4
-		XYi dataSize{};                     // i32 * 2 ( GLTiledTexture.unalignedSize )
+        // pos: gl draw position by anchor 0,0
+        // scale: for viewport size change
+        XY pos{}, scale{};                                  // float * 4
+        // tileSize: single tile size
+        // mapSize: whole map/grid logic size( unaligned )
+        XY tileSize{}, mapSize{};                           // float * 4
 
-        /*
-        * example:
-            pos = camera.ToGLPos({ 0, stage->mapSize.y });
-            scale = camera.scale;
-            tileSize = tileSize;
-            mapSize = stage->gridSize * tileSize;
-            tiling = 1;
-            offset = 0;
-        */
-        void Fill(XY pos_, XY scale_, XY tileSize_, XY mapSize_, XY tiling_ = 1, XY offset_ = {}, XYi dataSize_ = {});
+        void Fill(XY pos_, XY scale_ = 1.f, XY tileSize_ = 32, XY mapSize_ = {});
     };
 
     struct Shader_Tiled : Shader {
         using Shader::Shader;
-        GLint uTex0{ -1 }, uTex1{ -1 }, aVert{ -1 }, aPosScale{ -1 }, aTileSizeMapSize{ -1 }, aTilingOffset{ -1 }, aDataSize{ -1 };
+        GLint uTex0{ -1 }, uTex1{ -1 }, aVert{ -1 }, aPosScale{ -1 }, aTileSizeMapSize{ -1 };
         GLVertexArrays va;
         GLBuffer vb, ib;
 
@@ -37,8 +30,8 @@ namespace xx {
         void Begin() override;
         void End() override;
         void Commit();
-		Shader_TiledData* Draw(GLuint texId_TiledSample_, GLuint texId_TiledData_);
-		Shader_TiledData* Draw(xx::Shared<xx::GLTexture> const& texTiledSample_, xx::Shared<xx::GLTiledTexture> const& texTiledData_);
+		Shader_TiledData* Alloc(GLuint texId_TiledSample_, GLuint texId_TiledData_);
+		Shader_TiledData* Alloc(xx::Shared<xx::GLTexture> const& texTiledSample_, xx::Shared<xx::GLTiledTexture> const& texTiledData_);
     };
 
 }

@@ -2,15 +2,12 @@
 
 namespace xx {
 
-    void Shader_TiledData::Fill(XY pos_, XY scale_, XY tileSize_, XY mapSize_, XY tiling_, XY offset_, XYi dataSize_) {
+    void Shader_TiledData::Fill(XY pos_, XY scale_, XY tileSize_, XY mapSize_) {
         pos = pos_;
         scale = scale_;
         tileSize = tileSize_;
-        mapSize = mapSize_;
-        tiling = tiling_;
-        offset = offset_;
-        if (dataSize_.x || dataSize_.y) {
-            dataSize = dataSize_;
+        if (mapSize_.x > 0 || mapSize_.y > 0) {
+            mapSize = mapSize_;
         }
     }
 
@@ -19,47 +16,50 @@ namespace xx {
             v = LoadGLVertexShader({ XX_SHADER_CODE_FIRST_LINE R"(
 uniform vec2 uCxy;	            // screen center coordinate
 
-in vec2 aVert;	// fans index { 0, 0 }, { 0, 1.f }, { 1.f, 0 }, { 1.f, 1.f }
+in vec2 aVert;	                // fans index { 0, 0 }, { 0, 1.f }, { 1.f, 0 }, { 1.f, 1.f }
 
 in vec4 aPosScale;
 in vec4 aTileSizeMapSize;
-in vec4 aTilingOffset;
-in vec2 aDataSize;
 
-out vec2 vTexCoord;
-flat out vec4 vTileSizeOffset;
-flat out ivec2 vDataSize;
+out vec2 vOutUV;                // value range: 0 ~ mapSize * tileSize
+flat out vec4 vTileSizeOutSize;
 
 void main() {
-    gl_Position = vec4((aPosScale.xy + aTileSizeMapSize.zw * aVert * aPosScale.zw) * uCxy, 0.f, 1.f);
-    vTexCoord = vec2(aTileSizeMapSize.z * aVert.x * aTilingOffset.x, aTileSizeMapSize.w - aTileSizeMapSize.w * aVert.y * aTilingOffset.y);
-    vTileSizeOffset = vec4( aTileSizeMapSize.xy, aTilingOffset.zw );
-    vDataSize = ivec2(aDataSize);
+
+    vec2 pos = aPosScale.xy;
+    vec2 scale = aPosScale.zw;
+    vec2 tileSize = aTileSizeMapSize.xy;
+    vec2 mapSize = aTileSizeMapSize.zw;
+    vec2 outSize = mapSize * tileSize;
+    vec2 outOffset = outSize * -0.5f;
+
+    vOutUV = vec2(outSize.x * aVert.x, outSize.y - outSize.y * aVert.y);
+    gl_Position = vec4((pos + vOutUV + outOffset) * scale * uCxy, 0.f, 1.f);
+    vTileSizeOutSize = vec4(tileSize, outSize);
 })"sv });
 
             f = LoadGLFragmentShader({ XX_SHADER_CODE_FIRST_LINE R"(
 precision highp float;          // mediump draw border has issue
 uniform sampler2D uTex0;        // tiled samples
-uniform sampler2D uTex1;        // tild data array    .xy: uv  .z: colorPlus  .w: todo
+uniform usampler2D uTex1;       // tild data uint8+8[]    .x: tiled index  .y: 0~255 map to 0~1 color multiplier
 
-in vec2 vTexCoord;
-flat in vec4 vTileSizeOffset;
-flat in ivec2 vDataSize;
+in vec2 vOutUV;
+flat in vec4 vTileSizeOutSize;
 
 out vec4 oColor;
 
 void main() {
-    vec2 tileTexSize = vec2(textureSize(uTex0, 0));
-    vec2 tileSize = vTileSizeOffset.xy;
-    vec2 offset = vTileSizeOffset.zw;
-    vec2 p = vTexCoord + offset;
-    ivec2 n = ivec2(p / tileSize);
-    ivec2 miniIdx = n - (n / vDataSize) * vDataSize;
-    vec4 uvc = texelFetch(uTex1, miniIdx, 0);
-    vec2 uv = uvc.xy;// * tileSize;
-    vec2 uvOffset = p - tileSize * vec2(miniIdx);
-    vec4 c = texture(uTex0, (uv + uvOffset) / tileTexSize);
-    oColor = vec4( c.x * uvc.z, c.y * uvc.z, c.z * uvc.z, c.w );
+    vec2 tileSize = vTileSizeOutSize.xy;
+    vec2 outSize = vTileSizeOutSize.zw;
+    ivec2 mapIndex = ivec2(vOutUV / tileSize);
+    uvec4 data = texelFetch(uTex1, mapIndex, 0);
+    float colorMultiplier = float(data.y) / 255.f;
+    //oColor = vec4( float(data.x) / 9.f, 0, 0, 1 );
+    float tileIndex = float(data.x);
+    vec2 tileUV = vOutUV - vec2(mapIndex) * tileSize;
+    vec2 uv = vec2(tileUV.x + tileIndex * tileSize.x, tileSize.y - mod(tileUV.y, tileSize.y));
+    vec4 c = texture(uTex0, uv / vec2(textureSize(uTex0, 0)));
+    oColor = vec4( c.x * colorMultiplier, c.y * colorMultiplier, c.z * colorMultiplier, c.w * colorMultiplier );
 })"sv });
 
             p = LinkGLProgram(v, f);
@@ -71,8 +71,6 @@ void main() {
             aVert = glGetAttribLocation(p, "aVert");
             aPosScale = glGetAttribLocation(p, "aPosScale");
             aTileSizeMapSize = glGetAttribLocation(p, "aTileSizeMapSize");
-            aTilingOffset = glGetAttribLocation(p, "aTilingOffset");
-            aDataSize = glGetAttribLocation(p, "aDataSize");
             CheckGLError();
 
             glGenVertexArrays(1, &va.id);
@@ -95,14 +93,6 @@ void main() {
             glVertexAttribPointer(aTileSizeMapSize, 4, GL_FLOAT, GL_FALSE, sizeof(Shader_TiledData), (GLvoid*)offsetof(Shader_TiledData, tileSize));
             glVertexAttribDivisor(aTileSizeMapSize, 1);
             glEnableVertexAttribArray(aTileSizeMapSize);
-
-            glVertexAttribPointer(aTilingOffset, 4, GL_FLOAT, GL_FALSE, sizeof(Shader_TiledData), (GLvoid*)offsetof(Shader_TiledData, tiling));
-            glVertexAttribDivisor(aTilingOffset, 1);
-            glEnableVertexAttribArray(aTilingOffset);
-
-            glVertexAttribPointer(aDataSize, 2, GL_FLOAT, GL_FALSE, sizeof(Shader_TiledData), (GLvoid*)offsetof(Shader_TiledData, dataSize));
-            glVertexAttribDivisor(aDataSize, 1);
-            glEnableVertexAttribArray(aDataSize);
 
             glBindVertexArray(0);
             glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -147,7 +137,7 @@ void main() {
         count = 0;
     }
 
-    Shader_TiledData* Shader_Tiled::Draw(GLuint texId_TiledSample_, GLuint texId_TiledData_) {
+    Shader_TiledData* Shader_Tiled::Alloc(GLuint texId_TiledSample_, GLuint texId_TiledData_) {
         assert(GameBase::instance->shader == this);
         if (count + 1 > bufLen
             || (lastTextureId && lastTextureId != texId_TiledSample_)
@@ -161,9 +151,9 @@ void main() {
         return r;
     }
 
-    Shader_TiledData* Shader_Tiled::Draw(xx::Shared<xx::GLTexture> const& texTiledSample_, xx::Shared<xx::GLTiledTexture> const& texTiledData_) {
-        auto r = Draw(texTiledSample_->id, texTiledData_->id);
-        r->dataSize = { texTiledData_->unalignedSize.x, texTiledData_->unalignedSize.y };
+    Shader_TiledData* Shader_Tiled::Alloc(xx::Shared<xx::GLTexture> const& texTiledSample_, xx::Shared<xx::GLTiledTexture> const& texTiledData_) {
+        auto r = Alloc(texTiledSample_->id, texTiledData_->id);
+        r->mapSize = { texTiledData_->mapSize.x, texTiledData_->mapSize.y };
         return r;
     }
 }

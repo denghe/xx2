@@ -38,24 +38,34 @@ void Game::GLInit() {
 
 	ui->Make<xx::LabelButton>()->Init(4, p5 + XY{ 0, -60 }, a5, 48)("change bg").onClicked = [this] {
 		bgChanged = !bgChanged;
+		if (bgChanged) {
+			GenTiledBG();
+		}
 	};
 
 	// init logic
 	heart.Emplace()->Init(pics.heart);
 
 	// init tiled bg
-	auto d = std::make_unique<std::array<float, 4>[]>(tiledTexSize.x * tiledTexSize.y);
-	for (int y = 0; y < gridSize.y; ++y) {
-		for (int x = 0; x < gridSize.x; ++x) {
-			auto u = rnd.Next<int32_t>(0, 3) * 32.f;
-			auto v = rnd.Next<int32_t>(0, 3) * 32.f;
-			d[y * tiledTexSize.x + x] = { u, v, 1, 0 };
-		}
-	}
-	tiledData.Emplace(xx::LoadGLTiledTexture(d.get(), tiledTexSize.x, tiledTexSize.y, gridSize));
+	GenTiledBG();
 
 	// play bgm
 	PlayMusic(wavs.bgm1, 0.5f);
+}
+
+void Game::GenTiledBG() {
+	tiledBGScale = rnd.Next<float>(0.1f, 1.0f);
+	XYi gridSize{ designSize.x / 32 / tiledBGScale, designSize.y / 32 / tiledBGScale };
+	XYi tiledTexSize{ (gridSize.x + 7) & ~7u, (gridSize.y + 7) & ~7u };
+	auto d = std::make_unique<std::array<uint8_t, 2>[]>(tiledTexSize.x * tiledTexSize.y);
+	for (int y = 0; y < gridSize.y; ++y) {
+		for (int x = 0; x < gridSize.x; ++x) {
+			auto idx = (uint8_t)rnd.Next<int32_t>(0, 9);
+			auto color = (uint8_t)rnd.Next<int32_t>(0, 256);
+			d[y * tiledTexSize.x + x] = { idx, color };
+		}
+	}
+	tiledData.Emplace(xx::LoadGLTiledTexture(d.get(), tiledTexSize.x, tiledTexSize.y, gridSize));
 }
 
 void Game::Update() {
@@ -93,15 +103,7 @@ void Game::Update() {
 
 	// bg update & draw
 	if (bgChanged) {
-		auto s = cam.scale * 0.5f;
-		Tiled().Draw(pics.tiled9.tex, tiledData)->Fill(
-			-mapSize * 0.5f * s	// pos
-			, s				// scale
-			, 32.f			// tile size
-			, mapSize		// mapsize
-			, 1.f			// tiling( known issue: bad draw )
-			, 0.f			// offset
-		);
+		Tiled().Alloc(pics.tiled9.tex, tiledData)->Fill(0, tiledBGScale * cam.scale, 32.f);
 	}
 	else {
 		bgOffset += XY{ 0.5f, 0.5f } * delta;

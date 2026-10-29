@@ -26,9 +26,7 @@ struct Game : xx::GameBase {
 
 	xx::Shared<xx::GLTiledTexture> tiledData;
 	xx::Rnd rnd;
-	XYi gridSize{ designSize.x / 32 * 2, designSize.y / 32 * 2 };
-	XY mapSize{ gridSize.x * 32.f, gridSize.y * 32.f };
-	XYi tiledTexSize{ (gridSize.x + 7) & ~7u, (gridSize.y + 7) & ~7u };
+	float tiledBGScale{ 1.f };
 
 	XY bgOffset{};
 	bool bgChanged{};
@@ -41,5 +39,7 @@ struct Game : xx::GameBase {
 	void Delay() override;
 	void Stat() override;
 	void OnResize(bool modeChanged_) override;
+
+	void GenTiledBG();
 };
 extern Game gg;
