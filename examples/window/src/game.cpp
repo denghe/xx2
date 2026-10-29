@@ -26,6 +26,9 @@ void Game::GLInit() {
 	// init ui
 	ui.Emplace()->InitRoot(scale);
 
+	fpsLabel = ui->Make<xx::Label>();
+	fpsLabel->Init(1, p5 - designSize * 0.5f + XY{ 30, 30 }, a1, 48)("fps = ");
+
 	ui->Make<xx::Label>()->Init(1, p5 + XY{ 0, -69 }, a5, 48)("hi");
 
 	ui->Make<xx::LabelButton>()->Init(2, p5 + XY{ 0, 60 }, a5, 48)("change color!!!").onClicked = [this] {
@@ -54,9 +57,12 @@ void Game::GLInit() {
 }
 
 void Game::GenTiledBG() {
-	tiledBGScale = rnd.Next<float>(0.1f, 1.0f);
-	XYi gridSize{ designSize.x / 32 / tiledBGScale, designSize.y / 32 / tiledBGScale };
+	XYi gridSize{ 4096, 4096 };
 	XYi tiledTexSize{ (gridSize.x + 7) & ~7u, (gridSize.y + 7) & ~7u };
+	tiledBGScale = designSize.y / (float)gridSize.y / 32;
+	xx::CoutN("gridSize: ", gridSize.x, " x ", gridSize.y);
+	xx::CoutN("tiledBGScale: ", tiledBGScale);
+	auto secs = xx::NowEpochSeconds();
 	auto d = std::make_unique<std::array<uint8_t, 2>[]>(tiledTexSize.x * tiledTexSize.y);
 	for (int y = 0; y < gridSize.y; ++y) {
 		for (int x = 0; x < gridSize.x; ++x) {
@@ -65,7 +71,9 @@ void Game::GenTiledBG() {
 			d[y * tiledTexSize.x + x] = { idx, color };
 		}
 	}
+	xx::CoutN("rnd fill data. secs = ", xx::NowEpochSeconds(secs));
 	tiledData.Emplace(xx::LoadGLTiledTexture(d.get(), tiledTexSize.x, tiledTexSize.y, gridSize));
+	xx::CoutN("load texture. secs = ", xx::NowEpochSeconds(secs));
 }
 
 void Game::Update() {
@@ -134,8 +142,11 @@ void Game::OnResize(bool modeChanged_) {
 }
 
 void Game::Stat() {
+#if 0
 	xx::CoutN("drawFPS = ", drawFPS, " drawCall = "
 		, drawCall, " drawVerts = ", drawVerts
 		, " delayUpdates.len = ", delayUpdates.len
 	);
+#endif
+	fpsLabel->SetText("fps = " + std::to_string(drawFPS));
 }

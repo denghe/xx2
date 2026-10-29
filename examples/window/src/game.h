@@ -21,6 +21,8 @@ struct Game : xx::GameBase {
 	} wavs;
 
 	xx::Shared<xx::Node> ui;
+	xx::Weak<xx::Label> fpsLabel;
+	
 	xx::Camera cam;
 	xx::Shared<Monster> heart;
 
