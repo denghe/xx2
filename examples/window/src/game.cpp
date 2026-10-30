@@ -57,6 +57,7 @@ void Game::GLInit() {
 }
 
 void Game::GenTiledBG() {
+#if 1
 	XYi gridSize{ 4096, 4096 };
 	XYi tiledTexSize{ (gridSize.x + 7) & ~7u, (gridSize.y + 7) & ~7u };
 	tiledBGScale = designSize.y / (float)gridSize.y / 32;
@@ -71,6 +72,23 @@ void Game::GenTiledBG() {
 			d[y * tiledTexSize.x + x] = { idx, color };
 		}
 	}
+#else
+	// ensure content order
+	XYi gridSize{ 9, 9 };
+	XYi tiledTexSize{ (gridSize.x + 7) & ~7u, (gridSize.y + 7) & ~7u };
+	tiledBGScale = designSize.y / (float)gridSize.y / 32;
+	xx::CoutN("gridSize: ", gridSize.x, " x ", gridSize.y);
+	xx::CoutN("tiledBGScale: ", tiledBGScale);
+	auto secs = xx::NowEpochSeconds();
+	auto d = std::make_unique<std::array<uint8_t, 2>[]>(tiledTexSize.x * tiledTexSize.y);
+	for (int y = 0; y < gridSize.y; ++y) {
+		for (int x = 0; x < gridSize.x; ++x) {
+			auto idx = (uint8_t)y;
+			auto color = (uint8_t)((x+1) / 10.f * 255.f);
+			d[y * tiledTexSize.x + x] = { idx, color };
+		}
+	}
+#endif
 	xx::CoutN("rnd fill data. secs = ", xx::NowEpochSeconds(secs));
 	tiledData.Emplace(xx::LoadGLTiledTexture(d.get(), tiledTexSize.x, tiledTexSize.y, gridSize));
 	xx::CoutN("load texture. secs = ", xx::NowEpochSeconds(secs));

@@ -33,7 +33,7 @@ void main() {
     vec2 outSize = mapSize * tileSize;
     vec2 outOffset = outSize * -0.5f;
 
-    vOutUV = vec2(outSize.x * aVert.x, outSize.y - outSize.y * aVert.y);
+    vOutUV = vec2(outSize.x * aVert.x, outSize.y * aVert.y);
     gl_Position = vec4((pos + vOutUV + outOffset) * scale * uCxy, 0.f, 1.f);
     vTileSizeOutSize = vec4(tileSize, outSize);
 })"sv });
@@ -52,9 +52,9 @@ void main() {
     vec2 tileSize = vTileSizeOutSize.xy;
     vec2 outSize = vTileSizeOutSize.zw;
     ivec2 mapIndex = ivec2(vOutUV / tileSize);
+    mapIndex.y = int(outSize.y / tileSize.y) - 1 - mapIndex.y;	// flip y
     uvec4 data = texelFetch(uTex1, mapIndex, 0);
     float colorMultiplier = float(data.y) / 255.f;
-    //oColor = vec4( float(data.x) / 9.f, 0, 0, 1 );
     float tileIndex = float(data.x);
     vec2 tileUV = vOutUV - vec2(mapIndex) * tileSize;
     vec2 uv = vec2(tileUV.x + tileIndex * tileSize.x, tileSize.y - mod(tileUV.y, tileSize.y));
