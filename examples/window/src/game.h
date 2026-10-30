@@ -13,7 +13,7 @@ struct Game : xx::GameBase {
 
 	struct {
 		xx::Frame heart;	// pixel: 29 * 24
-		xx::Frame tiled9;	// pixel: 32*3 / 32*3
+		xx::Frame tiled9;	// pixel: 32*9 * 32
 	} pics;
 	struct {
 		xx::Shared<SoLoud::Wav> bgm1;
