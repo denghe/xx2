@@ -14,6 +14,7 @@ namespace xx {
 		XY Size() const;
 		uint8_t& operator[](int32_t idx) const;
 		RGBA8& At(int32_t idx) const;
+		RGB8& At3(int32_t idx) const;
 
 		STBImage(uint8_t const* buf, size_t len);
 		STBImage() = default;

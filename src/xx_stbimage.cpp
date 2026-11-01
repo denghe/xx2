@@ -40,6 +40,14 @@ namespace xx {
 		return ((RGBA8*)buf)[idx];
 	}
 
+	RGB8& STBImage::At3(int32_t idx) const {
+		assert(comp == 3);
+		assert(buf);
+		assert(idx >= 0);
+		assert(len > idx * comp);
+		return ((RGB8*)buf)[idx];
+	}
+
 	STBImage::STBImage(uint8_t const* buf, size_t len) {
 		Fill(buf, len);
 	}

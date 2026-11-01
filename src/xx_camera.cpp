@@ -3,6 +3,7 @@
 namespace xx {
 
 	void Camera::Init(float baseScale_, float logicScale_, XY original_) {
+		assert(baseScale_ > 0.f && logicScale_ > 0.f);
 		baseScale = baseScale_;
 		logicScale = logicScale_;
 		scale = logicScale * baseScale;
@@ -15,12 +16,14 @@ namespace xx {
 	}
 
 	void Camera::SetBaseScale(float baseScale_) {
+		assert(baseScale_ > 0.f);
 		baseScale = baseScale_;
 		scale = logicScale * baseScale;
 		_1_scale = 1.f / scale;
 	}
 
 	void Camera::SetLogicScale(float logicScale_) {
+		assert(logicScale_ > 0.f);
 		logicScale = logicScale_;
 		scale = logicScale * baseScale;
 		_1_scale = 1.f / scale;
