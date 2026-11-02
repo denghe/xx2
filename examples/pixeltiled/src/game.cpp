@@ -34,9 +34,7 @@ void Game::GLInit() {
 	// ...
 
 	// init cam
-	cam.Init(scale
-		, std::min(gg.designSize.x / map->pixelSize.x, gg.designSize.y / map->pixelSize.y)
-		, map->pixelSize * 0.5f);
+	cam.Init(scale, map->minScale, map->pixelSize * 0.5f);
 
 	// init ui
 	ui.Emplace()->InitRoot(scale);
@@ -59,11 +57,14 @@ bool Game::HandleInputs() {
 		running = false;
 		return true;
 	}
+	if (keyboard[GLFW_KEY_SPACE](1.f)) {
+		map->DigAll();
+	}
 	if (mouse[GLFW_MOUSE_BUTTON_WHEEL_UP](0.01f) || keyboard[GLFW_KEY_Z](0.01f) || joy.btns[GLFW_GAMEPAD_BUTTON_A](0.01f)) {
 		cam.SetLogicScale(cam.logicScale * 1.1f);
 	}
 	if (mouse[GLFW_MOUSE_BUTTON_WHEEL_DOWN](0.01f) || keyboard[GLFW_KEY_X](0.01f) || joy.btns[GLFW_GAMEPAD_BUTTON_B](0.01f)) {
-		if (cam.logicScale > 0.1f) cam.SetLogicScale(cam.logicScale * 0.95f);
+		if (cam.logicScale > map->minScale) cam.SetLogicScale(cam.logicScale * 0.95f);
 	}
 	return false;
 }
@@ -146,6 +147,7 @@ void Map::Init() {
 	// alloc data
 	texData = std::make_unique_for_overwrite<std::array<uint8_t, 2>[]>(contentSize.x * contentSize.y);
 	mapData = std::make_unique_for_overwrite<Block[]>(contentSize.x * contentSize.y);
+	minScale = std::min(gg.designSize.x / pixelSize.x, gg.designSize.y / pixelSize.y);
 
 	// fill tex & map data
 	for (int32_t y = 0; y < img.h; ++y) {
@@ -284,6 +286,35 @@ void Map::TryDig1x1(XYi cri_) {
 	TryAdd8Neighbors(x, y, 255);
 	LightLeighbors(100);
 	LightLeighbors(20);
+}
+
+void Map::DigAll() {
+	// set spaces
+	for (int32_t y = 0; y < mapSize.y; ++y) {
+		for (int32_t x = 0; x < mapSize.x; ++x) {
+			auto idx = y * mapSize.x + x;
+			if (mapData[idx].type == BlockTypes::Breakable) {
+				mapData[idx].type = BlockTypes::Space;
+				texData[idx][0] = 10;	// set to space
+				texData[idx][1] = 0;	// set light effect to 0
+				--breakPixelCount;
+			}
+		}
+	}
+
+	// light 255
+	neighbors.Clear();
+	for (int32_t y = 0; y < mapSize.y; ++y) {
+		for (int32_t x = 0; x < mapSize.x; ++x) {
+			auto idx = y * mapSize.x + x;
+			if (mapData[idx].type == BlockTypes::Space) {
+				TryAdd8Neighbors(x, y, 255);
+			}
+		}
+	}
+	LightLeighbors(100);
+	LightLeighbors(20);
+
 }
 
 void Map::Dig3x3(XYi cri_) {

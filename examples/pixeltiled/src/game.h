@@ -19,6 +19,7 @@ struct Map {
 	XYi mapSize{};
 	XY pixelSize{};
 	XY beginPos{};
+	float minScale{};
 	int32_t whitePixelCount{};
 	int32_t breakPixelCount{};
 	xx::List<XYi> neighbors, bak;
@@ -26,6 +27,7 @@ struct Map {
 	bool CheckBreakable3x3(XYi cri_);	// return true mean all 3x3 blocks are breakable
 	void TryDig1x1(XYi cri_);
 	void Dig3x3(XYi cri_);
+	void DigAll();
 	void LightLeighbors(uint8_t c_);
 	void TryAddNeighbor(int32_t nx_, int32_t ny_, uint8_t c_);
 	void TryAdd8Neighbors(int32_t nx_, int32_t ny_, uint8_t c_);
