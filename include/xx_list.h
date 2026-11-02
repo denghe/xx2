@@ -232,6 +232,7 @@ namespace xx {
         }
 
         void AddRange(T const* items, SizeType count) {
+			if (count <= 0) return;
             if (auto newBuf = ReserveBegin(len + count)) {
                 if constexpr (std::is_standard_layout_v<T> && std::is_trivial_v<T>) {
                     ::memcpy(newBuf + len, items, count * sizeof(T));
