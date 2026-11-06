@@ -57,7 +57,7 @@ void main() {
     float colorMultiplier = float(data.y) / 255.f;
     float tileIndex = float(data.x);
     vec2 tileUV = vOutUV - vec2(mapIndex) * tileSize;
-    vec2 uv = vec2(tileUV.x + tileIndex * tileSize.x, tileSize.y - mod(tileUV.y, tileSize.y));
+    vec2 uv = vec2(tileUV.x * 0.999999f + tileIndex * tileSize.x, (tileSize.y - mod(tileUV.y, tileSize.y)) * 0.999999f);
     vec4 c = texture(uTex0, uv / vec2(textureSize(uTex0, 0)));
     oColor = vec4( c.x * colorMultiplier, c.y * colorMultiplier, c.z * colorMultiplier, c.w * colorMultiplier );
 })"sv });
