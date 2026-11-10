@@ -3,6 +3,7 @@
 // shader headers include here
 #include "shader_grass.h"
 #include "shader_radiate_golden_rays.h"
+#include "shader_ring.h"
 // ...
 
 struct Game : xx::GameBase {
@@ -26,6 +27,7 @@ struct Game : xx::GameBase {
 	// shaders
 	xx::Shader_Grass shaderGrass;
 	xx::Shader_RadiateGoldenRays shaderRadiateGoldenRays;
+	xx::Shader_Ring shaderRing;
 	// ...
 
 

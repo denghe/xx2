@@ -1,7 +1,7 @@
 ﻿#include "pch.h"
 #include "scene_mainmenu.h"
-#include "scene_shaderGrass.h"
-#include "scene_shaderRadiateGoldenRays.h"
+#include "scene_shader_grass.h"
+#include "scene_shader_radiate_golden_rays.h"
 // ...
 
 void Scene_MainMenu::Init() {

@@ -17,6 +17,7 @@ void Game::GLInit() {
 	// init shaders
 	shaderGrass.Init();
 	shaderRadiateGoldenRays.Init();
+	shaderRing.Init();
 	// ... init other shaders here
 
 	// init first scene

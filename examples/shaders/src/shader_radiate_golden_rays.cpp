@@ -2,6 +2,8 @@
 #include "shader_radiate_golden_rays.h"
 #include "xx_gamebase.h"
 
+#define Shader_RadiateGoldenRays_ENABLE_CIRCLE_MESH 1
+
 namespace xx {
 
 	void Shader_RadiateGoldenRays::Init() {
@@ -61,7 +63,7 @@ void main() {
 	radial = radial * radial;
 
 	// Angular ray pattern: bright at the center of each ray, darker toward the edges
-	float slice_angle = 6.28318530718 / ray_count; // 2PI / 射线数量
+	float slice_angle = 6.28318530718 / ray_count; // 2PI / ray count
 	float in_slice = mod(angle + 3.14159265359, slice_angle);
 	float dist_from_ray_center = abs(in_slice - slice_angle * 0.5);
 	float ray = 1.0 - smoothstep(0.0, slice_angle * 0.35, dist_from_ray_center);
@@ -105,7 +107,7 @@ void main() {
 		glBindVertexArray(va);
 
 		glBindBuffer(GL_ARRAY_BUFFER, ib);
-#if 0
+#if Shader_RadiateGoldenRays_ENABLE_CIRCLE_MESH
 		// verts add circle points
 		List<XY> verts;
 		verts.Emplace(0, 0);	// circle center
@@ -169,11 +171,18 @@ void main() {
 		glBindBuffer(GL_ARRAY_BUFFER, vb);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(Shader_RadiateGoldenRaysData) * count, data.get(), GL_STREAM_DRAW);
 
-		//glDrawArraysInstanced(GL_TRIANGLE_FAN, 0, numCircleMeshSegaments + 2, count);
+#if Shader_RadiateGoldenRays_ENABLE_CIRCLE_MESH
+		glDrawArraysInstanced(GL_TRIANGLE_FAN, 0, numCircleMeshSegaments + 2, count);
+#else
 		glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, count);
+#endif
 		CheckGLError();
 
+#if Shader_RadiateGoldenRays_ENABLE_CIRCLE_MESH
+		GameBase::instance->drawVerts += count * (3 * numCircleMeshSegaments);
+#else
 		GameBase::instance->drawVerts += count * 6;
+#endif
 		GameBase::instance->drawCall += 1;
 
 		count = 0;

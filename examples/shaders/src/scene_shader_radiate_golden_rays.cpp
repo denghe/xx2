@@ -1,5 +1,5 @@
 ﻿#include "pch.h"
-#include "scene_shaderRadiateGoldenRays.h"
+#include "scene_shader_radiate_golden_rays.h"
 #include "scene_mainmenu.h"
 
 void Scene_Shader_RadiateGoldenRays::Init() {
