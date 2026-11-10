@@ -8,6 +8,7 @@
 #endif
 
 namespace xx {
+    struct GameBase;
 
     // base class
     struct Shader {
@@ -24,6 +25,22 @@ namespace xx {
         virtual ~Shader() {}
         virtual void Begin() = 0;
         virtual void End() = 0;
+
+        // need c++23
+        // for easy Commit previous different shader
+        auto& operator()(this auto&& self) {
+		    auto g = GameBase::instance;
+		    if (g->shader != &self) {
+			    if (g->shader) {
+				    g->shader->End();
+				    g->shader = {};
+			    }
+			    self.Begin();
+			    g->shader = &self;
+		    }
+		    return self;
+	    }
+
     };
 
 }

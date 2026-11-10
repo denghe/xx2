@@ -18,9 +18,6 @@ namespace xx {
         std::unique_ptr<Shader_RadiateGoldenRaysData[]> data = std::make_unique_for_overwrite<Shader_RadiateGoldenRaysData[]>(maxNums);
         int32_t count{};
 
-        // for easy use
-        Shader_RadiateGoldenRays& operator()();
-
         void Init();
 
         virtual void Begin() override;
