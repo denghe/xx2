@@ -48,6 +48,10 @@ namespace xx {
             return len;
         }
 
+        SizeType ByteLen() const {
+            return sizeof(T) * len;
+        }
+
         List Clone() const {
             List rtv;
             rtv.Reserve(len);

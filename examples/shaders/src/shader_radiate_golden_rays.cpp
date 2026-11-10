@@ -10,77 +10,79 @@ namespace xx {
 uniform vec2 uCxy;	// screen center coordinate
 in vec2 aVert;
 in vec4 aPosTimeRadius;
+in vec4 aCenterColor;
+in vec4 aRayColor;
+in vec4 aRcRsRfCgr;	// aRayCount RaySharpness RadiusFade CenterGlowRadius
+in vec3 aRSFsFs;	// aRotationSpeed FlickerSpeed FlickerStrength
+flat out vec4 vCenterColor;
+flat out vec4 vRayColor;
+flat out vec4 vRcRsRfCgr;
+flat out vec4 vRSFsFs;
 out vec2 vUV;
-flat out float vTime;
 
 void main() {
+	vCenterColor = aCenterColor;
+	vRayColor = aRayColor;
+	vRcRsRfCgr = aRcRsRfCgr;
+	vRSFsFs = vec4(aRSFsFs, aPosTimeRadius.z);
 	vec2 pos = aPosTimeRadius.xy + aVert * aPosTimeRadius.w;
     gl_Position = vec4(pos * uCxy, 0, 1);
 	vUV = aVert;
-	vTime = aPosTimeRadius.z;
 })"sv });
 
 
 		f = LoadGLFragmentShader({ XX_SHADER_CODE_FIRST_LINE R"(
 precision lowp float;
 in vec2 vUV;
-flat in float vTime;
+flat in vec4 vCenterColor;
+flat in vec4 vRayColor;
+flat in vec4 vRcRsRfCgr;
+flat in vec4 vRSFsFs;
 out vec4 oColor;
 
-// 中心颜色（接近白色）
-const vec4 center_color = vec4(1.0, 1.0, 0.98, 1.0);
-// 射线颜色（金色/黄色）
-const vec4 ray_color = vec4(1.0, 0.88, 0.45, 0.92);
-// 放射线条数量
-const float ray_count = 12.0;
-// 线条锐度（数值越大线条越细、轮廓越锐利）
-const float ray_sharpness = 2.0;
-// 径向衰减范围：从中心到该距离线条慢慢淡出，1=一直延伸到边缘
-const float radius_fade = 1.1;
-// 中心辉光半径（中心亮斑范围大小）
-const float center_glow_radius = 0.5;
-// 顺时针旋转速度（弧度/秒）
-const float rotation_speed = 0.1;
-// 闪烁速度（越大闪得越快）
-const float flicker_speed = 2.0;
-// 闪烁强度（0=不闪烁，1=线条明暗变化幅度最大）
-const float flicker_strength = 1.0;
-
 void main() {
+	float ray_count = vRcRsRfCgr.x;
+	float ray_sharpness = vRcRsRfCgr.y;
+	float radius_fade = vRcRsRfCgr.z;
+	float center_glow_radius = vRcRsRfCgr.w;
+	float rotation_speed = vRSFsFs.x;
+	float flicker_speed = vRSFsFs.y;
+	float flicker_strength = vRSFsFs.z;
+	float time = vRSFsFs.w;
 
 	float dist = length(vUV);
 	float angle = atan(vUV.y, vUV.x);
 
-	// 顺时针旋转：角度减去时间*转速，实现顺时针转动
-	angle += vTime * rotation_speed;
+	// Clockwise rotation (subtracting time from angle produces clockwise motion)
+	angle += time * rotation_speed;
 
-	// 径向衰减：中心亮，向外逐渐淡出
+	// Radial fade: bright at the center, fades out gradually toward the edges
 	float radial = 1.0 - smoothstep(0.0, radius_fade, dist);
 	radial = radial * radial;
 
-	// 角度分片，生成放射线条
+	// Angular ray pattern: bright at the center of each ray, darker toward the edges
 	float slice_angle = 6.28318530718 / ray_count; // 2PI / 射线数量
 	float in_slice = mod(angle + 3.14159265359, slice_angle);
 	float dist_from_ray_center = abs(in_slice - slice_angle * 0.5);
 	float ray = 1.0 - smoothstep(0.0, slice_angle * 0.35, dist_from_ray_center);
 	ray = pow(ray, ray_sharpness);
 
-	// 单独线条闪烁：每一根射线用不同相位正弦，错开闪烁节奏
+	// Per-ray flicker: brightness varies with a sine wave based on ray index
 	float ray_index = floor((angle + 3.14159265359) / slice_angle);
-	float flicker = 0.5 + 0.5 * sin(vTime * flicker_speed + ray_index * 1.618);
+	float flicker = 0.5 + 0.5 * sin(time * flicker_speed + ray_index * 1.618);
 	flicker = mix(1.0, flicker, flicker_strength);
 	ray *= flicker;
 
-	// 中心辉光（物品中心的漫反射亮光）
+	// Center glow (light bloom behind the element)
 	float glow = 1.0 - smoothstep(0.0, center_glow_radius, dist);
 
-	// 最终透明度：射线 + 中心辉光，乘径向衰减
+	// Final alpha: combines rays + center glow with radial fade applied
 	float alpha = (ray * 0.75 + glow * 0.5) * radial;
 	alpha = clamp(alpha, 0.0, 1.0);
 
-	// 颜色混合：辉光越强越偏向中心白色，否则偏向射线金色
-	vec3 col = mix(ray_color.rgb, center_color.rgb, glow);
-	oColor = vec4(col * alpha, alpha * ray_color.a);
+	// Color mix: premutiple alpha
+	vec3 col = mix(vRayColor.rgb, vCenterColor.rgb, glow);
+	oColor = vec4(col * alpha, vRayColor.a * alpha);
 })"sv });
 
 		p = LinkGLProgram(v, f);
@@ -89,6 +91,11 @@ void main() {
 
 		aVert = glGetAttribLocation(p, "aVert");
 		aPosTimeRadius = glGetAttribLocation(p, "aPosTimeRadius");
+		aCenterColor = glGetAttribLocation(p, "aCenterColor");
+		aRayColor = glGetAttribLocation(p, "aRayColor");
+		aRayCountRaySharpnessRadiusFadeCenterGlowRadius = glGetAttribLocation(p, "aRcRsRfCgr");
+		aRotationSpeedFlickerSpeedFlickerStrength = glGetAttribLocation(p, "aRSFsFs");
+
 		CheckGLError();
 
 		glGenVertexArrays(1, &va.id);
@@ -97,9 +104,23 @@ void main() {
 
 		glBindVertexArray(va);
 
-		static const XY verts[4] = { { -1, -1 },{ -1, 1 },{ 1, -1 },{ 1, 1 } };
 		glBindBuffer(GL_ARRAY_BUFFER, ib);
+#if 0
+		// verts add circle points
+		List<XY> verts;
+		verts.Emplace(0, 0);	// circle center
+		static constexpr double angleStep = 2.0 * M_PI / numCircleMeshSegaments;
+		for (int i = 0; i < numCircleMeshSegaments; ++i) {
+			double angle = i * angleStep;
+			verts.Emplace(std::cos(angle), std::sin(angle));
+		}
+		verts.Emplace(verts[1]);	// close circle
+		assert(verts.len == numCircleMeshSegaments + 2);
+		glBufferData(GL_ARRAY_BUFFER, verts.ByteLen(), verts.Buf(), GL_STATIC_DRAW);
+#else
+		static const XY verts[4] = { { -1, -1 },{ -1, 1 },{ 1, -1 },{ 1, 1 } };
 		glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
+#endif
 		glVertexAttribPointer(aVert, 2, GL_FLOAT, GL_FALSE, sizeof(XY), 0);
 		glEnableVertexAttribArray(aVert);
 
@@ -108,6 +129,22 @@ void main() {
 		glVertexAttribPointer(aPosTimeRadius, 4, GL_FLOAT, GL_FALSE, sizeof(Shader_RadiateGoldenRaysData), (GLvoid*)offsetof(Shader_RadiateGoldenRaysData, pos));
 		glVertexAttribDivisor(aPosTimeRadius, 1);
 		glEnableVertexAttribArray(aPosTimeRadius);
+
+		glVertexAttribPointer(aCenterColor, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(Shader_RadiateGoldenRaysData), (GLvoid*)offsetof(Shader_RadiateGoldenRaysData, centerColor));
+		glVertexAttribDivisor(aCenterColor, 1);
+		glEnableVertexAttribArray(aCenterColor);
+
+		glVertexAttribPointer(aRayColor, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(Shader_RadiateGoldenRaysData), (GLvoid*)offsetof(Shader_RadiateGoldenRaysData, rayColor));
+		glVertexAttribDivisor(aRayColor, 1);
+		glEnableVertexAttribArray(aRayColor);
+
+		glVertexAttribPointer(aRayCountRaySharpnessRadiusFadeCenterGlowRadius, 4, GL_FLOAT, GL_FALSE, sizeof(Shader_RadiateGoldenRaysData), (GLvoid*)offsetof(Shader_RadiateGoldenRaysData, rayCount));
+		glVertexAttribDivisor(aRayCountRaySharpnessRadiusFadeCenterGlowRadius, 1);
+		glEnableVertexAttribArray(aRayCountRaySharpnessRadiusFadeCenterGlowRadius);
+
+		glVertexAttribPointer(aRotationSpeedFlickerSpeedFlickerStrength, 3, GL_FLOAT, GL_FALSE, sizeof(Shader_RadiateGoldenRaysData), (GLvoid*)offsetof(Shader_RadiateGoldenRaysData, rotationSpeed));
+		glVertexAttribDivisor(aRotationSpeedFlickerSpeedFlickerStrength, 1);
+		glEnableVertexAttribArray(aRotationSpeedFlickerSpeedFlickerStrength);
 
 		glBindVertexArray(0);
 		CheckGLError();
@@ -132,6 +169,7 @@ void main() {
 		glBindBuffer(GL_ARRAY_BUFFER, vb);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(Shader_RadiateGoldenRaysData) * count, data.get(), GL_STREAM_DRAW);
 
+		//glDrawArraysInstanced(GL_TRIANGLE_FAN, 0, numCircleMeshSegaments + 2, count);
 		glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, count);
 		CheckGLError();
 
@@ -152,11 +190,24 @@ void main() {
 		return r;
 	}
 
-	void Shader_RadiateGoldenRays::Draw(XY pos_, float time_, float radius_) {
-		auto data = Alloc(1);
-		data->pos = pos_;
-		data->time = time_;
-		data->radius = radius_;
+	void Shader_RadiateGoldenRays::Draw(XY pos_, float time_, float radius_
+		, RGBA8 centerColor_, RGBA8 rayColor_
+		, float rayCount_, float raySharpness_, float radiusFade_, float centerGlowRadius_
+		, float rotationSpeed_, float flickerSpeed_, float flickerStrength_
+	) {
+		auto d = Alloc(1);
+		d->pos = pos_;
+		d->time = time_;
+		d->radius = radius_;
+		d->centerColor = centerColor_;
+		d->rayColor = rayColor_;
+		d->rayCount = rayCount_;
+		d->raySharpness = raySharpness_;
+		d->radiusFade = radiusFade_;
+		d->centerGlowRadius = centerGlowRadius_;
+		d->rotationSpeed = rotationSpeed_;
+		d->flickerSpeed = flickerSpeed_;
+		d->flickerStrength = flickerStrength_;
 	}
 
 }
