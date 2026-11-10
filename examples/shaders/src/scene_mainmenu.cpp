@@ -2,6 +2,7 @@
 #include "scene_mainmenu.h"
 #include "scene_shader_grass.h"
 #include "scene_shader_radiate_golden_rays.h"
+#include "scene_shader_ring.h"
 // ...
 
 void Scene_MainMenu::Init() {
@@ -30,6 +31,10 @@ void Scene_MainMenu::MakeUI() {
 	offset.y -= cLineHeight * 1.5;
 	ui->Make<xx::LabelButton>()->Init(2, offset, anchor, fontSize)("Scene_Shader_RadiateGoldenRays").onClicked = [this] {
 		gg.MakeScene<Scene_Shader_RadiateGoldenRays>()->Init();
+	};
+	offset.y -= cLineHeight * 1.5;
+	ui->Make<xx::LabelButton>()->Init(2, offset, anchor, fontSize)("Scene_Shader_Ring").onClicked = [this] {
+		gg.MakeScene<Scene_Shader_Ring>()->Init();
 	};
 }
 

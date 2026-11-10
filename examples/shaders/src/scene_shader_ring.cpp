@@ -29,8 +29,9 @@ void Scene_Shader_Ring::FixedUpdate() {
 }
 
 void Scene_Shader_Ring::Draw() {
-	float tiling{ 1.f };
-	gg.shaderRing().Draw({ 0, 0, uint16_t(gg.designSize.x * tiling), uint16_t(gg.designSize.y * tiling) }, {}, 0.5f, 1.f / tiling);
+	float radius{ gg.designSize.y * 0.5f };
+	float borderWidth{ 5.f / radius };
+	gg.shaderRing().Draw({}, radius * cam.scale, borderWidth, xx::RGBA8_White);
 	// ...
 	gg.DrawNode(ui);
 }
