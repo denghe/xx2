@@ -61,12 +61,11 @@ const float flicker_strength = 1.0;
 
 void main() {
 
-	vec2 uv = vUV;
-	float dist = length(uv);// * 2.0;
-	float angle = atan(uv.y, uv.x);
+	float dist = length(vUV);
+	float angle = atan(vUV.y, vUV.x);
 
 	// 顺时针旋转：角度减去时间*转速，实现顺时针转动
-	angle -= vTime * rotation_speed;
+	angle += vTime * rotation_speed;
 
 	// 径向衰减：中心亮，向外逐渐淡出
 	float radial = 1.0 - smoothstep(0.0, radius_fade, dist);
@@ -94,8 +93,7 @@ void main() {
 
 	// 颜色混合：辉光越强越偏向中心白色，否则偏向射线金色
 	vec3 col = mix(ray_color.rgb, center_color.rgb, glow);
-	oColor = vec4(col, alpha * ray_color.a);
-
+	oColor = vec4(col * alpha, alpha * ray_color.a);
 })"sv });
 
 		p = LinkGLProgram(v, f);

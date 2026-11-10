@@ -30,8 +30,7 @@ void Scene_Shader_RadiateGoldenRays::FixedUpdate() {
 }
 
 void Scene_Shader_RadiateGoldenRays::Draw() {
-	float tiling{ 1.f };
-	gg.shaderRadiateGoldenRays().Draw({}, time, gg.designSize.y * 0.5f);
+	gg.shaderRadiateGoldenRays().Draw({}, time, gg.designSize.y * 0.5f * cam.scale);
 	// ...
 	gg.DrawNode(ui);
 }
