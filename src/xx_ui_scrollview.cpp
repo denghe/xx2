@@ -14,13 +14,14 @@ namespace xx {
 	//	eb.uiHandler.Reset();
 	//}
 
-	void ScrollView::Init(int32_t z_, XY const& position_, XY const& scale_, XY const& anchor_, XY const& size_, XY const& contentSize_) {
-		Node::InitDerived<ScrollView>(z_, position_, scale_, anchor_, size_);
+	void ScrollView::Init(int32_t z_, XY const& position_, XY const& anchor_, XY const& scale_, XY const& size_, XY const& contentSize_) {
+		Node::InitDerived<ScrollView>(z_, position_, anchor_, scale_, size_);
 		children.Clear();
 		auto&& c = Make<Node>();	// children[0] is content node
 		c->scissor = WeakFromThis(this);
 		CalcDragLimit(contentSize_);
-		c->Init(z_, basePos + dragLimit, { 1,1 }, {}, contentSize_);
+		c->Init(z_, basePos + dragLimit, {}, { 1,1 }, contentSize_);
+		TryRegisterAutoUpdate();
 	}
 
 	void ScrollView::InitContentSize(XY const& contentSize_, bool resetPosition_) {
@@ -81,12 +82,17 @@ namespace xx {
 		return 1;
 	}
 
-	int32_t ScrollView::OnMouseMove() {
+	int32_t ScrollView::Update() {
 		auto& eb = *GameBase::instance;
 		if (eb.uiHandler.TryGetPointer() == this) {
-			auto d = eb.mousePos - mouseLastPos;
-			mouseLastPos = eb.mousePos;
-			UpdateContentPosition(children[0]->position + d);
+			if (eb.mouse[GLFW_MOUSE_BUTTON_LEFT]) {
+				auto d = eb.mousePos - mouseLastPos;
+				mouseLastPos = eb.mousePos;
+				UpdateContentPosition(children[0]->position + d);
+			}
+			else {
+				eb.uiHandler.Reset();
+			}
 		}
 		// todo
 		return 0;
