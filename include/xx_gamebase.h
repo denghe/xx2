@@ -203,7 +203,9 @@ namespace xx {
 
         Shared<GLTexture> LoadTexture(std::string_view fn_, bool pngAutoPremultiplyAlpla_ = true);
 
+#if 0
 		void FixAMDGraphicsCardBugs();
+#endif
         void ResizeCalc();  // for window resize event
         void SetWindowSize(XY siz); // for framebuffer only
         void GLViewport();
