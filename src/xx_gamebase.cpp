@@ -29,6 +29,7 @@ namespace xx {
         }
     }
 
+#if 0
 	// viewport maybe ignore title bar height when resizing window ( AMD card only )
 	void GameBase::FixAMDGraphicsCardBugs() {
 		if (isResizing && isAMDCard) {
@@ -40,6 +41,7 @@ namespace xx {
 			glfwSetWindowMonitor(wnd, NULL, x, y, w, h, GLFW_DONT_CARE);
 		}
 	}
+#endif
 
     // for window resize event
     void GameBase::ResizeCalc() {
@@ -908,7 +910,9 @@ namespace xx {
 	}
 
 	void GameBase::Loop(bool fromEvent) {
+#if 0
 		FixAMDGraphicsCardBugs();
+#endif
 		GLClear(clearColor);
 		GLBlendFunc();
 
