@@ -74,6 +74,7 @@ namespace xx {
 	};
 
 	int32_t ScrollView::OnMouseDown(int32_t btnId_) {
+		if (!enabled) return 0;
 		if (btnId_ != GLFW_MOUSE_BUTTON_LEFT) return 0;
 		auto& eb = *GameBase::instance;
 		assert(!eb.uiHandler);
