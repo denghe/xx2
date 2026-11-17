@@ -16,10 +16,11 @@ namespace xx {
 
 	// content align: left-top
 	struct ScrollView : MouseEventHandlerNode, Scissor {
+		static constexpr int32_t cTypeId{20};
 
 		XY basePos{}, dragLimit{};
 
-		void Init(int32_t z_, XY const& position_, XY const& scale_, XY const& anchor_, XY const& size_, XY const& contentSize_);
+		void Init(int32_t z_, XY const& position_, XY const& anchor_, XY const& scale_,  XY const& size_, XY const& contentSize_);
 
 		template<typename T>
 		Shared<T>& MakeContent() {
@@ -39,8 +40,7 @@ namespace xx {
 
 		XY mouseDownPos{}, mouseLastPos{};
 		virtual int32_t OnMouseDown(int32_t btnId_) override;
-		virtual int32_t OnMouseMove() override;
-
+		virtual int32_t Update() override;
 	};
 
 }

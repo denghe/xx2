@@ -55,30 +55,71 @@ namespace xx {
 		if (btnId_ != GLFW_MOUSE_BUTTON_LEFT
 			&& btnId_ != GLFW_MOUSE_BUTTON_RIGHT) return 0;
 		if (!enabled) return 0;
-		LostFocus();
-		if (btnId_ == GLFW_MOUSE_BUTTON_LEFT) {
-			onClicked();
-		}
-		else {
-			onClicked2();
-		}
+
+        if (!scissor) {
+            LostFocus();
+            if (btnId_ == GLFW_MOUSE_BUTTON_LEFT) {
+                onClicked();
+            }
+            else {
+                onClicked2();
+            }
+        }
+        else {
+            pressedInScissor = true;
+        }
 		return 1;
 	}
 
 	int32_t Button::OnMouseMove() {
 		if (!enabled) return 0;
-		if (!focused) {
-			SetFocus();
-			TryRegisterAutoUpdate();
-		}
+
+        if (!scissor) {
+            if (!focused) {
+                SetFocus();
+                TryRegisterAutoUpdate();
+            }
+        }
+        else {
+            auto& eb = *GameBase::instance;
+            auto& uiHandler = eb.uiHandler;
+            if (!focused && uiHandler.TryGetPointer() != scissor) {
+                SetFocus();
+                TryRegisterAutoUpdate();
+            }
+            else if (uiHandler.TryGetPointer() == this && eb.mouse[GLFW_MOUSE_BUTTON_LEFT]) {
+                // check scroll view & detect move distance & set handler to sv
+                auto d = eb.mousePos - position;
+                if (d.Mag2() > 3 * 3) {
+                    LostFocus();
+                    pressedInScissor = false;
+                    scissor.Lock().As<MouseEventHandlerNode>()->OnMouseDown(GLFW_MOUSE_BUTTON_LEFT);
+                }
+            }
+        }
 		return 1;
 	}
 
 	int32_t Button::Update() {
-		if (GameBase::instance->uiHandler.TryGetPointer() != this || !MousePosInArea()) {
-			LostFocus();
-			return 1;
-		}
+        auto& eb = *GameBase::instance;
+        auto& uiHandler = eb.uiHandler;
+        if (!scissor) {
+            if (uiHandler.TryGetPointer() != this || !MousePosInArea()) {
+                LostFocus();
+                return 1;
+            }
+        }
+        else {
+            if (!MousePosInArea()) {
+                LostFocus();
+                return 1;
+            }
+            else if (focused && pressedInScissor && !eb.mouse[GLFW_MOUSE_BUTTON_LEFT]) {
+                pressedInScissor = false;
+                onClicked();
+                return 0;
+            }
+        }
 		return 0;
 	}
 
