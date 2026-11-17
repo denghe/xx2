@@ -146,7 +146,7 @@ namespace xx {
 
     struct MouseEventHandlerNode : Node {
         int32_t indexAtUiGrid{ -1 };
-
+        bool pressedInScissor{};
         virtual int32_t OnMouseDown(int32_t btnId_) { return 0; };	// return 1: swallow
         virtual int32_t OnMouseMove() { return 0; };
         bool MousePosInArea() const;

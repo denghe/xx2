@@ -29,7 +29,6 @@ namespace xx {
 
 		std::function<void()> onClicked = [] { printf("Button1 clicked.\n"); };
 		std::function<void()> onClicked2 = [] { printf("Button2 clicked.\n"); };
-        bool pressedInScissor{};
 
 		Button& Init(int32_t z_, XY position_, XY anchor_, XY size_
 			, Shared<Scale9Config> cfgNormal_ = GameBase::instance->embed.cfg_s9bN
