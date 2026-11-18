@@ -91,7 +91,7 @@ namespace xx {
 		}
 	}
 
-	void Slider::MousePos2Vulue() {
+	void Slider::MousePos2Value() {
 		auto mx = GameBase::instance->mousePos.x;
 		auto x1 = worldMinXY.x + widthTxtLeft * worldScale.x;
 		auto x2 = worldMinXY.x + (widthTxtLeft + widthBar) * worldScale.x;
@@ -115,7 +115,7 @@ namespace xx {
 		if (btnId_ != GLFW_MOUSE_BUTTON_LEFT) return 0;
 		auto& eb = *GameBase::instance;
 		eb.uiHandler = WeakFromThis(this);
-		MousePos2Vulue();
+		MousePos2Value();
 		return 0;
 	}
 
@@ -135,7 +135,7 @@ namespace xx {
 			SetFocus();
 		}
 		if (blockMoving) {
-			MousePos2Vulue();
+			MousePos2Value();
 		}
 		if (callbackWhenBlockMoving && valueBak != value) {
 			onChanged(value);
