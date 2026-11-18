@@ -84,18 +84,28 @@ namespace xx {
 	}
 
 	int32_t ScrollView::Update() {
+		if (!enabled) return 0;
 		auto& eb = *GameBase::instance;
-		if (eb.uiHandler.TryGetPointer() == this) {
-			if (eb.mouse[GLFW_MOUSE_BUTTON_LEFT]) {
-				auto d = eb.mousePos - mouseLastPos;
-				mouseLastPos = eb.mousePos;
-				UpdateContentPosition(children[0]->position + d);
+		if (MousePosInArea()) {
+			if (eb.mouse[GLFW_MOUSE_BUTTON_WHEEL_UP]) {
+				UpdateContentPosition(children[0]->position - XY{ 0.f, mouseWheelY });
 			}
-			else {
-				eb.uiHandler.Reset();
+			else if (eb.mouse[GLFW_MOUSE_BUTTON_WHEEL_DOWN]) {
+				UpdateContentPosition(children[0]->position + XY{ 0.f, mouseWheelY });
 			}
 		}
-		// todo
+
+		if (eb.uiHandler.TryGetPointer() != this) {
+			return 0;
+		}
+		if (eb.mouse[GLFW_MOUSE_BUTTON_LEFT]) {
+			auto d = eb.mousePos - mouseLastPos;
+			mouseLastPos = eb.mousePos;
+			UpdateContentPosition(children[0]->position + d);
+		}
+		else {
+			eb.uiHandler.Reset();
+		}
 		return 0;
 	}
 

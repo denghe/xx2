@@ -17,7 +17,6 @@ namespace xx {
 		SetToUIHandler(true);
 		ApplyCfg();
 		onFocus();
-		//CoutN("SetFocus");
 	}
 
 	void InteractionNode::LostFocus() {
@@ -25,14 +24,12 @@ namespace xx {
 		SetToUIHandler(false);
 		focused = false;
 		ApplyCfg();
-		//CoutN("LostFocus");
 	}
 
 
 	Button& Button::Init(int32_t z_, XY position_, XY anchor_, XY size_
 		, Shared<Scale9Config> cfgNormal_
 		, Shared<Scale9Config> cfgHighlight_) {
-		//assert(typeId == cTypeId);
 		z = z_;
 		position = position_;
 		anchor = anchor_;
@@ -56,70 +53,76 @@ namespace xx {
 			&& btnId_ != GLFW_MOUSE_BUTTON_RIGHT) return 0;
 		if (!enabled) return 0;
 
-        if (!scissor) {
-            LostFocus();
-            if (btnId_ == GLFW_MOUSE_BUTTON_LEFT) {
-                onClicked();
-            }
-            else {
-                onClicked2();
-            }
-        }
-        else {
-            pressedInScissor = true;
-        }
+		if (!scissor) {
+			LostFocus();
+			if (btnId_ == GLFW_MOUSE_BUTTON_LEFT) {
+				onClicked();
+			}
+			else {
+				onClicked2();
+			}
+		}
+		else {
+			pressedInScissor = true;
+		}
 		return 1;
 	}
 
 	int32_t Button::OnMouseMove() {
 		if (!enabled) return 0;
 
-        if (!scissor) {
-            if (!focused) {
-                SetFocus();
-                TryRegisterAutoUpdate();
-            }
-        }
-        else {
-            auto& eb = *GameBase::instance;
-            auto& uiHandler = eb.uiHandler;
-            if (!focused && uiHandler.TryGetPointer() != scissor) {
-                SetFocus();
-                TryRegisterAutoUpdate();
-            }
-            else if (uiHandler.TryGetPointer() == this && eb.mouse[GLFW_MOUSE_BUTTON_LEFT]) {
-                // check scroll view & detect move distance & set handler to sv
-                auto d = eb.mousePos - position;
-                if (d.Mag2() > 3 * 3) {
-                    LostFocus();
-                    pressedInScissor = false;
-                    scissor.Lock().As<MouseEventHandlerNode>()->OnMouseDown(GLFW_MOUSE_BUTTON_LEFT);
-                }
-            }
-        }
+		auto& eb = *GameBase::instance;
+		auto& uiHandler = eb.uiHandler;
+		auto handlerPointer = uiHandler.TryGetPointer();
+
+		if (handlerPointer != nullptr && handlerPointer != scissor && handlerPointer != this) {
+			return 0;
+		}
+
+		if (!scissor) {
+			if (!focused) {
+				SetFocus();
+				TryRegisterAutoUpdate();
+			}
+		}
+		else {
+			if (!focused && handlerPointer != scissor) {
+				SetFocus();
+				TryRegisterAutoUpdate();
+			}
+			else if (handlerPointer == this && eb.mouse[GLFW_MOUSE_BUTTON_LEFT]) {
+				// check scroll view & detect move distance & set handler to sv
+				auto d = eb.mousePos - position;
+				if (d.Mag2() > 3 * 3) {
+					LostFocus();
+					pressedInScissor = false;
+					scissor.Lock().As<MouseEventHandlerNode>()->OnMouseDown(GLFW_MOUSE_BUTTON_LEFT);
+				}
+			}
+		}
 		return 1;
 	}
 
 	int32_t Button::Update() {
-        auto& eb = *GameBase::instance;
-        auto& uiHandler = eb.uiHandler;
-        if (!scissor) {
-            if (uiHandler.TryGetPointer() != this || !MousePosInArea()) {
-                LostFocus();
-                return 1;
-            }
-        }
-        else {
-            if (!MousePosInArea()) {
-                LostFocus();
-                return 1;
-            }
-            else if (focused && pressedInScissor && !eb.mouse[GLFW_MOUSE_BUTTON_LEFT]) {
-                pressedInScissor = false;
-                onClicked();
-                return 0;
-            }
-        }
+		auto& eb = *GameBase::instance;
+		auto& uiHandler = eb.uiHandler;
+		if (!scissor) {
+			if (uiHandler.TryGetPointer() != this || !MousePosInArea()) {
+				LostFocus();
+				return 1;
+			}
+		}
+		else {
+			if (!MousePosInArea()) {
+				LostFocus();
+				return 1;
+			}
+			else if (focused && pressedInScissor && !eb.mouse[GLFW_MOUSE_BUTTON_LEFT]) {
+				pressedInScissor = false;
+				onClicked();
+				return 0;
+			}
+		}
 		return 0;
 	}
 
