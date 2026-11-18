@@ -45,7 +45,7 @@ namespace xx {
 
         // for easy use
         Shader_RadiateGoldenRays& operator()() {
-            return Use<Shader_RadiateGoldenRays>();
+            return Use<Shader_RadiateGoldenRays, GameBase>();
         }
 
         void Init();

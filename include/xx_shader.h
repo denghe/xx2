@@ -8,7 +8,6 @@
 #endif
 
 namespace xx {
-    struct GameBase;
 
     // base class
     struct Shader {
@@ -31,11 +30,11 @@ namespace xx {
         // for easy Commit previous different shader
         auto& operator()(this auto&& self) {
 #else
-		template<typename T>
+		template<typename T, typename GB = xx::GameBase>
         T& Use() {
 			auto& self = *(T*)this;
 #endif
-		    auto g = GameBase::instance;
+		    auto g = GB::instance;
 		    if (g->shader != &self) {
 			    if (g->shader) {
 				    g->shader->End();

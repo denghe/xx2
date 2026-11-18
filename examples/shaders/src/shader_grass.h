@@ -25,7 +25,7 @@ namespace xx {
 
         // for easy use
         Shader_Grass& operator()() {
-            return Use<Shader_Grass>();
+            return Use<Shader_Grass, GameBase>();
         }
 
         void Init();

@@ -24,7 +24,7 @@ namespace xx {
 
         // for easy use
         Shader_Ring& operator()() {
-            return Use<Shader_Ring>();
+            return Use<Shader_Ring, GameBase>();
         }
 
         void Init();
