@@ -15,19 +15,6 @@ namespace xx {
 		texRect = rect_;
 	}
 
-	Shader_Grass& Shader_Grass::operator()() {
-		auto g = GameBase::instance;
-		if (g->shader != this) {
-			if (g->shader) {
-				g->shader->End();
-				g->shader = {};
-			}
-			Begin();
-			g->shader = this;
-		}
-		return *this;
-	}
-
 	void Shader_Grass::Init() {
 
 		v = LoadGLVertexShader({ XX_SHADER_CODE_FIRST_LINE R"(

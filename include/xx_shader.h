@@ -8,7 +8,6 @@
 #endif
 
 namespace xx {
-    struct GameBase;
 
     // base class
     struct Shader {
@@ -26,10 +25,16 @@ namespace xx {
         virtual void Begin() = 0;
         virtual void End() = 0;
 
-        // need c++23
+#if 0
+        // need c++23 ( macos compile error )
         // for easy Commit previous different shader
         auto& operator()(this auto&& self) {
-		    auto g = GameBase::instance;
+#else
+		template<typename T, typename GB = xx::GameBase>
+        T& Use() {
+			auto& self = *(T*)this;
+#endif
+		    auto g = GB::instance;
 		    if (g->shader != &self) {
 			    if (g->shader) {
 				    g->shader->End();

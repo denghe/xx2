@@ -24,7 +24,9 @@ namespace xx {
         int32_t count{};
 
         // for easy use
-        Shader_Grass& operator()();
+        Shader_Grass& operator()() {
+            return Use<Shader_Grass, GameBase>();
+        }
 
         void Init();
 
