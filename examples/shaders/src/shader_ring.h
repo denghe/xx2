@@ -22,6 +22,11 @@ namespace xx {
         std::unique_ptr<Shader_RingData[]> data = std::make_unique_for_overwrite<Shader_RingData[]>(maxNums);
         int32_t count{};
 
+        // for easy use
+        Shader_Ring& operator()() {
+            return Use<Shader_Ring>();
+        }
+
         void Init();
 
         virtual void Begin() override;

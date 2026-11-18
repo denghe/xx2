@@ -26,9 +26,15 @@ namespace xx {
         virtual void Begin() = 0;
         virtual void End() = 0;
 
-        // need c++23
+#if 0
+        // need c++23 ( macos compile error )
         // for easy Commit previous different shader
         auto& operator()(this auto&& self) {
+#else
+		template<typename T>
+        T& Use() {
+			auto& self = *(T*)this;
+#endif
 		    auto g = GameBase::instance;
 		    if (g->shader != &self) {
 			    if (g->shader) {
