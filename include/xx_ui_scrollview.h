@@ -19,6 +19,7 @@ namespace xx {
 		static constexpr int32_t cTypeId{20};
 
 		XY basePos{}, dragLimit{};
+        float mouseWheelY{8.f};
 
 		void Init(int32_t z_, XY const& position_, XY const& anchor_, XY const& scale_,  XY const& size_, XY const& contentSize_);
 

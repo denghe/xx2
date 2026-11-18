@@ -44,6 +44,7 @@ namespace xx {
 		Make<Scale9>();
 		ApplyValue();
 		ApplyCfg();
+		TryRegisterAutoUpdate();
 		return *this;
 	}
 
@@ -57,9 +58,9 @@ namespace xx {
 	}
 
 	Slider& Slider::SetValueEx(double v) {
-        SetValue(v);
-        ApplyValue();
-        onChanged(v);
+		SetValue(v);
+		ApplyValue();
+		onChanged(v);
 		return *this;
 	}
 
@@ -90,9 +91,7 @@ namespace xx {
 		}
 	}
 
-	int32_t Slider::OnMouseDown(int32_t btnId_) {
-		if (!enabled) return 0;
-		if (btnId_ != GLFW_MOUSE_BUTTON_LEFT) return 0;
+	void Slider::MousePos2Value() {
 		auto mx = GameBase::instance->mousePos.x;
 		auto x1 = worldMinXY.x + widthTxtLeft * worldScale.x;
 		auto x2 = worldMinXY.x + (widthTxtLeft + widthBar) * worldScale.x;
@@ -109,36 +108,40 @@ namespace xx {
 		}
 		ApplyValue();
 		blockMoving = true;
-		return 1;
 	}
 
-	int32_t Slider::OnMouseMove() {
+	int32_t Slider::OnMouseDown(int32_t btnId_) {
 		if (!enabled) return 0;
-		if (!focused) {
-			SetFocus();
-			TryRegisterAutoUpdate();
-		}
-		if (blockMoving) {
-			OnMouseDown(GLFW_MOUSE_BUTTON_LEFT);
-		}
-		return 1;
+		if (btnId_ != GLFW_MOUSE_BUTTON_LEFT) return 0;
+		auto& eb = *GameBase::instance;
+		eb.uiHandler = WeakFromThis(this);
+		MousePos2Value();
+		return 0;
 	}
 
 	int32_t Slider::Update() {
-		auto g = GameBase::instance;
-		if (g->uiHandler.TryGetPointer() != this || !MousePosInArea()) {
+		auto& g = *GameBase::instance;
+		if (g.uiHandler.TryGetPointer() != this) {
+			return 0;
+		}
+
+		if (!g.mouse[GLFW_MOUSE_BUTTON_LEFT]) {
 			LostFocus();
 			DragEnd();
-			return 1;
+			return 0;
 		}
-		if (!g->mouse[GLFW_MOUSE_BUTTON_LEFT]) {
-			DragEnd();
-		} else if (callbackWhenBlockMoving && blockMoving && valueBak != value) {
+
+		if (!focused) {
+			SetFocus();
+		}
+		if (blockMoving) {
+			MousePos2Value();
+		}
+		if (callbackWhenBlockMoving && valueBak != value) {
 			onChanged(value);
 			valueBak = value;
 			ApplyValue();
 		}
 		return 0;
 	}
-
 }
