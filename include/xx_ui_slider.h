@@ -44,7 +44,7 @@ namespace xx {
 		void ApplyValue();
 		void DragEnd();
 		// todo: enable disable
-        void MousePos2Vulue();
+        void MousePos2Value();
 		virtual int32_t OnMouseDown(int32_t btnId_) override;
 		int32_t Update() override;
 
