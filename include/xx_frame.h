@@ -38,9 +38,15 @@ namespace xx {
     // sprite frame with anchor point
     struct Frame {
         Shared<GLTexture> tex;
-        UVRect uvRect{};
-        XY anchor{};
-        ptrdiff_t userData{};
+        union {
+			uint64_t props[3]{};            // for memcpy & simple initialization
+        struct {
+            UVRect uvRect;
+            XY anchor;
+		    int32_t extrude;
+		    int32_t ext;                    // currently used by spine event data index, usually can be used as userData
+        };
+        };
 
         Frame() = default;
         Frame(Frame const&) = default;
@@ -58,7 +64,7 @@ namespace xx {
         void operator=(Shared<GLTexture> t);
 
         Frame(Shared<GLTexture> t);
-        Frame(Shared<GLTexture> t, int32_t x, int32_t y, int32_t w, int32_t h, XY anchor_ = 0.5f);
+        Frame(Shared<GLTexture> t, int32_t x, int32_t y, int32_t w, int32_t h, XY a = 0.5f, int32_t e = 0);
 
         void Clear();
     };

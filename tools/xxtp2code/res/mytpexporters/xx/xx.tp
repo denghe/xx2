@@ -1,0 +1,8 @@
+{
+  "texture":"{{texture.fullName}}",
+  "size":{"w":{{texture.size.width}},"h":{{texture.size.height}}},
+  "extrude":{{variantParams.extrude}},
+  "frames":[{% for sprite in allSprites %}
+    {"name":"{{sprite.trimmedName}}","uv":{"x":{{sprite.frameRect.x}},"y":{{sprite.frameRect.y}},"w":{{sprite.frameRect.width}},"h":{{sprite.frameRect.height}}}{% if sprite.trimmed %},"trim":{"oX":{{sprite.cornerOffset.x}},"oY":{{sprite.cornerOffset.y}},"sW":{{sprite.untrimmedSize.width}},"sH":{{sprite.untrimmedSize.height}}}{% endif %}{% if sprite.pivotPointNorm.x != 0.5 or sprite.pivotPointNorm.y != 0.5 %},"pivot":{"x":{{ sprite.pivotPointNorm.x|floatformat:6 }},"y":{{ sprite.pivotPointNorm.y|floatformat:6 }}}{% endif %}{% if sprite.scale9Enabled %},"scale9":{"x":{{ sprite.scale9Borders.x }},"y":{{ sprite.scale9Borders.y }},"w":{{ sprite.scale9Borders.width }},"h":{{ sprite.scale9Borders.height }}}{% endif %}}{% if not forloop.last %},{% endif %}{% endfor %}
+  ]
+}

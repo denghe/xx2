@@ -68,16 +68,18 @@ namespace xx {
         operator=(std::move(t));
     }
 
-    Frame::Frame(Shared<GLTexture> t, int32_t x, int32_t y, int32_t w, int32_t h, XY anchor_) {
+    Frame::Frame(Shared<GLTexture> t, int32_t x, int32_t y, int32_t w, int32_t h, XY a, int32_t e) {
         tex = std::move(t);
         uvRect = { (uint16_t)x, (uint16_t)y, (uint16_t)w, (uint16_t)h };
-        anchor = anchor_;
+        anchor = a;
+        extrude = e;
     }
 
     void Frame::operator=(Shared<GLTexture> t) {
         tex = std::move(t);
         uvRect = tex->Rect();
         anchor = 0.5f;
+        extrude = 0;
     }
 
     void Frame::Clear() {

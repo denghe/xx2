@@ -1,0 +1,67 @@
+<exporter version="1.0">
+    <!-- identifier of the exporter -->
+    <name>xx</name>
+	
+    <!-- display name of the exporter for the combo box -->
+    <displayName>xxtp (xx::Frame list)</displayName>
+             
+    <!-- description of the exporter -->
+    <description>for xx utils to generate code</description>
+
+    <!-- exporter version -->
+    <version>1.0</version>
+	
+    <files>
+        <file>
+            <!-- name of this file variable -->
+            <name>datafile</name>
+
+            <!-- human readable name (for GUI) -->
+            <displayName>Data file</displayName>
+
+            <!-- file extension for the file -->
+            <fileExtension>xxtp</fileExtension>
+
+            <!-- description what the file contains, used in tooltips in the GUI -->
+            <description>Sprite sheet data</description>
+
+            <!-- name of the template file -->
+            <template>xx.tp</template>
+        </file>
+    </files>
+
+    <!-- target framework supports trimming -->
+    <supportsTrimming>true</supportsTrimming>
+
+    <!-- target framework supports rendering sprite with triangle list, not just rectangle-->
+    <supportsPolygonPacking>false</supportsPolygonPacking>
+
+    <!-- target framework supports rotated sprites -->
+    <supportsRotation>false</supportsRotation>
+
+    <supportsPivotPoint>true</supportsPivotPoint>
+
+    <spriteOrigin>BottomLeft</spriteOrigin>
+
+    <supportsNPOT>true</supportsNPOT>
+    
+    <textureSizeFactor>4</textureSizeFactor>
+
+    <supportsMultiPack>false</supportsMultiPack>
+
+    <!-- supports file name stripping (remove .png etc) -->
+    <supportsTrimSpriteNames>true</supportsTrimSpriteNames>
+
+    <!-- supports texure subpath -->
+    <supportsTextureSubPath>no</supportsTextureSubPath>
+
+    <supportsScale9>true</supportsScale9>
+
+    <defaults>
+        <trimMode>None</trimMode>
+        <algorithm>MaxRects</algorithm>
+        <writePivotPoints>true</writePivotPoints>
+        <sizeConstraints>POT</sizeConstraints>
+    </defaults>
+
+</exporter>

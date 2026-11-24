@@ -118,7 +118,6 @@ press ENTER to continue...)#";
 
 		auto plistName = xx::U8AsString(p.filename().u8string());
 		auto fullpath = xx::U8AsString(std::filesystem::absolute(p).u8string());
-		auto blistPath = fullpath.substr(0, fullpath.size() - 6) + ".blist";
 
 		auto [iter, success] = plists.emplace(plistName, std::vector<std::string>{});
 		assert(success);
@@ -241,7 +240,7 @@ struct )#", structName, R"#( {)#", tmp, R"#(
 		code.clear();
 		tmp.clear();
 
-#if 0
+#if 0	// bad performance for compile.
 		for (auto& k : keys) {
 			auto f = &tp.frames[0];
 			for (auto& o : tp.frames) {
