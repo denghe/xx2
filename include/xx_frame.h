@@ -39,12 +39,13 @@ namespace xx {
     struct Frame {
         Shared<GLTexture> tex;
         union {
-			uint64_t props[3]{};            // for memcpy & simple initialization
+			uint64_t props[4]{};            // for memcpy & simple initialization
         struct {
             UVRect uvRect;
+            UVRect uvTrim;
             XY anchor;
 		    int32_t extrude;
-		    int32_t ext;                    // currently used by spine event data index, usually can be used as userData
+		    int32_t spineEventIndex;
         };
         };
 

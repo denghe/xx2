@@ -58,8 +58,10 @@
     <supportsScale9>true</supportsScale9>
 
     <defaults>
-        <trimMode>None</trimMode>
+        <trimMode>Trim</trimMode>
         <algorithm>MaxRects</algorithm>
+		<extrude>1</extrude>
+		<shapePadding>1</shapePadding>
         <writePivotPoints>true</writePivotPoints>
         <sizeConstraints>POT</sizeConstraints>
     </defaults>

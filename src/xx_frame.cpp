@@ -78,6 +78,7 @@ namespace xx {
     void Frame::operator=(Shared<GLTexture> t) {
         tex = std::move(t);
         uvRect = tex->Rect();
+        uvTrim = {};
         anchor = 0.5f;
         extrude = 0;
     }

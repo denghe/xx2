@@ -350,6 +350,9 @@ namespace xx {
             uint16_t x, y, w, h;
         };
         uint64_t data;
+        operator bool() const {
+            return w || h;
+        }
     };
 
     template<typename T>

@@ -64,7 +64,7 @@
             </struct>
         </struct>
         <key>shapePadding</key>
-        <uint>0</uint>
+        <uint>1</uint>
         <key>jpgQuality</key>
         <uint>80</uint>
         <key>pngOptimizationLevel</key>
@@ -173,31 +173,16 @@
         </struct>
         <key>individualSpriteSettings</key>
         <map type="IndividualSpriteSettingsMap">
-            <key type="filename">32.png</key>
+            <key type="filename">p1.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
-                <point_f>0.5,0.5</point_f>
+                <point_f>0.5,0.441176</point_f>
                 <key>spriteScale</key>
                 <double>1</double>
                 <key>scale9Enabled</key>
-                <true/>
-                <key>scale9Borders</key>
-                <rect>2,2,28,28</rect>
-                <key>scale9Paddings</key>
-                <rect>8,8,16,16</rect>
-                <key>scale9FromFile</key>
                 <false/>
-            </struct>
-            <key type="filename">34.png</key>
-            <struct type="IndividualSpriteSettings">
-                <key>pivotPoint</key>
-                <point_f>0,1</point_f>
-                <key>spriteScale</key>
-                <double>1</double>
-                <key>scale9Enabled</key>
-                <true/>
                 <key>scale9Borders</key>
-                <rect>3,3,28,28</rect>
+                <rect>9,9,17,17</rect>
                 <key>scale9Paddings</key>
                 <rect>9,9,17,17</rect>
                 <key>scale9FromFile</key>
@@ -206,7 +191,7 @@
             <key type="filename">p2.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
-                <point_f>0.5,0.5</point_f>
+                <point_f>0.5,0.235294</point_f>
                 <key>spriteScale</key>
                 <double>1</double>
                 <key>scale9Enabled</key>
@@ -218,16 +203,31 @@
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
-            <key type="filename">pivottest.png</key>
+            <key type="filename">p32.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
-                <point_f>0.5,0.25</point_f>
+                <point_f>0.5,0.5</point_f>
                 <key>spriteScale</key>
                 <double>1</double>
                 <key>scale9Enabled</key>
-                <false/>
+                <true/>
                 <key>scale9Borders</key>
-                <rect>9,9,17,17</rect>
+                <rect>1,1,30,30</rect>
+                <key>scale9Paddings</key>
+                <rect>8,8,16,16</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
+            <key type="filename">p34.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0.5,0.5</point_f>
+                <key>spriteScale</key>
+                <double>1</double>
+                <key>scale9Enabled</key>
+                <true/>
+                <key>scale9Borders</key>
+                <rect>2,2,30,30</rect>
                 <key>scale9Paddings</key>
                 <rect>9,9,17,17</rect>
                 <key>scale9FromFile</key>
@@ -240,10 +240,10 @@
             <struct type="SpriteSheet">
                 <key>files</key>
                 <array>
-                    <filename>32.png</filename>
-                    <filename>34.png</filename>
-                    <filename>pivottest.png</filename>
                     <filename>p2.png</filename>
+                    <filename>p1.png</filename>
+                    <filename>p32.png</filename>
+                    <filename>p34.png</filename>
                 </array>
             </struct>
         </map>

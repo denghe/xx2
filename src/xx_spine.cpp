@@ -95,11 +95,11 @@ namespace xx {
 
 					if (hasEventData) {
 						hasEventData = {};
-						f.ext = outEventDatas.len;
+						f.spineEventIndex = outEventDatas.len;
 						outEventDatas.Emplace(std::move(eventData));
 					}
 					else {
-						f.ext = -1;
+						f.spineEventIndex = -1;
 					}
 
 					++i;

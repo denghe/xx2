@@ -44,7 +44,12 @@ xx::Shared<xx::GLTexture> XxtpFileName::Load(std::filesystem::path rootPath_, bo
 		// ...
 	};
 
-	// todo: uvtrims
+	static constexpr xx::UVRect uvtrims[] = {
+		{},
+		{oX, oY, sW, sH},
+		{},
+		// ...
+	};
 
 	static constexpr xx::XY anchors[] = {
 		{ AX, AY },
@@ -65,6 +70,7 @@ xx::Shared<xx::GLTexture> XxtpFileName::Load(std::filesystem::path rootPath_, bo
 		f.tex = t;
 		f.uvRect = uvrects[i];
 		f.anchor = anchors[i];
+		f.uvTrim = uvtrims[i];
 		f.extrude = ??????????????????;
 	}
 
@@ -251,10 +257,9 @@ press ENTER to continue...)#";
 			});
 		}
 
-		std::vector<std::string> scale9sVars;
 		std::string code, tmp;
-		std::string uvrectsCode, anchorsCode, scale9sCode;
-		int32_t count{}, scale9sCount{};
+		std::string uvrectsCode, uvtrimsCode, anchorsCode, scale9sCode;
+		int32_t count{};
 
 		for (auto& k : keys) {
 			if (keyGroups.contains(k))
@@ -273,13 +278,25 @@ press ENTER to continue...)#";
 	xx::Frame )#", k, R"#(;)#");
 			xx::Append(uvrectsCode, R"#(
 	{ )#", f->uv.x, ", ", f->uv.y, ", ", f->uv.w, ", ", f->uv.h, " },");
-			xx::Append(anchorsCode, R"#(
+			if (f->trim) {
+				xx::Append(uvtrimsCode, R"#(
+	{ )#", f->trim.oX, ", ", f->trim.oY, ", ", f->trim.sW, ", ", f->trim.sH, " },");
+			}
+			else {
+				xx::Append(uvtrimsCode, R"#(
+	{}, )#");
+			}
+			if (f->pivot.x == f->pivot.y) {
+				xx::Append(anchorsCode, R"#(
+	{ )#", f->pivot.x, " },");
+			}
+			else {
+				xx::Append(anchorsCode, R"#(
 	{ )#", f->pivot.x, ", ", f->pivot.y, " },");
+			}
 			if (f->scale9) {
-				++scale9sCount;
-				scale9sVars.push_back(xx::ToString("_scale9_", k));
 				xx::Append(scale9sCode, R"#(
-	{ {)#", f->scale9.x, ", ", f->scale9.y, "}, {", f->scale9.w, ", ", f->scale9.h, "} },");
+	static constexpr xx::FromTo<xx::XY> _scale9_)#", k, "{ {", f->scale9.x, ", ", f->scale9.y, "}, {", f->scale9.w, ", ", f->scale9.h, "} };");
 			}
 		}
 
@@ -300,26 +317,33 @@ press ENTER to continue...)#";
 				++count;
 				xx::Append(uvrectsCode, R"#(
 	{ )#", f->uv.x, ", ", f->uv.y, ", ", f->uv.w, ", ", f->uv.h, " },");
-				xx::Append(anchorsCode, R"#(
+				if (f->trim) {
+					xx::Append(uvtrimsCode, R"#(
+	{ )#", f->trim.oX, ", ", f->trim.oY, ", ", f->trim.sW, ", ", f->trim.sH, " },");
+				}
+				else {
+					xx::Append(uvtrimsCode, R"#(
+	{}, )#");
+				}
+				if (f->pivot.x == f->pivot.y) {
+					xx::Append(anchorsCode, R"#(
+	{ )#", f->pivot.x, " },");
+				}
+				else {
+					xx::Append(anchorsCode, R"#(
 	{ )#", f->pivot.x, ", ", f->pivot.y, " },");
+				}
 				if (f->scale9) {
-					++scale9sCount;
-					scale9sVars.push_back(xx::ToString("_scale9_", name));
 					xx::Append(scale9sCode, R"#(
-	{ {)#", f->scale9.x, ", ", f->scale9.y, "}, {", f->scale9.w, ", ", f->scale9.h, "} },");
+	inline static xx::FromTo<xx::XY> _scale9_)#", k, "{ {", f->scale9.x, ", ", f->scale9.y, "}, {", f->scale9.w, ", ", f->scale9.h, "} };");
 				}
 			}
-		}
-
-		for (auto& vn : scale9sVars) {
-			xx::Append(tmp, R"#(
-	xx::FromTo<xx::XY> )#", vn, ";");
 		}
 
 		xx::Append(code, R"#(#pragma once
 #include <xx_frame.h>
 
-struct )#", structName, R"#( {)#", tmp, R"#(
+struct )#", structName, R"#( {)#", tmp, scale9sCode, R"#(
 
 	xx::Shared<xx::GLTexture> Load(std::filesystem::path rootPath_, bool generateMipmap_ = true);
 };
@@ -338,27 +362,21 @@ struct )#", structName, R"#( {)#", tmp, R"#(
 	static constexpr xx::UVRect uvrects[] = {)#", uvrectsCode, R"#(
 	};
 
-	static constexpr xx::XY anchors[] = {)#", anchorsCode, R"#(
+	static constexpr xx::UVRect uvtrims[] = {)#", uvtrimsCode, R"#(
 	};
 
-	static constexpr xx::FromTo<xx::XY> scale9s[] = {)#", scale9sCode, R"#(
+	static constexpr xx::XY anchors[] = {)#", anchorsCode, R"#(
 	};
 
 	for (int32_t i = 0; i < )#", count, R"#(; i++) {
 		auto& f = ((xx::Frame*)this)[i];
 		f.tex = t;
 		f.uvRect = uvrects[i];
+		f.uvTrim = uvtrims[i];
 		f.anchor = anchors[i];
 		f.extrude = )#", tp.extrude, R"#(;
 	}
 )#");
-		if (scale9sCount) {
-			xx::Append(tmp, R"#(
-	for (int32_t i = 0; i < )#", scale9sCount, R"#(; i++) {
-		(&this->)#", scale9sVars[0], R"#()[i] = scale9s[i];
-	}
-)#");
-		}
 
 		xx::Append(code, R"#(#include <xx_gamebase.h>
 #include ")#", codeFileName, R"#(.h"
@@ -377,7 +395,6 @@ xx::Shared<xx::GLTexture> )#", structName, R"#(::Load(std::filesystem::path root
 			return __LINE__;
 		}
 	}
-
 	xx::CoutN("finished! press ENTER to continue...");
 	std::cin.get();
 
