@@ -23,7 +23,7 @@ struct XxtpFileName {
 	xx::FromTo<XY> _scale9_xxx3;
 	...
 
-	xx::Shared<xx::GLTexture> Load(std::filesystem::path rootPath_, bool generateMipmap_ = true);
+	xx::Shared<xx::GLTexture> Load(std::filesystem::path const& rootPath_, bool generateMipmap_ = true);
 };
 
 ///////////////////////////////////////////////////////
@@ -33,8 +33,9 @@ struct XxtpFileName {
 #include <xx_gamebase.h>
 #include "xxtpFileName.h"
 
-xx::Shared<xx::GLTexture> XxtpFileName::Load(std::filesystem::path rootPath_, bool generateMipmap_ = true) {
-	auto t = xx::GameBase::instance->LoadTexture(rootPath_ / "texture file name.png");
+xx::Shared<xx::GLTexture> XxtpFileName::Load(std::filesystem::path const& rootPath_, bool generateMipmap_ = true) {
+	auto p = rootPath_ / "?????????????.png";
+	auto t = xx::GameBase::instance->LoadTexture(xx::U8AsString(p.u8string()));
 	if(generateMipmap_) t->TryGenerateMipmap();
 
 	static constexpr xx::UVRect uvrects[] = {
@@ -159,19 +160,18 @@ more help: see res/readme.txt
 press ENTER to continue...)#";
 	std::cin.get();
 
-	std::unordered_map<std::string, std::vector<std::string>> plists;		// plist file name : keys
-	std::map<std::string, std::string> keys;								// key : owner plist file name
-	std::unordered_map<std::string, TP> tps;	// plist file name : data
+	std::unordered_map<std::string, std::vector<std::string>> files;		// file name : keys
+	std::unordered_map<std::string, TP> tps;								// file name : data
 
 	for (auto&& entry : std::filesystem::/*recursive_*/directory_iterator(cp)) {
 		if (!entry.is_regular_file()) continue;
 		auto&& p = entry.path();
 		if (p.extension() != u8".xxtp") continue;
 
-		auto plistName = xx::U8AsString(p.filename().u8string());
+		auto fileName = xx::U8AsString(p.filename().u8string());
 		auto fullpath = xx::U8AsString(std::filesystem::absolute(p).u8string());
 
-		auto [iter, success] = plists.emplace(plistName, std::vector<std::string>{});
+		auto [iter, success] = files.emplace(fileName, std::vector<std::string>{});
 		assert(success);
 
 		auto fd = xx::ReadAllBytes(p);
@@ -180,7 +180,7 @@ press ENTER to continue...)#";
 			return __LINE__;
 		}
 
-		auto&& rtv = tps.emplace(plistName, TP{});
+		auto&& rtv = tps.emplace(fileName, TP{});
 		assert(rtv.second);
 		auto& tp = rtv.first->second;
 
@@ -197,29 +197,14 @@ press ENTER to continue...)#";
 			return __LINE__;
 		}
 
+		// key name prepare
 		for (auto& f : tp.frames) {
 			auto& k = f.name;
 			std::cout << "handle frame: " << k << std::endl;
 			if (k[0] >= '0' && k[0] <= '9') k = '_' + k;
 			for (auto& c : k) {
-				if (c == '/') c = '_';
-			}
-
-			for (auto const& c : k) {
-				if (c == '.' || c == ' ') {
-					std::cerr << "**************************** bad key name( can't contain ' ' or '.' ): " << k
-						<< "\n**************************** in plist: " << plistName
-						<< std::endl;
-					return __LINE__;
-				}
-			}
-
-			if (auto [iter, success] = keys.emplace(k, plistName); !success) {
-				std::cerr << "**************************** duplicate res name: " << k
-					<< "\n**************************** in plist: " << iter->second
-					<< "\n**************************** and plist " << plistName
-					<< std::endl;
-				return __LINE__;
+				// todo: more replace here
+				if (c == '/' || c == '.' || c == ' ') c = '_';
 			}
 			iter->second.push_back(k);
 		}
@@ -227,7 +212,7 @@ press ENTER to continue...)#";
 
 
 	for (auto&& [plistFileName, tp] : tps) {
-		auto structName = plistFileName.substr(0, plistFileName.size() - 6);
+		auto structName = plistFileName.substr(0, plistFileName.size() - 5);	// 5: .xxtp
 		auto codeFileName = structName;
 		structName[0] = std::toupper((uint8_t)structName[0]);
 
@@ -235,7 +220,7 @@ press ENTER to continue...)#";
 		std::map<std::string, std::vector<std::string>> keyGroups;
 		std::vector<std::string> keys;
 
-		auto&& allKeys = plists[plistFileName];
+		auto&& allKeys = files[plistFileName];
 		for (auto&& key : allKeys) {
 			if (auto idx = key.find_last_of('_'); idx != key.npos) {
 				auto k = key.substr(0, idx);
@@ -345,7 +330,7 @@ press ENTER to continue...)#";
 
 struct )#", structName, R"#( {)#", tmp, scale9sCode, R"#(
 
-	xx::Shared<xx::GLTexture> Load(std::filesystem::path rootPath_, bool generateMipmap_ = true);
+	xx::Shared<xx::GLTexture> Load(std::filesystem::path const& rootPath_, bool generateMipmap_ = true);
 };
 )#");
 		// save to file
@@ -381,8 +366,8 @@ struct )#", structName, R"#( {)#", tmp, scale9sCode, R"#(
 		xx::Append(code, R"#(#include <xx_gamebase.h>
 #include ")#", codeFileName, R"#(.h"
 
-xx::Shared<xx::GLTexture> )#", structName, R"#(::Load(std::filesystem::path rootPath_, bool generateMipmap_) {
-	auto t = xx::GameBase::instance->LoadTexture(rootPath_ / ")#", tp.texture, R"#(");
+xx::Shared<xx::GLTexture> )#", structName, R"#(::Load(std::filesystem::path const& rootPath_, bool generateMipmap_) {
+	auto t = xx::GameBase::instance->LoadTexture(xx::U8AsString((rootPath_ / ")#", tp.texture, R"#(").u8string()));
 	if (generateMipmap_) t->TryGenerateMipmap();
 )#", tmp, R"#(
 	return t;
