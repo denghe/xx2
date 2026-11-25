@@ -128,7 +128,7 @@ struct TPNode {
 	std::string name;
 	TPUV uv;
 	TPTrim trim;
-	TPPivot pivot;
+	TPPivot pivot, pivotBak;
 	TPScale9 scale9;
 };
 
@@ -197,7 +197,7 @@ press ENTER to continue...)#";
 			return __LINE__;
 		}
 
-		// key name prepare
+		// prepare
 		for (auto& f : tp.frames) {
 			auto& k = f.name;
 			std::cout << "handle frame: " << k << std::endl;
@@ -207,6 +207,13 @@ press ENTER to continue...)#";
 				if (c == '/' || c == '.' || c == ' ') c = '_';
 			}
 			iter->second.push_back(k);
+			f.pivotBak = f.pivot;
+			if (f.trim) {
+				// calculate new pivot
+				f.pivot.x = (f.pivot.x * f.trim.sW - f.trim.oX) / f.uv.w;
+				auto oy = /* f.trim.y */ f.trim.sH - f.trim.oY - f.uv.h;  // for opengl flip Y
+				f.pivot.y = (f.pivot.y * f.trim.sH - oy) / f.uv.h;
+			}
 		}
 	}
 
@@ -246,21 +253,8 @@ press ENTER to continue...)#";
 		std::string uvrectsCode, uvtrimsCode, anchorsCode, scale9sCode;
 		int32_t count{};
 
-		for (auto& k : keys) {
-			if (keyGroups.contains(k))
-				continue;
-
-			auto f = &tp.frames[0];
-			for (auto& o : tp.frames) {
-				if (o.name == k) {
-					f = &o;
-					break;
-				}
-			}
-
+		auto HandleTPNode = [&](TPNode* f) {
 			++count;
-			xx::Append(tmp, R"#(
-	xx::Frame )#", k, R"#(;)#");
 			xx::Append(uvrectsCode, R"#(
 	{ )#", f->uv.x, ", ", f->uv.y, ", ", f->uv.w, ", ", f->uv.h, " },");
 			if (f->trim) {
@@ -279,10 +273,28 @@ press ENTER to continue...)#";
 				xx::Append(anchorsCode, R"#(
 	{ )#", f->pivot.x, ", ", f->pivot.y, " },");
 			}
+			if (f->trim) {
+				xx::Append(anchorsCode, " // src povit: ", f->pivotBak.x, ", ", f->pivotBak.y);
+			}
 			if (f->scale9) {
 				xx::Append(scale9sCode, R"#(
-	static constexpr xx::FromTo<xx::XY> _scale9_)#", k, "{ {", f->scale9.x, ", ", f->scale9.y, "}, {", f->scale9.w, ", ", f->scale9.h, "} };");
+	static constexpr xx::FromTo<xx::XY> _scale9_)#", f->name, "{ {", f->scale9.x, ", ", f->scale9.y, "}, {", f->scale9.w, ", ", f->scale9.h, "} };");
 			}
+		};
+
+		for (auto& k : keys) {
+			if (keyGroups.contains(k))
+				continue;
+			auto f = &tp.frames[0];
+			for (auto& o : tp.frames) {
+				if (o.name == k) {
+					f = &o;
+					break;
+				}
+			}
+			HandleTPNode(f);
+			xx::Append(tmp, R"#(
+	xx::Frame )#", k, R"#(;)#");
 		}
 
 		for (auto&& kv : keyGroups) {
@@ -299,29 +311,7 @@ press ENTER to continue...)#";
 						break;
 					}
 				}
-				++count;
-				xx::Append(uvrectsCode, R"#(
-	{ )#", f->uv.x, ", ", f->uv.y, ", ", f->uv.w, ", ", f->uv.h, " },");
-				if (f->trim) {
-					xx::Append(uvtrimsCode, R"#(
-	{ )#", f->trim.oX, ", ", f->trim.oY, ", ", f->trim.sW, ", ", f->trim.sH, " },");
-				}
-				else {
-					xx::Append(uvtrimsCode, R"#(
-	{}, )#");
-				}
-				if (f->pivot.x == f->pivot.y) {
-					xx::Append(anchorsCode, R"#(
-	{ )#", f->pivot.x, " },");
-				}
-				else {
-					xx::Append(anchorsCode, R"#(
-	{ )#", f->pivot.x, ", ", f->pivot.y, " },");
-				}
-				if (f->scale9) {
-					xx::Append(scale9sCode, R"#(
-	inline static xx::FromTo<xx::XY> _scale9_)#", k, "{ {", f->scale9.x, ", ", f->scale9.y, "}, {", f->scale9.w, ", ", f->scale9.h, "} };");
-				}
+				HandleTPNode(f);
 			}
 		}
 

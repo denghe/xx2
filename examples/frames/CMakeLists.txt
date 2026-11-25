@@ -15,6 +15,7 @@ set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 
 include_directories(
 	src/
+	src_gen/
 )
 
 file(GLOB sources

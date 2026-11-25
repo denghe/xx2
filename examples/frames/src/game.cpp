@@ -18,6 +18,11 @@ void Game::Init() {
 }
 
 void Game::GLInit() {
+	// init res
+	auto&& rootPath = std::filesystem::current_path() / u8"res";
+	tp1.Load(rootPath);
+	tp2.Load(rootPath);
+
 	// init first scene
 	scene.Emplace<Scene_MainMenu>()->Init();
 }

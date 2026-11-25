@@ -1,5 +1,7 @@
 ﻿#pragma once
 #include "pch.h"
+#include <tp1.h>
+#include <tp2.h>
 
 struct Game : xx::GameBase {
 	static constexpr float cFps{ 120 };
@@ -17,6 +19,8 @@ struct Game : xx::GameBase {
 	// runtime vars
 	xx::Rnd rnd;
 	// ...
+	Tp1 tp1;
+	Tp2 tp2;
 
 	void Init() override;
 	void GLInit() override;

@@ -6,6 +6,7 @@ void Scene_Test1::Init() {
 	ui.Emplace()->InitRoot(gg.scale);
 	cam.Init(gg.scale, 1.f, 0);
 
+	// todo: combine tp1 & tp2 by RectPacker
 }
 
 void Scene_Test1::Update() {
@@ -29,6 +30,10 @@ void Scene_Test1::FixedUpdate() {
 }
 
 void Scene_Test1::Draw() {
+	gg.Quad().DrawFrame(gg.tp1.pics_p64, cam.ToGLPos({ -300, 0 }), cam.scale * 5);
+	gg.Quad().DrawFrame(gg.tp2.pics_p64, cam.ToGLPos({ 300, 0 }), cam.scale * 5);
+	gg.Quad().DrawFrame(gg.tp1.pics_a64, cam.ToGLPos({ -300, 0 }), cam.scale * 5, time);
+
 	// ...
 	gg.DrawNode(ui);
 }

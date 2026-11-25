@@ -67,6 +67,7 @@ namespace xx {
         Frame(Shared<GLTexture> t);
         Frame(Shared<GLTexture> t, int32_t x, int32_t y, int32_t w, int32_t h, XY a = 0.5f, int32_t e = 0);
 
+        XY CalcTrimAnchor(XY a) const;
         void Clear();
     };
 

@@ -83,6 +83,11 @@ namespace xx {
         extrude = 0;
     }
 
+    XY Frame::CalcTrimAnchor(XY a) const {
+        auto oy = /* uvTrim.y */ uvTrim.h - uvTrim.y - uvRect.h;  // for opengl flip Y
+        return { (a.x * uvTrim.w - uvTrim.x) / uvRect.w, (a.y * uvTrim.h - oy) / uvRect.h };
+    }
+
     void Frame::Clear() {
         tex.Reset();
     }
