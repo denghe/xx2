@@ -30,7 +30,7 @@ namespace xx {
         // for easy Commit previous different shader
         auto& operator()(this auto&& self) {
 #else
-		template<typename T, typename GB = xx::GameBase>
+		template<typename T, typename GB>
         T& Use() {
 			auto& self = *(T*)this;
 #endif
