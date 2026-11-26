@@ -187,15 +187,15 @@ press ENTER to continue...)#";
 		ajson::load_from_buff(tp, (char*)fd.buf, fd.len);
 		std::cout << "\nhandle file: " << p << std::endl;
 
-		// ensure file size
-		if (tp.size.w != tp.size.h) {
-			std::cerr << "**************************** bad file size. require: width == height: " << p << std::endl;
-			return __LINE__;
-		}
-		if (!std::has_single_bit((uint32_t)tp.size.w)) {
-			std::cerr << "**************************** bad file size( width & height should be 2^n ): " << p << std::endl;
-			return __LINE__;
-		}
+		//// ensure file size
+		//if (tp.size.w != tp.size.h) {
+		//	std::cerr << "**************************** bad file size. require: width == height: " << p << std::endl;
+		//	return __LINE__;
+		//}
+		//if (!std::has_single_bit((uint32_t)tp.size.w)) {
+		//	std::cerr << "**************************** bad file size( width & height should be 2^n ): " << p << std::endl;
+		//	return __LINE__;
+		//}
 
 		// prepare
 		for (auto& f : tp.frames) {

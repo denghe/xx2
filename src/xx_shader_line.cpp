@@ -130,5 +130,22 @@ void main() {
         }
     }
 
+    void Shader_Line::DrawRect(XY bottomLeftPos_, XY size_, xx::RGBA8 color_) {
+        auto points = Alloc(5);
+        points[0].x = points[4].x = bottomLeftPos_.x;
+        points[0].y = points[4].y = bottomLeftPos_.y;
+        points[1].x = bottomLeftPos_.x;
+        points[1].y = bottomLeftPos_.y + size_.y;
+        points[2].x = bottomLeftPos_.x + size_.x;
+        points[2].y = bottomLeftPos_.y + size_.y;
+        points[3].x = bottomLeftPos_.x + size_.x;
+        points[3].y = bottomLeftPos_.y;
+        (xx::RGBA8&)points[0].r = color_;
+        (xx::RGBA8&)points[1].r = color_;
+        (xx::RGBA8&)points[2].r = color_;
+        (xx::RGBA8&)points[3].r = color_;
+        (xx::RGBA8&)points[4].r = color_;
+    }
+
 }
  

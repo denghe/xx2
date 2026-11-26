@@ -5,8 +5,6 @@
 void Scene_Test1::Init() {
 	ui.Emplace()->InitRoot(gg.scale);
 	cam.Init(gg.scale, 1.f, 0);
-
-	// todo: combine tp1 & tp2 by RectPacker
 }
 
 void Scene_Test1::Update() {

@@ -26,6 +26,7 @@ namespace xx {
 		Shader_LineData* Alloc(int32_t num_);
 		void Fill(Shader_LineData const* buf_, int32_t num_);
 		void DrawCircle(XY centerPos_, float radius_, std::optional<float> radians_ = {}, int32_t segments_ = 20, xx::RGBA8 color_ = xx::RGBA8_White);
+		void DrawRect(XY bottomLeftPos_, XY size_, xx::RGBA8 color_ = xx::RGBA8_White);
 	};
 
 }
