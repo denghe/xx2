@@ -2,6 +2,7 @@
 #include "scene_mainmenu.h"
 #include "scene_test1.h"
 #include "scene_test2.h"
+#include "scene_test3.h"
 // ...
 
 void Scene_MainMenu::Init() {
@@ -31,6 +32,12 @@ void Scene_MainMenu::MakeUI() {
 	ui->Make<xx::LabelButton>()->Init(2, offset, anchor, fontSize)("Scene_Test2").onClicked = [this] {
 		gg.MakeScene<Scene_Test2>()->Init();
 	};
+	offset.y -= cLineHeight * 1.5;
+	ui->Make<xx::LabelButton>()->Init(2, offset, anchor, fontSize)("Scene").onClicked = [this] {
+		gg.MakeScene<Test3::Scene>()->Init();
+	};
+
+	gg.clearColor = xx::RGBA8_Black;
 }
 
 void Scene_MainMenu::Update() {

@@ -42,9 +42,12 @@ void Scene_Test2::FixedUpdate() {
 }
 
 void Scene_Test2::Draw() {
-	gg.Quad().DrawFrame(tp1p64, cam.ToGLPos({ -100, -150 }), cam.scale);
-	gg.Quad().DrawFrame(tp2p64, cam.ToGLPos({ 100, -150 }), cam.scale);
-	gg.Quad().DrawFrame(tp1a64, cam.ToGLPos({ -100, -150 }), cam.scale, time);
+	// draw call should be 2( quad + line ), fps > 400
+	for (size_t i = 0; i < 15000; i++) {
+		gg.Quad().DrawFrame(tp1p64, cam.ToGLPos({ -100, -150 }), cam.scale);
+		gg.Quad().DrawFrame(tp2p64, cam.ToGLPos({ 100, -150 }), cam.scale);
+		gg.Quad().DrawFrame(tp1a64, cam.ToGLPos({ -100, -150 }), cam.scale, time);
+	}
 
 	auto& tex = *tp1p64.tex;
 	auto p = cam.ToGLPos({ -tex.size.x / 2, 150 });

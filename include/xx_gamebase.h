@@ -210,6 +210,7 @@ namespace xx {
         void SetWindowSize(XY siz); // for framebuffer only
         void GLViewport();
         void GLClear(RGBA8 c);
+        void SetDefaultGLClearColor(RGBA8 c = {});
         void GLBlendFunc(std::array<uint32_t, 3> const& args);
         void GLBlendFunc();
         void SetBlendPremultipliedAlpha(bool e_ = true);

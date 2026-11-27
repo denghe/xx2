@@ -28,9 +28,12 @@ void Scene_Test1::FixedUpdate() {
 }
 
 void Scene_Test1::Draw() {
-	gg.Quad().DrawFrame(gg.tp1.pics_p64, cam.ToGLPos({ -300, 0 }), cam.scale * 5);
-	gg.Quad().DrawFrame(gg.tp2.pics_p64, cam.ToGLPos({ 300, 0 }), cam.scale * 5);
-	gg.Quad().DrawFrame(gg.tp1.pics_a64, cam.ToGLPos({ -300, 0 }), cam.scale * 5, time);
+	// draw call should be > 30000, fps < 40
+	for (size_t i = 0; i < 15000; i++) {
+		gg.Quad().DrawFrame(gg.tp1.pics_p64, cam.ToGLPos({ -300, 0 }), cam.scale * 5);
+		gg.Quad().DrawFrame(gg.tp2.pics_p64, cam.ToGLPos({ 300, 0 }), cam.scale * 5);
+		gg.Quad().DrawFrame(gg.tp1.pics_a64, cam.ToGLPos({ -300, 0 }), cam.scale * 5, time);
+	}
 
 	// ...
 	gg.DrawNode(ui);

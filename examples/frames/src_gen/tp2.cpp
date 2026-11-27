@@ -6,27 +6,36 @@ xx::Shared<xx::GLTexture> Tp2::Load(std::filesystem::path const& rootPath_, bool
 	if (generateMipmap_) t->TryGenerateMipmap();
 
 	static constexpr xx::UVRect uvrects[] = {
-	{ 30, 30, 64, 64 },
-	{ 30, 155, 62, 53 },
+	{ 68, 52, 40, 32 },
+	{ 1, 1, 64, 64 },
+	{ 1, 68, 64, 64 },
+	{ 68, 1, 48, 48 },
+	{ 1, 135, 62, 53 },
 	};
 
 	static constexpr xx::UVRect uvtrims[] = {
+	{}, 
+	{}, 
+	{}, 
 	{}, 
 	{ 1, 11, 64, 64 },
 	};
 
 	static constexpr xx::XY anchors[] = {
 	{ 0.5 },
+	{ 0.5 },
+	{ 0.5 },
+	{ 0.5 },
 	{ 0.5, 0.9433962 }, // src povit: 0.5, 0.78125
 	};
 
-	for (int32_t i = 0; i < 2; i++) {
+	for (int32_t i = 0; i < 5; i++) {
 		auto& f = ((xx::Frame*)this)[i];
 		f.tex = t;
 		f.uvRect = uvrects[i];
 		f.uvTrim = uvtrims[i];
 		f.anchor = anchors[i];
-		f.extrude = 30;
+		f.extrude = 1;
 	}
 
 	return t;

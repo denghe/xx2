@@ -10,7 +10,7 @@ Data:
 	Prepend folder name: [v]
 Texture:
 	Texture	Format: PNG-32
-	Transparency Handling: Premultiply alpha
+	Transparency Handling: Clear transparent pixel
 Layout:
 	Size constraints: POT (Power of 2)
 	Force squared: [v]

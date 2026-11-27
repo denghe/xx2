@@ -3,10 +3,6 @@
 #include "scene_mainmenu.h"
 Game gg;
 
-// todo:
-// test texture packer to code
-// test combine with extrude & border
-
 int32_t main() {
 	// enter game loop
 	return gg.Run();
