@@ -27,8 +27,8 @@ namespace Test3 {
 
 	struct Cannon {
 		// constexpr prepare
-		static constexpr float cBodyHeight{ gg.tp2._data_pics_circle64.uvRect.h };
-		static constexpr float cBarrelHeight{ gg.tp2._data_pics_barrel32.uvRect.h };
+		static constexpr float cBodyHeight{ gg.tp2._data_pics_circle64_png.uvRect.h };
+		static constexpr float cBarrelHeight{ gg.tp2._data_pics_barrel32_png.uvRect.h };
 
 		// for draw black border
 		static constexpr float cBorderWidth{ 5 };
@@ -67,7 +67,7 @@ namespace Test3 {
 
 	struct Bullet {
 		// constexpr prepare
-		static constexpr float cBodyHeight{ gg.tp2._data_pics_circle32.uvRect.h };
+		static constexpr float cBodyHeight{ gg.tp2._data_pics_circle32_png.uvRect.h };
 
 		// for draw black border
 		static constexpr float cBorderWidth{ 5 };

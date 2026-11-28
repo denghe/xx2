@@ -28,7 +28,7 @@ struct TPTrim {
 };
 
 struct TPNode {
-	std::string name;
+	std::string name, oriName;
 	TPUV uv;
 	TPTrim trim;
 	TPPivot pivot, pivotBak;
@@ -105,6 +105,7 @@ press ENTER to continue...)#";
 		// prepare
 		for (auto& f : tp.frames) {
 			auto& k = f.name;
+			f.oriName = f.name;
 			std::cout << "handle frame: " << k << std::endl;
 			if (k[0] >= '0' && k[0] <= '9') k = '_' + k;
 			for (auto& c : k) {
@@ -177,7 +178,10 @@ press ENTER to continue...)#";
 				extrudeCode = xx::ToString(tp.extrude);
 			}
 
+			// todo: // ../tp1/pics/a64.png
+
 			xx::Append(code1, R"#(
+	// ../)#", codeFileName, "/", f->oriName, R"#(
 	static constexpr xx::FrameData _data_)#", f->name, "{ xx::UVRect{"
 				, uvRectCode, "}, xx::UVRect{", uvTrimCode, "}, xx::XY{", anchorCode, "}, "
 				, extrudeCode, ", 0 };");

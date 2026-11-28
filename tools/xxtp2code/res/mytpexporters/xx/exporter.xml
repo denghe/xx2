@@ -50,7 +50,7 @@
     <supportsMultiPack>false</supportsMultiPack>
 
     <!-- supports file name stripping (remove .png etc) -->
-    <supportsTrimSpriteNames>true</supportsTrimSpriteNames>
+    <supportsTrimSpriteNames>false</supportsTrimSpriteNames>
 
     <!-- supports texure subpath -->
     <supportsTextureSubPath>no</supportsTextureSubPath>

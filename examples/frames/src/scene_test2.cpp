@@ -9,9 +9,9 @@ void Scene_Test2::Init() {
 	// combine tp1 & tp2 by RectPacker
 
 	// step1: copy frame from gg
-	tp1p64 = gg.tp1.pics_p64;
-	tp2p64 = gg.tp2.pics_p64;
-	tp1a64 = gg.tp1.pics_a64;
+	tp1p64 = gg.tp1.pics_p64_png;
+	tp2p64 = gg.tp2.pics_p64_png;
+	tp1a64 = gg.tp1.pics_a64_png;
 
 	// step2: combine & replace vars
 	xx::RectPackerEx rp;
