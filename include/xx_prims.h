@@ -210,6 +210,12 @@ namespace xx {
         uint8_t r, g, b, a;
         bool operator==(RGBA8 const&) const = default;
         bool operator!=(RGBA8 const&) const = default;
+        void SetPMAColor(RGB8 c_, float a_) {
+            r = uint8_t(c_.r * a_);
+            g = uint8_t(c_.g * a_);
+            b = uint8_t(c_.b * a_);
+            a = uint8_t(255.f * a_);
+        }
     };
     constexpr static RGBA8 RGBA8_Zero{ 0,0,0,0 };
     constexpr static RGBA8 RGBA8_Red{ 255,0,0,255 };

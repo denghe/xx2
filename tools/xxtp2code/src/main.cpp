@@ -231,7 +231,7 @@ press ENTER to continue...)#";
 
 struct )#", structName, R"#( {)#", code1, code2, R"#(
 
-	xx::Shared<xx::GLTexture> Load(std::filesystem::path const& rootPath_, bool generateMipmap_ = true);
+	xx::Shared<xx::GLTexture> Load(std::filesystem::path const& rootPath_, bool generateMipmap_ = true, bool pngAutoPremultiplyAlpla_ = true);
 };
 )#");
 		// save to file
@@ -280,8 +280,8 @@ struct )#", structName, R"#( {)#", code1, code2, R"#(
 		xx::Append(code3, R"#(#include "pch.h"
 #include ")#", codeFileName, R"#(.h"
 
-xx::Shared<xx::GLTexture> )#", structName, R"#(::Load(std::filesystem::path const& rootPath_, bool generateMipmap_) {
-	auto t = xx::GameBase::instance->LoadTexture(xx::U8AsString((rootPath_ / ")#", tp.texture, R"#(").u8string()));
+xx::Shared<xx::GLTexture> )#", structName, R"#(::Load(std::filesystem::path const& rootPath_, bool generateMipmap_, bool pngAutoPremultiplyAlpla_) {
+	auto t = xx::GameBase::instance->LoadTexture(xx::U8AsString((rootPath_ / ")#", tp.texture, R"#(").u8string()), pngAutoPremultiplyAlpla_);
 	if (generateMipmap_) t->TryGenerateMipmap();
 )#", code1, code2, R"#(
 	return t;

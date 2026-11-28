@@ -13,5 +13,5 @@ struct Tp1 {
 	xx::Frame pics_p64_png;
 	xx::Frame pics_t64_png;
 
-	xx::Shared<xx::GLTexture> Load(std::filesystem::path const& rootPath_, bool generateMipmap_ = true);
+	xx::Shared<xx::GLTexture> Load(std::filesystem::path const& rootPath_, bool generateMipmap_ = true, bool pngAutoPremultiplyAlpla_ = true);
 };
