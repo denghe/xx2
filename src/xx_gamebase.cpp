@@ -691,12 +691,10 @@ namespace xx {
 		glfwPollEvents();	// fix macos content scale mouse pos issue
 
 		int w{}, h{};
-#ifdef NDEBUG
 		// for small res device ( steamdeck: 1280x800 likely ), if designSize > phys res, set full screen mode
-		if (!title.starts_with("curve")) {
+		if (autoFullScreen) {
 			SetFullScreenMode();
 		}
-#endif
 		glfwGetFramebufferSize(wnd, &w, &h);
 		windowSize.x = (float)w;
 		windowSize.y = (float)h;
@@ -709,7 +707,9 @@ namespace xx {
 
 		// for some ATI/AMD card driver bug fix
 		std::string_view sv((char*)glGetString(GL_VENDOR));
+#if 0
 		isAMDCard = sv.starts_with("ATI") || sv.starts_with("AMD");
+#endif
 
 		// register event callbacks
 

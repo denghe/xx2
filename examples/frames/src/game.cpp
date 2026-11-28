@@ -11,6 +11,9 @@ int32_t main() {
 void Game::Init() {
 	DisableIME();
 	title = "examples_frames";
+#ifdef NDEBUG
+	//autoFullScreen = true;
+#endif
 }
 
 void Game::GLInit() {
@@ -18,6 +21,7 @@ void Game::GLInit() {
 	auto&& rootPath = std::filesystem::current_path() / u8"res";
 	tp1.Load(rootPath);
 	tp2.Load(rootPath);
+	tpfonts.Load(rootPath);
 
 	// init first scene
 	scene.Emplace<Scene_MainMenu>()->Init();

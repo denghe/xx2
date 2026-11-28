@@ -1,42 +1,15 @@
-#include <xx_gamebase.h>
+#include "pch.h"
 #include "tp2.h"
 
 xx::Shared<xx::GLTexture> Tp2::Load(std::filesystem::path const& rootPath_, bool generateMipmap_) {
 	auto t = xx::GameBase::instance->LoadTexture(xx::U8AsString((rootPath_ / "tp2.png").u8string()));
 	if (generateMipmap_) t->TryGenerateMipmap();
 
-	static constexpr xx::UVRect uvrects[] = {
-	{ 68, 52, 40, 32 },
-	{ 1, 1, 64, 64 },
-	{ 1, 68, 64, 64 },
-	{ 68, 1, 48, 48 },
-	{ 1, 135, 62, 53 },
-	};
-
-	static constexpr xx::UVRect uvtrims[] = {
-	{}, 
-	{}, 
-	{}, 
-	{}, 
-	{ 1, 11, 64, 64 },
-	};
-
-	static constexpr xx::XY anchors[] = {
-	{ 0.5 },
-	{ 0.5 },
-	{ 0.5 },
-	{ 0.5 },
-	{ 0.5, 0.9433962 }, // src povit: 0.5, 0.78125
-	};
-
-	for (int32_t i = 0; i < 5; i++) {
-		auto& f = ((xx::Frame*)this)[i];
-		f.tex = t;
-		f.uvRect = uvrects[i];
-		f.uvTrim = uvtrims[i];
-		f.anchor = anchors[i];
-		f.extrude = 1;
-	}
-
+	this->pics_barrel32.Fill(t, _data_pics_barrel32);
+	this->pics_circle32.Fill(t, _data_pics_circle32);
+	this->pics_circle64.Fill(t, _data_pics_circle64);
+	this->pics_p64.Fill(t, _data_pics_p64);
+	this->pics_roundbox48.Fill(t, _data_pics_roundbox48);
+	this->pics_t64.Fill(t, _data_pics_t64);
 	return t;
 };

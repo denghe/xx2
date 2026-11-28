@@ -26,19 +26,21 @@ namespace Test3 {
 	/*****************************************************************************************/
 
 	struct Cannon {
+		// constexpr prepare
+		static constexpr float cBodyHeight{ gg.tp2._data_pics_circle64.uvRect.h };
+		static constexpr float cBarrelHeight{ gg.tp2._data_pics_barrel32.uvRect.h };
+
 		// for draw black border
 		static constexpr float cBorderWidth{ 5 };
-		// (gg.tp2.pics_circle64.uvRect.h + cBorderWidth * 2) / gg.tp2.pics_circle64.uvRect.h;
-		static constexpr float cBlackBorderScale_Body{ 1.15625000 };
-		// (gg.tp2.pics_barrel32.uvRect.h + cBorderWidth * 2) / gg.tp2.pics_barrel32.uvRect.h;
-		static constexpr float cBlackBorderScale_Barrel{ 1.31250000 };
+		static constexpr float cBorderScale_Body{ (cBodyHeight + cBorderWidth * 2) / cBodyHeight };
+		static constexpr float cBorderScale_Barrel{ (cBarrelHeight + cBorderWidth * 2) / cBarrelHeight };
 
 		static constexpr float cBarrelMinDistance{ 20 };
 		static constexpr float cBarrelMaxDistance{ 48 };
 		static constexpr float cBarrelMoveDistance{ cBarrelMaxDistance - cBarrelMinDistance };
 		static constexpr float cShootDelay{ 0.5 };
 		static constexpr float cShootStartupDuration{ 0.25 };
-		static constexpr float cShootRecoveryDuration{ 0.03 };
+		static constexpr float cShootRecoveryDuration{ 0.07 };
 		static constexpr float cBarrelStartupMoveStep{ cBarrelMoveDistance / (gg.cFps * cShootStartupDuration) };
 		static constexpr float cBarrelRecoveryMoveStep{ cBarrelMoveDistance / (gg.cFps * cShootRecoveryDuration) };
 
@@ -64,12 +66,14 @@ namespace Test3 {
 	/*****************************************************************************************/
 
 	struct Bullet {
+		// constexpr prepare
+		static constexpr float cBodyHeight{ gg.tp2._data_pics_circle32.uvRect.h };
+
 		// for draw black border
 		static constexpr float cBorderWidth{ 5 };
-		// (gg.tp2.pics_circle32.uvRect.h + cBorderWidth * 2) / gg.tp2.pics_circle32.uvRect.h;
-		static constexpr float cBlackBorderScale_Body{ 1.3125};
+		static constexpr float cBorderScale_Body{ (cBodyHeight + cBorderWidth * 2) / cBodyHeight };
 		static constexpr float cMaxLife{ 5 };
-		static constexpr float cMoveFrameDistance{ 300 * gg.cDelta };
+		static constexpr float cMoveFrameDistance{ 30 * gg.cDelta };
 
 		XY pos{}, inc{};
 		float radians{};

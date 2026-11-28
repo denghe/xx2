@@ -101,7 +101,10 @@ namespace xx {
 		bool mute{};										// readonly. use SetMute() to change
 
         bool isResizing{};
+#if 0
         bool isAMDCard{};                                   // for ATI graphics card bug fix
+#endif
+        bool autoFullScreen{};
 
         Weak<Node> uiHandler;
         Grid2dBox uiGrid;

@@ -2,103 +2,6 @@
 #include <ajson.hpp>
 #include <iostream>
 
-/*
-* template
-* xxtpFileName.h
-
-#pragma once
-#include <xx_frame.h>
-
-struct XxtpFileName {
-	xx::Frame xxx1;
-	xx::Frame xxx2;
-	xx::Frame xxx3;
-	...
-	std::array<xx::Frame, ???> xxxA_;
-	std::array<xx::Frame, ???> xxxB_;
-	std::array<xx::Frame, ???> xxxC_;
-	...
-	xx::FromTo<XY> _scale9_xxx1;
-	xx::FromTo<XY> _scale9_xxx2;
-	xx::FromTo<XY> _scale9_xxx3;
-	...
-
-	xx::Shared<xx::GLTexture> Load(std::filesystem::path const& rootPath_, bool generateMipmap_ = true);
-};
-
-///////////////////////////////////////////////////////
-
-* xxtpFileName.cpp
-
-#include <xx_gamebase.h>
-#include "xxtpFileName.h"
-
-xx::Shared<xx::GLTexture> XxtpFileName::Load(std::filesystem::path const& rootPath_, bool generateMipmap_ = true) {
-	auto p = rootPath_ / "?????????????.png";
-	auto t = xx::GameBase::instance->LoadTexture(xx::U8AsString(p.u8string()));
-	if(generateMipmap_) t->TryGenerateMipmap();
-
-	static constexpr xx::UVRect uvrects[] = {
-		{X, Y, W, H},
-		{X, Y, W, H},
-		{X, Y, W, H},
-		// ...
-	};
-
-	static constexpr xx::UVRect uvtrims[] = {
-		{},
-		{oX, oY, sW, sH},
-		{},
-		// ...
-	};
-
-	static constexpr xx::XY anchors[] = {
-		{ AX, AY },
-		{ AX, AY },
-		{ AX, AY },
-		// ...
-	};
-
-	static constexpr xx::FromTo<xx::XY> scale9s[] = {
-		{{ ox, oy }, { cw, ch }},
-		{{ ox, oy }, { cw, ch }},
-		{{ ox, oy }, { cw, ch }},
-		// ...
-	};
-
-	for (int32_t i = 0; i < ????????; i++) {
-		auto& f = ((xx::Frame*)this)[i];
-		f.tex = t;
-		f.uvRect = uvrects[i];
-		f.anchor = anchors[i];
-		f.uvTrim = uvtrims[i];
-		f.extrude = ??????????????????;
-	}
-
-	for (int32_t i = 0; i < ????????; i++) {
-		(&this->)_scale9_ first var)[i] = scale9s[i];
-	}
-
-	return t;
-}
-
-
-data example:
-
-{
-  "texture":"test32.png",
-  "size":{"w":128,"h":128},
-  "extrude":1,
-  "frames":[
-	{"name":"32","uv":{"x":1,"y":37,"w":32,"h":32},"scale9":{"x":2,"y":2,"w":28,"h":28}},
-	{"name":"34","uv":{"x":1,"y":1,"w":34,"h":34},"pivot":{"x":0.000000,"y":0.000000},"scale9":{"x":3,"y":3,"w":28,"h":28}},
-	{"name":"p2","uv":{"x":1,"y":71,"w":15,"h":10},"trim":{"oX":10,"oY":7,"sW":34,"sH":34}},
-	{"name":"pivottest","uv":{"x":1,"y":71,"w":15,"h":10},"trim":{"oX":10,"oY":7,"sW":34,"sH":34},"pivot":{"x":0.500000,"y":0.750000}}
-  ]
-}
-
-*/
-
 struct TPUV {
 	int32_t x{ 0 }, y{ 0 }, w{ 0 }, h{ 0 };
 };
@@ -156,7 +59,7 @@ int main() {
 	SetConsoleOutputCP(CP_UTF8);
 	auto&& cp = std::filesystem::current_path();
 	std::cout << "tool: texturepacker xx *.xxtp -> *.h & cpp\n\nworking dir: " << xx::U8AsString(cp.u8string()) << R"#(
-more help: see res/readme.txt
+see also: res/readme.txt, ../examples/frames/src_gen
 press ENTER to continue...)#";
 	std::cin.get();
 
@@ -187,15 +90,17 @@ press ENTER to continue...)#";
 		ajson::load_from_buff(tp, (char*)fd.buf, fd.len);
 		std::cout << "\nhandle file: " << p << std::endl;
 
-		//// ensure file size
-		//if (tp.size.w != tp.size.h) {
-		//	std::cerr << "**************************** bad file size. require: width == height: " << p << std::endl;
-		//	return __LINE__;
-		//}
-		//if (!std::has_single_bit((uint32_t)tp.size.w)) {
-		//	std::cerr << "**************************** bad file size( width & height should be 2^n ): " << p << std::endl;
-		//	return __LINE__;
-		//}
+#if 0
+		// ensure file size
+		if (tp.size.w != tp.size.h) {
+			std::cerr << "**************************** bad file size. require: width == height: " << p << std::endl;
+			return __LINE__;
+		}
+		if (!std::has_single_bit((uint32_t)tp.size.w)) {
+			std::cerr << "**************************** bad file size( width & height should be 2^n ): " << p << std::endl;
+			return __LINE__;
+		}
+#endif
 
 		// prepare
 		for (auto& f : tp.frames) {
@@ -249,37 +154,39 @@ press ENTER to continue...)#";
 			});
 		}
 
-		std::string code, tmp;
-		std::string uvrectsCode, uvtrimsCode, anchorsCode, scale9sCode;
-		int32_t count{};
+
+		std::string code1, code2, code3;
 
 		auto HandleTPNode = [&](TPNode* f) {
-			++count;
-			xx::Append(uvrectsCode, R"#(
-	{ )#", f->uv.x, ", ", f->uv.y, ", ", f->uv.w, ", ", f->uv.h, " },");
+			std::string uvRectCode, uvTrimCode, anchorCode, extrudeCode = "0";
+
+			xx::Append(uvRectCode, f->uv.x, ", ", f->uv.y, ", ", f->uv.w, ", ", f->uv.h);
 			if (f->trim) {
-				xx::Append(uvtrimsCode, R"#(
-	{ )#", f->trim.oX, ", ", f->trim.oY, ", ", f->trim.sW, ", ", f->trim.sH, " },");
-			}
-			else {
-				xx::Append(uvtrimsCode, R"#(
-	{}, )#");
+				xx::Append(uvTrimCode, f->trim.oX, ", ", f->trim.oY, ", ", f->trim.sW, ", ", f->trim.sH);
 			}
 			if (f->pivot.x == f->pivot.y) {
-				xx::Append(anchorsCode, R"#(
-	{ )#", f->pivot.x, " },");
+				xx::Append(anchorCode, f->pivot.x);
 			}
 			else {
-				xx::Append(anchorsCode, R"#(
-	{ )#", f->pivot.x, ", ", f->pivot.y, " },");
+				xx::Append(anchorCode, f->pivot.x, ", ", f->pivot.y);
 			}
 			if (f->trim) {
-				xx::Append(anchorsCode, " // src povit: ", f->pivotBak.x, ", ", f->pivotBak.y);
+				xx::Append(anchorCode, "/* src: ", f->pivotBak.x, ", ", f->pivotBak.y, " */");
 			}
+			if (tp.extrude) {
+				extrudeCode = xx::ToString(tp.extrude);
+			}
+
+			xx::Append(code1, R"#(
+	static constexpr xx::FrameData _data_)#", f->name, "{ xx::UVRect{"
+				, uvRectCode, "}, xx::UVRect{", uvTrimCode, "}, xx::XY{", anchorCode, "}, "
+				, extrudeCode, ", 0 };");
+
 			if (f->scale9) {
-				xx::Append(scale9sCode, R"#(
+				xx::Append(code1, R"#(
 	static constexpr xx::FromTo<xx::XY> _scale9_)#", f->name, "{ {", f->scale9.x, ", ", f->scale9.y, "}, {", f->scale9.w, ", ", f->scale9.h, "} };");
 			}
+
 		};
 
 		for (auto& k : keys) {
@@ -293,14 +200,14 @@ press ENTER to continue...)#";
 				}
 			}
 			HandleTPNode(f);
-			xx::Append(tmp, R"#(
+			xx::Append(code2, R"#(
 	xx::Frame )#", k, R"#(;)#");
 		}
 
 		for (auto&& kv : keyGroups) {
 			auto& k = kv.first;
 			auto& names = kv.second;
-			xx::Append(tmp, R"#(
+			xx::Append(code2, R"#(
 	std::array<xx::Frame, )#", kv.second.size(), R"#(> )#", k, R"#(_;)#");
 			for (int i = 0; i < names.size(); ++i) {
 				auto name = kv.first + "_" + names[i];
@@ -315,60 +222,75 @@ press ENTER to continue...)#";
 			}
 		}
 
-		xx::Append(code, R"#(#pragma once
-#include <xx_frame.h>
+		xx::Append(code3, R"#(#pragma once
+#include "pch.h"
 
-struct )#", structName, R"#( {)#", tmp, scale9sCode, R"#(
+struct )#", structName, R"#( {)#", code1, code2, R"#(
 
 	xx::Shared<xx::GLTexture> Load(std::filesystem::path const& rootPath_, bool generateMipmap_ = true);
 };
 )#");
 		// save to file
 		auto fn = codeFileName + ".h";
-		if (int r = xx::WriteAllBytes((std::u8string&)fn, code.data(), code.size())) {
+		if (int r = xx::WriteAllBytes((std::u8string&)fn, code3.data(), code3.size())) {
 			std::cerr << "write file failed! r = " << r << std::endl;
 			return __LINE__;
 		}
 
-		code.clear();
-		tmp.clear();
+		code1.clear();
+		code2.clear();
+		code3.clear();
 
-		xx::Append(tmp, R"#(
-	static constexpr xx::UVRect uvrects[] = {)#", uvrectsCode, R"#(
-	};
+		for (auto& k : keys) {
+			if (keyGroups.contains(k))
+				continue;
+			auto f = &tp.frames[0];
+			for (auto& o : tp.frames) {
+				if (o.name == k) {
+					f = &o;
+					break;
+				}
+			}
+			xx::Append(code2, R"#(
+	this->)#", k, ".Fill(t, _data_", f->name, ");");
+		}
 
-	static constexpr xx::UVRect uvtrims[] = {)#", uvtrimsCode, R"#(
-	};
+		for (auto&& kv : keyGroups) {
+			auto& k = kv.first;
+			auto& names = kv.second;
+			int32_t idx{};
+			for (int i = 0; i < names.size(); ++i) {
+				auto name = kv.first + "_" + names[i];
+				auto f = &tp.frames[0];
+				for (auto& o : tp.frames) {
+					if (o.name == name) {
+						f = &o;
+						break;
+					}
+				}
+				xx::Append(code2, R"#(
+	((xx::Frame*)&this->)#", k, "_)[", idx++ ,"].Fill(t, _data_", f->name, ");");
+			}
+		}
 
-	static constexpr xx::XY anchors[] = {)#", anchorsCode, R"#(
-	};
-
-	for (int32_t i = 0; i < )#", count, R"#(; i++) {
-		auto& f = ((xx::Frame*)this)[i];
-		f.tex = t;
-		f.uvRect = uvrects[i];
-		f.uvTrim = uvtrims[i];
-		f.anchor = anchors[i];
-		f.extrude = )#", tp.extrude, R"#(;
-	}
-)#");
-
-		xx::Append(code, R"#(#include <xx_gamebase.h>
+		xx::Append(code3, R"#(#include "pch.h"
 #include ")#", codeFileName, R"#(.h"
 
 xx::Shared<xx::GLTexture> )#", structName, R"#(::Load(std::filesystem::path const& rootPath_, bool generateMipmap_) {
 	auto t = xx::GameBase::instance->LoadTexture(xx::U8AsString((rootPath_ / ")#", tp.texture, R"#(").u8string()));
 	if (generateMipmap_) t->TryGenerateMipmap();
-)#", tmp, R"#(
+)#", code1, code2, R"#(
 	return t;
 };
 )#");
 		// save to file
 		fn = codeFileName + ".cpp";
-		if (int r = xx::WriteAllBytes((std::u8string&)fn, code.data(), code.size())) {
+		if (int r = xx::WriteAllBytes((std::u8string&)fn, code3.data(), code3.size())) {
 			std::cerr << "write file failed! r = " << r << std::endl;
 			return __LINE__;
 		}
+
+
 	}
 	xx::CoutN("finished! press ENTER to continue...");
 	std::cin.get();

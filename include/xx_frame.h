@@ -34,21 +34,28 @@ namespace xx {
         void Clear();
     };
 
-
-    // sprite frame with anchor point
-    struct Frame {
+    // Frame part 1
+    struct FrameTex {
         Shared<GLTexture> tex;
-        union {
-			uint64_t props[4]{};            // for memcpy & simple initialization
+    };
+
+    // Frame part 2
+    // for static constexpr declare & easy copy value to Frame
+    struct FrameData {
+    union {
         struct {
             UVRect uvRect;
             UVRect uvTrim;
             XY anchor;
-		    int32_t extrude;
-		    int32_t spineEventIndex;
+            int32_t extrude;
+            int32_t spineEventIndex;
         };
-        };
+        std::array<uint64_t, 4> props{};            // for memcpy & simple initialization
+    };
+    };
 
+    // sprite frame with anchor point
+    struct Frame : FrameTex, FrameData {
         Frame() = default;
         Frame(Frame const&) = default;
         Frame(Frame&&) = default;
@@ -68,6 +75,7 @@ namespace xx {
         Frame(Shared<GLTexture> t, int32_t x, int32_t y, int32_t w, int32_t h, XY a = 0.5f, int32_t e = 0);
 
         XY CalcTrimAnchor(XY a) const;
+        void Fill(Shared<GLTexture> const& t_, FrameData const& d_);
         void Clear();
     };
 

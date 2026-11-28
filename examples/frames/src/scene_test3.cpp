@@ -124,8 +124,8 @@ namespace Test3 {
 	void Cannon::Draw1() {
 		auto& cam = scene->cam;
 		// draw black border
-		gg.Quad().DrawFrame(gg.tp2.pics_circle64, cam.ToGLPos(pos), cBlackBorderScale_Body * cam.scale, -radians, 1, xx::RGBA8_Black);
-		gg.Quad().DrawFrame(gg.tp2.pics_barrel32, cam.ToGLPos(barrelPos), cBlackBorderScale_Barrel * cam.scale, -radians, 1, xx::RGBA8_Black);
+		gg.Quad().DrawFrame(gg.tp2.pics_circle64, cam.ToGLPos(pos), cBorderScale_Body * cam.scale, -radians, 1, xx::RGBA8_Black);
+		gg.Quad().DrawFrame(gg.tp2.pics_barrel32, cam.ToGLPos(barrelPos), cBorderScale_Barrel * cam.scale, -radians, 1, xx::RGBA8_Black);
 	}
 
 	void Cannon::Draw2() {
@@ -159,13 +159,13 @@ namespace Test3 {
 	void Bullet::Draw1() {
 		auto& cam = scene->cam;
 		// draw black border
-		gg.Quad().DrawFrame(gg.tp2.pics_circle64, cam.ToGLPos(pos), cBlackBorderScale_Body  * cam.scale * 0.5f, -radians, 1, xx::RGBA8_Black);
+		gg.Quad().DrawFrame(gg.tp2.pics_circle32, cam.ToGLPos(pos), cBorderScale_Body  * cam.scale, -radians, 1, xx::RGBA8_Black);
 	}
 
 	void Bullet::Draw2() {
 		auto& cam = scene->cam;
 		// draw shape
-		gg.Quad().DrawFrame(gg.tp2.pics_circle64, cam.ToGLPos(pos), cam.scale * 0.5f, -radians);
+		gg.Quad().DrawFrame(gg.tp2.pics_circle32, cam.ToGLPos(pos), cam.scale, -radians);
 	}
 
 }

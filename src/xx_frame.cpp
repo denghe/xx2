@@ -88,6 +88,11 @@ namespace xx {
         return { (a.x * uvTrim.w - uvTrim.x) / uvRect.w, (a.y * uvTrim.h - oy) / uvRect.h };
     }
 
+    void Frame::Fill(Shared<GLTexture> const& t_, FrameData const& d_) {
+        tex = t_;
+        props = d_.props;
+    }
+
     void Frame::Clear() {
         tex.Reset();
     }

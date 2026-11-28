@@ -2,6 +2,7 @@
 #include "pch.h"
 #include <tp1.h>
 #include <tp2.h>
+#include <tpfonts.h>
 
 struct Game : xx::GameBase {
 	static constexpr float cFps{ 120 };
@@ -21,6 +22,7 @@ struct Game : xx::GameBase {
 	// ...
 	Tp1 tp1;
 	Tp2 tp2;
+	Tpfonts tpfonts;
 
 	void Init() override;
 	void GLInit() override;
